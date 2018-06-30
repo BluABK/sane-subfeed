@@ -54,6 +54,75 @@ def get_my_uploads(youtube):
         print('An HTTP error %d occurred:\n%s' % (e.resp.status, e.content))
 
 
+# Remove keyword arguments that are not set.
+def remove_empty_kwargs(**kwargs):
+    good_kwargs = {}
+    if kwargs is not None:
+        for key, value in kwargs.items():
+            if value:
+                good_kwargs[key] = value
+
+    return good_kwargs
+
+
+def subscriptions_list_my_subscriptions(client, **kwargs):
+    # See full sample for function
+    kwargs = remove_empty_kwargs(**kwargs)
+
+    response = client.subscriptions().list(
+        **kwargs
+    ).execute()
+
+    # return print_response(response)
+    return response
+
+
+# get_my_subscriptions():
+
+
 if __name__ == '__main__':
     youtube = get_authenticated_service()
-    get_my_uploads(youtube)
+    # get_my_uploads(youtube)
+    response = subscriptions_list_my_subscriptions(client=youtube,
+                                                   part='snippet,contentDetails',
+                                                   mine=True)
+    subscription_total = response['pageInfo']['totalResults']
+    subscription_list = response['items']
+
+    print("Found %s subscriptions." % subscription_total)
+
+    if 'nextPageToken' in response:
+        next_page = True
+        next_page_token = response['nextPageToken']
+        print("DEBUG: Querying PageToken: ", end='')
+
+        while next_page:
+            print(", %s" % next_page_token, end='')
+            this_response = subscriptions_list_my_subscriptions(client=youtube,
+                                                                part='snippet,contentDetails',
+                                                                mine=True,
+                                                                pageToken=next_page_token)
+            subscription_list += this_response['items']
+
+            if 'nextPageToken' in this_response:
+                next_page_token = this_response['nextPageToken']
+            else:
+                print("")
+                next_page = False
+
+    subscribed_channels = {}
+    for item in subscription_list:
+        item_id = item['id']
+        channel_title = item['snippet']['title']
+        channel_description = item['snippet']['description']
+        channel_id = item['snippet']['resourceId']['channelId']
+
+        subscribed_channels.update({channel_id: channel_title})
+
+        print("[%s] %s: %s" % (channel_id, channel_title, repr(channel_description)))  # end result
+
+    if subscription_total != len(subscription_list):
+        print("WARNING: Subscription list mismatched advertised length (%s/%s)!" % (len(subscription_list),
+                                                                                    subscription_total))
+    print("================ DEBUG SPAM COMMENCES BELOW THIS LINE ================")
+    print(subscription_list)
