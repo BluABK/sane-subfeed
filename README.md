@@ -12,3 +12,5 @@
     ```
     pip install --upgrade google-auth google-auth-oauthlib google-auth-httplib2
     ```
+
+* https://developers.google.com/youtube/v3/getting-started
