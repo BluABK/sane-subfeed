@@ -15,7 +15,7 @@ from googleapiclient.errors import HttpError
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 # Internal resources
-import my_uploads
+# import my_uploads
 
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application, including its client_id and
@@ -43,17 +43,6 @@ def get_authenticated_service():
     return build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
 
-def get_my_uploads(youtube):
-    try:
-        uploads_playlist_id = my_uploads.get_my_uploads_list(youtube)
-        if uploads_playlist_id:
-            my_uploads.list_my_uploaded_videos(youtube, uploads_playlist_id)
-        else:
-            print('There is no uploaded videos playlist for this user.')
-    except HttpError as e:
-        print('An HTTP error %d occurred:\n%s' % (e.resp.status, e.content))
-
-
 # Remove keyword arguments that are not set.
 def remove_empty_kwargs(**kwargs):
     good_kwargs = {}
@@ -77,12 +66,109 @@ def subscriptions_list_my_subscriptions(client, **kwargs):
     return response
 
 
-# get_my_subscriptions():
+def channels_list_by_id(**kwargs):
+    # See full sample for function
+    kwargs = remove_empty_kwargs(**kwargs)
+
+    response = youtube.channels().list(
+        **kwargs
+    ).execute()
+
+    return response
+
+
+def playlists_list_by_id(**kwargs):
+    # See full sample for function
+    kwargs = remove_empty_kwargs(**kwargs)
+
+    response = youtube.playlists().list(**kwargs).execute()
+
+    return response
+
+
+def playlist_items_list_by_playlist_id(**kwargs):
+    # See full sample for function
+    kwargs = remove_empty_kwargs(**kwargs)
+
+    response = youtube.playlistItems().list(**kwargs).execute()
+
+    return response
+
+
+def get_uploads_list(playlist_id):
+    # Retrieve the contentDetails part of the channel resource for the
+    # authenticated user's channel.
+    channels_response = youtube.channels().list(
+        id=playlist_id,
+        part='contentDetails'
+    ).execute()
+
+    for channel in channels_response['items']:
+        # From the API response, extract the playlist ID that identifies the list
+        # of videos uploaded to the authenticated user's channel.
+        return channel['contentDetails']['relatedPlaylists']['uploads']
+
+    return None
+
+
+def list_uploaded_videos(uploads_playlist_id):
+    # Retrieve the list of videos uploaded to the authenticated user's channel.
+    playlistitems_list_request = youtube.playlistItems().list(
+        playlistId=uploads_playlist_id,
+        part='snippet',
+        maxResults=5
+    )
+
+    print('Videos in list %s' % uploads_playlist_id)
+    while playlistitems_list_request:
+        playlistitems_list_response = playlistitems_list_request.execute()
+
+        # Print information about each video.
+        for playlist_item in playlistitems_list_response['items']:
+            title = playlist_item['snippet']['title']
+            video_id = playlist_item['snippet']['resourceId']['videoId']
+            print('%s (%s)' % (title, video_id))
+
+        playlistitems_list_request = youtube.playlistItems().list_next(
+            playlistitems_list_request, playlistitems_list_response)
+
+
+def get_uploads(playlist_id):
+    try:
+        uploads_playlist_id = get_uploads_list(playlist_id)
+        if uploads_playlist_id:
+            list_uploaded_videos(uploads_playlist_id)
+        else:
+            print('There is no uploaded videos playlist for this user.')
+    except HttpError as e:
+        print('An HTTP error %d occurred:\n%s' % (e.resp.status, e.content))
 
 
 if __name__ == '__main__':
     youtube = get_authenticated_service()
-    # get_my_uploads(youtube)
+    # get_uploads(mine=True)
+
+    # Get channel
+    test_chan = channels_list_by_id(part='snippet,contentDetails,statistics',
+                                    id='UCZn2JQsQd3MXH07aI9TDI3g')
+
+    # Get ID of uploads playlist
+    test_chan_uploads_playlist_id = test_chan['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+    # Should be UUZn2JQsQd3MXH07aI9TDI3g
+    print(test_chan_uploads_playlist_id)
+    print("UUZn2JQsQd3MXH07aI9TDI3g")
+
+    # Get playlistListResponse item of uploads playlist
+    test_chan_uploads_playlist = playlist_items_list_by_playlist_id(part='snippet,contentDetails',
+                                       maxResults=25,
+                                       playlistId=test_chan_uploads_playlist_id)
+
+    list_uploaded_videos(test_chan_uploads_playlist_id)
+
+    print(test_chan_uploads_playlist)
+    get_uploads(test_chan_uploads_playlist)
+
+    exit()
     response = subscriptions_list_my_subscriptions(client=youtube,
                                                    part='snippet,contentDetails',
                                                    mine=True)
@@ -124,5 +210,6 @@ if __name__ == '__main__':
     if subscription_total != len(subscription_list):
         print("WARNING: Subscription list mismatched advertised length (%s/%s)!" % (len(subscription_list),
                                                                                     subscription_total))
+
     print("================ DEBUG SPAM COMMENCES BELOW THIS LINE ================")
     print(subscription_list)
