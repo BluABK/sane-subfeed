@@ -35,6 +35,10 @@ SCOPES = ['https://www.googleapis.com/auth/youtube.readonly']
 API_SERVICE_NAME = 'youtube'
 API_VERSION = 'v3'
 
+YOUTUBE_URL = "https://www.youtube.com/"
+YOUTUBE_PARM_VIDEO = "watch?v="
+YT_VIDEO_URL = YOUTUBE_URL + YOUTUBE_PARM_VIDEO
+
 
 # Authorize the request and store authorization credentials.
 def get_authenticated_service():
@@ -95,22 +99,6 @@ def playlist_items_list_by_playlist_id(**kwargs):
     return response
 
 
-def get_uploads_list(playlist_id):
-    # Retrieve the contentDetails part of the channel resource for the
-    # authenticated user's channel.
-    channels_response = youtube.channels().list(
-        id=playlist_id,
-        part='contentDetails'
-    ).execute()
-
-    for channel in channels_response['items']:
-        # From the API response, extract the playlist ID that identifies the list
-        # of videos uploaded to the authenticated user's channel.
-        return channel['contentDetails']['relatedPlaylists']['uploads']
-
-    return None
-
-
 def list_uploaded_videos(uploads_playlist_id):
     # Retrieve the list of videos uploaded to the authenticated user's channel.
     playlistitems_list_request = youtube.playlistItems().list(
@@ -127,26 +115,18 @@ def list_uploaded_videos(uploads_playlist_id):
         for playlist_item in playlistitems_list_response['items']:
             title = playlist_item['snippet']['title']
             video_id = playlist_item['snippet']['resourceId']['videoId']
-            print('%s (%s)' % (title, video_id))
+            date_published = playlist_item['snippet']['publishedAt']
+            description = playlist_item['snippet']['description']
+            thumbnails = playlist_item['snippet']['thumbnails']
+
+            print('%s\t%s%s\t%s\t%s' % (date_published, YT_VIDEO_URL, video_id, title, repr(description)))
 
         playlistitems_list_request = youtube.playlistItems().list_next(
             playlistitems_list_request, playlistitems_list_response)
 
 
-def get_uploads(playlist_id):
-    try:
-        uploads_playlist_id = get_uploads_list(playlist_id)
-        if uploads_playlist_id:
-            list_uploaded_videos(uploads_playlist_id)
-        else:
-            print('There is no uploaded videos playlist for this user.')
-    except HttpError as e:
-        print('An HTTP error %d occurred:\n%s' % (e.resp.status, e.content))
-
-
 if __name__ == '__main__':
     youtube = get_authenticated_service()
-    # get_uploads(mine=True)
 
     # Get channel
     test_chan = channels_list_by_id(part='snippet,contentDetails,statistics',
@@ -154,19 +134,9 @@ if __name__ == '__main__':
 
     # Get ID of uploads playlist
     test_chan_uploads_playlist_id = test_chan['items'][0]['contentDetails']['relatedPlaylists']['uploads']
-    # Should be UUZn2JQsQd3MXH07aI9TDI3g
-    print(test_chan_uploads_playlist_id)
-    print("UUZn2JQsQd3MXH07aI9TDI3g")
 
     # Get playlistListResponse item of uploads playlist
-    test_chan_uploads_playlist = playlist_items_list_by_playlist_id(part='snippet,contentDetails',
-                                       maxResults=25,
-                                       playlistId=test_chan_uploads_playlist_id)
-
     list_uploaded_videos(test_chan_uploads_playlist_id)
-
-    print(test_chan_uploads_playlist)
-    get_uploads(test_chan_uploads_playlist)
 
     exit()
     response = subscriptions_list_my_subscriptions(client=youtube,
