@@ -8,7 +8,9 @@
 from math import fsum
 from collections import OrderedDict
 from timeit import default_timer as timer
+import time
 import threading
+# import multiprocessing.dummy as mp
 
 # Google/YouTube API
 # import google.oauth2.credentials
@@ -194,22 +196,96 @@ def process_subscriptions(subs, info=False):
     return channels
 
 
-def get_uploads_all_channels(subs, debug=False, info=False, threads=10):
+class GetUploadsThread(threading.Thread):
+    def __init__(self, thread_id, channel, info=False, debug=False):
+        threading.Thread.__init__(self)
+        self.thread_id = thread_id
+        self.channel = channel
+        self.info = info
+        self.debug = debug
+        self.statistics = {}
+        self.videos = []
+        self.job_done = False
+
+    def run(self):
+        channel_title = self.channel['snippet']['title']
+        channel_id = self.channel['snippet']['resourceId']['channelId']
+        print("Starting #%s for channel: %s" % (self.thread_id, channel_title))
+        if self.info:
+            print("\tFetching Uploaded videos for channel: %s" % channel_title)
+        retval = get_uploads(channel_id, debug=self.debug)
+
+        self.videos = retval[0]
+        self.statistics = retval[1]
+
+        self.job_done = True
+        print("Exiting #%s" % self.thread_id)
+
+    def get_videos(self):
+        return self.videos
+
+    def get_statistics(self):
+        return self.statistics
+
+    def get_id(self):
+        return self.thread_id
+
+    def finished(self):
+        return self.job_done
+
+
+def get_uploads_all_channels(subs, debug=False, info=False, threads=4):
     statistics = []
     new_videos_by_timestamp = {}
 
-    for channel in subs:
-        #threading.Thread()
-        channel_title = channel['snippet']['title']
-        channel_id = channel['snippet']['resourceId']['channelId']
-        if info:
-            print("Fetching Uploaded videos for channel: %s" % channel_title)
-        tmp = get_uploads(channel_id, debug=debug)
-        new_videos_channel = tmp[0]
-        statistics.append(tmp[1])
+    thread_increment = 0
+    thread_list = []
+    threads_running = {}
+    if threads > 0:
+        for channel in subs:
+            print(threads_running)
+            for tid, t in threads_running:
+                if t.finished():
+                    t.join()
+                    threads_running.pop(tid)
 
-        for vid in new_videos_channel:
-            new_videos_by_timestamp.update({vid['date']: vid})
+            # Ensure not starting more threads than given thread limit
+            while len(threads_running.items()) >= threads:
+                for tid, thread in threads_running:
+                    if thread.finished():
+                        thread.join()
+                        threads_running.pop(tid)
+
+            thread = GetUploadsThread(thread_increment, channel, info=True, debug=False)
+            thread.start()
+            threads_running.update({str(thread_increment): thread})
+            print(threads_running)
+            thread_list.append(thread)
+            thread_increment += 1
+
+        print("Iterating over thread list...")
+        for t in thread_list:
+            while t.finished() is not True:
+                print("BUG: Thread #%s is still not done... Sleeping for 10 seconds" % t.get_id())
+                time.sleep(10)
+            for vid in t.get_videos():
+                new_videos_by_timestamp.update({vid['date']: vid})
+
+            statistics.append(t.get_statistics())
+    # TODO: Legacy failsafe until thread implementation works
+    else:
+        for channel in subs:
+            # threading.Thread()
+            channel_title = channel['snippet']['title']
+            channel_id = channel['snippet']['resourceId']['channelId']
+            if info:
+                print("Fetching Uploaded videos for channel: %s" % channel_title)
+            tmp = get_uploads(channel_id, debug=debug)
+            new_videos_channel = tmp[0]
+            statistics.append(tmp[1])
+
+            for vid in new_videos_channel:
+                new_videos_by_timestamp.update({vid['date']: vid})
 
     # Return a reverse chronological sorted OrderedDict (newest --> oldest)
     retval = OrderedDict(sorted(new_videos_by_timestamp.items(), reverse=True))
@@ -267,7 +343,7 @@ if __name__ == '__main__':
 
     # Fetch uploaded videos for each subscribed channel
     timer_start = timer()
-    subscription_feed = get_uploads_all_channels(subscription_list, debug=False, threads=10)  # FIXME: Re-using subscription_list?
+    subscription_feed = get_uploads_all_channels(subscription_list, debug=False, threads=0)  # FIXME: Re-using subscription_list?
     timer_end = timer()
     subfeed_time_elapsed = (timer_end - timer_start)
 
