@@ -208,7 +208,7 @@ if __name__ == '__main__':
         channel_id = channel['snippet']['resourceId']['channelId']
         print("Fetching Uploaded videos for channel: %s" % channel_title)
 
-        new_videos_channel = get_uploads(channel_id, debug=True)
+        new_videos_channel = get_uploads(channel_id, debug=False)
 
         new_videos_by_channel.update({channel_title: new_videos_channel})
         for video in new_videos_channel:
@@ -216,8 +216,13 @@ if __name__ == '__main__':
 
     new_videos = OrderedDict(sorted(new_videos_by_timestamp.items(), reverse=True))
 
+    # TODO: Omit really old videos from feed (possibly implement in the uploaded videos fetching part)
+    # TODO: Make list havea sensible length and not subscriptions*25 (Currently mitigated by 'i')
     print("Supposedly sane and datestamp sorted subscription feed:")
     for i, (date, video) in enumerate(new_videos.items()):
+        # Cut off at a sensible length # FIXME: Hack
+        if i > 100:
+            break
         offset = ocd_longest_channel_title - len(video['channel'])
         spacing = " " * offset + " " * 4
         print('%s\t%s%s\t%s:%s%s\t%s' % (video['date'], YT_VIDEO_URL, video['id'], video['channel'], spacing,
