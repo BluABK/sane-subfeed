@@ -80,6 +80,7 @@ def channels_list_by_id(**kwargs):
 
 
 def list_uploaded_videos(uploads_playlist_id, debug=False, limit=25):
+    _timer_start = timer()
     # Retrieve the list of videos uploaded to the authenticated user's channel.
     playlistitems_list_request = youtube.playlistItems().list(
         maxResults=5, part='snippet', playlistId=uploads_playlist_id)
@@ -88,6 +89,7 @@ def list_uploaded_videos(uploads_playlist_id, debug=False, limit=25):
         print('Videos in list %s' % uploads_playlist_id)
 
     videos = []
+    channel_title = "ERROR: CHANNEL TITLE WAS N/A"  # Store the channel title for use in statistics
     while playlistitems_list_request:
         playlistitems_list_response = playlistitems_list_request.execute()
 
@@ -108,11 +110,17 @@ def list_uploaded_videos(uploads_playlist_id, debug=False, limit=25):
                            'description': description, 'thumbnails': thumbnails})
             # videos.append([date_published, video_id, channel_title, title, description])
             if len(videos) >= limit:
-                return videos
+                _timer_end = timer()
+                statistics = {'channel_title': channel_title, 'time_elapsed': (_timer_end - _timer_start)}
+                return [videos, statistics]
 
+        # Keep traversing pages
         playlistitems_list_request = youtube.playlistItems().list_next(
             playlistitems_list_request, playlistitems_list_response)
-    return videos
+    _timer_end = timer()
+    statistics = {'channel_title': channel_title, 'time_elapsed': (_timer_end - _timer_start)}
+
+    return [videos, statistics]
 
 
 def get_uploads(channel_id, debug=False, limit=25):
@@ -186,19 +194,19 @@ def process_subscriptions(subs, info=False):
     return channels
 
 
-def get_uploads_all_channels(subs, debug=False, info=False):
+def get_uploads_all_channels(subs, debug=False, info=False, threads=10):
     statistics = []
     new_videos_by_timestamp = {}
 
     for channel in subs:
+        #threading.Thread()
         channel_title = channel['snippet']['title']
         channel_id = channel['snippet']['resourceId']['channelId']
         if info:
             print("Fetching Uploaded videos for channel: %s" % channel_title)
-        _timer_start = timer()
-        new_videos_channel = get_uploads(channel_id, debug=debug)
-        _timer_end = timer()
-        statistics.append({'channel_title': channel_title, 'time_elapsed': (_timer_end - _timer_start)})
+        tmp = get_uploads(channel_id, debug=debug)
+        new_videos_channel = tmp[0]
+        statistics.append(tmp[1])
 
         for vid in new_videos_channel:
             new_videos_by_timestamp.update({vid['date']: vid})
@@ -259,7 +267,7 @@ if __name__ == '__main__':
 
     # Fetch uploaded videos for each subscribed channel
     timer_start = timer()
-    subscription_feed = get_uploads_all_channels(subscription_list, debug=False)  # FIXME: Re-using subscription_list?
+    subscription_feed = get_uploads_all_channels(subscription_list, debug=False, threads=10)  # FIXME: Re-using subscription_list?
     timer_end = timer()
     subfeed_time_elapsed = (timer_end - timer_start)
 
