@@ -8,10 +8,10 @@ import argparse
 import os
 import re
 
-import google.oauth2.credentials
-import google_auth_oauthlib.flow
+#import google.oauth2.credentials
+#import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
+#from googleapiclient.errors import HttpError
 from google_auth_oauthlib.flow import InstalledAppFlow
 from collections import OrderedDict
 
@@ -152,27 +152,26 @@ def get_uploads(channel_id, debug=False, max=25):
     return list_uploaded_videos(test_chan_uploads_playlist_id, debug=debug, max=max)
 
 
-if __name__ == '__main__':
-    debug_main = True
-    youtube = get_authenticated_service()
-
+def get_subscriptions(info=False, debug=False, traverse_pages=True):
     response = subscriptions_list_my_subscriptions(client=youtube,
                                                    part='snippet,contentDetails',
                                                    mine=True)
     subscription_total = response['pageInfo']['totalResults']
     subscription_list = response['items']
 
-    print("Found %s subscriptions." % subscription_total)
+    if info:
+        print("Found %s subscriptions." % subscription_total)
 
-    if 'nextPageToken' in response:
-        #next_page = False # FIXME: DEBUG HACK: skip processing entire sublist
+    if traverse_pages and 'nextPageToken' in response:
+        # next_page = False # FIXME: DEBUG HACK: skip processing entire sublist
         next_page = True
         next_page_token = response['nextPageToken']
-        #print("DEBUG: Querying PageToken: ", end='')
-        print("Querying PageTokens...")
+        # print("DEBUG: Querying PageToken: ", end='')
+        if debug:
+            print("Querying PageTokens...")
 
         while next_page:
-            #print(", %s" % next_page_token, end='')
+            # print(", %s" % next_page_token, end='')
             this_response = subscriptions_list_my_subscriptions(client=youtube,
                                                                 part='snippet,contentDetails',
                                                                 mine=True,
@@ -185,50 +184,86 @@ if __name__ == '__main__':
                 print("")
                 next_page = False
 
-    subscribed_channels = {}
-    ocd_longest_channel_title = 0
+    return [subscription_total, subscription_list]
+
+
+def process_subscriptions(info=False):
+    channels = {}
+    longest_title = 0
     for item in subscription_list:
         item_id = item['id']
-        channel_title = item['snippet']['title']
-        channel_description = item['snippet']['description']
-        channel_id = item['snippet']['resourceId']['channelId']
+        title = item['snippet']['title']
+        description = item['snippet']['description']
+        cid = item['snippet']['resourceId']['channelId']
 
         # Fix spacing issues between Channel and Video Title
-        if len(channel_title) > ocd_longest_channel_title:
-            ocd_longest_channel_title = len(channel_title)
+        if len(title) > longest_title:
+            longest_title = len(title)
 
-        subscribed_channels.update({channel_id: channel_title})
+        # Put channels and relevant data into a dict that is easier to handle
+        channels.update({'id': cid, 'title': title, 'description': description, 'longest_title': longest_title})
 
-        print("[%s] %s: %s" % (channel_id, channel_title, repr(channel_description)))  # end result
+        if info:
+            print("[%s] %s: %s" % (id, title, repr(description)))  # end result
 
-    if subscription_total != len(subscription_list):
-        print("WARNING: Subscription list mismatched advertised length (%s/%s)!" % (len(subscription_list),
-                                                                                    subscription_total))
-    new_videos_by_channel = {}
+    return channels
+
+
+def get_uploads_all_channels(debug=False):
+    # new_videos_by_channel = {}
     new_videos_by_timestamp = {}
     for channel in subscription_list:
         channel_title = channel['snippet']['title']
         channel_id = channel['snippet']['resourceId']['channelId']
-        if debug_main:
+        if debug:
             print("Fetching Uploaded videos for channel: %s" % channel_title)
 
         new_videos_channel = get_uploads(channel_id, debug=False)
+        # new_videos_by_channel.update({channel_title: new_videos_channel})
 
-        new_videos_by_channel.update({channel_title: new_videos_channel})
-        for video in new_videos_channel:
-            new_videos_by_timestamp.update({video['date']: video})
+        for vid in new_videos_channel:
+            new_videos_by_timestamp.update({vid['date']: vid})
 
-    new_videos = OrderedDict(sorted(new_videos_by_timestamp.items(), reverse=True))
+    # Return a reverse chronological sorted OrderedDict (newest --> oldest)
+    return OrderedDict(sorted(new_videos_by_timestamp.items(), reverse=True))
 
+
+def print_subscription_feed(cutoff=20):
     # TODO: Omit really old videos from feed (possibly implement in the uploaded videos fetching part)
     # TODO: Make list have a sensible length and not subscriptions*25 (Currently mitigated by 'i')
-    print("Supposedly sane and datestamp sorted subscription feed:")
-    for i, (date, video) in enumerate(new_videos.items()):
+    for i, (date, video) in enumerate(subscription_feed.items()):
         # Cut off at a sensible length # FIXME: Hack
-        if i > 100:
+        if i > cutoff:
             break
-        offset = ocd_longest_channel_title - len(video['channel'])
+        # TODO: Use longest title of current list, not entire subscriptions.
+        offset = subscribed_channels['longest_title'] - len(video['channel'])
         spacing = " " * offset + " " * 4
-        print('%s\t%s%s\t%s:%s%s\t%s' % (video['date'], YT_VIDEO_URL, video['id'], video['channel'], spacing,
-                                           video['title'], repr(video['description'])))
 
+        print('%s\t%s%s\t%s:%s%s\t%s' % (video['date'], YT_VIDEO_URL, video['id'], video['channel'], spacing,
+                                         video['title'], repr(video['description'])))
+
+
+if __name__ == '__main__':
+    debug_main = True
+
+    # Auth OAuth2 with YouTube API
+    youtube = get_authenticated_service()
+
+    # Get authenticated user's subscriptions
+    subscriptions = get_subscriptions(info=True)
+    subscription_total = subscriptions[0]
+    subscription_list = subscriptions[1]
+
+    if subscription_total != len(subscription_list):
+        print("WARNING: Subscription list mismatched advertised length (%s/%s)!" % (len(subscription_list),
+                                                                                    subscription_total))
+
+    # Process subscriptions and related data into a more manageable dict
+    subscribed_channels = process_subscriptions(info=False)
+
+    # Fetch uploaded videos for each subscribed channel
+    subscription_feed = get_uploads_all_channels(debug=False)
+
+    # Print the subscription feed
+    print("Supposedly sane and datestamp sorted subscription feed:")
+    print_subscription_feed(cutoff=100)
