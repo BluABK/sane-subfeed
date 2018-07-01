@@ -109,7 +109,9 @@ def list_uploaded_videos(uploads_playlist_id, debug=False, max=25):
 
     )
 
-    print('Videos in list %s' % uploads_playlist_id)
+    if debug:
+        print('Videos in list %s' % uploads_playlist_id)
+
     videos = []
     while playlistitems_list_request:
         playlistitems_list_response = playlistitems_list_request.execute()
@@ -151,6 +153,7 @@ def get_uploads(channel_id, debug=False, max=25):
 
 
 if __name__ == '__main__':
+    debug_main = True
     youtube = get_authenticated_service()
 
     response = subscriptions_list_my_subscriptions(client=youtube,
@@ -206,7 +209,8 @@ if __name__ == '__main__':
     for channel in subscription_list:
         channel_title = channel['snippet']['title']
         channel_id = channel['snippet']['resourceId']['channelId']
-        print("Fetching Uploaded videos for channel: %s" % channel_title)
+        if debug_main:
+            print("Fetching Uploaded videos for channel: %s" % channel_title)
 
         new_videos_channel = get_uploads(channel_id, debug=False)
 
@@ -217,7 +221,7 @@ if __name__ == '__main__':
     new_videos = OrderedDict(sorted(new_videos_by_timestamp.items(), reverse=True))
 
     # TODO: Omit really old videos from feed (possibly implement in the uploaded videos fetching part)
-    # TODO: Make list havea sensible length and not subscriptions*25 (Currently mitigated by 'i')
+    # TODO: Make list have a sensible length and not subscriptions*25 (Currently mitigated by 'i')
     print("Supposedly sane and datestamp sorted subscription feed:")
     for i, (date, video) in enumerate(new_videos.items()):
         # Cut off at a sensible length # FIXME: Hack
