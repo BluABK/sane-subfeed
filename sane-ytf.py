@@ -5,6 +5,7 @@
 # python my_uploads.py
 
 import argparse
+from math import fsum
 import os
 import re
 
@@ -14,6 +15,8 @@ from googleapiclient.discovery import build
 #from googleapiclient.errors import HttpError
 from google_auth_oauthlib.flow import InstalledAppFlow
 from collections import OrderedDict
+import time
+from timeit import default_timer as timer
 
 # Internal resources
 # import my_uploads
@@ -82,32 +85,10 @@ def channels_list_by_id(**kwargs):
     return response
 
 
-def playlists_list_by_id(**kwargs):
-    # See full sample for function
-    kwargs = remove_empty_kwargs(**kwargs)
-
-    response = youtube.playlists().list(**kwargs).execute()
-
-    return response
-
-
-def playlist_items_list_by_playlist_id(**kwargs):
-    # See full sample for function
-    kwargs = remove_empty_kwargs(**kwargs)
-
-    response = youtube.playlistItems().list(**kwargs).execute()
-
-    return response
-
-
-def list_uploaded_videos(uploads_playlist_id, debug=False, max=25):
+def list_uploaded_videos(uploads_playlist_id, debug=False, limit=25):
     # Retrieve the list of videos uploaded to the authenticated user's channel.
     playlistitems_list_request = youtube.playlistItems().list(
-        maxResults=5,
-        part='snippet',
-        playlistId=uploads_playlist_id
-
-    )
+        maxResults=5, part='snippet', playlistId=uploads_playlist_id)
 
     if debug:
         print('Videos in list %s' % uploads_playlist_id)
@@ -127,12 +108,12 @@ def list_uploaded_videos(uploads_playlist_id, debug=False, max=25):
 
             if debug:
                 print('%s\t%s%s\t%s:\t%s\t%s' % (date_published, YT_VIDEO_URL, video_id, channel_title, title,
-                                                repr(description)))
+                                                 repr(description)))
 
             videos.append({'date': date_published, 'id': video_id, 'channel': channel_title, 'title': title,
                            'description': description, 'thumbnails': thumbnails})
             #videos.append([date_published, video_id, channel_title, title, description])
-            if len(videos) >= max:
+            if len(videos) >= limit:
                 return videos
 
         playlistitems_list_request = youtube.playlistItems().list_next(
@@ -140,30 +121,38 @@ def list_uploaded_videos(uploads_playlist_id, debug=False, max=25):
     return videos
 
 
-def get_uploads(channel_id, debug=False, max=25):
+def get_uploads(channel_id, debug=False, limit=25):
     # Get channel
-    test_chan = channels_list_by_id(part='snippet,contentDetails,statistics',
-                                    id=channel_id)
+    channel = channels_list_by_id(part='snippet,contentDetails,statistics', id=channel_id)
 
     # Get ID of uploads playlist
-    test_chan_uploads_playlist_id = test_chan['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+    channel_uploads_playlist_id = channel['items'][0]['contentDetails']['relatedPlaylists']['uploads']
 
     # Get playlistListResponse item of uploads playlist
-    return list_uploaded_videos(test_chan_uploads_playlist_id, debug=debug, max=max)
+    return list_uploaded_videos(channel_uploads_playlist_id, debug=debug, limit=limit)
 
 
-def get_subscriptions(info=False, debug=False, traverse_pages=True):
+def get_subscriptions(info=False, debug=False, traverse_pages=True, stats=False):
+    statistics = None
+    if stats:
+        statistics = {}
+
+    if stats:
+        timer_start = timer()
     response = subscriptions_list_my_subscriptions(client=youtube,
                                                    part='snippet,contentDetails',
                                                    mine=True)
-    subscription_total = response['pageInfo']['totalResults']
-    subscription_list = response['items']
+    total = response['pageInfo']['totalResults']
+    subs = response['items']
+
+    if stats:
+        timer_end = timer()
+        statistics = {'time_elapsed_page': [(timer_end - timer_start)]}
 
     if info:
-        print("Found %s subscriptions." % subscription_total)
+        print("Found %s subscriptions." % total)
 
     if traverse_pages and 'nextPageToken' in response:
-        # next_page = False # FIXME: DEBUG HACK: skip processing entire sublist
         next_page = True
         next_page_token = response['nextPageToken']
         # print("DEBUG: Querying PageToken: ", end='')
@@ -171,12 +160,18 @@ def get_subscriptions(info=False, debug=False, traverse_pages=True):
             print("Querying PageTokens...")
 
         while next_page:
+            if stats:
+                timer_start = timer()
             # print(", %s" % next_page_token, end='')
             this_response = subscriptions_list_my_subscriptions(client=youtube,
                                                                 part='snippet,contentDetails',
                                                                 mine=True,
                                                                 pageToken=next_page_token)
-            subscription_list += this_response['items']
+            subs += this_response['items']
+
+            if stats:
+                timer_end = timer()
+                statistics['time_elapsed_page'].append((timer_end - timer_start))
 
             if 'nextPageToken' in this_response:
                 next_page_token = this_response['nextPageToken']
@@ -184,7 +179,7 @@ def get_subscriptions(info=False, debug=False, traverse_pages=True):
                 print("")
                 next_page = False
 
-    return [subscription_total, subscription_list]
+    return [total, subs, statistics]
 
 
 def process_subscriptions(info=False):
@@ -209,23 +204,33 @@ def process_subscriptions(info=False):
     return channels
 
 
-def get_uploads_all_channels(debug=False):
+def get_uploads_all_channels(debug=False, info=False, stats=False):
+    statistics = None
+    if stats:
+        statistics = []
     # new_videos_by_channel = {}
     new_videos_by_timestamp = {}
     for channel in subscription_list:
         channel_title = channel['snippet']['title']
         channel_id = channel['snippet']['resourceId']['channelId']
-        if debug:
+        if info:
             print("Fetching Uploaded videos for channel: %s" % channel_title)
-
-        new_videos_channel = get_uploads(channel_id, debug=False)
-        # new_videos_by_channel.update({channel_title: new_videos_channel})
+        if stats:
+            timer_start = timer()
+        new_videos_channel = get_uploads(channel_id, debug=debug)
+        if stats:
+            timer_end = timer()
+            statistics.append({'channel_title': channel_title, 'time_elapsed': (timer_end - timer_start)})
 
         for vid in new_videos_channel:
             new_videos_by_timestamp.update({vid['date']: vid})
 
     # Return a reverse chronological sorted OrderedDict (newest --> oldest)
-    return OrderedDict(sorted(new_videos_by_timestamp.items(), reverse=True))
+    retval = OrderedDict(sorted(new_videos_by_timestamp.items(), reverse=True))
+    if stats:
+        retval['statistics'] = statistics
+
+    return retval
 
 
 def print_subscription_feed(cutoff=20):
@@ -243,16 +248,36 @@ def print_subscription_feed(cutoff=20):
                                          video['title'], repr(video['description'])))
 
 
+def print_stats_summary(time_list, indent=''):
+    print(indent + "Fastest load: %s seconds." % min(time_list))
+    print(indent + "Slowest load: %s seconds." % max(time_list))
+    print(indent + "Average load: %s seconds." % float(fsum(time_list)/float(len(time_list))))
+
+
 if __name__ == '__main__':
-    debug_main = True
+    global_debug = False
+    global_info = False
+    collect_statistics = True
+
+    # Statistics
+    subscriptions_statistics = None
+    get_uploads_statistics = None
 
     # Auth OAuth2 with YouTube API
     youtube = get_authenticated_service()
 
     # Get authenticated user's subscriptions
-    subscriptions = get_subscriptions(info=True)
+    if collect_statistics:
+        timer_start = timer()
+    subscriptions = get_subscriptions(info=True, stats=collect_statistics)
+
     subscription_total = subscriptions[0]
     subscription_list = subscriptions[1]
+
+    if collect_statistics:
+        timer_end = timer()
+        subscriptions_statistics = subscriptions[2]
+        subscriptions_statistics['time_elapsed'] = (timer_end - timer_start)
 
     if subscription_total != len(subscription_list):
         print("WARNING: Subscription list mismatched advertised length (%s/%s)!" % (len(subscription_list),
@@ -262,8 +287,30 @@ if __name__ == '__main__':
     subscribed_channels = process_subscriptions(info=False)
 
     # Fetch uploaded videos for each subscribed channel
-    subscription_feed = get_uploads_all_channels(debug=False)
+    if collect_statistics:
+        timer_start = timer()
+    subscription_feed = get_uploads_all_channels(debug=False, stats=collect_statistics)
+    if collect_statistics:
+        timer_end = timer()
+        subfeed_time_elapsed = (timer_end - timer_start)
 
     # Print the subscription feed
-    print("Supposedly sane and datestamp sorted subscription feed:")
     print_subscription_feed(cutoff=100)
+
+    if collect_statistics:
+        print("\nSTATISTICS:")
+        page_time = subscriptions_statistics['time_elapsed_page']
+        page_total = subscriptions_statistics['time_elapsed']
+        print("Subscriptions: Traversed %s pages of subscriptions in %s seconds" % (
+            len(page_time), page_total))
+        print_stats_summary(page_time, indent='\t')
+
+        print("Subscription feed: Requested %s playlists in %s seconds." % (
+            len(subscription_feed['statistics']), subfeed_time_elapsed))
+        subfeed_time_elapsed_channels = []
+        # Iterate a list of two-item dicts
+        for item in subscription_feed['statistics']:
+            # Append elapsed time statistics to a list
+            subfeed_time_elapsed_channels.append(item['time_elapsed'])
+
+        print_stats_summary(subfeed_time_elapsed_channels, indent='\t')
