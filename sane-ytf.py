@@ -210,15 +210,15 @@ def get_uploads_all_channels(subs, debug=False, info=False):
     return retval
 
 
-def print_subscription_feed(cutoff=20):
+def print_subscription_feed(subfeed, longest_title, cutoff=20):
     # TODO: Omit really old videos from feed (possibly implement in the uploaded videos fetching part)
     # TODO: Make list have a sensible length and not subscriptions*25 (Currently mitigated by 'i')
-    for i, (date, video) in enumerate(subscription_feed.items()):
+    for i, (date, video) in enumerate(subfeed.items()):
         # Cut off at a sensible length # FIXME: Hack
         if i > cutoff:
             break
         # TODO: Use longest title of current list, not entire subscriptions.
-        offset = subscribed_channels['longest_title'] - len(video['channel'])
+        offset = longest_title - len(video['channel'])
         spacing = " " * offset + " " * 4
 
         print('%s\t%s%s\t%s:%s%s\t%s' % (video['date'], YT_VIDEO_URL, video['id'], video['channel'], spacing,
@@ -254,7 +254,7 @@ if __name__ == '__main__':
         print("WARNING: Subscription list mismatched advertised length (%s/%s)!" % (len(subscription_list),
                                                                                     subscription_total))
 
-    # Process subscriptions and related data into a more manageable dict
+    # Process subscriptions and related data into a more manageable dict, TODO: Currently only used for longest_title
     subscribed_channels = process_subscriptions(subscription_list, info=False)
 
     # Fetch uploaded videos for each subscribed channel
@@ -264,7 +264,7 @@ if __name__ == '__main__':
     subfeed_time_elapsed = (timer_end - timer_start)
 
     # Print the subscription feed
-    print_subscription_feed(cutoff=100)
+    print_subscription_feed(subscription_feed, subscribed_channels['longest_title'], cutoff=100)
 
     if collect_statistics:
         print("\nSTATISTICS:")
