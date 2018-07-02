@@ -74,9 +74,7 @@ def channels_list_by_id(**kwargs):
     # See full sample for function
     kwargs = remove_empty_kwargs(**kwargs)
 
-    response = youtube.channels().list(
-        **kwargs
-    ).execute()
+    response = youtube.channels().list(**kwargs).execute()
 
     return response
 
@@ -93,7 +91,20 @@ def list_uploaded_videos(uploads_playlist_id, debug=False, limit=25):
     videos = []
     channel_title = "ERROR: CHANNEL TITLE WAS N/A"  # Store the channel title for use in statistics
     while playlistitems_list_request:
-        playlistitems_list_response = playlistitems_list_request.execute()
+        successful = False
+        attempts = 0
+        # Handle bad requests (SSLEror etc)
+        while not successful or attempts > 5:
+            try:
+                playlistitems_list_response = playlistitems_list_request.execute()
+                successful = True
+            except Exception as e:
+                attempts += 1
+                print("%s (attempt: %s )" % (e, attempts))
+                pass
+        if attempts > 5:
+            print("Failed all 5 attempts on playlist: https://www.youtube.com/playlist?list=%s" % uploads_playlist_id)
+
 
         # Grab information about each video.
         for playlist_item in playlistitems_list_response['items']:
@@ -127,7 +138,24 @@ def list_uploaded_videos(uploads_playlist_id, debug=False, limit=25):
 
 def get_uploads(channel_id, debug=False, limit=25):
     # Get channel
-    channel = channels_list_by_id(part='snippet,contentDetails,statistics', id=channel_id)
+    successful = False
+    attempts = 0
+    # Handle bad requests (SSLEror etc)
+    while not successful or attempts > 5:
+        try:
+            channel = channels_list_by_id(part='snippet,contentDetails,statistics', id=channel_id)
+            successful = True
+        except SystemExit as e:
+            attempts += 1
+            print("%s (attempt: %s )" % (e, attempts))
+            pass
+        except Exception as e:
+            attempts += 1
+            print("%s (attempt: %s )" % (e, attempts))
+            pass
+    if attempts > 5:
+        print("Failed all 5 attempts on get_uploads(%s): " % channel_id)
+
 
     # Get ID of uploads playlist
     channel_uploads_playlist_id = channel['items'][0]['contentDetails']['relatedPlaylists']['uploads']
@@ -207,6 +235,7 @@ class GetUploadsThread(threading.Thread):
         self.videos = []
         self.job_done = False
 
+    # TODO: Handle failed requests
     def run(self):
         channel_title = self.channel['snippet']['title']
         channel_id = self.channel['snippet']['resourceId']['channelId']
@@ -234,44 +263,34 @@ class GetUploadsThread(threading.Thread):
         return self.job_done
 
 
-def get_uploads_all_channels(subs, debug=False, info=False, threads=4):
+def get_uploads_all_channels(subs, debug=False, info=False, load_time=30):
+    disable_threading = False
     statistics = []
     new_videos_by_timestamp = {}
 
     thread_increment = 0
     thread_list = []
-    threads_running = {}
-    if threads > 0:
+    delay = load_time/len(subs)
+    if not disable_threading:
         for channel in subs:
-            print(threads_running)
-            for tid, t in threads_running:
-                if t.finished():
-                    t.join()
-                    threads_running.pop(tid)
-
-            # Ensure not starting more threads than given thread limit
-            while len(threads_running.items()) >= threads:
-                for tid, thread in threads_running:
-                    if thread.finished():
-                        thread.join()
-                        threads_running.pop(tid)
-
             thread = GetUploadsThread(thread_increment, channel, info=True, debug=False)
-            thread.start()
-            threads_running.update({str(thread_increment): thread})
-            print(threads_running)
             thread_list.append(thread)
             thread_increment += 1
 
         print("Iterating over thread list...")
         for t in thread_list:
-            while t.finished() is not True:
-                print("BUG: Thread #%s is still not done... Sleeping for 10 seconds" % t.get_id())
-                time.sleep(10)
-            for vid in t.get_videos():
-                new_videos_by_timestamp.update({vid['date']: vid})
+            t.start()
+            #time.sleep(delay)
+            time.sleep(0.5)
 
-            statistics.append(t.get_statistics())
+        for t in thread_list:
+            while t.finished() is not True:
+                print("DEBUG: Thread #%s is still not done... Sleeping for 10 seconds" % t.get_id())
+                time.sleep(1)
+                for vid in t.get_videos():
+                    new_videos_by_timestamp.update({vid['date']: vid})
+                    statistics.append(t.get_statistics())
+
     # TODO: Legacy failsafe until thread implementation works
     else:
         for channel in subs:
@@ -343,7 +362,7 @@ if __name__ == '__main__':
 
     # Fetch uploaded videos for each subscribed channel
     timer_start = timer()
-    subscription_feed = get_uploads_all_channels(subscription_list, debug=False, threads=0)  # FIXME: Re-using subscription_list?
+    subscription_feed = get_uploads_all_channels(subscription_list, debug=False)  # FIXME: Re-using subscription_list?
     timer_end = timer()
     subfeed_time_elapsed = (timer_end - timer_start)
 
