@@ -90,6 +90,7 @@ def list_uploaded_videos(uploads_playlist_id, debug=False, limit=25):
 
     videos = []
     channel_title = "ERROR: CHANNEL TITLE WAS N/A"  # Store the channel title for use in statistics
+    plist_url_base = "https://www.youtube.com/playlist?list="
     while playlistitems_list_request:
         successful = False
         attempts = 0
@@ -98,13 +99,20 @@ def list_uploaded_videos(uploads_playlist_id, debug=False, limit=25):
             try:
                 playlistitems_list_response = playlistitems_list_request.execute()
                 successful = True
+            except SystemExit as e:
+                attempts += 1
+                print("list_uploaded_videos(%s%s) [Exception] SystemExit: %s (attempt: %s )" % (plist_url_base,
+                                                                                                uploads_playlist_id,
+                                                                                                e, attempts))
+                pass
             except Exception as e:
                 attempts += 1
-                print("%s (attempt: %s )" % (e, attempts))
+                print("list_uploaded_videos(%s%s) [Exception] Exception: %s (attempt: %s )" % (plist_url_base,
+                                                                                               uploads_playlist_id,
+                                                                                               e, attempts))
                 pass
         if attempts > 5:
-            print("Failed all 5 attempts on playlist: https://www.youtube.com/playlist?list=%s" % uploads_playlist_id)
-
+            print("list_uploaded_videos(%s%s): Failed all 5 attempts" % (plist_url_base, uploads_playlist_id))
 
         # Grab information about each video.
         for playlist_item in playlistitems_list_response['items']:
@@ -137,25 +145,26 @@ def list_uploaded_videos(uploads_playlist_id, debug=False, limit=25):
 
 
 def get_uploads(channel_id, debug=False, limit=25):
-    # Get channel
     successful = False
     attempts = 0
     # Handle bad requests (SSLEror etc)
     while not successful or attempts > 5:
         try:
+            # Get channel
             channel = channels_list_by_id(part='snippet,contentDetails,statistics', id=channel_id)
+
             successful = True
         except SystemExit as e:
             attempts += 1
-            print("%s (attempt: %s )" % (e, attempts))
+            print("get_uploads(%s): [Exception] SystemExit: %s (attempt: %s)" % (channel_id, e, attempts))
             pass
         except Exception as e:
             attempts += 1
-            print("%s (attempt: %s )" % (e, attempts))
+            print("get_uploads(%s): [Exception] Exception: %s (attempt: %s )" % (channel_id, e, attempts))
             pass
     if attempts > 5:
-        print("Failed all 5 attempts on get_uploads(%s): " % channel_id)
-
+        print("get_uploads(%s): Failed all 5 attempts." % channel_id)
+        return "get_uploads(%s): Failed all 5 attempts." % channel_id
 
     # Get ID of uploads playlist
     channel_uploads_playlist_id = channel['items'][0]['contentDetails']['relatedPlaylists']['uploads']
@@ -239,9 +248,11 @@ class GetUploadsThread(threading.Thread):
     def run(self):
         channel_title = self.channel['snippet']['title']
         channel_id = self.channel['snippet']['resourceId']['channelId']
-        print("Starting #%s for channel: %s" % (self.thread_id, channel_title))
+        print("Starting #%s for channel: %s" % (self.thread_id, channel_title), end='')
         if self.info:
-            print("\tFetching Uploaded videos for channel: %s" % channel_title)
+            print(" -- Fetching Uploaded videos for channel: %s" % channel_title)
+        else:
+            print("")
         retval = get_uploads(channel_id, debug=self.debug)
 
         self.videos = retval[0]
@@ -263,8 +274,7 @@ class GetUploadsThread(threading.Thread):
         return self.job_done
 
 
-def get_uploads_all_channels(subs, debug=False, info=False, load_time=30):
-    disable_threading = False
+def get_uploads_all_channels(subs, debug=False, info=False, load_time=30, disable_threading=False):
     statistics = []
     new_videos_by_timestamp = {}
 
@@ -281,15 +291,15 @@ def get_uploads_all_channels(subs, debug=False, info=False, load_time=30):
         for t in thread_list:
             t.start()
             #time.sleep(delay)
-            time.sleep(0.5)
+            time.sleep(1)
 
         for t in thread_list:
             while t.finished() is not True:
                 print("DEBUG: Thread #%s is still not done... Sleeping for 10 seconds" % t.get_id())
                 time.sleep(1)
-                for vid in t.get_videos():
-                    new_videos_by_timestamp.update({vid['date']: vid})
-                    statistics.append(t.get_statistics())
+            for vid in t.get_videos():
+                new_videos_by_timestamp.update({vid['date']: vid})
+                statistics.append(t.get_statistics())
 
     # TODO: Legacy failsafe until thread implementation works
     else:
@@ -316,11 +326,14 @@ def get_uploads_all_channels(subs, debug=False, info=False, load_time=30):
 def print_subscription_feed(subfeed, longest_title, cutoff=20):
     # TODO: Omit really old videos from feed (possibly implement in the uploaded videos fetching part)
     # TODO: Make list have a sensible length and not subscriptions*25 (Currently mitigated by 'i')
+    print(subfeed)
     for i, (date, video) in enumerate(subfeed.items()):
         # Cut off at a sensible length # FIXME: Hack
         if i > cutoff:
             break
         # TODO: Use longest title of current list, not entire subscriptions.
+        print(longest_title)
+        print(video)
         offset = longest_title - len(video['channel'])
         spacing = " " * offset + " " * 4
 
@@ -345,7 +358,7 @@ if __name__ == '__main__':
     # Get authenticated user's subscriptions
     timer_start = timer()
     # Get a list on the form of [total, subs, statistics]
-    subscriptions = get_subscriptions(info=True)
+    subscriptions = get_subscriptions(info=True, traverse_pages=False)
     subscription_total = subscriptions[0]
     subscription_list = subscriptions[1]
     timer_end = timer()
@@ -362,7 +375,7 @@ if __name__ == '__main__':
 
     # Fetch uploaded videos for each subscribed channel
     timer_start = timer()
-    subscription_feed = get_uploads_all_channels(subscription_list, debug=False)  # FIXME: Re-using subscription_list?
+    subscription_feed = get_uploads_all_channels(subscription_list, debug=False, disable_threading=False)  # FIXME: Re-using subscription_list?
     timer_end = timer()
     subfeed_time_elapsed = (timer_end - timer_start)
 
