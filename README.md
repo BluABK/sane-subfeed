@@ -1,6 +1,6 @@
 ## Prerequisites
 
-*   Python 2.6 or greater
+*   Python 3
 
 *   The pip package management tool
 
