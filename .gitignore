@@ -6,3 +6,6 @@ env/
 
 # youtube auth
 client_secret.json
+
+# python
+__pycache__
