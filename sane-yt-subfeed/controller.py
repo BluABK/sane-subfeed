@@ -219,7 +219,7 @@ class Controller:
             channels.update({'id': cid, 'title': title, 'description': description, 'longest_title': longest_title})
 
             if info:
-                print("[%s] %s: %s" % (id, title, repr(description)))
+                print("[%s] %s: %s" % (cid, title, repr(description)))
 
         return channels
 
