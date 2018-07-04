@@ -1,16 +1,11 @@
 #!/usr/bin/python
 
-# Retrieve the authenticated user's uploaded videos.
-# Sample usage:
-# python my_uploads.py
-
-# import argparse
+# import argparse # TODO: Implement argparse to sanely set a lot of currently hardcoded variables.
 from math import fsum
 from collections import OrderedDict
 from timeit import default_timer as timer
 import time
 import threading
-# import multiprocessing.dummy as mp
 
 # Google/YouTube API
 # import google.oauth2.credentials
@@ -18,9 +13,6 @@ import threading
 from googleapiclient.discovery import build
 # from googleapiclient.errors import HttpError
 from google_auth_oauthlib.flow import InstalledAppFlow
-
-# Internal resources
-# import my_uploads
 
 # The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
 # the OAuth 2.0 information for this application, including its client_id and
@@ -46,15 +38,22 @@ YOUTUBE_PARM_PLIST = "playlist?list ="
 YT_VIDEO_URL = YOUTUBE_URL + YOUTUBE_PARM_VIDEO
 
 
-# Authorize the request and store authorization credentials.
 def get_authenticated_service():
+    """
+    Authorize the request and store authorization credentials.
+    :return:
+    """
     flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
     credentials = flow.run_console()
     return build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
 
-# Remove keyword arguments that are not set.
 def remove_empty_kwargs(**kwargs):
+    """
+    Remove keyword arguments that are not set.
+    :param kwargs:
+    :return:
+    """
     good_kwargs = {}
     if kwargs is not None:
         for key, value in kwargs.items():
@@ -65,6 +64,12 @@ def remove_empty_kwargs(**kwargs):
 
 
 def list_subscriptions(client, **kwargs):
+    """
+    Get a list of the authenticated user's subscriptions
+    :param client:
+    :param kwargs:
+    :return:
+    """
     kwargs = remove_empty_kwargs(**kwargs)
     response = client.subscriptions().list(**kwargs).execute()
 
@@ -72,7 +77,11 @@ def list_subscriptions(client, **kwargs):
 
 
 def channels_list_by_id(**kwargs):
-    # See full sample for function
+    """
+    Get a youtube#channelListResponse,
+    :param kwargs:
+    :return: youtube#channelListResponse
+    """
     kwargs = remove_empty_kwargs(**kwargs)
 
     response = youtube.channels().list(**kwargs).execute()
@@ -81,6 +90,13 @@ def channels_list_by_id(**kwargs):
 
 
 def list_uploaded_videos(uploads_playlist_id, debug=False, limit=25):
+    """
+    Get a list of videos in a playlist
+    :param uploads_playlist_id:
+    :param debug:
+    :param limit: cutoff at this amount of videos/items
+    :return: [list(dict): videos, dict: statistics]
+    """
     _timer_start = timer()
     # Retrieve the list of videos uploaded to the authenticated user's channel.
     playlistitems_list_request = youtube.playlistItems().list(
@@ -91,33 +107,8 @@ def list_uploaded_videos(uploads_playlist_id, debug=False, limit=25):
 
     videos = []
     channel_title = "ERROR: CHANNEL TITLE WAS N/A"  # Store the channel title for use in statistics
-    plist_url_base = YOUTUBE_URL + YOUTUBE_PARM_PLIST
 
     while playlistitems_list_request:
-        successful = False
-        attempts = 0
-        """
-        # Handle bad requests (SSLEror etc)
-        while not successful or attempts > 5:
-            try:
-                playlistitems_list_response = playlistitems_list_request.execute()
-                successful = True
-            except SystemExit as e:
-                attempts += 1
-                print("list_uploaded_videos(%s%s) [Exception] SystemExit: %s (attempt: %s )" % (plist_url_base,
-                                                                                                uploads_playlist_id,
-                                                                                                e, attempts))
-                pass
-            except Exception as e:
-                attempts += 1
-                print("list_uploaded_videos(%s%s) [Exception] Exception: %s (attempt: %s )" % (plist_url_base,
-                                                                                               uploads_playlist_id,
-                                                                                               e, attempts))
-                pass
-        if attempts > 5:
-            print("list_uploaded_videos(%s%s): Failed all 5 attempts" % (plist_url_base, uploads_playlist_id))
-        """
-
         playlistitems_list_response = playlistitems_list_request.execute()
 
         # Grab information about each video.
@@ -151,31 +142,15 @@ def list_uploaded_videos(uploads_playlist_id, debug=False, limit=25):
 
 
 def get_uploads(channel_id, debug=False, limit=25):
-    successful = False
-    attempts = 0
     """
-    # Handle bad requests (SSLEror etc)
-    while not successful or attempts > 5:
-        try:
-            # Get channel
-            channel = channels_list_by_id(part='snippet,contentDetails,statistics', id=channel_id)
-
-            successful = True
-        except SystemExit as e:
-            attempts += 1
-            print("get_uploads(%s): [Exception] SystemExit: %s (attempt: %s)" % (channel_id, e, attempts))
-            pass
-        except Exception as e:
-            attempts += 1
-            print("get_uploads(%s): [Exception] Exception: %s (attempt: %s )" % (channel_id, e, attempts))
-            pass
-    if attempts > 5:
-        print("get_uploads(%s): Failed all 5 attempts." % channel_id)
-        return "get_uploads(%s): Failed all 5 attempts." % channel_id
+    Get a channel's "Uploaded videos" playlist, given channel ID.
+    :param channel_id:
+    :param debug:
+    :param limit: cutoff at this amount of videos/items
+    :return: list_uploaded_videos(channel_uploads_playlist_id, debug=debug, limit=limit)
     """
-
     # Get channel
-    channel = channels_list_by_id(part='snippet,contentDetails,statistics', id=channel_id)
+    channel = channels_list_by_id(part='snippet,contentDetails,statistics', id=channel_id) # FIXME: stats unnecessary?
 
     # Get ID of uploads playlist
     channel_uploads_playlist_id = channel['items'][0]['contentDetails']['relatedPlaylists']['uploads']
@@ -185,10 +160,17 @@ def get_uploads(channel_id, debug=False, limit=25):
 
 
 def get_subscriptions(info=False, debug=False, traverse_pages=True):
+    """
+    Get a list of the authenticated user's subscriptions.
+    :param info: debug lite
+    :param debug:
+    :param traverse_pages:
+    :return: [total, subs, statistics]
+    """
     _timer_start = timer()
     response = list_subscriptions(client=youtube, part='snippet,contentDetails', mine=True)
-    total = response['pageInfo']['totalResults']
-    subs = response['items']
+    total = response['pageInfo']['totalResults']  # Advertised size of subscription list (known to be inflated reality)
+    subs = response['items']  # The list of subscriptions
 
     _timer_end = timer()
     statistics = {'time_elapsed_page': [(_timer_end - _timer_start)]}
@@ -222,7 +204,13 @@ def get_subscriptions(info=False, debug=False, traverse_pages=True):
     return [total, subs, statistics]
 
 
-def process_subscriptions(subs, info=False):
+def process_subscriptions(subs, info=False):    # FIXME: Barely used?
+    """
+    Process subscriptions and related data into a more manageable dict.
+    :param subs:
+    :param info:
+    :return:
+    """
     channels = {}
     longest_title = 0
 
@@ -246,6 +234,13 @@ def process_subscriptions(subs, info=False):
 
 class GetUploadsThread(threading.Thread):
     def __init__(self, thread_id, channel, info=False, debug=False):
+        """
+        Init GetUploadsThread
+        :param thread_id:
+        :param channel:
+        :param info:
+        :param debug:
+        """
         threading.Thread.__init__(self)
         self.thread_id = thread_id
         self.channel = channel
@@ -257,6 +252,10 @@ class GetUploadsThread(threading.Thread):
 
     # TODO: Handle failed requests
     def run(self):
+        """
+        Override threading.Thread.run() with its own code
+        :return:
+        """
         channel_title = self.channel['snippet']['title']
         channel_id = self.channel['snippet']['resourceId']['channelId']
         print("Starting #%s for channel: %s" % (self.thread_id, channel_title), end='')
@@ -273,19 +272,44 @@ class GetUploadsThread(threading.Thread):
         print("Exiting #%s" % self.thread_id)
 
     def get_videos(self):
+        """
+        Return a list of videos
+        :return:
+        """
         return self.videos
 
     def get_statistics(self):
+        """
+        Return a dict of statistics/timings
+        :return:
+        """
         return self.statistics
 
     def get_id(self):
+        """
+        Return ID of this thread
+        :return:
+        """
         return self.thread_id
 
     def finished(self):
+        """
+        Return a boolean to check if run() has ended.
+        :return:
+        """
         return self.job_done
 
 
 def get_uploads_all_channels(subs, debug=False, info=False, load_time=30, disable_threading=False):
+    """
+    Returns a date-sorted OrderedDict of a list of each subscriptions' "Uploaded videos" playlist.
+    :param subs: list of subscriptions
+    :param debug:
+    :param info: debug lite
+    :param load_time: User specified expected time (in seconds) for the job to be done
+    :param disable_threading: Hack to disable the currently broken threading implementation (see: Issue #1)
+    :return:
+    """
     statistics = []
     new_videos_by_timestamp = {}
 
@@ -312,7 +336,7 @@ def get_uploads_all_channels(subs, debug=False, info=False, load_time=30, disabl
                 new_videos_by_timestamp.update({vid['date']: vid})
                 statistics.append(t.get_statistics())
 
-    # TODO: Legacy failsafe until thread implementation works
+    # TODO: Legacy failsafe until thread implementation works # FIXME: Split into own function
     else:
         for channel in subs:
             # threading.Thread()
@@ -335,6 +359,13 @@ def get_uploads_all_channels(subs, debug=False, info=False, load_time=30, disabl
 
 
 def print_subscription_feed(subfeed, longest_title, cutoff=20):
+    """
+    Print a basic listing of the processed subscription feed.
+    :param subfeed:
+    :param longest_title:
+    :param cutoff: How many videos/items to list
+    :return:
+    """
     # TODO: Omit really old videos from feed (possibly implement in the uploaded videos fetching part)
     # TODO: Make list have a sensible length and not subscriptions*25 (Currently mitigated by 'i')
     for i, (date, video) in enumerate(subfeed.items()):
@@ -350,6 +381,12 @@ def print_subscription_feed(subfeed, longest_title, cutoff=20):
 
 
 def print_stats_summary(time_list, indent=''):
+    """
+    Print some fancy min, max and average timing stats for various code/functions.
+    :param time_list:
+    :param indent:
+    :return:
+    """
     print(indent + "Fastest load: %s seconds." % min(time_list))
     print(indent + "Slowest load: %s seconds." % max(time_list))
     print(indent + "Average load: %s seconds." % float(fsum(time_list)/float(len(time_list))))
