@@ -41,7 +41,6 @@ class Controller:
     def __init__(self, youtube):
         self.youtube = youtube
 
-
     @staticmethod
     def remove_empty_kwargs(**kwargs):
         """
@@ -181,7 +180,7 @@ class Controller:
                 _timer_start = timer()
                 # print(", %s" % next_page_token, end='')
                 response = self.list_subscriptions(client=self.youtube, part='snippet,contentDetails',
-                                              mine=True, pageToken=next_page_token)
+                                                   mine=True, pageToken=next_page_token)
                 subs += response['items']
 
                 _timer_end = timer()
