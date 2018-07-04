@@ -1,4 +1,4 @@
-## Prerequisites acca edit
+## Prerequisites
 
 *   Python 3
 
