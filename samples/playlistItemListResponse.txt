@@ -1,0 +1,500 @@
+{
+	'kind': 'youtube#playlistItemListResponse', 
+	'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/iM8G2MZcrzCNyNyUq3m5FBJwUwE"', 
+	'nextPageToken': 'CBkQAA', 
+	'pageInfo': 
+	{
+		'totalResults': 120, 'resultsPerPage': 25
+	}, 
+	'items': 
+	[
+		{
+			'kind': 'youtube#playlistItem', 
+			'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/U_IWaoCgAEJVdOMUxoPZc1dz7jI"', 
+			'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLlgxWFVrR3Nja0dv', 
+			'snippet': 
+			{
+				'publishedAt': '2018-05-18T20:13:06.000Z', 
+				'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 
+				'title': "King's Quest", 
+				'description': "I have never played ANY King's Quest! :O", 
+				'thumbnails': 
+				{
+					'default': {'url': 'https://i.ytimg.com/vi/X1XUkGsckGo/default.jpg', 'width': 120, 'height': 90
+					}, 
+					'medium': {'url': 'https://i.ytimg.com/vi/X1XUkGsckGo/mqdefault.jpg', 'width': 320, 'height': 180
+					}, 
+					'high': 
+					{
+						'url': 'https://i.ytimg.com/vi/X1XUkGsckGo/hqdefault.jpg', 'width': 480, 'height': 360
+					}
+				}, 
+				'channelTitle': 'DemonTomatoDave', 
+				'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 
+				'position': 0, 
+				'resourceId': 
+				{
+					'kind': 'youtube#video', 
+					'videoId': 'X1XUkGsckGo'
+				}
+			}, 
+			'contentDetails': 
+			{
+				'videoId': 'X1XUkGsckGo', 
+				'videoPublishedAt': '2018-05-18T20:13:06.000Z'
+			}
+		}, 
+		{
+			'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/_kCeRfwmVOKhwjA0wrZgnAZFvnQ"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLmZVMmlObWE3ZnhZ', 'snippet': {'publishedAt': '2018-02-27T22:24:52.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'Atlantis Headcanon (Serious Disness podcast excerpt)', 'description': 'http://seriousdisness.wigglehe.com/  \n^^^^ That is the podcast this is from.\nYou can also subscribe on iTunes, or Apple Podcasts, or WHATEVER IT IS NOW here: https://itunes.apple.com/us/podcast/serious-disness/id1257468200', 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/fU2iNma7fxY/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/fU2iNma7fxY/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/fU2iNma7fxY/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/fU2iNma7fxY/sddefault.jpg', 'width': 640, 'height': 480
+}
+, 'maxres': {'url': 'https://i.ytimg.com/vi/fU2iNma7fxY/maxresdefault.jpg', 'width': 1280, 'height': 720
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 1, 'resourceId': {'kind': 'youtube#video', 'videoId': 'fU2iNma7fxY'
+}
+
+}
+, 'contentDetails': {'videoId': 'fU2iNma7fxY', 'videoPublishedAt': '2018-02-27T22:24:52.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/35upHlC4L8KiJlNEodyxLR-28E0"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLjhnVE00ckV6aGNj', 'snippet': {'publishedAt': '2018-01-05T00:31:46.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'The Ballad of Mecha Snata (Wiggle He)', 'description': "Yes, it would have been good if this was finished before Christmas.\n\nHere's the old traditional Christmas carol with a bit of new polish. If you ever wondered what the heck this song was, it was the surprise finale to a silly thread that ran in a forum one December, the second of a series of Christmas threads I used to write that were full of stories, drawings and general merriment. I'm currently in the process of reuploading them for my new audience to see, and when I reached this song, it just didn't sound good enough any more. So here we are.\n\nYou can find the full collection of Snatter stories (as I upload them) at www.wigglehe.com and the story this song was from begins here: http://wigglehe.com/snatter-2-01\n\nVisit http://patreon.com/demontomatodave to find 50 minutes of unreleased music, including Mario Land Without Lyrics, and a couple of my older songs with a similar amount of new polish to this one, only, moreso.", 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/8gTM4rEzhcc/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/8gTM4rEzhcc/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/8gTM4rEzhcc/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/8gTM4rEzhcc/sddefault.jpg', 'width': 640, 'height': 480
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 2, 'resourceId': {'kind': 'youtube#video', 'videoId': '8gTM4rEzhcc'
+}
+
+}
+, 'contentDetails': {'videoId': '8gTM4rEzhcc', 'videoPublishedAt': '2018-01-05T00:31:46.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/n2anZUvNsKSeIgArZxeVvJupMc0"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLmpFVDhISThSTmhR', 'snippet': {'publishedAt': '2017-12-01T22:21:12.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': "Dave's First Game", 'description': 'On retro games, and how they felt when they felt new.', 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/jET8HI8RNhQ/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/jET8HI8RNhQ/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/jET8HI8RNhQ/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/jET8HI8RNhQ/sddefault.jpg', 'width': 640, 'height': 480
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 3, 'resourceId': {'kind': 'youtube#video', 'videoId': 'jET8HI8RNhQ'
+}
+
+}
+, 'contentDetails': {'videoId': 'jET8HI8RNhQ', 'videoPublishedAt': '2017-12-01T22:21:12.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/xScoHMF7axumQd0U0A52rYuR3NQ"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLkdtVlpJeTRqRVNB', 'snippet': {'publishedAt': '2017-08-07T22:18:31.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'Sonic Mania Anticipation Stream!', 'description': "Let's croak us some eggs!", 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/GmVZIy4jESA/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/GmVZIy4jESA/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/GmVZIy4jESA/hqdefault.jpg', 'width': 480, 'height': 360
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 4, 'resourceId': {'kind': 'youtube#video', 'videoId': 'GmVZIy4jESA'
+}
+
+}
+, 'contentDetails': {'videoId': 'GmVZIy4jESA', 'videoPublishedAt': '2017-08-07T22:18:31.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/lF64MbvxjokrS8huN9vhNruM6kc"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLkdkUWU4NkVQNTJr', 'snippet': {'publishedAt': '2017-06-07T21:46:25.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'Election anxiety (and how to beat it)', 'description': "For anyone who wants to vote but is a bit nervous about what to expect, here is exactly what to expect.\n\nNormal service resumes in a couple of weeks -- I've got such a good silly video about games on the go, you'll see. Until then, aaaaaaarghhhhh electionnns make them stopppppp", 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/GdQe86EP52k/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/GdQe86EP52k/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/GdQe86EP52k/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/GdQe86EP52k/sddefault.jpg', 'width': 640, 'height': 480
+}
+, 'maxres': {'url': 'https://i.ytimg.com/vi/GdQe86EP52k/maxresdefault.jpg', 'width': 1280, 'height': 720
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 5, 'resourceId': {'kind': 'youtube#video', 'videoId': 'GdQe86EP52k'
+}
+
+}
+, 'contentDetails': {'videoId': 'GdQe86EP52k', 'videoPublishedAt': '2017-06-07T21:46:25.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/zDKSuq78ZSNkavnXvMT4BSNKoMw"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLmx2SFJVb2dmLUpB', 'snippet': {'publishedAt': '2017-05-20T23:34:39.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': "YOU'VE GOT LESS THAN AN HOUR LEFT!", 'description': "UK ppl: Do this by the end of Monday or they won't listen to you:\nhttps://www.gov.uk/register-to-vote\n\nHow to fix the only snag I can think of that you might hit - not knowing your National Insurance Number:\nhttps://www.gov.uk/lost-national-insurance-number\n\nPolitics Unboringed:\nhttps://www.youtube.com/watch?v=_gbDAvK42yA&list=PLfxy4_sBQdxzZNqvVQXcBPvsl1Zgzy2-q&index=3", 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/lvHRUogf-JA/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/lvHRUogf-JA/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/lvHRUogf-JA/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/lvHRUogf-JA/sddefault.jpg', 'width': 640, 'height': 480
+}
+, 'maxres': {'url': 'https://i.ytimg.com/vi/lvHRUogf-JA/maxresdefault.jpg', 'width': 1280, 'height': 720
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 6, 'resourceId': {'kind': 'youtube#video', 'videoId': 'lvHRUogf-JA'
+}
+
+}
+, 'contentDetails': {'videoId': 'lvHRUogf-JA', 'videoPublishedAt': '2017-05-20T23:34:39.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/saCQjX8zhno54VkGIXEqf2nvWnc"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLnVSS1NHRk54Y3dr', 'snippet': {'publishedAt': '2017-05-12T23:21:24.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'Retro-VEDA Part 2!', 'description': "Yes! The first video only covered the first about ten days of the month! You didn't think April just ends there did you? No! And for years it's been going on, April after April, and here they are all at once. Do I care that it's now May as I upload this? Well that's up to you to decide, see if you can find any clues in the microexpressions in my eyes.\n\nMusic!\n#throb/susmabers - Peacy Voice\nMartin Iveson - Moody Breeze\nJochel Hippel (Mad Max) - A Prehistoric Tale", 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/uRKSGFNxcwk/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/uRKSGFNxcwk/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/uRKSGFNxcwk/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/uRKSGFNxcwk/sddefault.jpg', 'width': 640, 'height': 480
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 7, 'resourceId': {'kind': 'youtube#video', 'videoId': 'uRKSGFNxcwk'
+}
+
+}
+, 'contentDetails': {'videoId': 'uRKSGFNxcwk', 'videoPublishedAt': '2017-05-12T23:21:24.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/JI4ivkrVEqLQofqgkIykn0xNQEM"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLmpoRFIwQTFWWDJJ', 'snippet': {'publishedAt': '2017-04-30T12:34:50.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'Retro-VEDA', 'description': 'Here is what happened to me every day in April\n\nhttps://www.patreon.com/demontomatodave\n\n\n\nMusic:\nLyndon Sharp - Bubble Dizzy\n4-mat - A City at Night\nRichard Jacques - Volcano Valley Zone act 2\nDavid Whittaker - Leatherneck Song 2\nMarvin - Emercy\nMarc Brown - Stevspam\nJogeir - Memories', 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/jhDR0A1VX2I/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/jhDR0A1VX2I/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/jhDR0A1VX2I/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/jhDR0A1VX2I/sddefault.jpg', 'width': 640, 'height': 480
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 8, 'resourceId': {'kind': 'youtube#video', 'videoId': 'jhDR0A1VX2I'
+}
+
+}
+, 'contentDetails': {'videoId': 'jhDR0A1VX2I', 'videoPublishedAt': '2017-04-30T12:34:50.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/2J35HeAIzuY5f23mzfJmEw6g0LA"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLmVYODgxdmhiVGhF', 'snippet': {'publishedAt': '2017-02-18T01:17:54.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': "Bulmer's Bookshelf: Loooong books and The Reality Dysfunction", 'description': "How long is too long? (I mean books not Youtube videos, shush.) Is it still too long if it's about really good space ships?\n\nPeter F. Hamilton has some really good space ships.\n\nHere come two cool dudes:\n\nBrendan Ellis on Reality Dysfunction: https://www.youtube.com/watch?v=tIC2sjlJ4dQ\n\nGarrett Robinson on reading and Redshirts:\nhttps://www.youtube.com/watch?v=-TKB9grWYk8\n\nAnd here's my Bulmer's Bookshelf channel, where I talk about The Way of Kings:\nhttps://www.youtube.com/channel/UCggY1pZAvK0k3UW57FK5ISw/playlists", 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/eX881vhbThE/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/eX881vhbThE/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/eX881vhbThE/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/eX881vhbThE/sddefault.jpg', 'width': 640, 'height': 480
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 9, 'resourceId': {'kind': 'youtube#video', 'videoId': 'eX881vhbThE'
+}
+
+}
+, 'contentDetails': {'videoId': 'eX881vhbThE', 'videoPublishedAt': '2017-02-18T01:17:54.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/fCkHjaTs90Kmt9CchJG04nh7UJM"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLmJyTlZoekxLemJB', 'snippet': {'publishedAt': '2017-01-25T20:21:56.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': "Anno you're going to dig this", 'description': "Usually my game streams happen at twitch.tv/demontomatodave and are archived on my gaming channel here:\nhttps://www.youtube.com/channel/UChlgkE9N56v1dlm3h3dzNFw\n\nBut this was a test to make sure my Youtube streaming was set up right for the DemonTomatoDave channel. So here we are! Enjoy this lovely game with me.\n\nHere's my video about the first game in this series: https://www.youtube.com/watch?v=oQVFzt4JFhg", 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/brNVhzLKzbA/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/brNVhzLKzbA/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/brNVhzLKzbA/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/brNVhzLKzbA/sddefault.jpg', 'width': 640, 'height': 480
+}
+, 'maxres': {'url': 'https://i.ytimg.com/vi/brNVhzLKzbA/maxresdefault.jpg', 'width': 1280, 'height': 720
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 10, 'resourceId': {'kind': 'youtube#video', 'videoId': 'brNVhzLKzbA'
+}
+
+}
+, 'contentDetails': {'videoId': 'brNVhzLKzbA', 'videoPublishedAt': '2017-01-25T20:21:56.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/0nrPwnbNNiHKem4xlZCpLcvPKz4"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLnM2dTM5eE11U084', 'snippet': {'publishedAt': '2017-01-02T00:13:29.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'WE MADE IT! Happy New Year!', 'description': 'Now we can achieve anything!', 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/s6u39xMuSO8/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/s6u39xMuSO8/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/s6u39xMuSO8/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/s6u39xMuSO8/sddefault.jpg', 'width': 640, 'height': 480
+}
+, 'maxres': {'url': 'https://i.ytimg.com/vi/s6u39xMuSO8/maxresdefault.jpg', 'width': 1280, 'height': 720
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 11, 'resourceId': {'kind': 'youtube#video', 'videoId': 's6u39xMuSO8'
+}
+
+}
+, 'contentDetails': {'videoId': 's6u39xMuSO8', 'videoPublishedAt': '2017-01-02T00:13:29.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/MPEPAuvk1qhxtNfju2cTsECJYxg"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLlVjYzcwcGdtSzdN', 'snippet': {'publishedAt': '2016-12-24T18:57:01.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'Rogue One review - Spoiler Free! Then a spoiler warning, then still quite spoiler-free.', 'description': 'I watched Star Wars I did! I did it on Monday, just under a week after it released. Here are a sequence of words about it.', 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/Ucc70pgmK7M/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/Ucc70pgmK7M/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/Ucc70pgmK7M/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/Ucc70pgmK7M/sddefault.jpg', 'width': 640, 'height': 480
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 12, 'resourceId': {'kind': 'youtube#video', 'videoId': 'Ucc70pgmK7M'
+}
+
+}
+, 'contentDetails': {'videoId': 'Ucc70pgmK7M', 'videoPublishedAt': '2016-12-24T18:57:01.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/q8Lp58cBy7ORjSPuJRmBTH1_mTA"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLnZhZFhWTGhKV3Mw', 'snippet': {'publishedAt': '2016-12-24T23:47:05.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'What does Wiggle He mean?', 'description': "It's time you knew what those old Christmas songs are all about...\n\nWIGGLEHE.COM\n\nBulmer Boops Buttons:\nhttps://www.youtube.com/channel/UChlgkE9N56v1dlm3h3dzNFw\n\nBulmer's Bookshelf:\nhttps://www.youtube.com/channel/UCggY1pZAvK0k3UW57FK5ISw/playlists", 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/vadXVLhJWs0/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/vadXVLhJWs0/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/vadXVLhJWs0/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/vadXVLhJWs0/sddefault.jpg', 'width': 640, 'height': 480
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 13, 'resourceId': {'kind': 'youtube#video', 'videoId': 'vadXVLhJWs0'
+}
+
+}
+, 'contentDetails': {'videoId': 'vadXVLhJWs0', 'videoPublishedAt': '2016-12-24T23:47:05.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/WGGnfEgS4-m5KSwW4oXPPh3mKnU"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLm9RVkZ6dDRKRmhn', 'snippet': {'publishedAt': '2016-12-02T13:54:24.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'Learning to Settle', 'description': 'Pleasant pixelated piggies, sweet little virtual towns, and why I picked the wrong week to play a game about how easy it is for economies to fail.', 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/oQVFzt4JFhg/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/oQVFzt4JFhg/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/oQVFzt4JFhg/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/oQVFzt4JFhg/sddefault.jpg', 'width': 640, 'height': 480
+}
+, 'maxres': {'url': 'https://i.ytimg.com/vi/oQVFzt4JFhg/maxresdefault.jpg', 'width': 1280, 'height': 720
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 14, 'resourceId': {'kind': 'youtube#video', 'videoId': 'oQVFzt4JFhg'
+}
+
+}
+, 'contentDetails': {'videoId': 'oQVFzt4JFhg', 'videoPublishedAt': '2016-12-02T13:54:24.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/ilCvwcjDvbf93x-FAd0MeKdE5zE"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLkpRWVMtMk16TFZn', 'snippet': {'publishedAt': '2016-10-31T22:21:24.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'NaNoWriMo', 'description': "Here's where to go to see the streams:\nwww.patreon.com/demontomatodave\n\nHere's where to go to see Garrett's vloganovel streams:\nhttps://www.twitch.tv/vloganovel", 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/JQYS-2MzLVg/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/JQYS-2MzLVg/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/JQYS-2MzLVg/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/JQYS-2MzLVg/sddefault.jpg', 'width': 640, 'height': 480
+}
+, 'maxres': {'url': 'https://i.ytimg.com/vi/JQYS-2MzLVg/maxresdefault.jpg', 'width': 1280, 'height': 720
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 15, 'resourceId': {'kind': 'youtube#video', 'videoId': 'JQYS-2MzLVg'
+}
+
+}
+, 'contentDetails': {'videoId': 'JQYS-2MzLVg', 'videoPublishedAt': '2016-10-31T22:21:24.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/lJTXFk9pfIq96rNWLhsJOvozIuc"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLnVSMzFoZ3JNTG00', 'snippet': {'publishedAt': '2016-10-07T11:35:19.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'Force Awakens - Chapter 5', 'description': 'In which Finn really was a Stormtrooper', 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/uR31hgrMLm4/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/uR31hgrMLm4/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/uR31hgrMLm4/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/uR31hgrMLm4/sddefault.jpg', 'width': 640, 'height': 480
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 16, 'resourceId': {'kind': 'youtube#video', 'videoId': 'uR31hgrMLm4'
+}
+
+}
+, 'contentDetails': {'videoId': 'uR31hgrMLm4', 'videoPublishedAt': '2016-10-07T11:35:19.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/pZO5Vem4ndRf9F9O6FIw6VyxaJc"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLkVlVEZBM2FkaExR', 'snippet': {'publishedAt': '2016-11-01T22:43:01.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'Typecasting', 'description': 'NaNoWriMo: Day 1', 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/EeTFA3adhLQ/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/EeTFA3adhLQ/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/EeTFA3adhLQ/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/EeTFA3adhLQ/sddefault.jpg', 'width': 640, 'height': 480
+}
+, 'maxres': {'url': 'https://i.ytimg.com/vi/EeTFA3adhLQ/maxresdefault.jpg', 'width': 1280, 'height': 720
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 17, 'resourceId': {'kind': 'youtube#video', 'videoId': 'EeTFA3adhLQ'
+}
+
+}
+, 'contentDetails': {'videoId': 'EeTFA3adhLQ', 'videoPublishedAt': '2016-11-01T22:43:01.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/pnvZREaecaozgBolUPEjCymkpZg"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLkhtemFnaGROMkg0', 'snippet': {'publishedAt': '2016-09-20T11:49:15.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'A Gratitude Wodge', 'description': "Alcon, some fuzzies, a doofy little guy and a big wodge of gratitude\n\nLife's A Pitch podcast: https://soundcloud.com/lifesapitchpodcast/episode-79", 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/HmzaghdN2H4/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/HmzaghdN2H4/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/HmzaghdN2H4/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/HmzaghdN2H4/sddefault.jpg', 'width': 640, 'height': 480
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 18, 'resourceId': {'kind': 'youtube#video', 'videoId': 'HmzaghdN2H4'
+}
+
+}
+, 'contentDetails': {'videoId': 'HmzaghdN2H4', 'videoPublishedAt': '2016-09-20T11:49:15.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/wsPwZseadtd1KSxi_PHn3P-YAtE"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLlpfM0pUNlJXOWNF', 'snippet': {'publishedAt': '2016-09-10T17:07:44.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'WONKBOX.', 'description': 'wonk box', 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/Z_3JT6RW9cE/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/Z_3JT6RW9cE/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/Z_3JT6RW9cE/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/Z_3JT6RW9cE/sddefault.jpg', 'width': 640, 'height': 480
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 19, 'resourceId': {'kind': 'youtube#video', 'videoId': 'Z_3JT6RW9cE'
+}
+
+}
+, 'contentDetails': {'videoId': 'Z_3JT6RW9cE', 'videoPublishedAt': '2016-09-10T17:07:44.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/QW85jNzkfpAMY31kFCUpB53BfBo"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLl8wUy16RHVpTVRn', 'snippet': {'publishedAt': '2016-08-08T12:53:17.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': "Bulmers' Attic: Tiny Old Toys!", 'description': '#waddlethenobbledoo\n\nPatreons saw this video earlier than everyone else: http://www.patreon.com/demontomatodave', 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/_0S-zDuiMTg/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/_0S-zDuiMTg/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/_0S-zDuiMTg/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/_0S-zDuiMTg/sddefault.jpg', 'width': 640, 'height': 480
+}
+, 'maxres': {'url': 'https://i.ytimg.com/vi/_0S-zDuiMTg/maxresdefault.jpg', 'width': 1280, 'height': 720
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 20, 'resourceId': {'kind': 'youtube#video', 'videoId': '_0S-zDuiMTg'
+}
+
+}
+, 'contentDetails': {'videoId': '_0S-zDuiMTg', 'videoPublishedAt': '2016-08-08T12:53:17.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/HFz-5SlOjt2MKcL01i3FPykWGeM"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLldoRnU1bVgyNmZF', 'snippet': {'publishedAt': '2016-07-26T01:49:59.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'Exclusive Patreon Goodies', 'description': "http://www.patreon.com/demontomatodave\n\nI'll upload the next Revisiting Ocarina of Time video if I get 20 patrons!\n\n\nor if I don't!\n(It's coming in the next few days!)", 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/WhFu5mX26fE/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/WhFu5mX26fE/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/WhFu5mX26fE/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/WhFu5mX26fE/sddefault.jpg', 'width': 640, 'height': 480
+}
+, 'maxres': {'url': 'https://i.ytimg.com/vi/WhFu5mX26fE/maxresdefault.jpg', 'width': 1280, 'height': 720
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 21, 'resourceId': {'kind': 'youtube#video', 'videoId': 'WhFu5mX26fE'
+}
+
+}
+, 'contentDetails': {'videoId': 'WhFu5mX26fE', 'videoPublishedAt': '2016-07-26T01:49:59.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/RW2LnDrPTR4FDy0dtImNa1kn7Zg"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLkRhN0sxYVRvcFdv', 'snippet': {'publishedAt': '2016-07-26T12:12:11.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'Revisiting Ocarina of Time With Lyrics - Part 4: CONFRONTATION', 'description': 'In which we finally reach the Confrontation, and all its hidden melodies.\n\nOriginal Confrontation demo:\nhttps://www.youtube.com/watch?&v=i63ZinABiws\n\nThe actual Ocarina of Time With Lyrics song itself:\nhttps://www.youtube.com/watch?v=bRGxbQcunnU\n\nWithout Lyrics:\nhttps://demontomatodave.bandcamp.com/track/zelda-ocarina-of-time-without-lyrics\n\n\nPart 1:\nhttps://www.youtube.com/watch?v=4tOrA8fslbE\n\nPart 2:\nhttps://www.youtube.com/watch?v=88XF9yAml-8\n\nPart 2.5:\nhttps://www.youtube.com/watch?v=hcV5gbEznCA\n\nPart 3:\nhttps://www.youtube.com/watch?v=8obiZmhVAZ4', 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/Da7K1aTopWo/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/Da7K1aTopWo/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/Da7K1aTopWo/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/Da7K1aTopWo/sddefault.jpg', 'width': 640, 'height': 480
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 22, 'resourceId': {'kind': 'youtube#video', 'videoId': 'Da7K1aTopWo'
+}
+
+}
+, 'contentDetails': {'videoId': 'Da7K1aTopWo', 'videoPublishedAt': '2016-07-26T12:12:11.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/Mb1ZGRSJnNbmxiJuvnFExykS_ek"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLm84NklITC1uaTg4', 'snippet': {'publishedAt': '2016-07-11T19:10:06.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'I SAW GHOSTBUSTERS! [Spoiler-free review]', 'description': 'Is it good?? Is it terrible?? Here are my thoughts!', 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/o86IHL-ni88/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/o86IHL-ni88/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/o86IHL-ni88/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/o86IHL-ni88/sddefault.jpg', 'width': 640, 'height': 480
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 23, 'resourceId': {'kind': 'youtube#video', 'videoId': 'o86IHL-ni88'
+}
+
+}
+, 'contentDetails': {'videoId': 'o86IHL-ni88', 'videoPublishedAt': '2016-07-11T19:10:06.000Z'
+}
+
+}
+, {'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/31plwrIH0fCkUE7oy_Xb3vwCTJQ"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLjFJamlQT0FSSHZB', 'snippet': {'publishedAt': '2016-05-21T21:15:40.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'Force Awakens - Chapter 4', 'description': "Poe Dameron's mysterious disappearance", 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/1IjiPOARHvA/default.jpg', 'width': 120, 'height': 90
+}
+, 'medium': {'url': 'https://i.ytimg.com/vi/1IjiPOARHvA/mqdefault.jpg', 'width': 320, 'height': 180
+}
+, 'high': {'url': 'https://i.ytimg.com/vi/1IjiPOARHvA/hqdefault.jpg', 'width': 480, 'height': 360
+}
+, 'standard': {'url': 'https://i.ytimg.com/vi/1IjiPOARHvA/sddefault.jpg', 'width': 640, 'height': 480
+}
+
+}
+, 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 24, 'resourceId': {'kind': 'youtube#video', 'videoId': '1IjiPOARHvA'
+}
+
+}
+, 'contentDetails': {'videoId': '1IjiPOARHvA', 'videoPublishedAt': '2016-05-21T21:15:40.000Z'
+}
+
+}
+]
+}
+
