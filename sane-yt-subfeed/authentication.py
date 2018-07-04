@@ -1,7 +1,11 @@
+import os
+
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
-CLIENT_SECRETS_FILE = 'client_secret.json'
+OS_PATH = os.path.dirname(__file__)
+
+CLIENT_SECRETS_FILE = os.path.join(OS_PATH, 'resources', 'client_secret.json')
 SCOPES = ['https://www.googleapis.com/auth/youtube.readonly']
 
 API_SERVICE_NAME = 'youtube'
