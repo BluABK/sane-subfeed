@@ -1,0 +1,63 @@
+
+{
+	'kind': 'youtube#channelListResponse', 
+	'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/pjRKHU70ckyNRurYG5s3IDOTCUg"', 
+	'pageInfo': 
+	{
+		'totalResults': 1, 'resultsPerPage': 1
+	}, 
+	'items': 
+	[
+		{
+			'kind': 'youtube#channel', 
+			'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/zypVkiWECPFZQ_2y1g2RjsLpxzY"', 
+			'id': 'UCZn2JQsQd3MXH07aI9TDI3g', 
+			'snippet': 
+			{
+				'title': 'DemonTomatoDave', 
+				'description': 'Frightening fanboy.\ntwitter.com/demontomatodave', 
+				'customUrl': 'DemonTomatoDave', 
+				'publishedAt': '2009-11-19T12:31:36.000Z', 
+				'thumbnails': 
+				{
+					'default': 
+					{
+						'url': 'https://yt3.ggpht.com/-Dqz1Abcim6s/AAAAAAAAAAI/AAAAAAAAAAA/6RZhjDfDNI4/s88-c-k-no-mo-rj-c0xffffff/photo.jpg', 
+						'width': 88, 'height': 88
+					}, 'medium': 
+					{
+						'url': 'https://yt3.ggpht.com/-Dqz1Abcim6s/AAAAAAAAAAI/AAAAAAAAAAA/6RZhjDfDNI4/s240-c-k-no-mo-rj-c0xffffff/photo.jpg', 
+						'width': 240, 'height': 240
+					}, 'high': 
+					{
+						'url': 'https://yt3.ggpht.com/-Dqz1Abcim6s/AAAAAAAAAAI/AAAAAAAAAAA/6RZhjDfDNI4/s800-c-k-no-mo-rj-c0xffffff/photo.jpg', 
+						'width': 800, 'height': 800
+					}
+
+				}, 'localized': 
+				{
+					'title': 'DemonTomatoDave', 
+					'description': 'Frightening fanboy.\ntwitter.com/demontomatodave'
+				}, 'country': 'GB'
+			}, 
+			'contentDetails': 
+			{
+				'relatedPlaylists': 
+				{
+					'uploads': 'UUZn2JQsQd3MXH07aI9TDI3g', 
+					'watchHistory': 'HL', 
+					'watchLater': 'WL'
+				}
+
+			}, 
+			'statistics': 
+			{
+				'viewCount': '1394765', 
+				'commentCount': '0', 
+				'subscriberCount': '15076', 
+				'hiddenSubscriberCount': False, 'videoCount': '120'
+			}
+		}
+	]
+}
+

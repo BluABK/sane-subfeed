@@ -1,0 +1,97 @@
+reponse 
+{
+	'kind': 'youtube#subscriptionListResponse', 
+	'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/VIcypHSx3O8L-6csSQINalQX1jc"', 
+	'nextPageToken': 'CAUQAA', 
+	'pageInfo': 
+	{
+		'totalResults': 319, 
+		'resultsPerPage': 5
+	}, 
+	'items': 
+	[
+		{
+			'kind': 'youtube#subscription', 
+			'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/PSkznsuOQ8xqvyWxiIlfkGuX9LI"', 
+			'id': 'hq4NbEUcbmyR0tZtreCbMcdIdpn3fEQrcIsR1kfRtjI', 
+			'snippet': 
+			{
+				'publishedAt': '2015-06-23T15:00:53.000Z', 
+				'title': 'DemonTomatoDave', 
+				'description': 'Frightening fanboy.\ntwitter.com/demontomatodave', 
+				'resourceId': 
+				{
+					'kind': 'youtube#channel', 
+					'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g' 
+				}, 
+				'channelId': 'UCLozjflf3i84bu_2jLTK2rA', 
+				'thumbnails': 
+				{
+					'default': 
+					{
+						'url': 'https://yt3.ggpht.com/-Dqz1Abcim6s/AAAAAAAAAAI/AAAAAAAAAAA/6RZhjDfDNI4/s88-c-k-no-mo-rj-c0xffffff/photo.jpg'
+					}, 
+					'medium': 
+					{
+						'url': 'https://yt3.ggpht.com/-Dqz1Abcim6s/AAAAAAAAAAI/AAAAAAAAAAA/6RZhjDfDNI4/s240-c-k-no-mo-rj-c0xffffff/photo.jpg'
+					}, 
+					'high': 
+					{
+						'url': 'https://yt3.ggpht.com/-Dqz1Abcim6s/AAAAAAAAAAI/AAAAAAAAAAA/6RZhjDfDNI4/s800-c-k-no-mo-rj-c0xffffff/photo.jpg'
+					}
+				}
+			}, 
+			'contentDetails': 
+			{
+				'totalItemCount': 120, 
+				'newItemCount': 1, 
+				'activityType': 'all'
+			}
+		}, 
+		{
+			'kind': 'youtube#subscription', 
+			'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/wMxUocGIkNCJozZFvw-M5MIVQPY"', 
+			'id': 'hq4NbEUcbmyR0tZtreCbMd7Y7Yo66GTrBnPMULChvY8', 
+			'snippet': 
+			{
+				'publishedAt': '2013-10-16T17:13:28.000Z', 
+				'title': 'Jim Sterling', 
+				'description': 'The YouTube home of videogame not-journalist Jim Sterling. A game critic and raconteur, he runs The Jimquisition as a crowdfunded video series, podcast, and game review site, he is one third of FistShark Marketing, and he is trying to understand this YouTube thing!', 
+				'resourceId': 
+				{
+					'kind': 'youtube#channel', 
+					'channelId': 'UCWCw2Sd7RlYJ2yuNVHDWNOA'}, 
+					'channelId': 'UCLozjflf3i84bu_2jLTK2rA', 
+					'thumbnails': 
+					{
+						'default': 
+						{
+							'url': 'https://yt3.ggpht.com/-QZg-3Vf_L1w/AAAAAAAAAAI/AAAAAAAAAAA/sPsR_kzlqhk/s88-c-k-no-mo-rj-c0xffffff/photo.jpg'
+						}, 
+						'medium': 
+						{
+							'url': 'https://yt3.ggpht.com/-QZg-3Vf_L1w/AAAAAAAAAAI/AAAAAAAAAAA/sPsR_kzlqhk/s240-c-k-no-mo-rj-c0xffffff/photo.jpg'
+						}, 
+						'high': 
+						{
+							'url': 'https://yt3.ggpht.com/-QZg-3Vf_L1w/AAAAAAAAAAI/AAAAAAAAAAA/sPsR_kzlqhk/s800-c-k-no-mo-rj-c0xffffff/photo.jpg'
+						}
+					}
+			}, 
+			'contentDetails': 
+			{
+				'totalItemCount': 2051, 
+				'newItemCount': 8, 
+				'activityType': 'all'
+			}
+		}, 
+		{
+			'kind': 'youtube#subscription', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/0WlzeXZtqkRP65igJ2lIvWkVFGE"', 'id': 'hq4NbEUcbmyR0tZtreCbMSoyDnpePELDfvlUu1ZcQ6c', 'snippet': {'publishedAt': '2016-09-27T00:29:56.000Z', 'title': 'Shirrako', 'description': "COMING SOON: Naruto Shinobi Striker & More! 4K 60FPS videos, Walkthroughs, Boss Fight guides and many more videos!\n\nI'm just a guy that loves gaming and music, you will find unique gaming videos and soundtracks on my channel! \nOne of the fastest growing Gaming Channel on YouTube and the Home of 4K 60FPS. The Number #1 Best Quality Gaming Channel on YouTube, showcasing games in 4K 60FPS and 1080P HD.\nMy channel is all about Gaming Trailers, Gaming Videos. Trophy Walkthroughs and Soundtracks.\nSubscribe to support my YouTube videos, Thank you everyone! :)\n\n-Coming Soon Walkthroughs/Playthroughs-\n\nLEGO The Incredibles\nThe Crew 2\nBeyond Good & Evil 2\nSuper Smash Bros (Switch)\nMetroid Prime 4\nCall of Duty Black Ops 4\nFinal Fantasy VIII\nSpiderman (PS4)\nRed Dead Redemption 2\nThe Last of Us Part 2\nDays Gone\nDeath Stranding\nResident Evil 2 Remake\nKingdom Hearts 3\nFinal Fantasy VII Remake\n-\nPC SPECS\ni7-5960X 4.2 GHz\nGTX 1080TI\n32GB RAM DDR4", 'resourceId': {'kind': 'youtube#channel', 'channelId': 'UC7eAfUjR9gdIjoaoQaS0W-A'}, 'channelId': 'UCLozjflf3i84bu_2jLTK2rA', 'thumbnails': {'default': {'url': 'https://yt3.ggpht.com/-utn-ONq_WUk/AAAAAAAAAAI/AAAAAAAAAAA/Jd9LlA4aU_A/s88-c-k-no-mo-rj-c0xffffff/photo.jpg'}, 'medium': {'url': 'https://yt3.ggpht.com/-utn-ONq_WUk/AAAAAAAAAAI/AAAAAAAAAAA/Jd9LlA4aU_A/s240-c-k-no-mo-rj-c0xffffff/photo.jpg'}, 'high': {'url': 'https://yt3.ggpht.com/-utn-ONq_WUk/AAAAAAAAAAI/AAAAAAAAAAA/Jd9LlA4aU_A/s800-c-k-no-mo-rj-c0xffffff/photo.jpg'}}}, 'contentDetails': {'totalItemCount': 7452, 'newItemCount': 76, 'activityType': 'all'}}, 
+		{
+			'kind': 'youtube#subscription', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/53YGnj3i10MTgJQy4M-7fNGEnNQ"', 'id': 'hq4NbEUcbmyR0tZtreCbMRFDmbegiNp5gKCDuN91uk8', 'snippet': {'publishedAt': '2016-01-30T23:52:34.000Z', 'title': 'EnterElysium', 'description': 'I play games, I covered new releases (indie games especially) and occasionally I even do some gaming news if anything particularly interesting pops up!\n\nGaming Rig:\nProcessor: Intel Core i7-5930K 3.5GHz 6-Core Processor (note: Cooler Master AIO Heatsink).\nGraphics: Nvidia EVGA Geforce GTX 980Ti Hybrid\nRAM: 4x 8GB RAM, Corsair DDR4 Vengeance\nMotherBoard: ASUS X99 Deluxe\nStorage: 250GB and 500GB Samsung SSDs, 4x 4TB Western Digital Red HDD (2 in RAID0).\nPSU: Corsair HX850i\nTower: Fractal R5\n\nRecording Software: DXTory\n\nEditing Software: Adobe Suite\n\n---\n\nFan Mail, Business Mail and Delicious Goodness to:\n\nEnterElysium\nBox 332, Clifford House\n7-9 Clifford Street\nYork, Yorkshire\nYO1 9RA\nUnited Kingdom', 'resourceId': {'kind': 'youtube#channel', 'channelId': 'UC_lkYO1SiTqRAD_ou1Tk4Eg'}, 'channelId': 'UCLozjflf3i84bu_2jLTK2rA', 'thumbnails': {'default': {'url': 'https://yt3.ggpht.com/-hzvP6WlU_9M/AAAAAAAAAAI/AAAAAAAAAAA/hOniTL-9_XE/s88-c-k-no-mo-rj-c0xffffff/photo.jpg'}, 'medium': {'url': 'https://yt3.ggpht.com/-hzvP6WlU_9M/AAAAAAAAAAI/AAAAAAAAAAA/hOniTL-9_XE/s240-c-k-no-mo-rj-c0xffffff/photo.jpg'}, 'high': {'url': 'https://yt3.ggpht.com/-hzvP6WlU_9M/AAAAAAAAAAI/AAAAAAAAAAA/hOniTL-9_XE/s800-c-k-no-mo-rj-c0xffffff/photo.jpg'}}}, 'contentDetails': {'totalItemCount': 4375, 'newItemCount': 6, 'activityType': 'all'}}, 
+		{
+			'kind': 'youtube#subscription', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/d9jEjg_pu04moX-LtJJDu4obvSk"', 'id': 'hq4NbEUcbmyR0tZtreCbMd8s2SthkxkTBwuJDQwx0eA', 'snippet': {'publishedAt': '2015-03-09T21:53:00.000Z', 'title': 'Ohmwrecker / Maskedgamer', 'description': 'Home of the one and only Ohmwrecker!  Check back daily for seriously awesome gaming videos! :D\n\n►Business Inquiries: ohm[at]ohmwrecker.com\n\n►Fan Email: ohmzone[at]outlook.com\n\nFAQ:\n\n►Did you know that there\'s an item & song called the "Ohmwrecker" in League of Legends?  Yes, that\'s literally an item named after me, no kidding (see my video on it) :)\n\n►What do you use to record your gameplay?  OBS (PC), Elgato Game Capture 60S (consoles)\n\n►Computer specs?  Intel Core i7-6950X CPU, 64GB RAM, Geforce GTX 1080 Ti, 6TB HD.  \n\n►What do you edit videos with?  Vegas Pro - http://www.vegascreativesoftware.com/us/vegas-pro/', 'resourceId': {'kind': 'youtube#channel', 'channelId': 'UCURh19hEVawK-H0Wl7KnR5Q'}, 'channelId': 'UCLozjflf3i84bu_2jLTK2rA', 'thumbnails': {'default': {'url': 'https://yt3.ggpht.com/-1j1NF0O9Y6A/AAAAAAAAAAI/AAAAAAAAAAA/G5IoL-qV7qQ/s88-c-k-no-mo-rj-c0xffffff/photo.jpg'}, 'medium': {'url': 'https://yt3.ggpht.com/-1j1NF0O9Y6A/AAAAAAAAAAI/AAAAAAAAAAA/G5IoL-qV7qQ/s240-c-k-no-mo-rj-c0xffffff/photo.jpg'}, 'high': {'url': 'https://yt3.ggpht.com/-1j1NF0O9Y6A/AAAAAAAAAAI/AAAAAAAAAAA/G5IoL-qV7qQ/s800-c-k-no-mo-rj-c0xffffff/photo.jpg'}}}, 'contentDetails': {'totalItemCount': 2754, 'newItemCount': 7, 'activityType': 'all'}}
+	]
+}
+
+Process finished with exit code 0

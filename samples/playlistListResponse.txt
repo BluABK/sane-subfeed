@@ -1,0 +1,55 @@
+{
+	'kind': 'youtube#playlistListResponse', 
+	'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/EhajkNpGGcKyr3zlkZPprR38GSE"', 
+	'pageInfo': 
+	{
+		'totalResults': 1, 
+		'resultsPerPage': 25
+	}, 
+	'items': 
+	[
+		{
+			'kind': 'youtube#playlist', 
+			'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/4krwrYq5IXH_oM3oscrnZf5siqM"', 
+			'id': 'UUZn2JQsQd3MXH07aI9TDI3g', 
+			'snippet': 
+			{
+				'publishedAt': '1970-01-01T00:00:00.000Z', 
+				'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 
+				'title': 'Uploads from DemonTomatoDave', 
+				'description': '', 
+				'thumbnails': 
+				{
+					'default': 
+					{
+						'url': 'https://i.ytimg.com/vi/X1XUkGsckGo/default.jpg', 
+						'width': 120, 
+						'height': 90
+					}, 
+					'medium': 
+					{
+						'url': 'https://i.ytimg.com/vi/X1XUkGsckGo/mqdefault.jpg', 
+						'width': 320, 
+						'height': 180
+					}, 
+					'high': 
+					{
+						'url': 'https://i.ytimg.com/vi/X1XUkGsckGo/hqdefault.jpg', 
+						'width': 480, 
+						'height': 360
+					}
+				}, 
+				'channelTitle': 'DemonTomatoDave', 
+				'localized': 
+				{
+					'title': 'Uploads from DemonTomatoDave', 
+					'description': ''
+				}
+			}, 
+			'contentDetails': 
+			{
+				'itemCount': 120
+			}
+		}
+	]
+}
