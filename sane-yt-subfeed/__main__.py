@@ -32,7 +32,7 @@ except Exception as e:
 # Get authenticated user's subscriptions
 timer_start = timer()
 # Get a list on the form of [total, subs, statistics]
-subscriptions = controller.get_subscriptions(info=False, traverse_pages=False)
+subscriptions = controller.get_subscriptions(info=False, traverse_pages=True)
 subscription_total = subscriptions[0]
 subscription_list = subscriptions[1]
 timer_end = timer()
@@ -51,7 +51,7 @@ youtube_key = youtube_auth_keys()
 # Fetch uploaded videos for each subscribed channel
 timer_start = timer()
 uploads = Uploads(youtube_key)
-subscription_feed = uploads.get_uploads(subscription_list, debug=False, disable_threading=True)
+subscription_feed = uploads.get_uploads(subscription_list, debug=False, disable_threading=False)
 # subscription_feed = controller.get_uploads_all_channels(subscription_list, debug=False, disable_threading=False)  # FIXME: Re-using subscription_list?
 timer_end = timer()
 subfeed_time_elapsed = (timer_end - timer_start)

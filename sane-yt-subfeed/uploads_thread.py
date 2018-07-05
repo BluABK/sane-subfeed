@@ -3,7 +3,7 @@ import threading
 
 class GetUploadsThread(threading.Thread):
 
-    def __init__(self,uploads, thread_id, channel, info=False, debug=False):
+    def __init__(self, uploads, thread_id, channel, info=False, debug=False):
         """
         Init GetUploadsThread
         :param thread_id:

@@ -1,3 +1,4 @@
+from authentication import youtube_auth_keys
 from controller import Controller
 from uploads_thread import GetUploadsThread
 import time
@@ -77,7 +78,9 @@ class Uploads:
         thread_list = []
         delay = self.load_time / len(self.subs)
         for channel in self.subs:
-            thread = GetUploadsThread(self, thread_increment, channel, info=True, debug=False)
+            youtube_key = youtube_auth_keys()
+            uploads_new = Uploads(youtube_key)
+            thread = GetUploadsThread(uploads_new, thread_increment, channel, info=True, debug=False)
             thread_list.append(thread)
             thread_increment += 1
 
