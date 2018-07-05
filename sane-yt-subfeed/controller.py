@@ -134,9 +134,6 @@ class Controller:
         # Loop through subfeed and determine the longest channel name (for OCD/indent purposes) # TODO: Generalise
         longest_title = 0
         for i, (date, video) in enumerate(subfeed.items()):
-            print(i)
-            print(date)
-            print(video)
             if len(video.channel_title) > longest_title:
                 longest_title = len(video.channel_title)
             if i > cutoff:
