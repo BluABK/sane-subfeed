@@ -45,7 +45,7 @@ class GetUploadsThread(threading.Thread):
 
     def get_videos(self):
         """
-        Return a list of videos
+        Return a list of Video objects
         :return:
         """
         return self.videos
