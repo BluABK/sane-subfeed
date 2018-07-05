@@ -45,18 +45,30 @@
 			}
 		}, 
 		{
-			'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/_kCeRfwmVOKhwjA0wrZgnAZFvnQ"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLmZVMmlObWE3ZnhZ', 'snippet': {'publishedAt': '2018-02-27T22:24:52.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'Atlantis Headcanon (Serious Disness podcast excerpt)', 'description': 'http://seriousdisness.wigglehe.com/  \n^^^^ That is the podcast this is from.\nYou can also subscribe on iTunes, or Apple Podcasts, or WHATEVER IT IS NOW here: https://itunes.apple.com/us/podcast/serious-disness/id1257468200', 'thumbnails': {'default': {'url': 'https://i.ytimg.com/vi/fU2iNma7fxY/default.jpg', 'width': 120, 'height': 90
-}
-, 'medium': {'url': 'https://i.ytimg.com/vi/fU2iNma7fxY/mqdefault.jpg', 'width': 320, 'height': 180
-}
-, 'high': {'url': 'https://i.ytimg.com/vi/fU2iNma7fxY/hqdefault.jpg', 'width': 480, 'height': 360
-}
-, 'standard': {'url': 'https://i.ytimg.com/vi/fU2iNma7fxY/sddefault.jpg', 'width': 640, 'height': 480
-}
-, 'maxres': {'url': 'https://i.ytimg.com/vi/fU2iNma7fxY/maxresdefault.jpg', 'width': 1280, 'height': 720
-}
-
-}
+			'kind': 'youtube#playlistItem', 'etag': '"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/_kCeRfwmVOKhwjA0wrZgnAZFvnQ"', 'id': 'VVVabjJKUXNRZDNNWEgwN2FJOVRESTNnLmZVMmlObWE3ZnhZ', 'snippet': {'publishedAt': '2018-02-27T22:24:52.000Z', 'channelId': 'UCZn2JQsQd3MXH07aI9TDI3g', 'title': 'Atlantis Headcanon (Serious Disness podcast excerpt)', 'description': 'http://seriousdisness.wigglehe.com/  \n^^^^ That is the podcast this is from.\nYou can also subscribe on iTunes, or Apple Podcasts, or WHATEVER IT IS NOW here: https://itunes.apple.com/us/podcast/serious-disness/id1257468200',
+			'thumbnails':
+			{
+			    'default':
+			    {
+			        'url': 'https://i.ytimg.com/vi/fU2iNma7fxY/default.jpg', 'width': 120, 'height': 90
+                },
+                'medium':
+                {
+                    'url': 'https://i.ytimg.com/vi/fU2iNma7fxY/mqdefault.jpg', 'width': 320, 'height': 180
+                },
+                'high':
+                {
+                    'url': 'https://i.ytimg.com/vi/fU2iNma7fxY/hqdefault.jpg', 'width': 480, 'height': 360
+                },
+                'standard':
+                {
+                    'url': 'https://i.ytimg.com/vi/fU2iNma7fxY/sddefault.jpg', 'width': 640, 'height': 480
+                },
+                'maxres':
+                {
+                    'url': 'https://i.ytimg.com/vi/fU2iNma7fxY/maxresdefault.jpg', 'width': 1280, 'height': 720
+                }
+            }
 , 'channelTitle': 'DemonTomatoDave', 'playlistId': 'UUZn2JQsQd3MXH07aI9TDI3g', 'position': 1, 'resourceId': {'kind': 'youtube#video', 'videoId': 'fU2iNma7fxY'
 }
 

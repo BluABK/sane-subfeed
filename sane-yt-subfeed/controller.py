@@ -139,8 +139,6 @@ class Controller:
 
         return channels
 
-
-
     @staticmethod
     def print_subscription_feed(subfeed, longest_title, cutoff=20):
         """

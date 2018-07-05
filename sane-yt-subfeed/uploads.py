@@ -134,7 +134,7 @@ class Uploads:
             playlistitems_list_response = playlistitems_list_request.execute()
 
             # Grab information about each video.
-            for playlist_item in playlistitems_list_response['items']:
+            for playlist_item in playlistitems_list_response['items']: # TODO: Video obj
                 channel_title = playlist_item['snippet']['channelTitle']
                 title = playlist_item['snippet']['title']
                 video_id = playlist_item['snippet']['resourceId']['videoId']
