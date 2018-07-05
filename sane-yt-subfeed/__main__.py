@@ -1,5 +1,5 @@
 from controller import Controller
-from authentication import get_authenticated_service
+from authentication import youtube_auth_keys, youtube_auth_oauth
 from timeit import default_timer as timer
 from pickle_handler import load_youtube, dump_youtube
 
@@ -10,29 +10,29 @@ global_info = False
 collect_statistics = True
 
 try:
-    youtube = load_youtube()
+    youtube_oauth = load_youtube()
 except Exception as e:
     print(e)
-    youtube = get_authenticated_service()
-    dump_youtube(youtube)
+    youtube_oauth = youtube_auth_oauth()
+    dump_youtube(youtube_oauth)
 
 
 # Auth OAuth2 with YouTube API
 
 # Create controller object
-controller = Controller(youtube)
+controller = Controller(youtube_oauth)
 try:
     controller.get_subscriptions(traverse_pages=False)
 except Exception as e:
     print(e)
-    youtube = get_authenticated_service()
-    dump_youtube(youtube)
-    controller = Controller(youtube)
+    youtube_oauth = youtube_auth_oauth()
+    dump_youtube(youtube_oauth)
+    controller = Controller(youtube_oauth)
 
 # Get authenticated user's subscriptions
 timer_start = timer()
 # Get a list on the form of [total, subs, statistics]
-subscriptions = controller.get_subscriptions(info=False, traverse_pages=True)
+subscriptions = controller.get_subscriptions(info=False, traverse_pages=False)
 subscription_total = subscriptions[0]
 subscription_list = subscriptions[1]
 timer_end = timer()
@@ -47,10 +47,11 @@ if subscription_total != len(subscription_list):
 # Process subscriptions and related data into a more manageable dict, TODO: Currently only used for longest_title
 subscribed_channels = controller.process_subscriptions(subscription_list, info=True)
 
+youtube_key = youtube_auth_keys()
 # Fetch uploaded videos for each subscribed channel
 timer_start = timer()
-uploads = Uploads(youtube)
-subscription_feed = uploads.get_uploads(subscription_list, debug=False, disable_threading=False)
+uploads = Uploads(youtube_key)
+subscription_feed = uploads.get_uploads(subscription_list, debug=False, disable_threading=True)
 # subscription_feed = controller.get_uploads_all_channels(subscription_list, debug=False, disable_threading=False)  # FIXME: Re-using subscription_list?
 timer_end = timer()
 subfeed_time_elapsed = (timer_end - timer_start)
