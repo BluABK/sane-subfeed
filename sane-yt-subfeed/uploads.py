@@ -33,8 +33,7 @@ class Uploads:
         if disable_threading:
             uploads = self.get_uploads_sequential()
         else:
-            # uploads = self.get_uploads_threaded()
-            uploads = None
+            uploads = self.get_uploads_threaded()
         self.uploads = uploads
         return uploads
 
@@ -61,41 +60,43 @@ class Uploads:
 
         return retval
 
-    # def get_uploads_threaded(self):
-    #     """
-    #     Returns a date-sorted OrderedDict of a list of each subscriptions' "Uploaded videos" playlist.
-    #     :param subs: list of subscriptions
-    #     :param debug:
-    #     :param info: debug lite
-    #     :param load_time: User specified expected time (in seconds) for the job to be done
-    #     :param disable_threading: Hack to disable the currently broken threading implementation (see: Issue #1)
-    #     :return:
-    #     """
-    #     statistics = []
-    #     new_videos_by_timestamp = {}
-    #
-    #     thread_increment = 0
-    #     thread_list = []
-    #     delay = self.load_time / len(self.subs)
-    #     for channel in self.subs:
-    #         thread = GetUploadsThread(thread_increment, channel, info=True, debug=False)
-    #         thread_list.append(thread)
-    #         thread_increment += 1
-    #
-    #     print("Iterating over thread list...")
-    #     for t in thread_list:
-    #         t.start()
-    #         # time.sleep(delay)
-    #         time.sleep(0.5)
-    #
-    #     for t in thread_list:
-    #         while t.finished() is not True:
-    #             print("DEBUG: Thread #%s is still not done... Sleeping for 10 seconds" % t.get_id())
-    #             time.sleep(1)
-    #         for vid in t.get_videos():
-    #             new_videos_by_timestamp.update({vid['date']: vid})
-    #             statistics.append(t.get_statistics())
-    #      return
+    def get_uploads_threaded(self):
+        """
+        Returns a date-sorted OrderedDict of a list of each subscriptions' "Uploaded videos" playlist.
+        :param subs: list of subscriptions
+        :param debug:
+        :param info: debug lite
+        :param load_time: User specified expected time (in seconds) for the job to be done
+        :param disable_threading: Hack to disable the currently broken threading implementation (see: Issue #1)
+        :return:
+        """
+        statistics = []
+        new_videos_by_timestamp = {}
+
+        thread_increment = 0
+        thread_list = []
+        delay = self.load_time / len(self.subs)
+        for channel in self.subs:
+            thread = GetUploadsThread(self, thread_increment, channel, info=True, debug=False)
+            thread_list.append(thread)
+            thread_increment += 1
+
+        print("Iterating over thread list...")
+        for t in thread_list:
+            t.start()
+            # time.sleep(delay)
+            time.sleep(0.5)
+
+        for t in thread_list:
+            while t.finished() is not True:
+                print("DEBUG: Thread #%s is still not done... Sleeping for 10 seconds" % t.get_id())
+                time.sleep(1)
+            for vid in t.get_videos():
+                new_videos_by_timestamp.update({vid['date']: vid})
+                statistics.append(t.get_statistics())
+        retval = OrderedDict(sorted(new_videos_by_timestamp.items(), reverse=True))
+        retval['statistics'] = statistics
+        return retval
 
     def get_channel_uploads(self, channel_id):
         """

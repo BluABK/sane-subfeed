@@ -3,7 +3,7 @@ import threading
 
 class GetUploadsThread(threading.Thread):
 
-    def __init__(self, thread_id, channel, info=False, debug=False):
+    def __init__(self,uploads, thread_id, channel, info=False, debug=False):
         """
         Init GetUploadsThread
         :param thread_id:
@@ -19,6 +19,7 @@ class GetUploadsThread(threading.Thread):
         self.statistics = {}
         self.videos = []
         self.job_done = False
+        self.uploads = uploads
 
     # TODO: Handle failed requests
     def run(self):
@@ -33,7 +34,7 @@ class GetUploadsThread(threading.Thread):
             print(" -- Fetching Uploaded videos for channel: %s" % channel_title)
         else:
             print("")
-        retval = self.controller.get_uploads(channel_id, debug=self.debug)
+        retval = self.uploads.get_channel_uploads(channel_id)
 
         self.videos = retval[0]
         self.statistics = retval[1]
