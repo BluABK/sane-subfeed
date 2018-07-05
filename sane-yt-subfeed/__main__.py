@@ -2,6 +2,8 @@ from controller import Controller
 from authentication import get_authenticated_service
 from timeit import default_timer as timer
 
+from uploads import Uploads
+
 global_debug = False
 global_info = False
 collect_statistics = True
@@ -16,7 +18,7 @@ controller = Controller(youtube)
 # Get authenticated user's subscriptions
 timer_start = timer()
 # Get a list on the form of [total, subs, statistics]
-subscriptions = controller.get_subscriptions(info=True, traverse_pages=False)
+subscriptions = controller.get_subscriptions(info=False, traverse_pages=True)
 subscription_total = subscriptions[0]
 subscription_list = subscriptions[1]
 timer_end = timer()
@@ -33,7 +35,9 @@ subscribed_channels = controller.process_subscriptions(subscription_list, info=T
 
 # Fetch uploaded videos for each subscribed channel
 timer_start = timer()
-subscription_feed = controller.get_uploads_all_channels(subscription_list, debug=False, disable_threading=True)  # FIXME: Re-using subscription_list?
+uploads = Uploads(youtube)
+subscription_feed = uploads.get_uploads(subscription_list, debug=False, disable_threading=True)
+# subscription_feed = controller.get_uploads_all_channels(subscription_list, debug=False, disable_threading=False)  # FIXME: Re-using subscription_list?
 timer_end = timer()
 subfeed_time_elapsed = (timer_end - timer_start)
 

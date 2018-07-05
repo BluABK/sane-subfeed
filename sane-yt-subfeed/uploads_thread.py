@@ -2,9 +2,8 @@ import threading
 
 
 class GetUploadsThread(threading.Thread):
-    controller = None
 
-    def __init__(self, thread_id, controller, channel, info=False, debug=False):
+    def __init__(self, thread_id, channel, info=False, debug=False):
         """
         Init GetUploadsThread
         :param thread_id:
@@ -13,7 +12,6 @@ class GetUploadsThread(threading.Thread):
         :param debug:
         """
         threading.Thread.__init__(self)
-        self.controller = controller
         self.thread_id = thread_id
         self.channel = channel
         self.info = info
