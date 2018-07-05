@@ -4,6 +4,7 @@ from uploads_thread import GetUploadsThread
 import time
 from collections import OrderedDict
 from timeit import default_timer as timer
+from tqdm import tqdm # fancy progress bar
 
 YOUTUBE_URL = "https://www.youtube.com/"
 YOUTUBE_PARM_VIDEO = "watch?v="
@@ -77,26 +78,32 @@ class Uploads:
         thread_increment = 0
         thread_list = []
         delay = self.load_time / len(self.subs)
-        for channel in self.subs:
+
+        print("Creating YouTube service object from API_KEY for %s channels:" % len(self.subs))
+        for channel in tqdm(self.subs):
+            if self.debug:
+                print("Creating YouTube service object from API_KEY for channel: %s" % channel['snippet']['title'])
             youtube_key = youtube_auth_keys()
             uploads_new = Uploads(youtube_key)
             thread = GetUploadsThread(uploads_new, thread_increment, channel, info=True, debug=False)
             thread_list.append(thread)
             thread_increment += 1
 
-        print("Iterating over thread list...")
-        for t in thread_list:
+        print("\nStarting threads:")
+        for t in tqdm(thread_list):
             t.start()
             # time.sleep(delay)
-            time.sleep(0.5)
+            time.sleep(0.010)
 
-        for t in thread_list:
+        print("\nCollecting data from %s threads:" % len(thread_list))
+        for t in tqdm(thread_list):
             while t.finished() is not True:
-                print("DEBUG: Thread #%s is still not done... Sleeping for 10 seconds" % t.get_id())
-                time.sleep(1)
+                print("\nNOTE: Thread #%s is still not done... Sleeping for 0.010 seconds" % t.get_id())
+                time.sleep(0.010)
             for vid in t.get_videos():
                 new_videos_by_timestamp.update({vid['date']: vid})
                 statistics.append(t.get_statistics())
+
         retval = OrderedDict(sorted(new_videos_by_timestamp.items(), reverse=True))
         retval['statistics'] = statistics
         return retval
