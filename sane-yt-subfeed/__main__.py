@@ -1,6 +1,7 @@
 from controller import Controller
 from authentication import get_authenticated_service
 from timeit import default_timer as timer
+from pickle_handler import load_youtube, dump_youtube
 
 from uploads import Uploads
 
@@ -8,12 +9,25 @@ global_debug = False
 global_info = False
 collect_statistics = True
 
+try:
+    youtube = load_youtube()
+except Exception as e:
+    print(e)
+    youtube = get_authenticated_service()
+    dump_youtube(youtube)
+
 
 # Auth OAuth2 with YouTube API
-youtube = get_authenticated_service()
 
 # Create controller object
 controller = Controller(youtube)
+try:
+    controller.get_subscriptions(traverse_pages=False)
+except Exception as e:
+    print(e)
+    youtube = get_authenticated_service()
+    dump_youtube(youtube)
+    controller = Controller(youtube)
 
 # Get authenticated user's subscriptions
 timer_start = timer()
