@@ -1,6 +1,7 @@
 from authentication import youtube_auth_keys
 from controller import Controller
 from uploads_thread import GetUploadsThread
+from video import Video
 import time
 from collections import OrderedDict
 from timeit import default_timer as timer
@@ -53,8 +54,8 @@ class Uploads:
             new_videos_channel = tmp[0]
             statistics.append(tmp[1])
 
-            for vid in new_videos_channel:
-                new_videos_by_timestamp.update({vid['date']: vid})
+            for video in new_videos_channel:
+                new_videos_by_timestamp.update({video.date_published: video})
 
         # Return a reverse chronological sorted OrderedDict (newest --> oldest)
         retval = OrderedDict(sorted(new_videos_by_timestamp.items(), reverse=True))
@@ -98,10 +99,11 @@ class Uploads:
         print("\nCollecting data from %s threads:" % len(thread_list))
         for t in tqdm(thread_list):
             while t.finished() is not True:
-                print("\nNOTE: Thread #%s is still not done... Sleeping for 0.010 seconds" % t.get_id())
+                if self.debug:
+                    print("\nNOTE: Thread #%s is still not done... Sleeping for 0.010 seconds" % t.get_id())
                 time.sleep(0.010)
             for vid in t.get_videos():
-                new_videos_by_timestamp.update({vid['date']: vid})
+                new_videos_by_timestamp.update({vid.date_published: vid})
                 statistics.append(t.get_statistics())
 
         retval = OrderedDict(sorted(new_videos_by_timestamp.items(), reverse=True))
@@ -145,27 +147,26 @@ class Uploads:
             playlistitems_list_response = playlistitems_list_request.execute()
 
             # Grab information about each video.
-            for playlist_item in playlistitems_list_response['items']: # TODO: Video obj
-                channel_title = playlist_item['snippet']['channelTitle']
-                title = playlist_item['snippet']['title']
-                video_id = playlist_item['snippet']['resourceId']['videoId']
-                date_published = playlist_item['snippet']['publishedAt']
-                description = playlist_item['snippet']['description']
-                thumbnails = playlist_item['snippet']['thumbnails']
+            first_run = True
+            for playlist_item in playlistitems_list_response['items']:
+                video = Video(playlist_item)
+
+                if first_run:
+                    channel_title = video.channel_title  # Used for statistics
 
                 if self.debug:
-                    print('%s\t%s%s\t%s:\t%s\t%s' % (date_published, YT_VIDEO_URL, video_id, channel_title, title,
-                                                     repr(description)))
-
-                videos.append({'date': date_published, 'id': video_id, 'channel': channel_title, 'title': title,
-                               'description': description, 'thumbnails': thumbnails})
-                # videos.append([date_published, video_id, channel_title, title, description])
+                    print('%s\t%s%s\t%s:\t%s\t%s' % (video.date_published, YT_VIDEO_URL, video.video_id,
+                                                     video.channel_title, video.title, repr(video.description)))
+                # TODO: clean
+                #videos.append({'date': video.date_published, 'id': video.video_id, 'channel': video.channel_title, 'title': video.title,
+                #               'description': video.description, 'thumbnails': video.thumbnails})
+                videos.append(video)
                 if len(videos) >= self.limit:
-                    _timer_end = timer()
-                    statistics = {'channel_title': channel_title, 'time_elapsed': (_timer_end - _timer_start)}
-                    return [videos, statistics]
+                    _timer_end = timer()    # end timer for channel statistics (*NOT* video)
+                    statistics = {'channel_title': video.channel_title, 'time_elapsed': (_timer_end - _timer_start)}
+                    return [videos, statistics]     # TODO: Make channel stats into object and give ptr to Video?
 
-            # Keep traversing pages
+            # Keep traversing pages # FIXME: Add limitation
             playlistitems_list_request = self.youtube.playlistItems().list_next(
                 playlistitems_list_request, playlistitems_list_response)
         _timer_end = timer()

@@ -44,20 +44,27 @@ if subscription_total != len(subscription_list):
     print("WARNING: Subscription list mismatched advertised length (%s/%s)!" % (len(subscription_list),
                                                                                 subscription_total))
 
-# Process subscriptions and related data into a more manageable dict, TODO: Currently only used for longest_title
-subscribed_channels = controller.process_subscriptions(subscription_list, info=False)
+# Print the channels in a subscription list
+# subscribed_channels = controller.print_channels(subscription_list)
 
 youtube_key = youtube_auth_keys()
 # Fetch uploaded videos for each subscribed channel
 timer_start = timer()
 uploads = Uploads(youtube_key)
 subscription_feed = uploads.get_uploads(subscription_list, info=True, debug=False, disable_threading=False)
-# subscription_feed = controller.get_uploads_all_channels(subscription_list, debug=False, disable_threading=False)  # FIXME: Re-using subscription_list?
 timer_end = timer()
 subfeed_time_elapsed = (timer_end - timer_start)
 
+# Split out the bothersome stats
+subscription_feed_statistics = None
+try:
+    subscription_feed_statistics = subscription_feed.pop('statistics')
+except KeyError:
+    pass
+
 # Print the subscription feed
-controller.print_subscription_feed(subscription_feed, subscribed_channels['longest_title'], cutoff=100)
+
+controller.print_subscription_feed(subscription_feed, cutoff=100)
 
 if collect_statistics:
     print("\nSTATISTICS:")
@@ -68,10 +75,10 @@ if collect_statistics:
     controller.print_stats_summary(page_time, indent='\t')
 
     print("Subscription feed: Requested %s playlists in %s seconds." % (    # FIXME: Ridiculously inflated number
-        len(subscription_feed['statistics']), subfeed_time_elapsed))
+        len(subscription_feed_statistics), subfeed_time_elapsed))
     subfeed_time_elapsed_channels = []
     # Iterate a list of two-item dicts
-    for item in subscription_feed['statistics']:
+    for item in subscription_feed_statistics:
         # Append elapsed time statistics to a list
         subfeed_time_elapsed_channels.append(item['time_elapsed'])
 

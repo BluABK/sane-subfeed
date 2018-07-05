@@ -12,6 +12,7 @@ class Video:
     playlist_pos = None
     url_video = None
     url_playlist_video = None
+    stats_time_elapsed = None
 
     def __init__(self, playlist_item):
         """
@@ -27,7 +28,7 @@ class Video:
         self.playlist_pos = playlist_item['snippet']['position']    # Which position it's got in the playlist
 
         self.url_video = YOUTUBE_URL_BASE + YOUTUBE_URL_PART_VIDEO + self.video_id
-        self.url_playlist_video = self.url_video + "&list=" + + self.playlist_id
+        self.url_playlist_video = self.url_video + "&list=" + self.playlist_id
 
         self.determine_thumbnails(playlist_item['snippet']['thumbnails'])
 
@@ -56,3 +57,6 @@ class Video:
         if 'maxres' in thumbnails_item.keys():
             self.thumbnails['available_quality'].append("maxres")       # 1280x720 px
             self.thumbnails['maxres'] = thumbnails_item['maxres']
+
+    def set_stats(self, stats):
+            self.stats_time_elapsed = stats

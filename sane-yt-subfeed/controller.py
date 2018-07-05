@@ -112,42 +112,36 @@ class Controller:
         return [total, subs, statistics]
 
     @staticmethod
-    def process_subscriptions(subs, info=False):  # FIXME: Barely used?
+    def print_channels(subs):
         """
-        Process subscriptions and related data into a more manageable dict.
+        Prints a list of channels and relevant data from a subscription list
         :param subs:
-        :param info:
         :return:
         """
-        channels = {}
-        longest_title = 0
-
-        for _item in subs:
-            title = _item['snippet']['title']
-            description = _item['snippet']['description']
-            cid = _item['snippet']['resourceId']['channelId']
-
-            # Fix spacing issues between Channel and Video Title
-            if len(title) > longest_title:
-                longest_title = len(title)
-
-            # Put channels and relevant data into a dict that is easier to handle
-            channels.update({'id': cid, 'title': title, 'description': description, 'longest_title': longest_title})
-
-            if info:
-                print("[%s] %s: %s" % (cid, title, repr(description)))
-
-        return channels
+        for s in subs:
+            print("[%s] %s: %s" % (s['snippet']['resourceId']['channelId'], s['snippet']['title'],
+                                   repr(s['snippet']['description'])))
 
     @staticmethod
-    def print_subscription_feed(subfeed, longest_title, cutoff=20):
+    def print_subscription_feed(subfeed, cutoff=20):
         """
         Print a basic listing of the processed subscription feed.
         :param subfeed:
-        :param longest_title:
         :param cutoff: How many videos/items to list
         :return:
         """
+
+        # Loop through subfeed and determine the longest channel name (for OCD/indent purposes) # TODO: Generalise
+        longest_title = 0
+        for i, (date, video) in enumerate(subfeed.items()):
+            print(i)
+            print(date)
+            print(video)
+            if len(video.channel_title) > longest_title:
+                longest_title = len(video.channel_title)
+            if i > cutoff:
+                break
+
         # TODO: Omit really old videos from feed (possibly implement in the uploaded videos fetching part)
         # TODO: Make list have a sensible length and not subscriptions*25 (Currently mitigated by 'i')
         for i, (date, video) in enumerate(subfeed.items()):
@@ -155,11 +149,11 @@ class Controller:
             if i > cutoff:
                 break
             # TODO: Use longest title of current list, not entire subscriptions.
-            offset = longest_title - len(video['channel'])
+            offset = longest_title - len(video.channel_title)
             spacing = " " * offset + " " * 4
 
-            print('%s\t%s%s\t%s:%s%s\t%s' % (video['date'], YT_VIDEO_URL, video['id'], video['channel'], spacing,
-                                             video['title'], repr(video['description'])))
+            print('%s\t%s%s\t%s:%s%s\t%s…' % (video.date_published, YT_VIDEO_URL, video.video_id, video.channel_title,
+                                              spacing, video.title, repr(video.description)[0:30]))
 
     @staticmethod
     def print_stats_summary(time_list, indent=''):
