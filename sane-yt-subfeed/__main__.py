@@ -36,7 +36,7 @@ subscribed_channels = controller.process_subscriptions(subscription_list, info=T
 # Fetch uploaded videos for each subscribed channel
 timer_start = timer()
 uploads = Uploads(youtube)
-subscription_feed = uploads.get_uploads(subscription_list, debug=False, disable_threading=True)
+subscription_feed = uploads.get_uploads(subscription_list, debug=False, disable_threading=False)
 # subscription_feed = controller.get_uploads_all_channels(subscription_list, debug=False, disable_threading=False)  # FIXME: Re-using subscription_list?
 timer_end = timer()
 subfeed_time_elapsed = (timer_end - timer_start)
