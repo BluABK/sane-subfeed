@@ -29,10 +29,10 @@ class GetUploadsThread(threading.Thread):
         """
         channel_title = self.channel['snippet']['title']
         channel_id = self.channel['snippet']['resourceId']['channelId']
-        print("Starting #%s for channel: %s" % (self.thread_id, channel_title), end='')
-        if self.info:
-            print(" -- Fetching Uploaded videos for channel: %s" % channel_title)
-        else:
+        if self.debug:
+            print("Starting #%s for channel: %s" % (self.thread_id, channel_title), end='')
+            if self.info:
+                print(" -- Fetching Uploaded videos for channel: %s" % channel_title)
             print("")
         retval = self.uploads.get_channel_uploads(channel_id)
 
@@ -40,7 +40,8 @@ class GetUploadsThread(threading.Thread):
         self.statistics = retval[1]
 
         self.job_done = True
-        print("Exiting #%s" % self.thread_id)
+        if self.debug:
+            print("Exiting #%s" % self.thread_id)
 
     def get_videos(self):
         """
