@@ -2,6 +2,7 @@
 
 # import argparse # TODO: Implement argparse to sanely set a lot of currently hardcoded variables.
 from uploads_thread import GetUploadsThread
+from statistic import Statistic
 from math import fsum
 from timeit import default_timer as timer
 # Google/YouTube API
@@ -66,25 +67,22 @@ class Controller:
 
         return response
 
-    def get_subscriptions(self, info=False, debug=False, traverse_pages=True):
+    def get_subscriptions(self, info=False, debug=False, traverse_pages=True, stats=True):
         """
         Get a list of the authenticated user's subscriptions.
+        :param stats:
         :param info: debug lite
         :param debug:
         :param traverse_pages:
         :return: [total, subs, statistics]
         """
-        _timer_start = timer()
+        stat_get_subs = None
+        if stats:
+            stat_get_subs = Statistic("Subscriptions (GET): Time elapsed per page", timer=True)
         response = self.list_subscriptions(client=self.youtube, part='snippet,contentDetails', mine=True)
-        total = response['pageInfo'][
-            'totalResults']  # Advertised size of subscription list (known to be inflated reality)
         subs = response['items']  # The list of subscriptions
-
-        _timer_end = timer()
-        statistics = {'time_elapsed_page': [(_timer_end - _timer_start)]}
-
-        if info:
-            print("Found %s subscriptions." % total)
+        if stats:
+            stat_get_subs.stop_timer()
 
         if traverse_pages and 'nextPageToken' in response:
             next_page = True
@@ -94,14 +92,14 @@ class Controller:
                 print("Querying PageTokens...")
 
             while next_page:
-                _timer_start = timer()
+                if stats:
+                    stat_get_subs.start_timer()
                 # print(", %s" % next_page_token, end='')
                 response = self.list_subscriptions(client=self.youtube, part='snippet,contentDetails',
                                                    mine=True, pageToken=next_page_token)
                 subs += response['items']
-
-                _timer_end = timer()
-                statistics['time_elapsed_page'].append((_timer_end - _timer_start))
+                if stats:
+                    stat_get_subs.stop_timer()
 
                 if 'nextPageToken' in response:
                     next_page_token = response['nextPageToken']
@@ -109,7 +107,7 @@ class Controller:
                     print("")
                     next_page = False
 
-        return [total, subs, statistics]
+        return subs
 
     @staticmethod
     def print_channels(subs):
