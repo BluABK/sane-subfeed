@@ -1,13 +1,15 @@
 from controller import Controller
 from authentication import youtube_auth_keys, youtube_auth_oauth
-from timeit import default_timer as timer
 from pickle_handler import load_youtube, dump_youtube
+from statistic import Statistic, all_statistics
 
 from uploads import Uploads
 
 global_debug = False
 global_info = False
-collect_statistics = True
+info = True
+debug = True
+print_statistics = True
 
 try:
     youtube_oauth = load_youtube()
@@ -21,8 +23,11 @@ except Exception as e:
 
 # Create controller object
 controller = Controller(youtube_oauth)
+
 try:
-    controller.get_subscriptions(traverse_pages=False)
+    controller.get_subscriptions(traverse_pages=False, stats=False)
+except ValueError as abks_exception:
+    raise abks_exception
 except Exception as e:
     print(e)
     youtube_oauth = youtube_auth_oauth()
@@ -30,43 +35,29 @@ except Exception as e:
     controller = Controller(youtube_oauth)
 
 # Get authenticated user's subscriptions
-timer_start = timer()
-# Get a list on the form of [total, subs, statistics]
+stat_get_subs = Statistic("Subscriptions (GET): Total runtime", timer=True)
+
+# Get a list on the form of [total, subs]
 subscriptions = controller.get_subscriptions(info=True, traverse_pages=True)
-subscription_total = subscriptions[0]
-subscription_list = subscriptions[1]
-timer_end = timer()
+if info:
+    print("Found %s subscriptions." % len(subscriptions))
+stat_get_subs.stop_timer()
 
-subscriptions_statistics: dict = subscriptions[2]
-subscriptions_statistics['time_elapsed'] = (timer_end - timer_start)
-
-if subscription_total != len(subscription_list):
-    print("WARNING: Subscription list mismatched advertised length (%s/%s)!" % (len(subscription_list),
-                                                                                subscription_total))
 
 # Print the channels in a subscription list
 # subscribed_channels = controller.print_channels(subscription_list)
 
 youtube_key = youtube_auth_keys()
 # Fetch uploaded videos for each subscribed channel
-timer_start = timer()
+stat_get_uploads = Statistic("Uploads (GET): Total runtime", timer=True)
 uploads = Uploads(youtube_key)
-subscription_feed = uploads.get_uploads(subscription_list, info=True, debug=False, disable_threading=False)
-timer_end = timer()
-subfeed_time_elapsed = (timer_end - timer_start)
-
-# Split out the bothersome stats
-subscription_feed_statistics = None
-try:
-    subscription_feed_statistics = subscription_feed.pop('statistics')
-except KeyError:
-    pass
+subscription_feed = uploads.get_uploads(subscriptions, info=True, debug=False, disable_threading=False)
+stat_get_uploads.stop_timer()
 
 # Print the subscription feed
-
 controller.print_subscription_feed(subscription_feed, cutoff=100)
 
-if collect_statistics:
+"""
     print("\nSTATISTICS:")
     page_time = subscriptions_statistics['time_elapsed_page']
     page_total = subscriptions_statistics['time_elapsed']
@@ -81,5 +72,10 @@ if collect_statistics:
     for item in subscription_feed_statistics:
         # Append elapsed time statistics to a list
         subfeed_time_elapsed_channels.append(item['time_elapsed'])
+"""
+if print_statistics:
+    print("\nSTATISTICS:")
+    for stat in all_statistics:
+        stat.print_stats_summary(indent='\t')
 
-    controller.print_stats_summary(subfeed_time_elapsed_channels, indent='\t')
+    # controller.print_stats_summary(subfeed_time_elapsed_channels, indent='\t')
