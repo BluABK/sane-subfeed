@@ -77,7 +77,7 @@ class Uploads:
         for t in tqdm(thread_list):
             t.start()
             # time.sleep(delay)
-            time.sleep(0.010)
+            # time.sleep(0.001)
 
         print("\nCollecting data from %s threads:" % len(thread_list))
         for t in tqdm(thread_list):
