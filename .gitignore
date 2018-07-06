@@ -7,7 +7,7 @@ env/
 # sane-yt-subfeed
 client_secret.json
 keys.json
-youtube.pkl
+*.pkl
 
 
 # python
