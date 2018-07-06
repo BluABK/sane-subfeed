@@ -72,19 +72,13 @@ class Uploads:
             thread = GetUploadsThread(thread_increment, channel,  debug=False)
             thread_list.append(thread)
             thread_increment += 1
-
         print("\nStarting threads:")
         for t in tqdm(thread_list):
             t.start()
-            # time.sleep(delay)
-            # time.sleep(0.001)
 
         print("\nCollecting data from %s threads:" % len(thread_list))
         for t in tqdm(thread_list):
-            while t.finished() is not True:
-                if self.debug:
-                    print("\nNOTE: Thread #%s is still not done... Sleeping for 0.010 seconds" % t.get_id())
-                time.sleep(0.010)
+            t.join()
             for vid in t.get_videos():
                 new_videos_by_timestamp.update({vid.date_published: vid})
 
