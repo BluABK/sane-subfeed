@@ -2,9 +2,7 @@
 
 # import argparse # TODO: Implement argparse to sanely set a lot of currently hardcoded variables.
 from uploads_thread import GetUploadsThread
-from statistic import Statistic
 from math import fsum
-from timeit import default_timer as timer
 # Google/YouTube API
 # import google.oauth2.credentials
 # import google_auth_oauthlib.flow
@@ -76,13 +74,8 @@ class Controller:
         :param traverse_pages:
         :return: [total, subs, statistics]
         """
-        stat_get_subs = None
-        if stats:
-            stat_get_subs = Statistic("Subscriptions (GET): Time elapsed per page", timer=True)
         response = self.list_subscriptions(client=self.youtube, part='snippet,contentDetails', mine=True)
         subs = response['items']  # The list of subscriptions
-        if stats:
-            stat_get_subs.stop_timer()
 
         if traverse_pages and 'nextPageToken' in response:
             next_page = True
@@ -92,14 +85,10 @@ class Controller:
                 print("Querying PageTokens...")
 
             while next_page:
-                if stats:
-                    stat_get_subs.start_timer()
                 # print(", %s" % next_page_token, end='')
                 response = self.list_subscriptions(client=self.youtube, part='snippet,contentDetails',
                                                    mine=True, pageToken=next_page_token)
                 subs += response['items']
-                if stats:
-                    stat_get_subs.stop_timer()
 
                 if 'nextPageToken' in response:
                     next_page_token = response['nextPageToken']
@@ -149,15 +138,3 @@ class Controller:
 
             print('%s\t%s%s\t%s:%s%s\t%s…' % (video.date_published, YT_VIDEO_URL, video.video_id, video.channel_title,
                                               spacing, video.title, repr(video.description)[0:30]))
-
-    @staticmethod
-    def print_stats_summary(time_list, indent=''):
-        """
-        Print some fancy min, max and average timing stats for various code/functions.
-        :param time_list:
-        :param indent:
-        :return:
-        """
-        print(indent + "Fastest load: %s seconds." % min(time_list))
-        print(indent + "Slowest load: %s seconds." % max(time_list))
-        print(indent + "Average load: %s seconds." % float(fsum(time_list) / float(len(time_list))))

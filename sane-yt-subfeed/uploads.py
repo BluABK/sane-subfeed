@@ -2,7 +2,6 @@ from authentication import youtube_auth_keys
 from controller import Controller
 from uploads_thread import GetUploadsThread
 from video import Video
-from statistic import Statistic, all_statistics
 import time
 from collections import OrderedDict
 from tqdm import tqdm   # fancy progress bar
@@ -22,20 +21,17 @@ class Uploads:
     limit = 25
     youtube = None
     load_time = 30
-    stat_all_playlists_id = None
 
     def __init__(self, youtube):
         self.youtube = youtube
 
-    def get_uploads(self, subs, debug=False, info=False, load_time=30, disable_threading=False, limit=25, stats=False):
+    def get_uploads(self, subs, debug=False, info=False, load_time=30, disable_threading=False, limit=25):
         self.subs = subs
         self.debug = debug
         self.info = info
         self.load_time = load_time
         self.disable_threading = disable_threading
         self.limit = limit
-        stat_get_subs = Statistic("Uploads (GET): Time elapsed per 'Uploaded videos' playlist", timer=True)
-        self.stat_all_playlists_id = stat_get_subs.my_id
         if disable_threading:
             uploads = self.get_uploads_sequential()
         else:
@@ -95,10 +91,8 @@ class Uploads:
                 time.sleep(0.010)
             for vid in t.get_videos():
                 new_videos_by_timestamp.update({vid.date_published: vid})
-                statistics.append(t.get_statistics())
 
         retval = OrderedDict(sorted(new_videos_by_timestamp.items(), reverse=True))
-        retval['statistics'] = statistics
         return retval
 
     def get_channel_uploads(self, channel_id):
@@ -123,7 +117,6 @@ class Uploads:
         :param uploads_playlist_id:
         :return: [list(dict): videos, dict: statistics]
         """
-        stat_get_plist = Statistic("Uploads (GET): Time elapsed retrieving 'Uploaded videos' playlist for ", timer=True)
         # Retrieve the list of videos uploaded to the authenticated user's channel.
         playlistitems_list_request = self.youtube.playlistItems().list(
             maxResults=5, part='snippet', playlistId=uploads_playlist_id)
@@ -137,32 +130,19 @@ class Uploads:
             playlistitems_list_response = playlistitems_list_request.execute()
 
             # Grab information about each video.
-            first_run = True
             for playlist_item in playlistitems_list_response['items']:
                 video = Video(playlist_item)
-
-                if first_run:
-                    stat_get_plist.name += video.channel_title  # Append channel title to the statistic
 
                 if self.debug:
                     print('%s\t%s%s\t%s:\t%s\t%s' % (video.date_published, YT_VIDEO_URL, video.video_id,
                                                      video.channel_title, video.title, repr(video.description)))
                 videos.append(video)
                 if len(videos) >= self.limit:
-                    #print(all_statistics)
-                    #print(self.stat_all_playlists_id)
-                    #print(all_statistics[self.stat_all_playlists_id].timers)
-                    tmp = stat_get_plist.stop_timer()
-                    #print(tmp)
-                    all_statistics[self.stat_all_playlists_id].add_finished_timer(tmp)
-
                     return videos
 
             # Keep traversing pages # FIXME: Add limitation
             playlistitems_list_request = self.youtube.playlistItems().list_next(
                 playlistitems_list_request, playlistitems_list_response)
-
-            all_statistics[self.stat_all_playlists_id].add_finished_timer(stat_get_plist.stop_timer())
 
         return videos
 
