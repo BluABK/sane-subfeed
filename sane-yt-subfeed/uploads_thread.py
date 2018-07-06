@@ -1,9 +1,12 @@
 import threading
 
+from authentication import youtube_auth_keys
+from youtube_requests import get_channel_uploads
+
 
 class GetUploadsThread(threading.Thread):
 
-    def __init__(self, uploads, thread_id, channel, info=False, debug=False):
+    def __init__(self, thread_id, channel, info=False, debug=False):
         """
         Init GetUploadsThread
         :param thread_id:
@@ -19,7 +22,6 @@ class GetUploadsThread(threading.Thread):
         self.statistics = {}
         self.videos = []
         self.job_done = False
-        self.uploads = uploads
 
     # TODO: Handle failed requests
     def run(self):
@@ -35,7 +37,8 @@ class GetUploadsThread(threading.Thread):
                 print(" -- Fetching Uploaded videos for channel: %s" % channel_title)
             print("")
 
-        self.videos = self.uploads.get_channel_uploads(channel_id)
+        youtube = youtube_auth_keys()
+        self.videos = get_channel_uploads(youtube, channel_id)
 
         self.job_done = True
         if self.debug:
