@@ -24,15 +24,16 @@ except Exception as e:
 # Create controller object
 
 try:
-    get_subscriptions(youtube_oauth, traverse_pages=False, stats=False)
+    get_subscriptions(youtube_oauth)
 except Exception as e:
     print(e)
+    #raise e
     youtube_oauth = youtube_auth_oauth()
     dump_youtube(youtube_oauth)
 
 # Get authenticated user's subscriptions
 # Get a list on the form of [total, subs]
-subscriptions = get_subscriptions(youtube_oauth, info=True, traverse_pages=True)
+subscriptions = get_subscriptions(youtube_oauth)
 if info:
     print("Found %s subscriptions." % len(subscriptions))
 

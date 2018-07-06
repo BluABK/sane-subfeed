@@ -48,7 +48,7 @@ def list_uploaded_videos(youtube_key, uploads_playlist_id):
     """
     # Retrieve the list of videos uploaded to the authenticated user's channel.
     playlistitems_list_request = youtube_key.playlistItems().list(
-        maxResults=5, part='snippet', playlistId=uploads_playlist_id)
+        maxResults=50, part='snippet', playlistId=uploads_playlist_id)
 
     # TODO fix debug
     # if self.debug:
@@ -64,8 +64,8 @@ def list_uploaded_videos(youtube_key, uploads_playlist_id):
 
             # TODO fix debug
             # if self.debug:
-            #     print('%s\t%s%s\t%s:\t%s\t%s' % (video.date_published, YT_VIDEO_URL, video.video_id,
-            #                                      video.channel_title, video.title, repr(video.description)))
+            #print('%s\t%s%s\t%s:\t%s\t%s' % (video.date_published, YT_VIDEO_URL, video.video_id,
+            #                                 video.channel_title, video.title, repr(video.description)))
             videos.append(video)
             # TODO fix debug
             if len(videos) >= 25:
@@ -78,7 +78,7 @@ def list_uploaded_videos(youtube_key, uploads_playlist_id):
     return videos
 
 
-def get_subscriptions(youtube_oauth, info=False, debug=False, traverse_pages=True, stats=True):
+def get_subscriptions(youtube_oauth):
     """
     Get a list of the authenticated user's subscriptions.
     :param youtube_oauth:
@@ -88,40 +88,21 @@ def get_subscriptions(youtube_oauth, info=False, debug=False, traverse_pages=Tru
     :param traverse_pages:
     :return: [total, subs, statistics]
     """
-    response = list_subscriptions(youtube_oauth, part='snippet,contentDetails', mine=True)
-    subs = response['items']  # The list of subscriptions
+    subscription_list_request = youtube_oauth.subscriptions().list(part='snippet,contentDetails', mine=True,
+                                                                   maxResults=50)
+    subs = []
+    # Retrieve the list of subscribed channels for authenticated user's channel.
+    while subscription_list_request:
+        subscription_list_response = subscription_list_request.execute()
 
-    if traverse_pages and 'nextPageToken' in response:
-        next_page = True
-        next_page_token = response['nextPageToken']
-        # print("DEBUG: Querying PageToken: ", end='')
-        if debug:
-            print("Querying PageTokens...")
-
-        while next_page:
-            # print(", %s" % next_page_token, end='')
-            response = list_subscriptions(youtube_oauth, part='snippet,contentDetails',
-                                               mine=True, pageToken=next_page_token)
-            subs += response['items']
-
-            if 'nextPageToken' in response:
-                next_page_token = response['nextPageToken']
-            else:
-                print("")
-                next_page = False
+        # Grab information about each subscription page
+        for page in subscription_list_response['items']:
+            #print(page['snippet']['title'])
+            subs.append(page)
+        #print("-- Page --")
+        # Keep traversing pages # FIXME: Add limitation
+        subscription_list_request = youtube_oauth.playlistItems().list_next(
+            subscription_list_request, subscription_list_response)
 
     return subs
 
-
-def list_subscriptions(youtube_oauth, **kwargs):
-    """
-    Get a list of the authenticated user's subscriptions
-    :param youtube_oauth:
-    :param client:
-    :param kwargs:
-    :return:
-    """
-    kwargs = remove_empty_kwargs(**kwargs)
-    response = youtube_oauth.subscriptions().list(**kwargs).execute()
-
-    return response
