@@ -34,10 +34,8 @@ class GetUploadsThread(threading.Thread):
             if self.info:
                 print(" -- Fetching Uploaded videos for channel: %s" % channel_title)
             print("")
-        retval = self.uploads.get_channel_uploads(channel_id)
 
-        self.videos = retval[0]
-        self.statistics = retval[1]
+        self.videos = self.uploads.get_channel_uploads(channel_id)
 
         self.job_done = True
         if self.debug:
