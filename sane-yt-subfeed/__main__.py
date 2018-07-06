@@ -38,7 +38,7 @@ except Exception as e:
 stat_get_subs = Statistic("Subscriptions (GET): Total runtime", timer=True)
 
 # Get a list on the form of [total, subs]
-subscriptions = controller.get_subscriptions(info=True, traverse_pages=True)
+subscriptions = controller.get_subscriptions(info=True, traverse_pages=False)
 if info:
     print("Found %s subscriptions." % len(subscriptions))
 stat_get_subs.stop_timer()
@@ -73,6 +73,7 @@ controller.print_subscription_feed(subscription_feed, cutoff=100)
         # Append elapsed time statistics to a list
         subfeed_time_elapsed_channels.append(item['time_elapsed'])
 """
+print_statistics = False
 if print_statistics:
     print("\nSTATISTICS:")
     for stat in all_statistics:

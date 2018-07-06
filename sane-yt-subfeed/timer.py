@@ -6,11 +6,13 @@ class Timer:
     t_stop = None
     time_elapsed = None
 
-    def __init__(self, autostart=True):
+    def __init__(self, autostart=True, time_elapsed=None):
         """
         Start, stop and query a default_timer
         :param autostart: start a timer upon instantiation
         """
+        if time_elapsed:
+            self.time_elapsed = time_elapsed
         if autostart:
             self.start()
 
