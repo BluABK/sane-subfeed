@@ -149,12 +149,12 @@ class Uploads:
                                                      video.channel_title, video.title, repr(video.description)))
                 videos.append(video)
                 if len(videos) >= self.limit:
-                    print(all_statistics)
-                    print(self.stat_all_playlists_id)
-                    print(all_statistics[self.stat_all_playlists_id].timers)
+                    #print(all_statistics)
+                    #print(self.stat_all_playlists_id)
+                    #print(all_statistics[self.stat_all_playlists_id].timers)
                     tmp = stat_get_plist.stop_timer()
-                    print(tmp)
-                    all_statistics[self.stat_all_playlists_id].timers.append(tmp)
+                    #print(tmp)
+                    all_statistics[self.stat_all_playlists_id].add_finished_timer(tmp)
 
                     return videos
 
@@ -162,7 +162,7 @@ class Uploads:
             playlistitems_list_request = self.youtube.playlistItems().list_next(
                 playlistitems_list_request, playlistitems_list_response)
 
-            all_statistics[self.stat_all_playlists_id].timers.append(stat_get_plist.stop_timer())
+            all_statistics[self.stat_all_playlists_id].add_finished_timer(stat_get_plist.stop_timer())
 
         return videos
 

@@ -1,7 +1,7 @@
 from math import fsum
 from timer import Timer
 
-all_statistics = {}
+all_statistics = []
 
 
 class Statistic:
@@ -59,6 +59,9 @@ class Statistic:
         # Return elapsed times (list)
         return t_elapsed
 
+    def add_finished_timer(self, time_elapsed):
+        self.timers.append(Timer(time_elapsed))
+
     def print_stats_summary(self, indent='', print_name=True):
         """
         Print some fancy min, max and average timing stats for this Statistic object.
@@ -68,7 +71,12 @@ class Statistic:
         """
         if print_name:
             print(indent + self.name)
-        print(indent + "Fastest load: %s seconds." % min(self.timers))
-        print(indent + "Slowest load: %s seconds." % max(self.timers))
-        print(indent + "Average load: %s seconds." % float(fsum(self.timers) / float(len(self.timers))))
+        timers_time = []
+        print(self.timers)
+        for t in self.timers:
+            print(t.time_elapsed)
+            timers_time.append(t.time_elapsed)
+        print(indent + "Fastest load: %s seconds." % min(timers_time))
+        print(indent + "Slowest load: %s seconds." % max(timers_time))
+        print(indent + "Average load: %s seconds." % float(fsum(timers_time) / float(len(timers_time))))
 
