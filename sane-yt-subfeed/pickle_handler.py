@@ -24,3 +24,13 @@ def load_pickle(path):
 
 def load_youtube():
     return load_pickle(YOUTUBE_PICKLE)
+
+
+def load_build_key(key_nr):
+    path = os.path.join(OS_PATH, 'resources', 'dump_keys', '{}.pkl'.format(key_nr))
+    return load_pickle(path)
+
+
+def dump_build_key(dump_key, key_nr):
+    path = os.path.join(OS_PATH, 'resources', 'dump_keys', '{}.pkl'.format(key_nr))
+    dump_pickle(dump_key, path)

@@ -1,6 +1,7 @@
 import threading
 
 from authentication import youtube_auth_keys
+from pickle_handler import load_build_key, dump_build_key
 from youtube_requests import get_channel_uploads
 
 
@@ -37,7 +38,15 @@ class GetUploadsThread(threading.Thread):
                 print(" -- Fetching Uploaded videos for channel: %s" % channel_title)
             print("")
 
-        youtube = youtube_auth_keys()
+        # youtube = youtube_auth_keys()
+
+        try:
+            youtube = load_build_key(self.thread_id)
+        except FileNotFoundError as e:
+            # print(e)
+            youtube = youtube_auth_keys()
+            dump_build_key(youtube, self.thread_id)
+
         self.videos = get_channel_uploads(youtube, channel_id)
 
         self.job_done = True
