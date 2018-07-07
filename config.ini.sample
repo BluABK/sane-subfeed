@@ -1,0 +1,9 @@
+[Gui]
+launch_gui = True
+
+[Debug]
+debug = False
+
+[Requests]
+since_last_vid_limit = 10
+min_diff_time = 100

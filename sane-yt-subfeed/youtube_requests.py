@@ -1,5 +1,7 @@
 import time
 
+
+from config_handler import read_config
 from print_functions import remove_empty_kwargs
 from video import Video
 import datetime
@@ -59,6 +61,9 @@ def list_uploaded_videos(youtube_key, uploads_playlist_id):
     req_nr = 1
     req_limit = 1
     videos = []
+    since_last_vid_limit = int(read_config('Requests', 'since_last_vid_limit'))
+    min_diff_time = int(read_config('Requests', 'min_diff_time'))
+
     while playlistitems_list_request:
         playlistitems_list_response = playlistitems_list_request.execute()
 
@@ -78,7 +83,8 @@ def list_uploaded_videos(youtube_key, uploads_playlist_id):
                     min_time = vid_date
             time_diff = max_time - min_time
             last_vid_diff = datetime.datetime.now() - max_time
-            if time_diff < datetime.timedelta(days=100) and last_vid_diff < datetime.timedelta(days=10):
+            if time_diff < datetime.timedelta(days=min_diff_time) and last_vid_diff < datetime.timedelta(
+                    days=since_last_vid_limit):
                 req_limit += 1
 
         if req_nr >= req_limit:
