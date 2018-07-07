@@ -6,9 +6,9 @@
 from PyQt5.QtCore import QDate, QTime, QDateTime, Qt, QBasicTimer
 # noinspection PyUnresolvedReferences
 from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessageBox, QMainWindow, QAction, qApp, \
-    QMenu, QGridLayout, QProgressBar, QPixMap
+    QMenu, QGridLayout, QProgressBar, QLabel
 # noinspection PyUnresolvedReferences
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtGui import QIcon, QFont, QPixmap
 import sys
 
 
@@ -33,12 +33,19 @@ class Gui(QWidget):
 
         positions = [(i, j) for i in range(5) for j in range(4)]
 
+        counter = 1
         for position, name in zip(positions, names):
-
+            if counter >= 21:
+                counter = 1
             if name == '':
                 continue
             button = QPushButton(name)
-            grid.addWidget(button, *position)
+            filename = "{}.jpg".format(counter)
+            pixmap = QPixmap(filename)
+            lbl = QLabel(self)
+            lbl.setPixmap(pixmap)
+            grid.addWidget(lbl, *position)
+            counter += 1
 
         # self.move(300, 150)
 
