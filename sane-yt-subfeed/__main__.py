@@ -1,6 +1,7 @@
 from authentication import youtube_auth_keys, youtube_auth_oauth
 from pickle_handler import load_youtube, dump_youtube
 from print_functions import print_subscription_feed
+from timeit import default_timer
 
 from uploads import Uploads
 from youtube_requests import get_subscriptions
@@ -10,6 +11,7 @@ global_info = False
 info = True
 debug = True
 print_statistics = True
+start = default_timer()
 
 try:
     youtube_oauth = load_youtube()
@@ -47,3 +49,6 @@ subscription_feed = uploads.get_uploads(subscriptions, info=True, debug=False, d
 
 # Print the subscription feed
 print_subscription_feed(subscription_feed, cutoff=100)
+
+time_elsapsed = default_timer() - start
+print("\nRun time: {}".format(time_elsapsed))
