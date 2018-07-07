@@ -8,7 +8,7 @@ env/
 client_secret.json
 keys.json
 *.pkl
-
+config.ini
 
 # python
 __pycache__
