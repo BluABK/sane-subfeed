@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 # PyCharm bug: PyCharm seems to be expecting the referenced module to be included in an __all__ = [] statement
-# noinspection PyUnresolvedReferences
+# noinspection PyUnresolvedReferencesa
 from PyQt5.QtCore import QDate, QTime, QDateTime, Qt, QBasicTimer
-# noinspection PyUnresolvedReferences
+# noinspection PyUnresolvedReferencesa
 from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessageBox, QMainWindow, QAction, qApp, \
-    QMenu, QGridLayout, QProgressBar, QLabel
-# noinspection PyUnresolvedReferences
+    QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit
+# noinspection PyUnresolvedReferencesa
 from PyQt5.QtGui import QIcon, QFont, QPixmap
 import sys
 
@@ -22,33 +22,69 @@ class Gui(QWidget):
 
         grid = QGridLayout()
         grid.setSpacing(10)
+
+        sublayout = QVBoxLayout()
+        label1 = QLabel('AAAAAAAAAAAAAAAA')
+        line_edit1 = QLineEdit()
+        sublayout.addWidget(label1)
+        # sublayout.addWidget(line_edit1)
+        # grid.addLayout(sublayout, 4, 0, 1, 3)
+
         self.setLayout(grid)
+
         video_item = "Video.thumb"
-        names = [video_item, video_item, video_item, video_item, video_item, video_item,
+        # video_item = sublayout
+        # items = [video_item, video_item, video_item, video_item, video_item, video_item,
+        #          video_item, video_item, video_item, video_item, video_item, video_item,
+        #          video_item, video_item, video_item, video_item, video_item, video_item,
+        #          video_item, video_item, video_item, video_item, video_item, video_item,
+        #          video_item, video_item, video_item, video_item, video_item, video_item,
+        #          video_item, video_item, video_item, video_item, video_item, video_item]
+
+        items = [video_item,    video_item,     video_item,     video_item,     video_item,     video_item,
+                 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
                  video_item, video_item, video_item, video_item, video_item, video_item,
+                 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
                  video_item, video_item, video_item, video_item, video_item, video_item,
+                 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
                  video_item, video_item, video_item, video_item, video_item, video_item,
+                 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
                  video_item, video_item, video_item, video_item, video_item, video_item,
-                 video_item, video_item, video_item, video_item, video_item, video_item]
+                 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
+                 video_item, video_item, video_item, video_item, video_item, video_item,
+                 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE']
 
         positions = [(i, j) for i in range(5) for j in range(4)]
 
         counter = 1
-        for position, name in zip(positions, names):
+        real_counter = 0
+        for position, name in zip(positions, items):
+        # for position, video_layout in zip(positions, items):
             if counter >= 21:
                 counter = 1
             if name == '':
                 continue
-            button = QPushButton(name)
-            filename = "{}.jpg".format(counter)
-            pixmap = QPixmap(filename)
-            lbl = QLabel(self)
-            lbl.setPixmap(pixmap)
-            grid.addWidget(lbl, *position)
+            if name == 'SAMPLE TITLE':
+                filename = "{}.jpg".format(counter)
+                lbl = QLabel(filename)
+                print("adding TITLE to pos: {}".format(filename, *position))
+                grid.addWidget(lbl, *position)
+            else:
+                # button = QPushButton(name)
+                filename = "{}.jpg".format(counter)
+                pixmap = QPixmap(filename)
+                lbl = QLabel(self)
+                lbl.setPixmap(pixmap)
+                lbl.setToolTip("Video {}".format(counter))
+                # video_layout.addWidget(QLabel(filename))
+                # grid.addLayout(video_layout, *position)
+                print("adding {} to pos: {}".format(filename, *position))
+                grid.addWidget(lbl, *position)
+                # print(grid.children()[0].alignment)
             counter += 1
-
-        # self.move(300, 150)
-
+            real_counter += 1
+        print(grid)
+                # grid.addChildWidget(QLabel(filename))
 
         # exit_action = QAction(QIcon('exit.png'), '&Exit', self)
         # exit_action.setShortcut('Ctrl+Q')
@@ -69,7 +105,7 @@ class Gui(QWidget):
         # file_menu.addMenu(sub_menu)
         # file_menu.addAction(exit_action)
         #
-        # QToolTip.setFont(QFont('SansSerif', 10))
+        QToolTip.setFont(QFont('SansSerif', 10))
         #
         # # self.setToolTip('This is a <b>QWidget</b> widget')
         # btn = QPushButton('Button 1', self)
