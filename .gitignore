@@ -12,3 +12,6 @@ keys.json
 
 # python
 __pycache__
+
+# gui mess
+*.jpg
