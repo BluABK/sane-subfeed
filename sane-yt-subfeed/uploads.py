@@ -1,9 +1,12 @@
+import threading
+
 from authentication import youtube_auth_keys
+from generate_keys import GenerateKeys
 from pickle_handler import load_batch_build_key, dump_batch_build_key
 from uploads_thread import GetUploadsThread
 import time
 from collections import OrderedDict
-from tqdm import tqdm   # fancy progress bar
+from tqdm import tqdm  # fancy progress bar
 
 YOUTUBE_URL = "https://www.youtube.com/"
 YOUTUBE_PARM_VIDEO = "watch?v="
@@ -65,17 +68,21 @@ class Uploads:
 
         thread_increment = 0
         thread_list = []
-        delay = self.load_time / len(self.subs)     # TODO: Implement or drop
+        delay = self.load_time / len(self.subs)  # TODO: Implement or drop
 
         youtube_list = []
         try:
             youtube_list = load_batch_build_key()
-        except Exception as e:
-            print(e)
-            for channel in self.subs:
-                youtube_list.append(youtube_auth_keys())
+        except FileNotFoundError:
+            print("\nGenerating youtube key builds:")
+            youtube_list.extend(self.generate_keys(len(self.subs)))
             dump_batch_build_key(youtube_list)
 
+        diff = len(self.subs) - len(youtube_list)
+        if diff > 0:
+            print("\nGenerating diff youtube key builds:")
+            youtube_list.extend(self.generate_keys(diff))
+            dump_batch_build_key(youtube_list)
 
         print("Creating YouTube service object from API_KEY for %s channels:" % len(self.subs))
         for channel, youtube in tqdm(zip(self.subs, youtube_list)):
@@ -95,3 +102,22 @@ class Uploads:
                 new_videos_by_timestamp.update({vid.date_published: vid})
 
         return OrderedDict(sorted(new_videos_by_timestamp.items(), reverse=True))
+
+    @staticmethod
+    def generate_keys(key_number):
+        keys = []
+        threads = []
+
+        print("\nStarting key generation threads:")
+        for _ in tqdm(range(key_number)):
+            t = GenerateKeys(keys)
+            t.start()
+            threads.append(t)
+
+        print("\nClosing key generation threads:")
+        for t in tqdm(threads):
+            t.join()
+        return keys
+
+
+
