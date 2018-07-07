@@ -19,8 +19,14 @@ defaults = {
     },
     'Gui': {
         'launch': 'Gui',
+    },
+    'Thumbnails': {
+        '0': 'default',
+        '1': 'medium',
+        '2': 'high',
+        '3': 'standard',
+        '4': 'maxres'
     }
-
 }
 
 
