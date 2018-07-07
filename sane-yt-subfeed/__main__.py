@@ -1,11 +1,12 @@
 from authentication import youtube_auth_keys, youtube_auth_oauth
-from pickle_handler import load_youtube, dump_youtube
+from pickle_handler import load_youtube, dump_youtube, load_sub_list, dump_sub_list
 from print_functions import print_subscription_feed
 from timeit import default_timer
 
 from uploads import Uploads
 from youtube_requests import get_subscriptions
 
+cached_subs = True
 global_debug = False
 global_info = False
 info = True
@@ -15,8 +16,7 @@ start = default_timer()
 
 try:
     youtube_oauth = load_youtube()
-except Exception as e:
-    print(e)
+except FileNotFoundError:
     youtube_oauth = youtube_auth_oauth()
     dump_youtube(youtube_oauth)
 
@@ -26,16 +26,13 @@ except Exception as e:
 # Create controller object
 
 try:
-    get_subscriptions(youtube_oauth)
-except Exception as e:
-    print(e)
-    #raise e
-    youtube_oauth = youtube_auth_oauth()
-    dump_youtube(youtube_oauth)
+    subscriptions = load_sub_list()
+except FileNotFoundError:
+    subscriptions = get_subscriptions(youtube_oauth)
+    dump_sub_list(subscriptions)
 
 # Get authenticated user's subscriptions
 # Get a list on the form of [total, subs]
-subscriptions = get_subscriptions(youtube_oauth)
 if info:
     print("Found %s subscriptions." % len(subscriptions))
 

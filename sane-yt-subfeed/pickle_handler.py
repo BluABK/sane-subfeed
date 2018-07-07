@@ -4,7 +4,9 @@ import pickle
 
 OS_PATH = os.path.dirname(__file__)
 
-YOUTUBE_PICKLE = os.path.join(OS_PATH, 'resources', 'youtube.pkl')
+PICKLE_PATH = os.path.join(OS_PATH, 'resources', 'pickles')
+
+YOUTUBE_PICKLE = os.path.join(PICKLE_PATH, 'youtube_oauth.pkl')
 
 
 def dump_youtube(youtube):
@@ -27,18 +29,31 @@ def load_youtube():
 
 
 def load_build_key(key_nr):
-    path = os.path.join(OS_PATH, 'resources', 'dump_keys', '{}.pkl'.format(key_nr))
+    path = os.path.join(PICKLE_PATH, '{}.pkl'.format(key_nr))
     return load_pickle(path)
+
 
 def load_batch_build_key():
-    path = os.path.join(OS_PATH, 'resources', 'dump_keys', 'test.pkl')
+    path = os.path.join(PICKLE_PATH, 'youtube_auth_keys.pkl')
     return load_pickle(path)
 
+
 def dump_batch_build_key(youtube_list):
-    path = os.path.join(OS_PATH, 'resources', 'dump_keys', 'test.pkl')
+    path = os.path.join(PICKLE_PATH, 'youtube_auth_keys.pkl')
     dump_pickle(youtube_list, path)
 
 
 def dump_build_key(dump_key, key_nr):
-    path = os.path.join(OS_PATH, 'resources', 'dump_keys', '{}.pkl'.format(key_nr))
+    path = os.path.join(PICKLE_PATH, '{}.pkl'.format(key_nr))
     dump_pickle(dump_key, path)
+
+
+def dump_sub_list(sub_list):
+    path = os.path.join(PICKLE_PATH, 'youtube_subs.pkl')
+    dump_pickle(sub_list, path)
+
+
+def load_sub_list():
+    path = os.path.join(PICKLE_PATH, 'youtube_subs.pkl')
+    return load_pickle(path)
+
