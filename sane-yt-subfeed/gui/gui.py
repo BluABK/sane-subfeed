@@ -32,55 +32,57 @@ class Gui(QWidget):
 
         self.setLayout(grid)
 
-        video_item = "Video.thumb"
-        # video_item = sublayout
-        # items = [video_item, video_item, video_item, video_item, video_item, video_item,
-        #          video_item, video_item, video_item, video_item, video_item, video_item,
-        #          video_item, video_item, video_item, video_item, video_item, video_item,
-        #          video_item, video_item, video_item, video_item, video_item, video_item,
-        #          video_item, video_item, video_item, video_item, video_item, video_item,
-        #          video_item, video_item, video_item, video_item, video_item, video_item]
+        # video_item = "Video.thumb"
+        video_item = sublayout
+        items = [video_item, video_item, video_item, video_item, video_item, video_item,
+                 video_item, video_item, video_item, video_item, video_item, video_item,
+                 video_item, video_item, video_item, video_item, video_item, video_item,
+                 video_item, video_item, video_item, video_item, video_item, video_item,
+                 video_item, video_item, video_item, video_item, video_item, video_item,
+                 video_item, video_item, video_item, video_item, video_item, video_item]
 
-        items = [video_item,    video_item,     video_item,     video_item,     video_item,     video_item,
-                 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
-                 video_item, video_item, video_item, video_item, video_item, video_item,
-                 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
-                 video_item, video_item, video_item, video_item, video_item, video_item,
-                 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
-                 video_item, video_item, video_item, video_item, video_item, video_item,
-                 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
-                 video_item, video_item, video_item, video_item, video_item, video_item,
-                 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
-                 video_item, video_item, video_item, video_item, video_item, video_item,
-                 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE']
+        # items = [video_item,    video_item,     video_item,     video_item,     video_item,     video_item,
+        #          'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
+        #          video_item, video_item, video_item, video_item, video_item, video_item,
+        #          'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
+        #          video_item, video_item, video_item, video_item, video_item, video_item,
+        #          'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
+        #          video_item, video_item, video_item, video_item, video_item, video_item,
+        #          'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
+        #          video_item, video_item, video_item, video_item, video_item, video_item,
+        #          'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
+        #          video_item, video_item, video_item, video_item, video_item, video_item,
+        #          'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE']
 
         positions = [(i, j) for i in range(5) for j in range(4)]
 
         counter = 1
         real_counter = 0
-        for position, name in zip(positions, items):
-        # for position, video_layout in zip(positions, items):
+        # for position, name in zip(positions, items):
+        for position, video_layout in zip(positions, items):
             if counter >= 21:
                 counter = 1
-            if name == '':
+            # if name == '':
+            if items == '':
                 continue
-            if name == 'SAMPLE TITLE':
-                filename = "{}.jpg".format(counter)
-                lbl = QLabel(filename)
-                print("adding TITLE to pos: {}".format(filename, *position))
-                grid.addWidget(lbl, *position)
-            else:
-                # button = QPushButton(name)
-                filename = "{}.jpg".format(counter)
-                pixmap = QPixmap(filename)
-                lbl = QLabel(self)
-                lbl.setPixmap(pixmap)
-                lbl.setToolTip("Video {}".format(counter))
-                # video_layout.addWidget(QLabel(filename))
-                # grid.addLayout(video_layout, *position)
-                print("adding {} to pos: {}".format(filename, *position))
-                grid.addWidget(lbl, *position)
-                # print(grid.children()[0].alignment)
+            # if name == 'SAMPLE TITLE':
+            #     filename = "{}.jpg".format(counter)
+            #     lbl = QLabel(filename)
+            #     print("adding TITLE to pos: {}".format(filename, *position))
+            #     grid.addWidget(lbl, *position)
+            # else:
+            # button = QPushButton(name)
+            filename = "{}.jpg".format(counter)
+            pixmap = QPixmap(filename)
+            lbl = QLabel(self)
+            lbl.setPixmap(pixmap)
+            lbl.setToolTip("Video {}".format(counter))
+            video_layout.addWidget(QLabel(filename))
+            grid.addLayout(video_layout, *position)
+            print("adding {} to pos: {}".format(filename, *position))
+            grid.addWidget(lbl, *position)
+            # print(grid.children()[0].alignment)
+
             counter += 1
             real_counter += 1
         print(grid)
