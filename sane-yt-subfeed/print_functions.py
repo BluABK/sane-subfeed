@@ -67,21 +67,25 @@ def print_subscription_feed(subfeed, cutoff=20):
 
     # Loop through subfeed and determine the longest channel name (for OCD/indent purposes) # TODO: Generalise
     longest_title = 0
-    for i, (date, video) in enumerate(subfeed.items()):
+    counter = 0
+    for video in subfeed:
         if len(video.channel_title) > longest_title:
             longest_title = len(video.channel_title)
-        if i > cutoff:
+        counter += 1
+        if counter > cutoff:
             break
 
     # TODO: Omit really old videos from feed (possibly implement in the uploaded videos fetching part)
     # TODO: Make list have a sensible length and not subscriptions*25 (Currently mitigated by 'i')
-    for i, (date, video) in enumerate(subfeed.items()):
+    counter = 0
+    for video in subfeed:
         # Cut off at a sensible length # FIXME: Hack
-        if i > cutoff:
+        if counter > cutoff:
             break
         # TODO: Use longest title of current list, not entire subscriptions.
         offset = longest_title - len(video.channel_title)
         spacing = " " * offset + " " * 4
-
-        print('%s\t%s%s\t%s:%s%s\t%s…' % (video.date_published, YT_VIDEO_URL, video.video_id, video.channel_title,
-                                          spacing, video.title, repr(video.description)[0:30]))
+        if video.channel_title == "quill18":
+            print('%s\t%s%s\t%s:%s%s\t%s…' % (video.date_published, YT_VIDEO_URL, video.video_id, video.channel_title,
+                                              spacing, video.title, repr(video.description)[0:30]))
+        counter += 1
