@@ -1,3 +1,5 @@
+from authentication import youtube_auth_keys
+from pickle_handler import load_batch_build_key, dump_batch_build_key
 from uploads_thread import GetUploadsThread
 import time
 from collections import OrderedDict
@@ -65,11 +67,21 @@ class Uploads:
         thread_list = []
         delay = self.load_time / len(self.subs)     # TODO: Implement or drop
 
+        youtube_list = []
+        try:
+            youtube_list = load_batch_build_key()
+        except Exception as e:
+            print(e)
+            for channel in self.subs:
+                youtube_list.append(youtube_auth_keys())
+            dump_batch_build_key(youtube_list)
+
+
         print("Creating YouTube service object from API_KEY for %s channels:" % len(self.subs))
-        for channel in tqdm(self.subs):
+        for channel, youtube in tqdm(zip(self.subs, youtube_list)):
             if self.debug:
                 print("Creating YouTube service object from API_KEY for channel: %s" % channel['snippet']['title'])
-            thread = GetUploadsThread(thread_increment, channel,  debug=False)
+            thread = GetUploadsThread(thread_increment, youtube, channel, debug=False)
             thread_list.append(thread)
             thread_increment += 1
         print("\nStarting threads:")

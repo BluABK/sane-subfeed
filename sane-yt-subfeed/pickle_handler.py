@@ -30,6 +30,14 @@ def load_build_key(key_nr):
     path = os.path.join(OS_PATH, 'resources', 'dump_keys', '{}.pkl'.format(key_nr))
     return load_pickle(path)
 
+def load_batch_build_key():
+    path = os.path.join(OS_PATH, 'resources', 'dump_keys', 'test.pkl')
+    return load_pickle(path)
+
+def dump_batch_build_key(youtube_list):
+    path = os.path.join(OS_PATH, 'resources', 'dump_keys', 'test.pkl')
+    dump_pickle(youtube_list, path)
+
 
 def dump_build_key(dump_key, key_nr):
     path = os.path.join(OS_PATH, 'resources', 'dump_keys', '{}.pkl'.format(key_nr))
