@@ -43,11 +43,11 @@ class Uploads:
 
     def get_uploads_threaded(self):
         """
-        Returns a date-sorted OrderedDict of a list of each subscriptions' "Uploaded videos" playlist.
+        Returns a date-sorted list of each subscription's "Uploaded videos" playlist.
         :return:
         """
         statistics = []
-        new_videos_by_timestamp = {}
+        videos = []
 
         thread_increment = 0
         thread_list = []
@@ -81,10 +81,10 @@ class Uploads:
         print("\nCollecting data from %s threads:" % len(thread_list))
         for t in tqdm(thread_list):
             t.join()
-            for vid in t.get_videos():
-                new_videos_by_timestamp.update({vid.date_published: vid})
+            videos.extend(t.get_videos())
 
-        return OrderedDict(sorted(new_videos_by_timestamp.items(), reverse=True))
+        # return OrderedDict(sorted(videos.items(), reverse=True))
+        return sorted(videos, key=lambda video: video.date_published, reverse=True)
 
     @staticmethod
     def generate_keys(key_number):
