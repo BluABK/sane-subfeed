@@ -1,3 +1,5 @@
+import datetime
+
 from settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 
 
@@ -22,7 +24,8 @@ class Video:
         self.channel_title = playlist_item['snippet']['channelTitle']
         self.title = playlist_item['snippet']['title']
         self.video_id = playlist_item['snippet']['resourceId']['videoId']
-        self.date_published = playlist_item['snippet']['publishedAt']
+        str_date = playlist_item['snippet']['publishedAt']
+        self.date_published = datetime.datetime.strptime(str_date, '%Y-%m-%dT%H:%M:%S.000Z')
         self.description = playlist_item['snippet']['description']
         self.playlist_id = playlist_item['snippet']['playlistId']   # Which playlist it's added from
         self.playlist_pos = playlist_item['snippet']['position']    # Which position it's got in the playlist

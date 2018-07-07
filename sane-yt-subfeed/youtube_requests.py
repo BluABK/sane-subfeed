@@ -1,5 +1,8 @@
+import time
+
 from print_functions import remove_empty_kwargs
 from video import Video
+import datetime
 
 YOUTUBE_URL = "https://www.youtube.com/"
 YOUTUBE_PARM_VIDEO = "watch?v="
@@ -53,7 +56,8 @@ def list_uploaded_videos(youtube_key, uploads_playlist_id):
     # TODO fix debug
     # if self.debug:
     #     print('Videos in list %s' % uploads_playlist_id)
-
+    req_nr = 1
+    req_limit = 1
     videos = []
     while playlistitems_list_request:
         playlistitems_list_response = playlistitems_list_request.execute()
@@ -61,17 +65,26 @@ def list_uploaded_videos(youtube_key, uploads_playlist_id):
         # Grab information about each video.
         for playlist_item in playlistitems_list_response['items']:
             video = Video(playlist_item)
-
-            # TODO fix debug
-            # if self.debug:
-            #print('%s\t%s%s\t%s:\t%s\t%s' % (video.date_published, YT_VIDEO_URL, video.video_id,
-            #                                 video.channel_title, video.title, repr(video.description)))
             videos.append(video)
-            # TODO fix debug
-            if len(videos) >= 25:
-                return videos
 
-        # Keep traversing pages # FIXME: Add limitation
+        if len(videos) > 0:
+            max_time = videos[0].date_published
+            min_time = videos[0].date_published
+            for vid in videos:
+                vid_date = vid.date_published
+                if vid_date > max_time:
+                    max_time = vid_date
+                if vid_date < min_time:
+                    min_time = vid_date
+            time_diff = max_time - min_time
+            last_vid_diff = datetime.datetime.now() - max_time
+            if time_diff < datetime.timedelta(days=100) and last_vid_diff < datetime.timedelta(days=10):
+                req_limit += 1
+
+        if req_nr >= req_limit:
+            return videos
+        else:
+            req_nr += 1
         playlistitems_list_request = youtube_key.playlistItems().list_next(
             playlistitems_list_request, playlistitems_list_response)
 
@@ -97,12 +110,11 @@ def get_subscriptions(youtube_oauth):
 
         # Grab information about each subscription page
         for page in subscription_list_response['items']:
-            #print(page['snippet']['title'])
+            # print(page['snippet']['title'])
             subs.append(page)
-        #print("-- Page --")
+        # print("-- Page --")
         # Keep traversing pages # FIXME: Add limitation
         subscription_list_request = youtube_oauth.playlistItems().list_next(
             subscription_list_request, subscription_list_response)
 
     return subs
-
