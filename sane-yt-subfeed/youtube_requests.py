@@ -1,7 +1,9 @@
+import os
 import time
 
 
 from config_handler import read_config
+from pickle_handler import dump_pickle, PICKLE_PATH
 from print_functions import remove_empty_kwargs
 from video import Video
 import datetime
@@ -88,6 +90,9 @@ def list_uploaded_videos(youtube_key, uploads_playlist_id):
                 req_limit += 1
 
         if req_nr >= req_limit:
+            # if len(videos) > 0 and videos[0].channel_title == "Jesse Cox":
+            #     print(videos[0].thumbnails)
+            #     dump_pickle(videos, os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
             return videos
         else:
             req_nr += 1

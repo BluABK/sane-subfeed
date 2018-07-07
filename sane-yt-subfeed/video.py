@@ -33,7 +33,8 @@ class Video:
         self.url_video = YOUTUBE_URL_BASE + YOUTUBE_URL_PART_VIDEO + self.video_id
         self.url_playlist_video = self.url_video + "&list=" + self.playlist_id
 
-        self.determine_thumbnails(playlist_item['snippet']['thumbnails'])
+        self.thumbnails = playlist_item['snippet']['thumbnails']
+        # self.determine_thumbnails(playlist_item.snippet.thumbnails)
 
     def determine_thumbnails(self, thumbnails_item):
         """
