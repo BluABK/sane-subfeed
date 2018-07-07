@@ -85,7 +85,6 @@ def print_subscription_feed(subfeed, cutoff=20):
         # TODO: Use longest title of current list, not entire subscriptions.
         offset = longest_title - len(video.channel_title)
         spacing = " " * offset + " " * 4
-        if video.channel_title == "quill18":
-            print('%s\t%s%s\t%s:%s%s\t%s…' % (video.date_published, YT_VIDEO_URL, video.video_id, video.channel_title,
-                                              spacing, video.title, repr(video.description)[0:30]))
+        print('%s\t%s%s\t%s:%s%s\t%s…' % (video.date_published, YT_VIDEO_URL, video.video_id, video.channel_title,
+                                          spacing, video.title, repr(video.description)[0:30]))
         counter += 1
