@@ -36,27 +36,10 @@ class Uploads:
         self.limit = limit
         if disable_threading:
             raise ValueError('Disable threading is obsolete')
-            # uploads = self.get_uploads_sequential()
         else:
             uploads = self.get_uploads_threaded()
         self.uploads = uploads
         return uploads
-
-    # def get_uploads_sequential(self):
-    #     new_videos_by_timestamp = {}
-    #
-    #     for channel in self.subs:
-    #         channel_title = channel['snippet']['title']
-    #         channel_id = channel['snippet']['resourceId']['channelId']
-    #         if self.info:
-    #             print("Fetching Uploaded videos for channel: %s" % channel_title)
-    #
-    #         # Create a (datestamp: video) dict
-    #         for video in self.get_channel_uploads(channel_id):
-    #             new_videos_by_timestamp.update({video.date_published: video})
-    #
-    #     # Return a reverse chronological sorted OrderedDict (newest --> oldest)
-    #     return OrderedDict(sorted(new_videos_by_timestamp.items(), reverse=True))
 
     def get_uploads_threaded(self):
         """
