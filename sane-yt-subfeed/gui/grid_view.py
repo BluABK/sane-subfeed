@@ -1,6 +1,3 @@
-# !/usr/bin/python3
-# -*- coding: utf-8 -*-
-
 # PyCharm bug: PyCharm seems to be expecting the referenced module to be included in an __all__ = [] statement
 # noinspection PyUnresolvedReferencesa
 from PyQt5.QtCore import QDate, QTime, QDateTime, Qt, QBasicTimer
@@ -9,10 +6,9 @@ from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessa
     QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit
 # noinspection PyUnresolvedReferencesa
 from PyQt5.QtGui import QIcon, QFont, QPixmap
-import sys
 
 
-class Gui(QWidget):
+class GridView(QWidget):
     def __init__(self):
         super().__init__()
         self.init_ui()
@@ -59,6 +55,7 @@ class Gui(QWidget):
         counter = 1
         real_counter = 0
         # for position, name in zip(positions, items):
+        print(positions)
         for position, video_layout in zip(positions, items):
             if counter >= 21:
                 counter = 1
@@ -78,7 +75,7 @@ class Gui(QWidget):
             lbl.setPixmap(pixmap)
             lbl.setToolTip("Video {}".format(counter))
             video_layout.addWidget(QLabel(filename))
-            grid.addLayout(video_layout, *position)
+            # grid.addLayout(video_layout, *position)
             print("adding {} to pos: {}".format(filename, *position))
             grid.addWidget(lbl, *position)
             # print(grid.children()[0].alignment)
@@ -121,8 +118,8 @@ class Gui(QWidget):
         # qbtn.resize(qbtn.sizeHint())
         # qbtn.move(100, 50)
         #
-        self.setWindowTitle('Sane Subscription Feed, yo!')
-        self.setWindowIcon(QIcon('blu.ico'))
+        # self.setWindowTitle('Sane Subscription Feed, yo!')
+        # self.setWindowIcon(QIcon('blu.ico'))
         # self.statusBar().showMessage('Ready.')
         #
 
@@ -139,7 +136,7 @@ class Gui(QWidget):
         # self.setGeometry(300, 300, 280, 170)
         # self.setWindowTitle('QProgressBar')
 
-        self.show()
+        self.show()     # FIXME: conflict with MainWindow?
 
     def button_clicked(self):
 
@@ -198,9 +195,10 @@ class Gui(QWidget):
             # self.timer.start(100, self)
             self.btn.setText('1')
 
-
+# TODO: Remove after debugging is done
+import sys
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ui = Gui()
+    ex = GridView()
 
     sys.exit(app.exec_())
