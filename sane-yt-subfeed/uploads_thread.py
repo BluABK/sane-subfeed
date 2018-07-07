@@ -7,7 +7,7 @@ from youtube_requests import get_channel_uploads
 
 class GetUploadsThread(threading.Thread):
 
-    def __init__(self, thread_id, channel, info=False, debug=False):
+    def __init__(self, thread_id, youtube, channel, info=False, debug=False):
         """
         Init GetUploadsThread
         :param thread_id:
@@ -23,6 +23,7 @@ class GetUploadsThread(threading.Thread):
         self.statistics = {}
         self.videos = []
         self.job_done = False
+        self.youtube = youtube
 
     # TODO: Handle failed requests
     def run(self):
@@ -40,14 +41,7 @@ class GetUploadsThread(threading.Thread):
 
         # youtube = youtube_auth_keys()
 
-        try:
-            youtube = load_build_key(self.thread_id)
-        except FileNotFoundError as e:
-            # print(e)
-            youtube = youtube_auth_keys()
-            dump_build_key(youtube, self.thread_id)
-
-        self.videos = get_channel_uploads(youtube, channel_id)
+        self.videos = get_channel_uploads(self.youtube, channel_id)
 
         self.job_done = True
         if self.debug:
