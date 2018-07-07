@@ -15,27 +15,39 @@ print_statistics = True
 start = default_timer()
 
 
-
 # Auth OAuth2 with YouTube API
 
 # Create controller object
 
-try:
-    subscriptions = load_sub_list()
-except FileNotFoundError:
-    try:
-        youtube_oauth = load_youtube()
-    except FileNotFoundError:
-        youtube_oauth = youtube_auth_oauth()
-        dump_youtube(youtube_oauth)
-    subscriptions = get_subscriptions(youtube_oauth)
-    dump_sub_list(subscriptions)
+def cached_authenticated_get_subscriptions(cached):
+    if cached:
+        try:
+            temp_subscriptions = load_sub_list()
+        except FileNotFoundError:
+            try:
+                youtube_oauth = load_youtube()
+            except FileNotFoundError:
+                youtube_oauth = youtube_auth_oauth()
+                dump_youtube(youtube_oauth)
+            temp_subscriptions = get_subscriptions(youtube_oauth)
+            dump_sub_list(temp_subscriptions)
+    else:
+        try:
+            youtube_oauth = load_youtube()
+            temp_subscriptions = get_subscriptions(youtube_oauth)
+        except FileNotFoundError:
+            youtube_oauth = youtube_auth_oauth()
+            dump_youtube(youtube_oauth)
+            temp_subscriptions = get_subscriptions(youtube_oauth)
+    return temp_subscriptions
+
+
+subscriptions = cached_authenticated_get_subscriptions(cached_subs)
 
 # Get authenticated user's subscriptions
 # Get a list on the form of [total, subs]
 if info:
     print("Found %s subscriptions." % len(subscriptions))
-
 
 # Print the channels in a subscription list
 # subscribed_channels = controller.print_channels(subscription_list)
