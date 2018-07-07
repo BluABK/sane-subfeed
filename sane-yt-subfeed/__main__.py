@@ -14,11 +14,6 @@ debug = True
 print_statistics = True
 start = default_timer()
 
-try:
-    youtube_oauth = load_youtube()
-except FileNotFoundError:
-    youtube_oauth = youtube_auth_oauth()
-    dump_youtube(youtube_oauth)
 
 
 # Auth OAuth2 with YouTube API
@@ -28,6 +23,11 @@ except FileNotFoundError:
 try:
     subscriptions = load_sub_list()
 except FileNotFoundError:
+    try:
+        youtube_oauth = load_youtube()
+    except FileNotFoundError:
+        youtube_oauth = youtube_auth_oauth()
+        dump_youtube(youtube_oauth)
     subscriptions = get_subscriptions(youtube_oauth)
     dump_sub_list(subscriptions)
 
