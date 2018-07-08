@@ -2,12 +2,9 @@
 # -*- coding: utf-8 -*-
 
 # PyCharm bug: PyCharm seems to be expecting the referenced module to be included in an __all__ = [] statement
-# noinspection PyUnresolvedReferencesa
 from PyQt5.QtCore import QDate, QTime, QDateTime, Qt, QBasicTimer
-# noinspection PyUnresolvedReferencesa
 from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessageBox, QMainWindow, QAction, qApp, \
     QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit
-# noinspection PyUnresolvedReferencesa
 from PyQt5.QtGui import QIcon, QFont, QPixmap
 import sys
 

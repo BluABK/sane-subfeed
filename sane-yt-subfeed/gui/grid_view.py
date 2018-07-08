@@ -1,10 +1,7 @@
 # PyCharm bug: PyCharm seems to be expecting the referenced module to be included in an __all__ = [] statement
-# noinspection PyUnresolvedReferencesa
 from PyQt5.QtCore import QDate, QTime, QDateTime, Qt, QBasicTimer
-# noinspection PyUnresolvedReferencesa
 from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessageBox, QMainWindow, QAction, qApp, \
     QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit
-# noinspection PyUnresolvedReferencesa
 from PyQt5.QtGui import QIcon, QFont, QPixmap
 
 from thumbnail_handler import download_thumbnails_threaded
@@ -86,7 +83,8 @@ class GridView(QWidget):
             pixmap = QPixmap(filename)
             lbl = QLabel(self)
             lbl.setPixmap(pixmap)
-            lbl.setToolTip("Video {}".format(counter))
+            # lbl.setToolTip("Video {}".format(counter))
+            lbl.setToolTip("{}: {}".format(self.subfeed[counter].channel_title, self.subfeed[counter].title))
             video_layout.addWidget(QLabel(filename))
             # grid.addLayout(video_layout, *position)
             print("adding {} to pos: {}".format(filename, *position))
@@ -130,8 +128,8 @@ class GridView(QWidget):
         # qbtn.resize(qbtn.sizeHint())
         # qbtn.move(100, 50)
         #
-        # self.setWindowTitle('Sane Subscription Feed, yo!')
-        # self.setWindowIcon(QIcon('blu.ico'))
+        self.setWindowTitle('Sane Subscription Feed, yo!')
+        self.setWindowIcon(QIcon('blu.ico'))
         # self.statusBar().showMessage('Ready.')
         #
 

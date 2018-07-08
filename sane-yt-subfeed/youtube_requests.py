@@ -92,8 +92,10 @@ def list_uploaded_videos(youtube_key, uploads_playlist_id):
         if req_nr >= req_limit:
             if len(videos) > 0 and videos[0].channel_title == "SYFY":
                 print('{}: {}'.format(videos[0].channel_title, req_nr))
+                counter = 0
                 for v in videos:
-                    print(v.title)
+                    print("{}: {}".format(counter, v.title))
+                    counter += 1
                 # dump_pickle(videos, os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
             # if len(videos) > 0 and videos[0].channel_title == "Jesse Cox":
             # #   print(videos[0].thumbnails)
