@@ -16,9 +16,9 @@ from .grid_view import GridView
 class MainWindow(QMainWindow):
     subfeed = None
 
-    def __init__(self, subfeed):
+    def __init__(self):
         super().__init__()
-        self.subfeed = subfeed
+        # self.subfeed = subfeed
         self.clipboard = QApplication.clipboard()
         self.init_ui()
 
@@ -110,7 +110,7 @@ class MainWindow(QMainWindow):
         # self.setWindowTitle('QProgressBar')
 
         windowLayout = QVBoxLayout()
-        gv = GridView(self.subfeed, self.clipboard, self.statusBar())
+        gv = GridView(self.clipboard, self.statusBar())
         # windowLayout.addWidget(gv)
         self.setCentralWidget(gv)
         self.setLayout(windowLayout)
