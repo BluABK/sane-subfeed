@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # PyCharm bug: PyCharm seems to be expecting the referenced module to be included in an __all__ = [] statement
+import time
+
 from PyQt5.Qt import QClipboard
 from PyQt5.QtCore import QDate, QTime, QDateTime, Qt, QBasicTimer
 from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessageBox, QMainWindow, QAction, qApp, \
@@ -9,16 +11,19 @@ from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessa
 from PyQt5.QtGui import QIcon, QFont, QPixmap
 import sys
 
-
+from thumbnail_handler import thumbnails_dl_and_paths
+from uploads import Uploads
 from .grid_view import GridView
 
 
 class MainWindow(QMainWindow):
-    subfeed = None
+    uploads = None
+    gv = None
 
     def __init__(self):
         super().__init__()
         # self.subfeed = subfeed
+        self.uploads = Uploads()
         self.clipboard = QApplication.clipboard()
         self.init_ui()
 
@@ -110,9 +115,10 @@ class MainWindow(QMainWindow):
         # self.setWindowTitle('QProgressBar')
 
         windowLayout = QVBoxLayout()
-        gv = GridView(self.clipboard, self.statusBar())
+        self.gv = GridView(self.uploads, self.clipboard, self.statusBar())
+        # print(grid)
         # windowLayout.addWidget(gv)
-        self.setCentralWidget(gv)
+        self.setCentralWidget(self.gv)
         self.setLayout(windowLayout)
         self.resize(1280, 800)  # Start at a sane 16:10 minsize since thumbs are scaling now
         self.show()
@@ -182,7 +188,11 @@ class MainWindow(QMainWindow):
         print("Dummy Function 7")
 
     def func8(self):
-        print("Dummy Function 8")
+        print('function 8')
+        self.gv.uploads.get_uploads()
+        paths = thumbnails_dl_and_paths(self.gv.uploads.uploads[:30])
+        for q_label, path in zip(self.gv.q_labels, paths):
+            q_label.setPixmap(QPixmap(path))
 
 
 # if __name__ == '__main__':
