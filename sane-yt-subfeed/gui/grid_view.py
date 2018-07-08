@@ -1,6 +1,3 @@
-# !/usr/bin/python3
-# -*- coding: utf-8 -*-
-
 # PyCharm bug: PyCharm seems to be expecting the referenced module to be included in an __all__ = [] statement
 # noinspection PyUnresolvedReferencesa
 from PyQt5.QtCore import QDate, QTime, QDateTime, Qt, QBasicTimer
@@ -9,12 +6,17 @@ from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessa
     QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit
 # noinspection PyUnresolvedReferencesa
 from PyQt5.QtGui import QIcon, QFont, QPixmap
-import sys
+
+from thumbnail_handler import download_thumbnails_threaded
 
 
-class Gui(QWidget):
-    def __init__(self):
+class GridView(QWidget):
+    subfeed = None
+
+    def __init__(self, subfeed):
         super().__init__()
+        self.subfeed = subfeed
+
         self.init_ui()
 
     def init_ui(self):
@@ -56,13 +58,15 @@ class Gui(QWidget):
 
         positions = [(i, j) for i in range(5) for j in range(4)]
 
-        counter = 1
-        real_counter = 0
+        counter = 0
         # for position, name in zip(positions, items):
+        file_list = download_thumbnails_threaded(self.subfeed)
+        print(len(file_list))
+        print(file_list)
+        print(positions)
         for position, video_layout in zip(positions, items):
-            if counter >= 21:
-                counter = 1
-            # if name == '':
+            if counter >= len(items):
+                break
             if items == '':
                 continue
             # if name == 'SAMPLE TITLE':
@@ -72,19 +76,24 @@ class Gui(QWidget):
             #     grid.addWidget(lbl, *position)
             # else:
             # button = QPushButton(name)
-            filename = "{}.jpg".format(counter)
+            # filename = "{}.jpg".format(counter)
+            try:
+                filename = file_list[counter]
+            except:
+                print(counter)
+                print(len(file_list))
+                raise
             pixmap = QPixmap(filename)
             lbl = QLabel(self)
             lbl.setPixmap(pixmap)
             lbl.setToolTip("Video {}".format(counter))
             video_layout.addWidget(QLabel(filename))
-            grid.addLayout(video_layout, *position)
+            # grid.addLayout(video_layout, *position)
             print("adding {} to pos: {}".format(filename, *position))
             grid.addWidget(lbl, *position)
             # print(grid.children()[0].alignment)
 
             counter += 1
-            real_counter += 1
         print(grid)
                 # grid.addChildWidget(QLabel(filename))
 
@@ -121,8 +130,8 @@ class Gui(QWidget):
         # qbtn.resize(qbtn.sizeHint())
         # qbtn.move(100, 50)
         #
-        self.setWindowTitle('Sane Subscription Feed, yo!')
-        self.setWindowIcon(QIcon('blu.ico'))
+        # self.setWindowTitle('Sane Subscription Feed, yo!')
+        # self.setWindowIcon(QIcon('blu.ico'))
         # self.statusBar().showMessage('Ready.')
         #
 
@@ -139,7 +148,7 @@ class Gui(QWidget):
         # self.setGeometry(300, 300, 280, 170)
         # self.setWindowTitle('QProgressBar')
 
-        self.show()
+        self.show()     # FIXME: conflict with MainWindow?
 
     def button_clicked(self):
 
@@ -198,9 +207,10 @@ class Gui(QWidget):
             # self.timer.start(100, self)
             self.btn.setText('1')
 
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ui = Gui()
-
-    sys.exit(app.exec_())
+# TODO: Remove after debugging is done
+# import sys
+# if __name__ == '__main__':
+#     app = QApplication(sys.argv)
+#     ex = GridView(None)
+#
+#     sys.exit(app.exec_())
