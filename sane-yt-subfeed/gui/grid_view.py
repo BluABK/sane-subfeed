@@ -6,6 +6,14 @@ from PyQt5.QtGui import QIcon, QFont, QPixmap
 
 from thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path
 
+class ExtendedQLabel(QLabel):
+
+    def __init__(self, parent, img_id):
+        QLabel.__init__(self, parent)
+        self.img_id = img_id
+
+    def mouseReleaseEvent(self, ev):
+        print('clicked: {}'.format(self.id))
 
 class GridView(QWidget):
     subfeed = None
@@ -80,7 +88,7 @@ class GridView(QWidget):
                 # print(len(file_list))
                 raise
             pixmap = QPixmap(filename)
-            lbl = QLabel(self)
+            lbl = ExtendedQLabel(self, counter)
             lbl.setPixmap(pixmap)
             # lbl.setToolTip("Video {}".format(counter))
             lbl.setToolTip("{}: {}".format(self.subfeed[counter].channel_title, self.subfeed[counter].title))
