@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessa
     QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit
 from PyQt5.QtGui import QIcon, QFont, QPixmap, QPainter
 
-from thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path
+from ..thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path
 
 
 class ExtendedQLabel(QLabel):

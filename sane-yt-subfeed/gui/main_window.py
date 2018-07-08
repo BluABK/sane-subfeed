@@ -8,7 +8,8 @@ from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessa
 from PyQt5.QtGui import QIcon, QFont, QPixmap
 import sys
 
-from gui.grid_view import GridView
+
+from .grid_view import GridView
 
 
 class MainWindow(QMainWindow):

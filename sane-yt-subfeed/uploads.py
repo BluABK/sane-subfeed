@@ -1,11 +1,6 @@
-import threading
-
-from authentication import youtube_auth_keys
-from generate_keys import GenerateKeys
-from pickle_handler import load_batch_build_key, dump_batch_build_key
-from uploads_thread import GetUploadsThread
-import time
-from collections import OrderedDict
+from .generate_keys import GenerateKeys
+from .pickle_handler import load_batch_build_key, dump_batch_build_key
+from .uploads_thread import GetUploadsThread
 from tqdm import tqdm  # fancy progress bar
 
 YOUTUBE_URL = "https://www.youtube.com/"

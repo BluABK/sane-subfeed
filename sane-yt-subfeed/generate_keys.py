@@ -1,6 +1,6 @@
 import threading
 
-from authentication import youtube_auth_keys
+from .authentication import youtube_auth_keys
 
 
 class GenerateKeys(threading.Thread):
