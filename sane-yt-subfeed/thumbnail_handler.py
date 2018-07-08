@@ -1,6 +1,7 @@
 import os
 import shutil
 import threading
+import time
 
 from tqdm import tqdm
 
@@ -10,14 +11,14 @@ import certifi
 import urllib3
 
 OS_PATH = os.path.dirname(__file__)
-
+THUMBNAILS_PATH = os.path.join(OS_PATH, 'resources', 'thumbnails')
 
 class DownloadThumbnail(threading.Thread):
 
-    def __init__(self, video, path_list):
+    def __init__(self, video, thread_list):
         threading.Thread.__init__(self)
         self.video = video
-        self.path_list = path_list
+        self.thread_list = thread_list
 
     def run(self):
         vid_path = os.path.join(OS_PATH, 'resources', 'thumbnails', '{}.jpg'.format(self.video.video_id))
@@ -25,7 +26,11 @@ class DownloadThumbnail(threading.Thread):
             thumbnail_dict = get_best_thumbnail(self.video)
             # print(thumbnail_dict)
             download_file(thumbnail_dict['url'], vid_path)
-        self.path_list.append(vid_path)
+        self.thread_list.remove(self)
+
+
+def get_thumbnail_path(vid):
+    return os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(vid.video_id))
 
 
 def download_thumbnails_seq(vid_list):
@@ -41,17 +46,24 @@ def download_thumbnails_seq(vid_list):
 
 
 def download_thumbnails_threaded(vid_list):
-    path_list = []
     thread_list = []
+    thread_limit = int(read_config('Threading', 'img_threads'))
     print("\nStarting thumbnail download threads")
     for video in tqdm(vid_list):
-        t = DownloadThumbnail(video, path_list)
+        t = DownloadThumbnail(video, thread_list)
+        thread_list.append(t)
         t.start()
+        # print(len(thread_list))
+        while len(thread_list) >= thread_limit:
+            print(len(thread_list))
+            time.sleep(0.0001)
+            # thread = thread_list.pop(0)
+            # thread.join()
+
 
     print("\nWaiting for download threads to finish")
     for t in tqdm(thread_list):
         t.join()
-    return path_list
 
 
 def jesse_pickle():
