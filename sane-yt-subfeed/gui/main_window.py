@@ -2,18 +2,14 @@
 # -*- coding: utf-8 -*-
 
 # PyCharm bug: PyCharm seems to be expecting the referenced module to be included in an __all__ = [] statement
-import time
 
-from PyQt5.Qt import QClipboard
-from PyQt5.QtCore import QDate, QTime, QDateTime, Qt, QBasicTimer
-from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessageBox, QMainWindow, QAction, qApp, \
-    QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit
-from PyQt5.QtGui import QIcon, QFont, QPixmap
-import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, \
+    QMenu, QProgressBar, QVBoxLayout
+from PyQt5.QtGui import QIcon
 
 from thumbnail_handler import thumbnails_dl_and_paths
 from uploads import Uploads
-from .grid_view import GridView
+from gui.views.grid_view import GridView
 
 
 class MainWindow(QMainWindow):
@@ -213,10 +209,3 @@ class MainWindow(QMainWindow):
         for q_label, video in zip(self.gv.q_labels, uploads):
             q_label.set_video(video)
             q_label.update()
-
-
-# if __name__ == '__main__':
-#     app = QApplication(sys.argv)
-#     ex = MainWindow()
-#
-#     sys.exit(app.exec_())
