@@ -182,13 +182,7 @@ class MainWindow(QMainWindow):
         urls = ""
         for i in range(grid_items - 1):
             print(i)
-            print(self.subfeed[i])
-            try:
-                print(self.subfeed[1].video_title)
-            except:
-                pass
-            # urls += "{}\n".format(self.subfeed[i].video_url)
-            urls += str(i)
+            urls += "{}\n".format(self.uploads.uploads[1].video_title)
             print("Debug: urls = '{}'".format(urls))
 
         print("Copied URLs to clipboard: \n{}".format(urls))
