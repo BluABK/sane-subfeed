@@ -217,11 +217,9 @@ class MainWindow(QMainWindow):
         print('function 8')
         self.gv.uploads.get_uploads()
         uploads = self.gv.uploads.uploads[:30]
-        paths = thumbnails_dl_and_paths(self.gv.uploads.uploads[:30])
-        counter = 0
-        for q_label, path in zip(self.gv.q_labels, paths):
-            q_label.set_video(uploads[counter], path)
-            counter += 1
+        thumbnails_dl_and_paths(self.gv.uploads.uploads[:30])
+        for q_label, video in zip(self.gv.q_labels, uploads):
+            q_label.set_video(video)
 
 
 # if __name__ == '__main__':

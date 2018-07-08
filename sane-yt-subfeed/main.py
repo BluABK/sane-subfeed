@@ -33,7 +33,7 @@ def run_print():
     if info:
         print("Found %s subscriptions." % len(subscriptions))
     uploads = Uploads()
-    subscription_feed = uploads.get_uploads(subscriptions, info=True, debug=False, disable_threading=False)
+    subscription_feed = uploads.get_uploads(subscriptions)
     time_elsapsed = default_timer() - start
     print("\nRun time: {}".format(time_elsapsed))
 

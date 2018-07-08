@@ -10,6 +10,7 @@ class Video:
     date_published = None
     description = None
     thumbnails = {}
+    thumbnail_path = ''
     playlist_id = None
     playlist_pos = None
     url_video = None

@@ -27,10 +27,11 @@ class ExtendedQLabel(QLabel):
     def setPixmap(self, p):
         self.p = p
 
-    def set_video(self, video, path):
+    def set_video(self, video):
         self.video = video
         self.set_tool_tip()
-        self.setPixmap(QPixmap(path))
+        print(video.thumbnail_path)
+        self.setPixmap(QPixmap(video.thumbnail_path))
 
     def set_tool_tip(self):
         self.setToolTip("{}: {}".format(self.video.channel_title, self.video.title))
@@ -108,6 +109,7 @@ class GridView(QWidget):
             self.uploads = load_pickle(os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
         else:
             self.uploads.get_uploads()
+            dump_pickle(self.uploads, os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
         paths = thumbnails_dl_and_paths(self.uploads.uploads[:30])
         print(positions)
         for position, video_layout in zip(positions, items):
@@ -122,11 +124,11 @@ class GridView(QWidget):
                 print(counter)
                 # print(len(file_list))
                 raise
-            pixmap = QPixmap(filename)
+            # pixmap = QPixmap(filename)
             lbl = ExtendedQLabel(self, self.uploads.uploads[counter], counter, self.clipboard, self.status_bar)
             # lbl.setPixmap(pixmap)
             # lbl.setToolTip("{}: {}".format(self.uploads.uploads[counter].channel_title, self.uploads.uploads[counter].title))
-            lbl.set_video(self.uploads.uploads[counter], filename)
+            lbl.set_video(self.uploads.uploads[counter])
             # lbl.set_video(self.uploads.uploads[counter], filename)
             self.q_labels.append(lbl)
             video_layout.addWidget(QLabel(filename))
