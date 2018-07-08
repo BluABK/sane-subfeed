@@ -1,3 +1,7 @@
+import sys
+
+from PyQt5.QtWidgets import QApplication
+
 from authentication import youtube_auth_keys, youtube_auth_oauth
 from pickle_handler import load_youtube, dump_youtube, load_sub_list, dump_sub_list
 from print_functions import print_subscription_feed
@@ -5,6 +9,8 @@ from timeit import default_timer
 
 from uploads import Uploads
 from youtube_requests import get_subscriptions
+from gui.main_window import MainWindow
+from gui.grid_view import GridView
 
 cached_subs = True
 global_debug = False
@@ -61,3 +67,10 @@ print_subscription_feed(subscription_feed, cutoff=500)
 
 time_elsapsed = default_timer() - start
 print("\nRun time: {}".format(time_elsapsed))
+
+# MainWindow()
+app = QApplication(sys.argv)
+ex = GridView(subscription_feed[:100])
+
+sys.exit(app.exec_())
+
