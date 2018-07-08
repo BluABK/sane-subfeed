@@ -7,10 +7,16 @@ from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessa
 # noinspection PyUnresolvedReferencesa
 from PyQt5.QtGui import QIcon, QFont, QPixmap
 
+from thumbnail_handler import download_thumbnails_threaded
+
 
 class GridView(QWidget):
-    def __init__(self):
+    subfeed = None
+
+    def __init__(self, subfeed):
         super().__init__()
+        self.subfeed = subfeed
+
         self.init_ui()
 
     def init_ui(self):
@@ -52,14 +58,15 @@ class GridView(QWidget):
 
         positions = [(i, j) for i in range(5) for j in range(4)]
 
-        counter = 1
-        real_counter = 0
+        counter = 0
         # for position, name in zip(positions, items):
+        file_list = download_thumbnails_threaded(self.subfeed)
+        print(len(file_list))
+        print(file_list)
         print(positions)
         for position, video_layout in zip(positions, items):
-            if counter >= 21:
-                counter = 1
-            # if name == '':
+            if counter >= len(items):
+                break
             if items == '':
                 continue
             # if name == 'SAMPLE TITLE':
@@ -69,7 +76,13 @@ class GridView(QWidget):
             #     grid.addWidget(lbl, *position)
             # else:
             # button = QPushButton(name)
-            filename = "{}.jpg".format(counter)
+            # filename = "{}.jpg".format(counter)
+            try:
+                filename = file_list[counter]
+            except:
+                print(counter)
+                print(len(file_list))
+                raise
             pixmap = QPixmap(filename)
             lbl = QLabel(self)
             lbl.setPixmap(pixmap)
@@ -81,7 +94,6 @@ class GridView(QWidget):
             # print(grid.children()[0].alignment)
 
             counter += 1
-            real_counter += 1
         print(grid)
                 # grid.addChildWidget(QLabel(filename))
 
@@ -196,9 +208,9 @@ class GridView(QWidget):
             self.btn.setText('1')
 
 # TODO: Remove after debugging is done
-import sys
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = GridView()
-
-    sys.exit(app.exec_())
+# import sys
+# if __name__ == '__main__':
+#     app = QApplication(sys.argv)
+#     ex = GridView(None)
+#
+#     sys.exit(app.exec_())

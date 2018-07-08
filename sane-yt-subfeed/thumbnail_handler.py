@@ -54,8 +54,8 @@ def download_thumbnails_threaded(vid_list):
     return path_list
 
 
-# def jesse_pickle():
-#     return load_pickle(os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
+def jesse_pickle():
+    return load_pickle(os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
 
 
 def download_file(url, path):
