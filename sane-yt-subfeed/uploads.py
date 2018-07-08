@@ -1,3 +1,4 @@
+from .youtube_requests import cached_authenticated_get_subscriptions
 from .generate_keys import GenerateKeys
 from .pickle_handler import load_batch_build_key, dump_batch_build_key
 from .uploads_thread import GetUploadsThread
@@ -22,8 +23,8 @@ class Uploads:
     def __init__(self):
         pass
 
-    def get_uploads(self, subs, debug=False, info=False, load_time=30, disable_threading=False, limit=25):
-        self.subs = subs
+    def get_uploads(self, debug=False, info=False, load_time=30, disable_threading=False, limit=25):
+        self.subs = cached_authenticated_get_subscriptions()
         self.debug = debug
         self.info = info
         self.load_time = load_time

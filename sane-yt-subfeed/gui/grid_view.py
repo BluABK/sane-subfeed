@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessa
     QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit
 from PyQt5.QtGui import QIcon, QFont, QPixmap, QPainter
 
+from .uploads import Uploads
 from ..thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path
 
 
@@ -29,10 +30,11 @@ class ExtendedQLabel(QLabel):
 
     def mouseReleaseEvent(self, ev):
         print('clicked {:2d}: {} {} - {}'.format(self.img_id, self.video.url_video, self.video.channel_title,
-                                              self.video.title))
+                                                 self.video.title))
         self.clipboard.setText(self.video.url_video)
         self.status_bar.showMessage('Copied URL to clipboard: {} ({} - {})'.format(self.video.url_video,
-                                                                             self.video.channel_title, self.video.title))
+                                                                                   self.video.channel_title,
+                                                                                   self.video.title))
 
     def contextMenuEvent(self, event):
         menu = QMenu(self)
@@ -50,11 +52,11 @@ class ExtendedQLabel(QLabel):
 
 
 class GridView(QWidget):
-    subfeed = None
+    uploads = None
 
-    def __init__(self, subfeed, clipboard, status_bar):
+    def __init__(self, clipboard, status_bar):
         super().__init__()
-        self.subfeed = subfeed
+        self.uploads = Uploads()
         self.clipboard = clipboard
         self.status_bar = status_bar
         self.init_ui()
@@ -87,7 +89,7 @@ class GridView(QWidget):
 
         counter = 0
         # for position, name in zip(positions, items):
-        download_thumbnails_threaded(self.subfeed)
+        download_thumbnails_threaded(self.uploads)
         print(positions)
         for position, video_layout in zip(positions, items):
             if counter >= len(items):
@@ -104,16 +106,16 @@ class GridView(QWidget):
             # filename = "{}.jpg".format(counter)
             try:
 
-                filename = get_thumbnail_path(self.subfeed[counter])
+                filename = get_thumbnail_path(self.uploads[counter])
             except:
                 print(counter)
                 # print(len(file_list))
                 raise
             pixmap = QPixmap(filename)
-            lbl = ExtendedQLabel(self, counter, self.subfeed[counter], self.clipboard, self.status_bar)
+            lbl = ExtendedQLabel(self, counter, self.uploads[counter], self.clipboard, self.status_bar)
             lbl.setPixmap(pixmap)
             # lbl.setToolTip("Video {}".format(counter))
-            lbl.setToolTip("{}: {}".format(self.subfeed[counter].channel_title, self.subfeed[counter].title))
+            lbl.setToolTip("{}: {}".format(self.uploads[counter].channel_title, self.uploads[counter].title))
             video_layout.addWidget(QLabel(filename))
             # grid.addLayout(video_layout, *position)
             print("adding {} to pos: {}".format(filename, *position))
@@ -122,7 +124,7 @@ class GridView(QWidget):
 
             counter += 1
         print(grid)
-                # grid.addChildWidget(QLabel(filename))
+        # grid.addChildWidget(QLabel(filename))
 
         # QToolTip.setFont(QFont('SansSerif', 10))
         #
@@ -175,7 +177,6 @@ class GridView(QWidget):
     def quit_query(self, event):
         reply = QMessageBox.question(self, 'Quit?', "Are you sure to quit?", QMessageBox.Yes | QMessageBox.No,
                                      QMessageBox.No)
-
 
 # TODO: Remove after debugging is done
 # import sys
