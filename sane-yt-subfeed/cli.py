@@ -3,10 +3,10 @@ import click
 from .main import run_with_gui, run_print
 
 
-@click.option(u'--tui', is_flag=True)
+@click.option(u'--no_gui', is_flag=True)
 @click.command()
-def cli(tui):
-    if tui:
+def cli(no_gui):
+    if no_gui:
         run_print()
     else:
         run_with_gui()
