@@ -13,7 +13,7 @@ class ExtendedQLabel(QLabel):
         self.img_id = img_id
 
     def mouseReleaseEvent(self, ev):
-        print('clicked: {}'.format(self.id))
+        print('clicked: {}'.format(self.img_id))
 
 class GridView(QWidget):
     subfeed = None
