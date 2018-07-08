@@ -6,7 +6,9 @@ env/
 
 # sane-yt-subfeed
 client_secret.json
+client_secret_private.json
 keys.json
+keys_private.json
 *.pkl
 config.ini
 
