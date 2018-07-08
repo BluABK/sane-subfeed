@@ -1,8 +1,6 @@
 import threading
 
-from authentication import youtube_auth_keys
-from pickle_handler import load_build_key, dump_build_key
-from youtube_requests import get_channel_uploads, list_uploaded_videos_search
+from .youtube_requests import get_channel_uploads, list_uploaded_videos_search
 
 
 class GetUploadsThread(threading.Thread):

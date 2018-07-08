@@ -2,11 +2,11 @@ import json
 import os
 import time
 
-
-from config_handler import read_config
-from pickle_handler import dump_pickle, PICKLE_PATH
-from print_functions import remove_empty_kwargs
-from video import Video
+from .authentication import youtube_auth_oauth
+from .config_handler import read_config
+from .pickle_handler import dump_pickle, PICKLE_PATH, load_sub_list, load_youtube, dump_youtube, dump_sub_list
+from .print_functions import remove_empty_kwargs
+from .video import Video
 import datetime
 
 YOUTUBE_URL = "https://www.youtube.com/"
@@ -181,3 +181,27 @@ def get_subscriptions(youtube_oauth):
             subscription_list_request, subscription_list_response)
 
     return subs
+
+
+def cached_authenticated_get_subscriptions():
+    cached_subs = read_config('Debug', 'cached_subs')
+    if cached_subs:
+        try:
+            temp_subscriptions = load_sub_list()
+        except FileNotFoundError:
+            try:
+                youtube_oauth = load_youtube()
+            except FileNotFoundError:
+                youtube_oauth = youtube_auth_oauth()
+                dump_youtube(youtube_oauth)
+            temp_subscriptions = get_subscriptions(youtube_oauth)
+            dump_sub_list(temp_subscriptions)
+    else:
+        try:
+            youtube_oauth = load_youtube()
+            temp_subscriptions = get_subscriptions(youtube_oauth)
+        except FileNotFoundError:
+            youtube_oauth = youtube_auth_oauth()
+            dump_youtube(youtube_oauth)
+            temp_subscriptions = get_subscriptions(youtube_oauth)
+    return temp_subscriptions

@@ -14,6 +14,7 @@ defaults = {
     },
     'Debug': {
         'debug': 'False',
+        'cached_subs': 'True',
     },
     'Gui': {
         'launch': 'Gui',

@@ -3,6 +3,7 @@ launch_gui = True
 
 [Debug]
 debug = False
+cached_subs = True
 
 [Requests]
 

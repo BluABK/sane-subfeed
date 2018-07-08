@@ -1,6 +1,6 @@
 import datetime
 
-from settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
+from .settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 
 
 class Video:
