@@ -68,19 +68,6 @@ class GridView(QWidget):
                  video_item, video_item, video_item, video_item, video_item, video_item,
                  video_item, video_item, video_item, video_item, video_item, video_item]
 
-        # items = [video_item,    video_item,     video_item,     video_item,     video_item,     video_item,
-        #          'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
-        #          video_item, video_item, video_item, video_item, video_item, video_item,
-        #          'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
-        #          video_item, video_item, video_item, video_item, video_item, video_item,
-        #          'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
-        #          video_item, video_item, video_item, video_item, video_item, video_item,
-        #          'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
-        #          video_item, video_item, video_item, video_item, video_item, video_item,
-        #          'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE',
-        #          video_item, video_item, video_item, video_item, video_item, video_item,
-        #          'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE', 'SAMPLE TITLE']
-
         positions = [(i, j) for i in range(5) for j in range(4)]
 
         counter = 0
@@ -122,26 +109,7 @@ class GridView(QWidget):
         print(grid)
                 # grid.addChildWidget(QLabel(filename))
 
-        # exit_action = QAction(QIcon('exit.png'), '&Exit', self)
-        # exit_action.setShortcut('Ctrl+Q')
-        # exit_action.setStatusTip('Exit application')
-        # exit_action.triggered.connect(qApp.quit)
-        #
-        # self.statusBar()
-        #
-        # sub_menu = QMenu('Import', self)
-        # sub_action = QAction('Import mail', self)
-        # sub_menu.addAction(sub_action)
-        #
-        # new_action = QAction('New', self)
-        #
-        # menubar = self.menuBar()
-        # file_menu = menubar.addMenu('&File')
-        # file_menu.addAction(new_action)
-        # file_menu.addMenu(sub_menu)
-        # file_menu.addAction(exit_action)
-        #
-        QToolTip.setFont(QFont('SansSerif', 10))
+        # QToolTip.setFont(QFont('SansSerif', 10))
         #
         # # self.setToolTip('This is a <b>QWidget</b> widget')
         # btn = QPushButton('Button 1', self)
@@ -155,8 +123,8 @@ class GridView(QWidget):
         # qbtn.resize(qbtn.sizeHint())
         # qbtn.move(100, 50)
         #
-        self.setWindowTitle('Sane Subscription Feed, yo!')
-        self.setWindowIcon(QIcon('blu.ico'))
+        # self.setWindowTitle('Sane Subscription Feed, yo! [Grid]')
+        # self.setWindowIcon(QIcon('blu.ico'))
         # self.statusBar().showMessage('Ready.')
         #
 
@@ -172,8 +140,8 @@ class GridView(QWidget):
         #
         # self.setGeometry(300, 300, 280, 170)
         # self.setWindowTitle('QProgressBar')
-        self.resize(1280, 800)  # Start at a sane 16:10 minsize since thumbs are scaling now
-        self.show()     # FIXME: conflict with MainWindow?
+        # self.resize(1280, 800)  # Start at a sane 16:10 minsize since thumbs are scaling now
+        # self.show()     # FIXME: conflict with MainWindow?
 
     def button_clicked(self):
 
