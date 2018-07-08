@@ -4,9 +4,9 @@ from PyQt5.QtWidgets import QApplication
 
 from timeit import default_timer
 
-from .uploads import Uploads
-from .youtube_requests import get_subscriptions, cached_authenticated_get_subscriptions
-from .gui.main_window import MainWindow
+from uploads import Uploads
+from youtube_requests import get_subscriptions, cached_authenticated_get_subscriptions
+from gui.main_window import MainWindow
 
 cached_subs = True
 global_debug = False

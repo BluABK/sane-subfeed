@@ -2,11 +2,11 @@ import json
 import os
 import time
 
-from .authentication import youtube_auth_oauth
-from .config_handler import read_config
-from .pickle_handler import dump_pickle, PICKLE_PATH, load_sub_list, load_youtube, dump_youtube, dump_sub_list
-from .print_functions import remove_empty_kwargs
-from .video import Video
+from authentication import youtube_auth_oauth
+from config_handler import read_config
+from pickle_handler import dump_pickle, PICKLE_PATH, load_sub_list, load_youtube, dump_youtube, dump_sub_list
+from print_functions import remove_empty_kwargs
+from video import Video
 import datetime
 
 YOUTUBE_URL = "https://www.youtube.com/"
@@ -162,7 +162,7 @@ def get_subscriptions(youtube_oauth):
     :param traverse_pages:
     :return: [total, subs, statistics]
     """
-    subscription_list_request = youtube_oauth.subscriptions().list(part='snippet,contentDetails', mine=True,
+    subscription_list_request = youtube_oauth.subscriptions().list(part='snippet', mine=True,
                                                                    maxResults=50)
     subs = []
     # Retrieve the list of subscribed channels for authenticated user's channel.

@@ -5,8 +5,8 @@ import time
 
 from tqdm import tqdm
 
-from .config_handler import read_config
-from .pickle_handler import PICKLE_PATH, load_pickle
+from config_handler import read_config
+from pickle_handler import PICKLE_PATH, load_pickle
 import certifi
 import urllib3
 

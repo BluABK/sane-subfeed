@@ -1,6 +1,6 @@
 import click
 
-from .main import run_with_gui, run_print
+from main import run_with_gui, run_print
 
 
 @click.option(u'--no_gui', is_flag=True)

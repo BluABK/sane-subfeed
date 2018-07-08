@@ -1,5 +1,6 @@
 # PyCharm bug: PyCharm seems to be expecting the referenced module to be included in an __all__ = [] statement
 import os
+import time
 
 from PyQt5.Qt import QClipboard
 from PyQt5.QtCore import QDate, QTime, QDateTime, Qt, QBasicTimer
@@ -8,8 +9,8 @@ from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessa
 from PyQt5.QtGui import QIcon, QFont, QPixmap, QPainter
 
 from pickle_handler import PICKLE_PATH, dump_pickle, load_pickle
-from ..uploads import Uploads
-from ..thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path, thumbnails_dl_and_paths
+from uploads import Uploads
+from thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path, thumbnails_dl_and_paths
 
 
 class ExtendedQLabel(QLabel):
@@ -54,10 +55,11 @@ class ExtendedQLabel(QLabel):
 
 class GridView(QWidget):
     uploads = None
+    q_labels = []
 
-    def __init__(self, clipboard, status_bar):
+    def __init__(self, uploads, clipboard, status_bar):
         super().__init__()
-        self.uploads = Uploads()
+        self.uploads = uploads
         self.clipboard = clipboard
         self.status_bar = status_bar
         self.init_ui()
@@ -90,8 +92,8 @@ class GridView(QWidget):
 
         counter = 0
         # for position, name in zip(positions, items):
-        # self.uploads = load_pickle(os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
-        self.uploads.get_uploads()
+        self.uploads = load_pickle(os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
+        # self.uploads.get_uploads()
         # dump_pickle(self.uploads, os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
         paths = thumbnails_dl_and_paths(self.uploads.uploads[:30])
         print(positions)
@@ -111,12 +113,15 @@ class GridView(QWidget):
             lbl = ExtendedQLabel(self, self.clipboard, self.status_bar)
             lbl.setPixmap(pixmap)
             lbl.setToolTip("{}: {}".format(self.uploads.uploads[counter].channel_title, self.uploads.uploads[counter].title))
+            self.q_labels.append(lbl)
             video_layout.addWidget(QLabel(filename))
             print("adding {} to pos: {}".format(filename, *position))
             grid.addWidget(lbl, *position)
 
             counter += 1
-        print(grid)
+        # self.uploads.get_uploads()
+
+
 
         # grid.addChildWidget(QLabel(filename))
 
