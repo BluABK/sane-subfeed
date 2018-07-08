@@ -72,7 +72,7 @@ print("\nRun time: {}".format(time_elsapsed))
 
 # MainWindow()
 app = QApplication(sys.argv)
-ex = GridView(subscription_feed[:100])
+ex = GridView(subscription_feed[:20])
 
 sys.exit(app.exec_())
 

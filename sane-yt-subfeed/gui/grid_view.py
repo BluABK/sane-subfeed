@@ -2,7 +2,7 @@
 from PyQt5.QtCore import QDate, QTime, QDateTime, Qt, QBasicTimer
 from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessageBox, QMainWindow, QAction, qApp, \
     QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit
-from PyQt5.QtGui import QIcon, QFont, QPixmap
+from PyQt5.QtGui import QIcon, QFont, QPixmap, QPainter
 
 from thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path
 
@@ -11,6 +11,15 @@ class ExtendedQLabel(QLabel):
     def __init__(self, parent, img_id):
         QLabel.__init__(self, parent)
         self.img_id = img_id
+
+    def setPixmap(self, p):
+        self.p = p
+
+    def paintEvent(self, event):
+        if self.p:
+            painter = QPainter(self)
+            painter.setRenderHint(QPainter.SmoothPixmapTransform)
+            painter.drawPixmap(self.rect(), self.p)
 
     def mouseReleaseEvent(self, ev):
         print('clicked: {}'.format(self.img_id))
