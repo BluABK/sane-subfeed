@@ -11,8 +11,6 @@ parser.read(CONFIG_PATH)
 
 defaults = {
     'Requests': {
-        'since_last_vid_limit': '10',
-        'min_diff_time': '100'
     },
     'Debug': {
         'debug': 'False',

@@ -5,8 +5,7 @@ launch_gui = True
 debug = False
 
 [Requests]
-since_last_vid_limit = 10
-min_diff_time = 100
+
 
 [Thumbnails]
 0 = default

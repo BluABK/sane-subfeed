@@ -68,12 +68,15 @@ class Uploads:
             dump_batch_build_key(youtube_list)
 
         print("Creating YouTube service object from API_KEY for %s channels:" % len(self.subs))
+        # thread_limit = 1
         for channel, youtube in tqdm(zip(self.subs, youtube_list)):
             if self.debug:
                 print("Creating YouTube service object from API_KEY for channel: %s" % channel['snippet']['title'])
-            thread = GetUploadsThread(thread_increment, youtube, channel, debug=False)
+            thread = GetUploadsThread(thread_increment, youtube, channel, 1, debug=False)
             thread_list.append(thread)
             thread_increment += 1
+            # if thread_increment >= thread_limit:
+            #     break
         print("\nStarting threads:")
         for t in tqdm(thread_list):
             t.start()
@@ -101,6 +104,3 @@ class Uploads:
         for t in tqdm(threads):
             t.join()
         return keys
-
-
-
