@@ -6,11 +6,13 @@ from PyQt5.QtGui import QIcon, QFont, QPixmap, QPainter
 
 from thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path
 
+
 class ExtendedQLabel(QLabel):
 
-    def __init__(self, parent, img_id):
+    def __init__(self, parent, img_id, video):
         QLabel.__init__(self, parent)
         self.img_id = img_id
+        self.video = video
 
     def setPixmap(self, p):
         self.p = p
@@ -22,7 +24,8 @@ class ExtendedQLabel(QLabel):
             painter.drawPixmap(self.rect(), self.p)
 
     def mouseReleaseEvent(self, ev):
-        print('clicked: {}'.format(self.img_id))
+        print('clicked {:2d}: {} {} - {}'.format(self.img_id, self.video.url_video, self.video.channel_title,
+                                              self.video.title))
 
     def contextMenuEvent(self, event):
         menu = QMenu(self)
@@ -30,6 +33,7 @@ class ExtendedQLabel(QLabel):
         action = menu.exec_(self.mapToGlobal(event.pos()))
         if action == quitAction:
             qApp.quit()
+
 
 class GridView(QWidget):
     subfeed = None
@@ -41,7 +45,7 @@ class GridView(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        # self.setGeometry(300, 300, 300, 220)
+        # self.setGeometry(500, 500, 300, 220)
 
         grid = QGridLayout()
         grid.setSpacing(10)
@@ -104,7 +108,7 @@ class GridView(QWidget):
                 # print(len(file_list))
                 raise
             pixmap = QPixmap(filename)
-            lbl = ExtendedQLabel(self, counter)
+            lbl = ExtendedQLabel(self, counter, self.subfeed[counter])
             lbl.setPixmap(pixmap)
             # lbl.setToolTip("Video {}".format(counter))
             lbl.setToolTip("{}: {}".format(self.subfeed[counter].channel_title, self.subfeed[counter].title))
@@ -168,7 +172,7 @@ class GridView(QWidget):
         #
         # self.setGeometry(300, 300, 280, 170)
         # self.setWindowTitle('QProgressBar')
-
+        self.resize(1280, 800)  # Start at a sane 16:10 minsize since thumbs are scaling now
         self.show()     # FIXME: conflict with MainWindow?
 
     def button_clicked(self):
