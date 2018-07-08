@@ -12,8 +12,11 @@ from gui.grid_view import GridView
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    subfeed = None
+
+    def __init__(self, subfeed):
         super().__init__()
+        self.subfeed = subfeed
         self.init_ui()
 
     def init_ui(self):
@@ -71,16 +74,17 @@ class MainWindow(QMainWindow):
         # self.setWindowTitle('QProgressBar')
 
         windowLayout = QVBoxLayout()
-        gv = GridView()
-        windowLayout.addWidget(gv)
+        gv = GridView(self.subfeed)
+        # windowLayout.addWidget(gv)
+        self.setCentralWidget(gv)
         self.setLayout(windowLayout)
-
+        self.resize(1280, 800)  # Start at a sane 16:10 minsize since thumbs are scaling now
         self.show()
-        gv.show()
+        # gv.show()
 
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = MainWindow()
-
-    sys.exit(app.exec_())
+# if __name__ == '__main__':
+#     app = QApplication(sys.argv)
+#     ex = MainWindow()
+#
+#     sys.exit(app.exec_())

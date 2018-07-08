@@ -70,9 +70,9 @@ time_elsapsed = default_timer() - start
 print("\nRun time: {}".format(time_elsapsed))
 
 
-# MainWindow()
 app = QApplication(sys.argv)
-ex = GridView(subscription_feed[:20])
+ex = MainWindow(subscription_feed[:20])
+# ex = GridView(subscription_feed[:20])
 
 sys.exit(app.exec_())
 
