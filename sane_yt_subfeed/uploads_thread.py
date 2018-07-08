@@ -1,6 +1,6 @@
 import threading
 
-from youtube_requests import list_uploaded_videos_search
+from sane_yt_subfeed.youtube_requests import list_uploaded_videos_search
 
 
 class GetUploadsThread(threading.Thread):

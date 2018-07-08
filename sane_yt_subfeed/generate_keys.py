@@ -1,6 +1,6 @@
 import threading
 
-from authentication import youtube_auth_keys
+from sane_yt_subfeed.authentication import youtube_auth_keys
 
 
 class GenerateKeys(threading.Thread):

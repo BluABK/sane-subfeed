@@ -2,7 +2,7 @@ import sys
 
 import click
 
-from main import run_with_gui, run_print
+from sane_yt_subfeed.main import run_with_gui, run_print
 
 
 @click.option(u'--no_gui', is_flag=True)

@@ -5,10 +5,11 @@ import time
 
 from tqdm import tqdm
 
-from config_handler import read_config
-from pickle_handler import PICKLE_PATH, load_pickle
 import certifi
 import urllib3
+
+from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.pickle_handler import load_pickle, PICKLE_PATH
 
 OS_PATH = os.path.dirname(__file__)
 THUMBNAILS_PATH = os.path.join(OS_PATH, 'resources', 'thumbnails')

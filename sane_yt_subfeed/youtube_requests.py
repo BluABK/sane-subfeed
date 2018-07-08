@@ -2,11 +2,11 @@ import json
 import os
 import time
 
-from authentication import youtube_auth_oauth
-from config_handler import read_config
-from pickle_handler import dump_pickle, PICKLE_PATH, load_sub_list, load_youtube, dump_youtube, dump_sub_list
-from print_functions import remove_empty_kwargs
-from video import Video
+from sane_yt_subfeed.authentication import youtube_auth_oauth
+from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.pickle_handler import dump_pickle, PICKLE_PATH, load_sub_list, load_youtube, dump_youtube, dump_sub_list
+from sane_yt_subfeed.print_functions import remove_empty_kwargs
+from sane_yt_subfeed.video import Video
 import datetime
 
 YOUTUBE_URL = "https://www.youtube.com/"
