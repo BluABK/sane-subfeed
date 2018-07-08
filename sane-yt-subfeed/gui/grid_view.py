@@ -27,6 +27,14 @@ class ExtendedQLabel(QLabel):
     def setPixmap(self, p):
         self.p = p
 
+    def set_video(self, video, path):
+        self.video = video
+        self.set_tool_tip()
+        self.setPixmap(QPixmap(path))
+
+    def set_tool_tip(self):
+        self.setToolTip("{}: {}".format(self.video.channel_title, self.video.title))
+
     def paintEvent(self, event):
         if self.p:
             painter = QPainter(self)
@@ -116,8 +124,10 @@ class GridView(QWidget):
                 raise
             pixmap = QPixmap(filename)
             lbl = ExtendedQLabel(self, self.uploads.uploads[counter], counter, self.clipboard, self.status_bar)
-            lbl.setPixmap(pixmap)
-            lbl.setToolTip("{}: {}".format(self.uploads.uploads[counter].channel_title, self.uploads.uploads[counter].title))
+            # lbl.setPixmap(pixmap)
+            # lbl.setToolTip("{}: {}".format(self.uploads.uploads[counter].channel_title, self.uploads.uploads[counter].title))
+            lbl.set_video(self.uploads.uploads[counter], filename)
+            # lbl.set_video(self.uploads.uploads[counter], filename)
             self.q_labels.append(lbl)
             video_layout.addWidget(QLabel(filename))
             print("adding {} to pos: {}".format(filename, *position))
