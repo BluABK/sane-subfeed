@@ -26,6 +26,9 @@ defaults = {
         '2': 'high',
         '3': 'standard',
         '4': 'maxres'
+    },
+    'Threading': {
+        'img_threads': '100',
     }
 }
 

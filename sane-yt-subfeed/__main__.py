@@ -3,6 +3,7 @@ from pickle_handler import load_youtube, dump_youtube, load_sub_list, dump_sub_l
 from print_functions import print_subscription_feed
 from timeit import default_timer
 
+from thumbnail_handler import download_thumbnails_threaded
 from uploads import Uploads
 from youtube_requests import get_subscriptions
 
@@ -61,3 +62,5 @@ print_subscription_feed(subscription_feed, cutoff=500)
 
 time_elsapsed = default_timer() - start
 print("\nRun time: {}".format(time_elsapsed))
+
+download_thumbnails_threaded(subscription_feed[:5000])
