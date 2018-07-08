@@ -58,13 +58,13 @@ class MainWindow(QMainWindow):
 
         # Set function menu triggers
         call_func1.triggered.connect(self.func1)
-        call_func1.triggered.connect(self.func2)
-        call_func1.triggered.connect(self.func3)
-        call_func1.triggered.connect(self.func4)
-        call_func1.triggered.connect(self.func5)
-        call_func1.triggered.connect(self.func6)
-        call_func1.triggered.connect(self.func7)
-        call_func1.triggered.connect(self.func8)
+        call_func2.triggered.connect(self.func2)
+        call_func3.triggered.connect(self.func3)
+        call_func4.triggered.connect(self.func4)
+        call_func5.triggered.connect(self.func5)
+        call_func6.triggered.connect(self.func6)
+        call_func7.triggered.connect(self.func7)
+        call_func8.triggered.connect(self.func8)
 
         counter = 1
         for func in funcs:
