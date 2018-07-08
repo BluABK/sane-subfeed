@@ -58,8 +58,8 @@ class MainWindow(QMainWindow):
         call_func5 = QAction('Function 5', self)
         call_func6 = QAction('Function 6', self)
         call_func7 = QAction('Function 7', self)
-        call_func8 = QAction('Function 8', self)
-        funcs = [call_func2,call_func3,call_func4,call_func5,call_func6,call_func7,call_func8]
+        refresh_list = QAction('Refresh Feed', self)
+        funcs = [call_func2,call_func3,call_func4,call_func5,call_func6,call_func7]
 
         # Set function menu triggers
         dump_urls.triggered.connect(self.dump_urls_clpbd)
@@ -72,7 +72,7 @@ class MainWindow(QMainWindow):
         call_func5.triggered.connect(self.func5)
         call_func6.triggered.connect(self.func6)
         call_func7.triggered.connect(self.func7)
-        call_func8.triggered.connect(self.func8)
+        refresh_list.triggered.connect(self.refresh_list)
 
         counter = 2
         for func in funcs:
@@ -85,6 +85,14 @@ class MainWindow(QMainWindow):
             # Add function to Function menu
             func_menu.addAction(func)
             counter += 1
+
+        # refresh_list
+        refresh_list.setShortcut('Ctrl+R')
+        refresh_list.setStatusTip('Execute Function {}'.format(counter))
+        func_menu.addAction(refresh_list)
+
+
+
         #
         # QToolTip.setFont(QFont('SansSerif', 10))
         #
@@ -205,7 +213,7 @@ class MainWindow(QMainWindow):
     def func7(self):
         print("Dummy Function 7")
 
-    def func8(self):
+    def refresh_list(self):
         print('function 8')
         self.gv.uploads.get_uploads()
         paths = thumbnails_dl_and_paths(self.gv.uploads.uploads[:30])
