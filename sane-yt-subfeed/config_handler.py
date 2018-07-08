@@ -1,3 +1,4 @@
+import ast
 import os
 from shutil import copyfile
 from configparser import ConfigParser, NoSectionError, NoOptionError
@@ -41,9 +42,9 @@ def read_config(section, option):
     except (NoSectionError, NoOptionError):
         value = defaults[section][option]
     if value:
-        return value
+        return ast.literal_eval(value)
     else:
-        return defaults[section][option]
+        return ast.literal_eval(defaults[section][option])
 
 
 def set_config(section, key, value):
