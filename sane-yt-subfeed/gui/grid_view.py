@@ -110,7 +110,7 @@ class GridView(QWidget):
                 # print(len(file_list))
                 raise
             pixmap = QPixmap(filename)
-            lbl = ExtendedQLabel(self, counter, self.subfeed[counter], self.clipboard)
+            lbl = ExtendedQLabel(self, counter, self.subfeed[counter], self.clipboard, self.status_bar)
             lbl.setPixmap(pixmap)
             # lbl.setToolTip("Video {}".format(counter))
             lbl.setToolTip("{}: {}".format(self.subfeed[counter].channel_title, self.subfeed[counter].title))

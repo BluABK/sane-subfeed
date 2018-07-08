@@ -41,6 +41,39 @@ class MainWindow(QMainWindow):
         file_menu.addAction(new_action)
         file_menu.addMenu(sub_menu)
         file_menu.addAction(exit_action)
+
+        # Function menu
+        func_menu = menubar.addMenu('&Function')
+
+        # Create Function menu items
+        call_func1 = QAction('Function 1', self)
+        call_func2 = QAction('Function 2', self)
+        call_func3 = QAction('Function 3', self)
+        call_func4 = QAction('Function 4', self)
+        call_func5 = QAction('Function 5', self)
+        call_func6 = QAction('Function 6', self)
+        call_func7 = QAction('Function 7', self)
+        call_func8 = QAction('Function 8', self)
+        funcs = [call_func1,call_func2,call_func3,call_func4,call_func5,call_func6,call_func7,call_func8]
+
+        # Set function menu triggers
+        call_func1.triggered.connect(self.func1)
+        call_func1.triggered.connect(self.func2)
+        call_func1.triggered.connect(self.func3)
+        call_func1.triggered.connect(self.func4)
+        call_func1.triggered.connect(self.func5)
+        call_func1.triggered.connect(self.func6)
+        call_func1.triggered.connect(self.func7)
+        call_func1.triggered.connect(self.func8)
+
+        counter = 1
+        for func in funcs:
+            # Set shortcut
+            func.setShortcut('Ctrl+{}'.format(counter))
+
+            # Add function to Function menu
+            func_menu.addAction(func)
+            counter += 1
         #
         QToolTip.setFont(QFont('SansSerif', 10))
         #
@@ -121,8 +154,32 @@ class MainWindow(QMainWindow):
             # self.timer.start(100, self)
             self.btn.setText('1')
 
-    def do_function(self):
-        print("Dummy Function")
+    # def do_function(self):
+    #     print("Dummy Function")
+
+    def func1(self):
+        print("Dummy Function 1")
+
+    def func2(self):
+        print("Dummy Function 2")
+
+    def func3(self):
+        print("Dummy Function 3")
+
+    def func4(self):
+        print("Dummy Function 4")
+
+    def func5(self):
+        print("Dummy Function 5")
+
+    def func6(self):
+        print("Dummy Function 6")
+
+    def func7(self):
+        print("Dummy Function 7")
+
+    def func8(self):
+        print("Dummy Function 8")
 
 
 # if __name__ == '__main__':
