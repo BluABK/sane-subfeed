@@ -174,20 +174,19 @@ class MainWindow(QMainWindow):
             # self.timer.start(100, self)
             self.btn.setText('1')
 
-    # def do_function(self):
-    #     print("Dummy Function")
-
     def dump_urls_clpbd(self):
+        """
+        Adds the url of each video in the view to a string, separated by \n and puts it on clipboard.
+        :return:
+        """
         grid_items = 20
         urls = ""
-        for i in range(grid_items - 1):
-            print(i)
-            urls += "{}\n".format(self.uploads.uploads[1].video_title)
-            print("Debug: urls = '{}'".format(urls))
+        for i in range(grid_items):
+            urls += "{}\n".format(self.gv.uploads.uploads[i].url_video)
 
         print("Copied URLs to clipboard: \n{}".format(urls))
         self.clipboard.setText(urls)
-
+        self.statusBar().showMessage('Copied {} URLs to clipboard'.format(len(urls.splitlines())))
 
     def func2(self):
         print("Dummy Function 2")
