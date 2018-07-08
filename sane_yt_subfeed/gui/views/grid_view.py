@@ -103,7 +103,11 @@ class GridView(QWidget):
         counter = 0
         use_dummy_data = read_config('Debug', 'use_dummy_uploads')
         if use_dummy_data:
-            self.uploads = load_pickle(os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
+            try:
+                self.uploads = load_pickle(os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
+            except FileNotFoundError:
+                self.uploads.get_uploads()
+                dump_pickle(self.uploads, os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
         else:
             self.uploads.get_uploads()
             dump_pickle(self.uploads, os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))

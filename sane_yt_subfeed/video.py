@@ -1,21 +1,51 @@
 import datetime
+import json
 
+import sqlalchemy
+from sqlalchemy import Boolean, DateTime, ForeignKey, Column, Integer, String
+from datetime import datetime
+
+
+from sqlalchemy.orm import relationship, backref
+
+from sane_yt_subfeed.database.orm import Base
 from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 
+from sqlalchemy.types import TypeDecorator
 
-class Video:
-    channel_title = None
-    title = None
-    video_id = None
-    date_published = None
-    description = None
-    thumbnails = {}
-    thumbnail_path = ''
-    playlist_id = None
-    playlist_pos = None
-    url_video = None
-    url_playlist_video = None
-    stats_time_elapsed = None
+SIZE = 256
+
+class TextPickleType(TypeDecorator):
+
+    impl = sqlalchemy.Text(SIZE)
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            value = json.dumps(value)
+
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            value = json.loads(value)
+        return value
+
+
+class Video(Base):
+    __tablename__ = 'Video'
+    video_id_key = Column('video_id_key', Integer, primary_key=True)
+    video_id = Column(String)
+    channel_title = Column(String)
+    title = Column(String)
+    playlist_id = Column(String)
+    date_published = Column(String)
+    description = Column(String)
+    thumbnail_path = Column(String)
+    playlist_pos = Column(String)
+    url_video = Column(String)
+    url_playlist_video = Column(String)
+    stats_time_elapsed = Column(String)
+    thumbnails = Column(TextPickleType())
 
     def __init__(self, search_item):
         """

@@ -1,3 +1,4 @@
+from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.youtube_requests import cached_authenticated_get_subscriptions
 from sane_yt_subfeed.generate_keys import GenerateKeys
 from sane_yt_subfeed.pickle_handler import load_batch_build_key, dump_batch_build_key
@@ -64,13 +65,16 @@ class Uploads:
             dump_batch_build_key(youtube_list)
 
         print("Creating YouTube service object from API_KEY for %s channels:" % len(self.subs))
-        # thread_limit = 1
+        channels_limit = read_config('Debug', 'use_dummy_uploads')
         for channel, youtube in tqdm(zip(self.subs, youtube_list)):
             if self.debug:
                 print("Creating YouTube service object from API_KEY for channel: %s" % channel['snippet']['title'])
             thread = GetUploadsThread(thread_increment, youtube, channel, 1, debug=False)
             thread_list.append(thread)
             thread_increment += 1
+            if channels_limit > 0 and channels_limit < thread_increment:
+                print('break: {}'.format(thread_increment))
+                break
             # if thread_increment >= thread_limit:
             #     break
         print("\nStarting threads:")
