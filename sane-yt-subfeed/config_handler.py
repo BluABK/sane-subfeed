@@ -42,7 +42,10 @@ def read_config(section, option):
     except (NoSectionError, NoOptionError):
         value = defaults[section][option]
     if value:
-        return ast.literal_eval(value)
+        try:
+            return ast.literal_eval(value)
+        except ValueError:
+            return value
     else:
         return ast.literal_eval(defaults[section][option])
 
