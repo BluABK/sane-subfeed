@@ -1,3 +1,4 @@
+import json
 import os
 import time
 
@@ -97,12 +98,54 @@ def list_uploaded_videos(youtube_key, uploads_playlist_id):
             #         print("{}: {}".format(counter, v.title))
             #         counter += 1
                 # dump_pickle(videos, os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
-            # if len(videos) > 0 and videos[0].channel_title == "Jesse Cox":
+            if len(videos) > 0 and videos[0].channel_title == "Jesse Cox":
+                # for vid in videos:
+                playlistitems_list_request_2 = youtube_key.search().list(
+                    maxResults=50, part='snippet', channelId='UCCbfB3cQtkEAiKfdRQnfQvw', order='date')
+                response = playlistitems_list_request_2.execute()
+                for item in response['items']:
+                    print(item['snippet']['title'])
             # #   print(videos[0].thumbnails)
                 # dump_pickle(videos, os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
             return videos
         else:
             req_nr += 1
+        playlistitems_list_request = youtube_key.playlistItems().list_next(
+            playlistitems_list_request, playlistitems_list_response)
+
+    return videos
+
+
+def list_uploaded_videos_search(youtube_key, channel_id, search_pages):
+    """
+    Get a list of videos in a playlist
+    :param search_pages:
+    :param channel_id:
+    :param youtube_key:
+    :return: [list(dict): videos, dict: statistics]
+    """
+    # Retrieve the list of videos uploaded to the authenticated user's channel.
+    playlistitems_list_request = youtube_key.search().list(
+        maxResults=50, part='snippet', channelId=channel_id, order='date')
+
+    req_limit = 1
+    videos = []
+    while playlistitems_list_request:
+        playlistitems_list_response = playlistitems_list_request.execute()
+
+        # Grab information about each video.
+        for search_result in playlistitems_list_response['items']:
+            if search_result['id']['kind'] == 'youtube#video':
+                video = Video(search_result)
+                # print('{}: {}'.format(video.channel_title, video.title))
+                # print(format(playlist_item))
+                videos.append(video)
+
+        if search_pages >= req_limit:
+            return videos
+        else:
+            search_pages += 1
+
         playlistitems_list_request = youtube_key.playlistItems().list_next(
             playlistitems_list_request, playlistitems_list_response)
 
@@ -128,6 +171,8 @@ def get_subscriptions(youtube_oauth):
 
         # Grab information about each subscription page
         for page in subscription_list_response['items']:
+            # if page['snippet']['title'] == "Jesse Cox":
+            #     print('Jesse Cox: {}'.format(page['snippet']['resourceId']['channelId']))
             # print(page['snippet']['title'])
             subs.append(page)
         # print("-- Page --")

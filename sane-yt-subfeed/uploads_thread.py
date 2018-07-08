@@ -2,12 +2,12 @@ import threading
 
 from authentication import youtube_auth_keys
 from pickle_handler import load_build_key, dump_build_key
-from youtube_requests import get_channel_uploads
+from youtube_requests import get_channel_uploads, list_uploaded_videos_search
 
 
 class GetUploadsThread(threading.Thread):
 
-    def __init__(self, thread_id, youtube, channel, info=False, debug=False):
+    def __init__(self, thread_id, youtube, channel, search_pages, info=False, debug=False):
         """
         Init GetUploadsThread
         :param thread_id:
@@ -24,6 +24,7 @@ class GetUploadsThread(threading.Thread):
         self.videos = []
         self.job_done = False
         self.youtube = youtube
+        self.search_pages = search_pages
 
     # TODO: Handle failed requests
     def run(self):
@@ -41,7 +42,8 @@ class GetUploadsThread(threading.Thread):
 
         # youtube = youtube_auth_keys()
 
-        self.videos = get_channel_uploads(self.youtube, channel_id)
+        # self.videos = get_channel_uploads(self.youtube, channel_id)
+        self.videos = list_uploaded_videos_search(self.youtube, channel_id, self.search_pages)
 
         self.job_done = True
         if self.debug:

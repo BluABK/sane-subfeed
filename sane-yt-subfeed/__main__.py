@@ -64,15 +64,14 @@ uploads = Uploads()
 subscription_feed = uploads.get_uploads(subscriptions, info=True, debug=False, disable_threading=False)
 
 # Print the subscription feed
-print_subscription_feed(subscription_feed, cutoff=500)
+# print_subscription_feed(subscription_feed, cutoff=500)
 
 time_elsapsed = default_timer() - start
 print("\nRun time: {}".format(time_elsapsed))
 
 
 app = QApplication(sys.argv)
-ex = MainWindow(subscription_feed[:20])
+ex = MainWindow(subscription_feed[:40])
 # ex = GridView(subscription_feed[:20])
 
 sys.exit(app.exec_())
-
