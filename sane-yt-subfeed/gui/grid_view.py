@@ -1,5 +1,7 @@
 # PyCharm bug: PyCharm seems to be expecting the referenced module to be included in an __all__ = [] statement
 # noinspection PyUnresolvedReferencesa
+import os
+
 from PyQt5.QtCore import QDate, QTime, QDateTime, Qt, QBasicTimer
 # noinspection PyUnresolvedReferencesa
 from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessageBox, QMainWindow, QAction, qApp, \
@@ -7,7 +9,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessa
 # noinspection PyUnresolvedReferencesa
 from PyQt5.QtGui import QIcon, QFont, QPixmap
 
-from thumbnail_handler import download_thumbnails_threaded
+from thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path
 
 
 class GridView(QWidget):
@@ -60,9 +62,7 @@ class GridView(QWidget):
 
         counter = 0
         # for position, name in zip(positions, items):
-        file_list = download_thumbnails_threaded(self.subfeed)
-        print(len(file_list))
-        print(file_list)
+        download_thumbnails_threaded(self.subfeed)
         print(positions)
         for position, video_layout in zip(positions, items):
             if counter >= len(items):
@@ -78,10 +78,11 @@ class GridView(QWidget):
             # button = QPushButton(name)
             # filename = "{}.jpg".format(counter)
             try:
-                filename = file_list[counter]
+
+                filename = get_thumbnail_path(self.subfeed[counter])
             except:
                 print(counter)
-                print(len(file_list))
+                # print(len(file_list))
                 raise
             pixmap = QPixmap(filename)
             lbl = QLabel(self)
