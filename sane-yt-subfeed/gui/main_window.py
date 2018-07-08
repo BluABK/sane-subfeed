@@ -207,12 +207,12 @@ class MainWindow(QMainWindow):
         print("Dummy Function 7")
 
     def refresh_list(self):
-        print('function 8')
         self.gv.uploads.get_uploads()
         uploads = self.gv.uploads.uploads[:30]
         thumbnails_dl_and_paths(self.gv.uploads.uploads[:30])
         for q_label, video in zip(self.gv.q_labels, uploads):
             q_label.set_video(video)
+            q_label.update()
 
 
 # if __name__ == '__main__':
