@@ -4,6 +4,7 @@ import time
 
 from sane_yt_subfeed.authentication import youtube_auth_oauth
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.pickle_handler import dump_pickle, PICKLE_PATH, load_sub_list, load_youtube, dump_youtube, dump_sub_list
 from sane_yt_subfeed.print_functions import remove_empty_kwargs
 from sane_yt_subfeed.video import Video
@@ -23,7 +24,7 @@ def get_channel_uploads(youtube_key, channel_id):
     :return: list_uploaded_videos(channel_uploads_playlist_id, debug=debug, limit=limit)
     """
     # Get channel
-    channel = channels_list_by_id(youtube_key, part='snippet,contentDetails,statistics',
+    channel = channels_list_by_id(youtube_key, part='contentDetails',
                                   id=channel_id)  # FIXME: stats unnecessary?
 
     # Get ID of uploads playlist
@@ -127,7 +128,6 @@ def list_uploaded_videos_search(youtube_key, channel_id, search_pages):
     # Retrieve the list of videos uploaded to the authenticated user's channel.
     playlistitems_list_request = youtube_key.search().list(
         maxResults=50, part='snippet', channelId=channel_id, order='date')
-
     req_limit = 1
     videos = []
     while playlistitems_list_request:
@@ -137,6 +137,9 @@ def list_uploaded_videos_search(youtube_key, channel_id, search_pages):
         for search_result in playlistitems_list_response['items']:
             if search_result['id']['kind'] == 'youtube#video':
                 video = Video(search_result)
+                db_session.add(video)
+                db_session.commit()
+                db_session.close()
                 # print('{}: {}'.format(video.channel_title, video.title))
                 # print(format(playlist_item))
                 videos.append(video)

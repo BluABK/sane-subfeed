@@ -5,6 +5,7 @@ launch_gui = True
 debug = False
 cached_subs = True
 use_dummy_uploads = False
+channels_limit = -1
 
 [Requests]
 
