@@ -1,7 +1,7 @@
-from youtube_requests import cached_authenticated_get_subscriptions
-from generate_keys import GenerateKeys
-from pickle_handler import load_batch_build_key, dump_batch_build_key
-from uploads_thread import GetUploadsThread
+from sane_yt_subfeed.youtube_requests import cached_authenticated_get_subscriptions
+from sane_yt_subfeed.generate_keys import GenerateKeys
+from sane_yt_subfeed.pickle_handler import load_batch_build_key, dump_batch_build_key
+from sane_yt_subfeed.uploads_thread import GetUploadsThread
 from tqdm import tqdm  # fancy progress bar
 
 YOUTUBE_URL = "https://www.youtube.com/"

@@ -8,10 +8,9 @@ from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessa
     QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit
 from PyQt5.QtGui import QIcon, QFont, QPixmap, QPainter
 
-from config_handler import read_config
-from pickle_handler import PICKLE_PATH, dump_pickle, load_pickle
-from uploads import Uploads
-from thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path, thumbnails_dl_and_paths
+from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.pickle_handler import PICKLE_PATH, dump_pickle, load_pickle
+from sane_yt_subfeed.thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path, thumbnails_dl_and_paths
 
 
 class ExtendedQLabel(QLabel):

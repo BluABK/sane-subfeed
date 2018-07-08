@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessa
     QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit, QTextEdit
 from PyQt5.QtGui import QIcon, QFont, QPixmap, QPainter
 
-from config_handler import read_config
+from sane_yt_subfeed.config_handler import read_config
 
 
 class ConfigView(QWidget):
