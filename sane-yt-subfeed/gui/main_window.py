@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # PyCharm bug: PyCharm seems to be expecting the referenced module to be included in an __all__ = [] statement
+from PyQt5.Qt import QClipboard
 from PyQt5.QtCore import QDate, QTime, QDateTime, Qt, QBasicTimer
 from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessageBox, QMainWindow, QAction, qApp, \
     QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit
@@ -17,6 +18,7 @@ class MainWindow(QMainWindow):
     def __init__(self, subfeed):
         super().__init__()
         self.subfeed = subfeed
+        self.clipboard = QApplication.clipboard()
         self.init_ui()
 
     def init_ui(self):
@@ -57,12 +59,9 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QIcon('blu.ico'))
         self.statusBar().showMessage('Ready.')
 
-        # self.a
-        #
+        self.pbar = QProgressBar(self)
+        self.pbar.setGeometry(30, 40, 200, 25)
 
-        # self.pbar = QProgressBar(self)
-        # self.pbar.setGeometry(30, 40, 200, 25)
-        #
         # self.btn = QPushButton('Start', self)
         # self.btn.move(40, 80)
         # # self.btn.clicked.connect(self.doAction)
@@ -74,13 +73,55 @@ class MainWindow(QMainWindow):
         # self.setWindowTitle('QProgressBar')
 
         windowLayout = QVBoxLayout()
-        gv = GridView(self.subfeed)
+        gv = GridView(self.subfeed, self.clipboard, self.statusBar())
         # windowLayout.addWidget(gv)
         self.setCentralWidget(gv)
         self.setLayout(windowLayout)
         self.resize(1280, 800)  # Start at a sane 16:10 minsize since thumbs are scaling now
         self.show()
         # gv.show()
+
+    def context_menu_vent(self, event):
+
+        cmenu = QMenu(self)
+
+        copy_link_action = cmenu.addAction("Copy link")
+        open_link_action = cmenu.addAction("Open link")
+        close_action = cmenu.addAction("Close")
+        action = cmenu.exec_(self.mapToGlobal(event.pos()))
+
+        if action == close_action:
+            qApp.quit()
+
+    def timer_event(self, e):
+        if self.step >= 100:
+            self.timer.stop()
+            self.btn.setText('Finished')
+            return
+
+        self.step = self.step + 1
+        self.pbar.setValue(self.step)
+
+    def do_action(self):
+        if self.timer.isActive():
+            self.timer.stop()
+            self.btn.setText('Start')
+        else:
+            self.timer.start(100, self)
+            self.btn.setText('Stop')
+
+    def load_progress(self):
+        if self.timer.isActive():
+            self.step = self.step + 1
+            self.pbar.setValue(self.step)
+            # self.timer.stop()
+            self.btn.setText('0')
+        else:
+            # self.timer.start(100, self)
+            self.btn.setText('1')
+
+    def do_function(self):
+        print("Dummy Function")
 
 
 # if __name__ == '__main__':
