@@ -5,8 +5,8 @@ import time
 
 from tqdm import tqdm
 
-from .config_handler import read_config
-from .pickle_handler import PICKLE_PATH, load_pickle
+from config_handler import read_config
+from pickle_handler import PICKLE_PATH, load_pickle
 import certifi
 import urllib3
 
@@ -55,15 +55,25 @@ def download_thumbnails_threaded(vid_list):
         t.start()
         # print(len(thread_list))
         while len(thread_list) >= thread_limit:
-            print(len(thread_list))
+            # print(len(thread_list))
             time.sleep(0.0001)
             # thread = thread_list.pop(0)
             # thread.join()
+    for thread in thread_list:
+        thread.join()
 
 
     print("\nWaiting for download threads to finish")
     for t in tqdm(thread_list):
         t.join()
+
+
+def thumbnails_dl_and_paths(vid_list):
+    download_thumbnails_threaded(vid_list)
+    path_list = []
+    for vid in vid_list:
+        path_list.append(get_thumbnail_path(vid))
+    return path_list
 
 
 def jesse_pickle():

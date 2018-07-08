@@ -1,6 +1,6 @@
 import threading
 
-from .youtube_requests import get_channel_uploads, list_uploaded_videos_search
+from youtube_requests import get_channel_uploads, list_uploaded_videos_search
 
 
 class GetUploadsThread(threading.Thread):
