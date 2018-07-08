@@ -24,6 +24,13 @@ class ExtendedQLabel(QLabel):
     def mouseReleaseEvent(self, ev):
         print('clicked: {}'.format(self.img_id))
 
+    def contextMenuEvent(self, event):
+        menu = QMenu(self)
+        quitAction = menu.addAction("Quit")
+        action = menu.exec_(self.mapToGlobal(event.pos()))
+        if action == quitAction:
+            qApp.quit()
+
 class GridView(QWidget):
     subfeed = None
 
