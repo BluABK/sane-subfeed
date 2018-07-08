@@ -4,6 +4,7 @@ launch_gui = True
 [Debug]
 debug = False
 cached_subs = True
+use_dummy_uploads = False
 
 [Requests]
 

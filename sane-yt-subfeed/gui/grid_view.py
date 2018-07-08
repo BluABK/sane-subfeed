@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessa
     QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit
 from PyQt5.QtGui import QIcon, QFont, QPixmap, QPainter
 
+from config_handler import read_config
 from pickle_handler import PICKLE_PATH, dump_pickle, load_pickle
 from uploads import Uploads
 from thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path, thumbnails_dl_and_paths
@@ -15,11 +16,13 @@ from thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path, 
 
 class ExtendedQLabel(QLabel):
 
-    def __init__(self, parent, clipboard, status_bar):
+    def __init__(self, parent, video, img_id, clipboard, status_bar):
         QLabel.__init__(self, parent)
         # self.clipboard().dataChanged.connect(self.clipboard_changed)
         self.clipboard = clipboard
         self.status_bar = status_bar
+        self.video = video
+        self.img_id = img_id
 
     def setPixmap(self, p):
         self.p = p
@@ -92,9 +95,11 @@ class GridView(QWidget):
 
         counter = 0
         # for position, name in zip(positions, items):
-        self.uploads = load_pickle(os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
-        # self.uploads.get_uploads()
-        # dump_pickle(self.uploads, os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
+        use_dummy_data = read_config('Debug', 'use_dummy_uploads')
+        if use_dummy_data:
+            self.uploads = load_pickle(os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
+        else:
+            self.uploads.get_uploads()
         paths = thumbnails_dl_and_paths(self.uploads.uploads[:30])
         print(positions)
         for position, video_layout in zip(positions, items):
@@ -110,7 +115,7 @@ class GridView(QWidget):
                 # print(len(file_list))
                 raise
             pixmap = QPixmap(filename)
-            lbl = ExtendedQLabel(self, self.clipboard, self.status_bar)
+            lbl = ExtendedQLabel(self, self.uploads.uploads[counter], counter, self.clipboard, self.status_bar)
             lbl.setPixmap(pixmap)
             lbl.setToolTip("{}: {}".format(self.uploads.uploads[counter].channel_title, self.uploads.uploads[counter].title))
             self.q_labels.append(lbl)
