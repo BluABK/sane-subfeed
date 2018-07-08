@@ -1,4 +1,5 @@
 # PyCharm bug: PyCharm seems to be expecting the referenced module to be included in an __all__ = [] statement
+from PyQt5.Qt import QClipboard
 from PyQt5.QtCore import QDate, QTime, QDateTime, Qt, QBasicTimer
 from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessageBox, QMainWindow, QAction, qApp, \
     QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit
@@ -9,10 +10,13 @@ from ..thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path
 
 class ExtendedQLabel(QLabel):
 
-    def __init__(self, parent, img_id, video):
+    def __init__(self, parent, img_id, video, clipboard, status_bar):
         QLabel.__init__(self, parent)
         self.img_id = img_id
         self.video = video
+        # self.clipboard().dataChanged.connect(self.clipboard_changed)
+        self.clipboard = clipboard
+        self.status_bar = status_bar
 
     def setPixmap(self, p):
         self.p = p
@@ -26,6 +30,9 @@ class ExtendedQLabel(QLabel):
     def mouseReleaseEvent(self, ev):
         print('clicked {:2d}: {} {} - {}'.format(self.img_id, self.video.url_video, self.video.channel_title,
                                               self.video.title))
+        self.clipboard.setText(self.video.url_video)
+        self.status_bar.showMessage('Copied URL to clipboard: {} ({} - {})'.format(self.video.url_video,
+                                                                             self.video.channel_title, self.video.title))
 
     def contextMenuEvent(self, event):
         menu = QMenu(self)
@@ -34,14 +41,22 @@ class ExtendedQLabel(QLabel):
         if action == quitAction:
             qApp.quit()
 
+    # Get the system clipboard contents
+    def clipboard_changed(self):
+        text = self.clipboard().text()
+        print(text)
+
+        self.b.insertPlainText(text + '\n')
+
 
 class GridView(QWidget):
     subfeed = None
 
-    def __init__(self, subfeed):
+    def __init__(self, subfeed, clipboard, status_bar):
         super().__init__()
         self.subfeed = subfeed
-
+        self.clipboard = clipboard
+        self.status_bar = status_bar
         self.init_ui()
 
     def init_ui(self):
@@ -95,7 +110,7 @@ class GridView(QWidget):
                 # print(len(file_list))
                 raise
             pixmap = QPixmap(filename)
-            lbl = ExtendedQLabel(self, counter, self.subfeed[counter])
+            lbl = ExtendedQLabel(self, counter, self.subfeed[counter], self.clipboard)
             lbl.setPixmap(pixmap)
             # lbl.setToolTip("Video {}".format(counter))
             lbl.setToolTip("{}: {}".format(self.subfeed[counter].channel_title, self.subfeed[counter].title))
@@ -161,44 +176,6 @@ class GridView(QWidget):
         reply = QMessageBox.question(self, 'Quit?', "Are you sure to quit?", QMessageBox.Yes | QMessageBox.No,
                                      QMessageBox.No)
 
-    def context_menu_vent(self, event):
-
-        cmenu = QMenu(self)
-
-        copy_link_action = cmenu.addAction("Copy link")
-        open_link_action = cmenu.addAction("Open link")
-        close_action = cmenu.addAction("Close")
-        action = cmenu.exec_(self.mapToGlobal(event.pos()))
-
-        if action == close_action:
-            qApp.quit()
-
-    def timer_event(self, e):
-        if self.step >= 100:
-            self.timer.stop()
-            self.btn.setText('Finished')
-            return
-
-        self.step = self.step + 1
-        self.pbar.setValue(self.step)
-
-    def do_action(self):
-        if self.timer.isActive():
-            self.timer.stop()
-            self.btn.setText('Start')
-        else:
-            self.timer.start(100, self)
-            self.btn.setText('Stop')
-
-    def load_progress(self):
-        if self.timer.isActive():
-            self.step = self.step + 1
-            self.pbar.setValue(self.step)
-            # self.timer.stop()
-            self.btn.setText('0')
-        else:
-            # self.timer.start(100, self)
-            self.btn.setText('1')
 
 # TODO: Remove after debugging is done
 # import sys
