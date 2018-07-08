@@ -15,6 +15,7 @@ defaults = {
     'Debug': {
         'debug': 'False',
         'cached_subs': 'True',
+        'use_dummy_uploads': 'False'
     },
     'Gui': {
         'launch': 'Gui',
