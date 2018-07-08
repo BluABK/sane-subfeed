@@ -55,10 +55,12 @@ def download_thumbnails_threaded(vid_list):
         t.start()
         # print(len(thread_list))
         while len(thread_list) >= thread_limit:
-            print(len(thread_list))
+            # print(len(thread_list))
             time.sleep(0.0001)
             # thread = thread_list.pop(0)
             # thread.join()
+    for thread in thread_list:
+        thread.join()
 
 
     print("\nWaiting for download threads to finish")
@@ -71,6 +73,7 @@ def thumbnails_dl_and_paths(vid_list):
     path_list = []
     for vid in vid_list:
         path_list.append(get_thumbnail_path(vid))
+    return path_list
 
 
 def jesse_pickle():

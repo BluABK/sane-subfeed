@@ -1,20 +1,21 @@
 # PyCharm bug: PyCharm seems to be expecting the referenced module to be included in an __all__ = [] statement
+import os
+
 from PyQt5.Qt import QClipboard
 from PyQt5.QtCore import QDate, QTime, QDateTime, Qt, QBasicTimer
 from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessageBox, QMainWindow, QAction, qApp, \
     QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit
 from PyQt5.QtGui import QIcon, QFont, QPixmap, QPainter
 
-from .uploads import Uploads
-from ..thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path
+from pickle_handler import PICKLE_PATH, dump_pickle, load_pickle
+from ..uploads import Uploads
+from ..thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path, thumbnails_dl_and_paths
 
 
 class ExtendedQLabel(QLabel):
 
-    def __init__(self, parent, img_id, video, clipboard, status_bar):
+    def __init__(self, parent, clipboard, status_bar):
         QLabel.__init__(self, parent)
-        self.img_id = img_id
-        self.video = video
         # self.clipboard().dataChanged.connect(self.clipboard_changed)
         self.clipboard = clipboard
         self.status_bar = status_bar
@@ -89,41 +90,34 @@ class GridView(QWidget):
 
         counter = 0
         # for position, name in zip(positions, items):
-        download_thumbnails_threaded(self.uploads)
+        # self.uploads = load_pickle(os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
+        self.uploads.get_uploads()
+        # dump_pickle(self.uploads, os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
+        paths = thumbnails_dl_and_paths(self.uploads.uploads[:30])
         print(positions)
         for position, video_layout in zip(positions, items):
             if counter >= len(items):
                 break
             if items == '':
                 continue
-            # if name == 'SAMPLE TITLE':
-            #     filename = "{}.jpg".format(counter)
-            #     lbl = QLabel(filename)
-            #     print("adding TITLE to pos: {}".format(filename, *position))
-            #     grid.addWidget(lbl, *position)
-            # else:
-            # button = QPushButton(name)
-            # filename = "{}.jpg".format(counter)
             try:
-
-                filename = get_thumbnail_path(self.uploads[counter])
+                print(counter)
+                filename = paths[counter]
             except:
                 print(counter)
                 # print(len(file_list))
                 raise
             pixmap = QPixmap(filename)
-            lbl = ExtendedQLabel(self, counter, self.uploads[counter], self.clipboard, self.status_bar)
+            lbl = ExtendedQLabel(self, self.clipboard, self.status_bar)
             lbl.setPixmap(pixmap)
-            # lbl.setToolTip("Video {}".format(counter))
-            lbl.setToolTip("{}: {}".format(self.uploads[counter].channel_title, self.uploads[counter].title))
+            lbl.setToolTip("{}: {}".format(self.uploads.uploads[counter].channel_title, self.uploads.uploads[counter].title))
             video_layout.addWidget(QLabel(filename))
-            # grid.addLayout(video_layout, *position)
             print("adding {} to pos: {}".format(filename, *position))
             grid.addWidget(lbl, *position)
-            # print(grid.children()[0].alignment)
 
             counter += 1
         print(grid)
+
         # grid.addChildWidget(QLabel(filename))
 
         # QToolTip.setFont(QFont('SansSerif', 10))
@@ -177,6 +171,9 @@ class GridView(QWidget):
     def quit_query(self, event):
         reply = QMessageBox.question(self, 'Quit?', "Are you sure to quit?", QMessageBox.Yes | QMessageBox.No,
                                      QMessageBox.No)
+
+    def refresh_grid(self):
+        pass
 
 # TODO: Remove after debugging is done
 # import sys
