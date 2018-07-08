@@ -46,7 +46,7 @@ class MainWindow(QMainWindow):
         func_menu = menubar.addMenu('&Function')
 
         # Create Function menu items
-        call_func1 = QAction('Function 1', self)
+        dump_urls = QAction('Copy all URLs', self)
         call_func2 = QAction('Function 2', self)
         call_func3 = QAction('Function 3', self)
         call_func4 = QAction('Function 4', self)
@@ -54,10 +54,13 @@ class MainWindow(QMainWindow):
         call_func6 = QAction('Function 6', self)
         call_func7 = QAction('Function 7', self)
         call_func8 = QAction('Function 8', self)
-        funcs = [call_func1,call_func2,call_func3,call_func4,call_func5,call_func6,call_func7,call_func8]
+        funcs = [call_func2,call_func3,call_func4,call_func5,call_func6,call_func7,call_func8]
 
         # Set function menu triggers
-        call_func1.triggered.connect(self.func1)
+        dump_urls.triggered.connect(self.dump_urls_clpbd)
+        dump_urls.setStatusTip('Copy URLs of all currently visible videos to clipboard')
+        func_menu.addAction(dump_urls)
+        dump_urls.setShortcut('Ctrl+D')
         call_func2.triggered.connect(self.func2)
         call_func3.triggered.connect(self.func3)
         call_func4.triggered.connect(self.func4)
@@ -66,7 +69,7 @@ class MainWindow(QMainWindow):
         call_func7.triggered.connect(self.func7)
         call_func8.triggered.connect(self.func8)
 
-        counter = 1
+        counter = 2
         for func in funcs:
             # Set shortcut
             func.setShortcut('Ctrl+{}'.format(counter))
@@ -78,7 +81,7 @@ class MainWindow(QMainWindow):
             func_menu.addAction(func)
             counter += 1
         #
-        QToolTip.setFont(QFont('SansSerif', 10))
+        # QToolTip.setFont(QFont('SansSerif', 10))
         #
         # # self.setToolTip('This is a <b>QWidget</b> widget')
         # btn = QPushButton('Button 1', self)
@@ -160,8 +163,23 @@ class MainWindow(QMainWindow):
     # def do_function(self):
     #     print("Dummy Function")
 
-    def func1(self):
-        print("Dummy Function 1")
+    def dump_urls_clpbd(self):
+        grid_items = 20
+        urls = ""
+        for i in range(grid_items - 1):
+            print(i)
+            print(self.subfeed[i])
+            try:
+                print(self.subfeed[1].video_title)
+            except:
+                pass
+            # urls += "{}\n".format(self.subfeed[i].video_url)
+            urls += str(i)
+            print("Debug: urls = '{}'".format(urls))
+
+        print("Copied URLs to clipboard: \n{}".format(urls))
+        self.clipboard.setText(urls)
+
 
     def func2(self):
         print("Dummy Function 2")

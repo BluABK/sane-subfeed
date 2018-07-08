@@ -52,7 +52,7 @@ class ExtendedQLabel(QLabel):
 class GridView(QWidget):
     subfeed = None
 
-    def __init__(self, subfeed, clipboard, status_bar):
+    def __init__(self, subfeed, clipboard, status_bar, grid_items=20):
         super().__init__()
         self.subfeed = subfeed
         self.clipboard = clipboard
