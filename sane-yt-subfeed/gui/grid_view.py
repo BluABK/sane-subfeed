@@ -30,7 +30,6 @@ class ExtendedQLabel(QLabel):
     def set_video(self, video):
         self.video = video
         self.set_tool_tip()
-        print(video.thumbnail_path)
         self.setPixmap(QPixmap(video.thumbnail_path))
 
     def set_tool_tip(self):
@@ -103,7 +102,6 @@ class GridView(QWidget):
         positions = [(i, j) for i in range(5) for j in range(4)]
 
         counter = 0
-        # for position, name in zip(positions, items):
         use_dummy_data = read_config('Debug', 'use_dummy_uploads')
         if use_dummy_data:
             self.uploads = load_pickle(os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
@@ -111,70 +109,20 @@ class GridView(QWidget):
             self.uploads.get_uploads()
             dump_pickle(self.uploads, os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
         paths = thumbnails_dl_and_paths(self.uploads.uploads[:30])
-        print(positions)
+        # print(positions)
         for position, video_layout in zip(positions, items):
             if counter >= len(items):
                 break
             if items == '':
                 continue
-            try:
-                print(counter)
-                filename = paths[counter]
-            except:
-                print(counter)
-                # print(len(file_list))
-                raise
-            # pixmap = QPixmap(filename)
+            filename = paths[counter]
             lbl = ExtendedQLabel(self, self.uploads.uploads[counter], counter, self.clipboard, self.status_bar)
-            # lbl.setPixmap(pixmap)
-            # lbl.setToolTip("{}: {}".format(self.uploads.uploads[counter].channel_title, self.uploads.uploads[counter].title))
             lbl.set_video(self.uploads.uploads[counter])
-            # lbl.set_video(self.uploads.uploads[counter], filename)
             self.q_labels.append(lbl)
             video_layout.addWidget(QLabel(filename))
-            print("adding {} to pos: {}".format(filename, *position))
             grid.addWidget(lbl, *position)
 
             counter += 1
-        # self.uploads.get_uploads()
-
-
-
-        # grid.addChildWidget(QLabel(filename))
-
-        # QToolTip.setFont(QFont('SansSerif', 10))
-        #
-        # # self.setToolTip('This is a <b>QWidget</b> widget')
-        # btn = QPushButton('Button 1', self)
-        # btn.setToolTip('This is a <b>QPushButton</b> widget')
-        # btn.clicked.connect(self.button_clicked)
-        # btn.resize(btn.sizeHint())
-        # btn.move(10, 50)
-        #
-        # qbtn = QPushButton('Quit', self)
-        # qbtn.clicked.connect(QApplication.instance().quit)
-        # qbtn.resize(qbtn.sizeHint())
-        # qbtn.move(100, 50)
-        #
-        # self.setWindowTitle('Sane Subscription Feed, yo! [Grid]')
-        # self.setWindowIcon(QIcon('blu.ico'))
-        # self.statusBar().showMessage('Ready.')
-        #
-
-        # self.pbar = QProgressBar(self)
-        # self.pbar.setGeometry(30, 40, 200, 25)
-        #
-        # self.btn = QPushButton('Start', self)
-        # self.btn.move(40, 80)
-        # # self.btn.clicked.connect(self.doAction)
-        #
-        # self.timer = QBasicTimer()
-        # self.step = 0
-        #
-        # self.setGeometry(300, 300, 280, 170)
-        # self.setWindowTitle('QProgressBar')
-        # self.resize(1280, 800)  # Start at a sane 16:10 minsize since thumbs are scaling now
-        # self.show()     # FIXME: conflict with MainWindow?
 
     def button_clicked(self):
 
