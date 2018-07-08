@@ -98,13 +98,13 @@ def list_uploaded_videos(youtube_key, uploads_playlist_id):
             #         print("{}: {}".format(counter, v.title))
             #         counter += 1
                 # dump_pickle(videos, os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
-            if len(videos) > 0 and videos[0].channel_title == "Jesse Cox":
-                # for vid in videos:
-                playlistitems_list_request_2 = youtube_key.search().list(
-                    maxResults=50, part='snippet', channelId='UCCbfB3cQtkEAiKfdRQnfQvw', order='date')
-                response = playlistitems_list_request_2.execute()
-                for item in response['items']:
-                    print(item['snippet']['title'])
+            # if len(videos) > 0 and videos[0].channel_title == "Jesse Cox":
+            #     # for vid in videos:
+            #     playlistitems_list_request_2 = youtube_key.search().list(
+            #         maxResults=50, part='snippet', channelId='UCCbfB3cQtkEAiKfdRQnfQvw', order='date')
+            #     response = playlistitems_list_request_2.execute()
+            #     for item in response['items']:
+            #         print(item['snippet']['title'])
             # #   print(videos[0].thumbnails)
                 # dump_pickle(videos, os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
             return videos
@@ -163,7 +163,7 @@ def get_subscriptions(youtube_oauth):
     :return: [total, subs, statistics]
     """
     subscription_list_request = youtube_oauth.subscriptions().list(part='snippet', mine=True,
-                                                                   maxResults=20)
+                                                                   maxResults=50)
     subs = []
     # Retrieve the list of subscribed channels for authenticated user's channel.
     while subscription_list_request:

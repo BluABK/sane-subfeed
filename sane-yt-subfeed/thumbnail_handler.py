@@ -13,6 +13,7 @@ import urllib3
 OS_PATH = os.path.dirname(__file__)
 THUMBNAILS_PATH = os.path.join(OS_PATH, 'resources', 'thumbnails')
 
+
 class DownloadThumbnail(threading.Thread):
 
     def __init__(self, video, thread_list):
@@ -26,23 +27,13 @@ class DownloadThumbnail(threading.Thread):
             thumbnail_dict = get_best_thumbnail(self.video)
             # print(thumbnail_dict)
             download_file(thumbnail_dict['url'], vid_path)
+        # TODO check if path exists before starting thread, and move vid_path out of thread
+        self.video.thumbnail_path = vid_path
         self.thread_list.remove(self)
 
 
 def get_thumbnail_path(vid):
     return os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(vid.video_id))
-
-
-def download_thumbnails_seq(vid_list):
-    path_list = []
-    for video in vid_list:
-        vid_path = os.path.join(OS_PATH, 'resources', 'thumbnails', '{}.jpg'.format(video.video_id))
-        if not os.path.exists(vid_path):
-            thumbnail_dict = get_best_thumbnail(video.thumbnails)
-            # print(thumbnail_dict)
-            download_file(thumbnail_dict['url'], vid_path)
-        path_list.append(vid_path)
-    return path_list
 
 
 def download_thumbnails_threaded(vid_list):
@@ -61,7 +52,6 @@ def download_thumbnails_threaded(vid_list):
             # thread.join()
     for thread in thread_list:
         thread.join()
-
 
     print("\nWaiting for download threads to finish")
     for t in tqdm(thread_list):
@@ -97,12 +87,12 @@ def get_best_thumbnail(vid):
 
 # if __name__ == "__main__":
 #     jesse_vids = load_pickle(os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
-    # test_run = 0
-    # for vid in jesse_vids:
-    #     thumbnail_dict = get_best_thumbnail(vid)
-    #     path = os.path.join(OS_PATH, 'resources', 'thumbnails', '{}.jpg'.format(vid.video_id))
-    #     # download_file(thumbnail_dict['url'], path)
-    #     if test_run == 2:
-    #         break
-    #     test_run += 1
-    # print(download_thumbnails_threaded(jesse_vids))
+# test_run = 0
+# for vid in jesse_vids:
+#     thumbnail_dict = get_best_thumbnail(vid)
+#     path = os.path.join(OS_PATH, 'resources', 'thumbnails', '{}.jpg'.format(vid.video_id))
+#     # download_file(thumbnail_dict['url'], path)
+#     if test_run == 2:
+#         break
+#     test_run += 1
+# print(download_thumbnails_threaded(jesse_vids))
