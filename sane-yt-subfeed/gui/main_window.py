@@ -216,9 +216,12 @@ class MainWindow(QMainWindow):
     def refresh_list(self):
         print('function 8')
         self.gv.uploads.get_uploads()
+        uploads = self.gv.uploads.uploads[:30]
         paths = thumbnails_dl_and_paths(self.gv.uploads.uploads[:30])
+        counter = 0
         for q_label, path in zip(self.gv.q_labels, paths):
-            q_label.setPixmap(QPixmap(path))
+            q_label.set_video(uploads[counter], path)
+            counter += 1
 
 
 # if __name__ == '__main__':

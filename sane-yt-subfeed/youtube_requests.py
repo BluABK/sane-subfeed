@@ -163,7 +163,7 @@ def get_subscriptions(youtube_oauth):
     :return: [total, subs, statistics]
     """
     subscription_list_request = youtube_oauth.subscriptions().list(part='snippet', mine=True,
-                                                                   maxResults=50)
+                                                                   maxResults=20)
     subs = []
     # Retrieve the list of subscribed channels for authenticated user's channel.
     while subscription_list_request:
