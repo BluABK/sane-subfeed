@@ -4,9 +4,9 @@ from PyQt5.QtWidgets import QApplication
 
 from timeit import default_timer
 
-from .uploads import Uploads
-from .youtube_requests import get_subscriptions, cached_authenticated_get_subscriptions
-from .gui.main_window import MainWindow
+from uploads import Uploads
+from youtube_requests import get_subscriptions, cached_authenticated_get_subscriptions
+from gui.main_window import MainWindow
 
 cached_subs = True
 global_debug = False
@@ -21,11 +21,8 @@ print_statistics = True
 # Create controller object
 
 def run_with_gui():
-    subscriptions = cached_authenticated_get_subscriptions()
-    uploads = Uploads()
-    subscription_feed = uploads.get_uploads(subscriptions, info=True, debug=False, disable_threading=False)
     app = QApplication(sys.argv)
-    ex = MainWindow(subscription_feed[:40])
+    ex = MainWindow()
     # ex = GridView(subscription_feed[:20])
     app.exec_()
 
