@@ -71,6 +71,9 @@ class MainWindow(QMainWindow):
             # Set shortcut
             func.setShortcut('Ctrl+{}'.format(counter))
 
+            # Set status_bar on-hover message for func
+            func.setStatusTip('Execute Function {}'.format(counter))
+
             # Add function to Function menu
             func_menu.addAction(func)
             counter += 1
