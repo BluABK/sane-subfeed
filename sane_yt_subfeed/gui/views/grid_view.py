@@ -110,7 +110,6 @@ class GridView(QWidget):
                 dump_pickle(self.uploads, os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
         else:
             self.uploads.get_uploads()
-            dump_pickle(self.uploads, os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
         paths = thumbnails_dl_and_paths(self.uploads.uploads[:30])
         # print(positions)
         for position, video_layout in zip(positions, items):
@@ -118,6 +117,7 @@ class GridView(QWidget):
                 break
             if items == '':
                 continue
+            # print(paths[counter])
             filename = paths[counter]
             lbl = ExtendedQLabel(self, self.uploads.uploads[counter], counter, self.clipboard, self.status_bar)
             lbl.set_video(self.uploads.uploads[counter])
