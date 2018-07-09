@@ -117,9 +117,12 @@ class GridView(QWidget):
                 dump_pickle(self.uploads, os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
         else:
             self.uploads.get_uploads()
+        if read_config('Gui', 'hide_downloaded'):
+            uploads = filter_downloaded(self.uploads.uploads, 40)
+        else:
+            uploads = self.uploads.uploads[:40]
 
-        paths = thumbnails_dl_and_paths(filter_downloaded(self.uploads.uploads, 40))
-        print(len(paths))
+        paths = thumbnails_dl_and_paths(uploads)
         # print(positions)
         for position, video_layout in zip(positions, items):
             if counter >= len(items):
