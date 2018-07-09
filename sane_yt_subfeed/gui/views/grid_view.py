@@ -9,8 +9,11 @@ from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessa
 from PyQt5.QtGui import QIcon, QFont, QPixmap, QPainter
 
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.database.methods import filter_downloaded
+from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.pickle_handler import PICKLE_PATH, dump_pickle, load_pickle
 from sane_yt_subfeed.thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path, thumbnails_dl_and_paths
+from sane_yt_subfeed.video import Video
 
 
 class ExtendedQLabel(QLabel):
@@ -44,6 +47,10 @@ class ExtendedQLabel(QLabel):
         print('clicked {:2d}: {} {} - {}'.format(self.img_id, self.video.url_video, self.video.channel_title,
                                                  self.video.title))
         self.clipboard.setText(self.video.url_video)
+        db_vid = db_session.query(Video).get(self.video.video_id)
+        self.video.downloaded = True
+        db_vid.downloaded = True
+        db_session.commit()
         self.status_bar.showMessage('Copied URL to clipboard: {} ({} - {})'.format(self.video.url_video,
                                                                                    self.video.channel_title,
                                                                                    self.video.title))
@@ -110,7 +117,9 @@ class GridView(QWidget):
                 dump_pickle(self.uploads, os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
         else:
             self.uploads.get_uploads()
-        paths = thumbnails_dl_and_paths(self.uploads.uploads[:30])
+
+        paths = thumbnails_dl_and_paths(filter_downloaded(self.uploads.uploads, 40))
+        print(len(paths))
         # print(positions)
         for position, video_layout in zip(positions, items):
             if counter >= len(items):
