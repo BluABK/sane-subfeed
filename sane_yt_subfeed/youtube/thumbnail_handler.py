@@ -3,6 +3,7 @@ import shutil
 import threading
 import time
 from collections import defaultdict
+from PIL import Image  # Image cropping (black barred thumbs, issue #11)
 
 from tqdm import tqdm
 
@@ -33,7 +34,7 @@ class DownloadThumbnail(threading.Thread):
             if self.force_dl_best:
                 force_download_best(self.video_id, vid_path)
             else:
-                download_file(self.thumbnail_dict['url'], vid_path)
+                download_file(self.thumbnail_dict['url'], vid_path, crop=True, quality='high')
 
 
 def get_thumbnail_path(vid):
@@ -62,6 +63,7 @@ def download_thumbnails_threaded(vid_list):
     print("\nAll threads done")
     db_session.commit()
 
+
 def set_thumbnail(video):
     vid_path = os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(video.video_id))
     if not os.path.exists(vid_path):
@@ -86,10 +88,13 @@ def jesse_pickle():
     return load_pickle(os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
 
 
-def download_file(url, path):
+def download_file(url, path, crop=False, quality=None):
     http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
     with http.request('GET', url, preload_content=False) as r, open(path, 'wb') as out_file:
         shutil.copyfileobj(r, out_file)
+    # FIXME: Move crop to a proper place -- HACK: crop images as they get downloaded
+    if crop:
+        crop_blackbars(path, quality=quality)
 
 
 def get_best_thumbnail(vid):
@@ -112,7 +117,27 @@ def force_download_best(vid_id, vid_path):
                 temp_url = url + '{url_quality}.jpg'.format_map(defaultdict(url_quality='maxresdefault'))
                 print(temp_url)
                 print(url)
-                download_file(temp_url, vid_path)
+                download_file(temp_url, vid_path, crop=False)
             except Exception as e:
                 raise e
 
+
+def crop_blackbars(image_filename, quality='high'):
+    """
+    Crop certain thumbnails that come shipped with black bars above and under
+    Qualities affected by this affliction, and actions taken:
+        high: 480x360 with bars --> crop to 480x270
+
+    coords: A tuple of x/y coordinates (x1, y1, x2, y2) or (left, top, right, bottom)
+    :param image_filename:
+    :param image_path:
+    :param quality:
+    :return:
+    """
+
+    img = Image.open(image_filename)
+    coords = None
+    if quality == 'high':
+        coords = (0, 45, 480, (360-45))
+    cropped_img = img.crop(coords)
+    cropped_img.save(os.path.join(THUMBNAILS_PATH, image_filename))
