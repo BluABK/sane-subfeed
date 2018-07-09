@@ -122,32 +122,3 @@ class GridView(QWidget):
             grid.addWidget(lbl, *position)
 
             counter += 1
-
-    def button_clicked(self):
-
-        sender = self.sender()
-        self.statusBar().showMessage(sender.text() + ' was pressed')
-
-    def btn1_event(self, event):
-        reply = QMessageBox.question(self, 'Button', "BUTTON BUTTON BUTTON BUTTON!", QMessageBox.Yes | QMessageBox.No,
-                                     QMessageBox.No)
-
-        if reply == QMessageBox.Yes:
-            event.accept()
-        else:
-            event.ignore()
-
-    def quit_query(self, event):
-        reply = QMessageBox.question(self, 'Quit?', "Are you sure to quit?", QMessageBox.Yes | QMessageBox.No,
-                                     QMessageBox.No)
-
-    def refresh_grid(self):
-        pass
-
-# TODO: Remove after debugging is done
-# import sys
-# if __name__ == '__main__':
-#     app = QApplication(sys.argv)
-#     ex = GridView(None)
-#
-#     sys.exit(app.exec_())

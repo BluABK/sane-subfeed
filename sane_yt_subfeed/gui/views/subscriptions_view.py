@@ -11,15 +11,19 @@ from sane_yt_subfeed.config_handler import read_config
 
 
 class SubscriptionsView(QWidget):
-    config_file = None
+    subs = None
 
-    def __init__(self, clipboard, status_bar):
+    def __init__(self, subs, clipboard, status_bar):
         super().__init__()
         self.config_file = None
         self.clipboard = clipboard
         self.status_bar = status_bar
+        self.subs = subs
         self.init_ui()
 
     def init_ui(self):
         # textbox = QTextEdit()
-        layout = None
+        layout = QVBoxLayout()
+
+        self.show()
+
