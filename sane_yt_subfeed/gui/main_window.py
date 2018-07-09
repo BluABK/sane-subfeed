@@ -8,16 +8,20 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, \
     QMenu, QProgressBar, QVBoxLayout
 from PyQt5.QtGui import QIcon
 
+from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
 from sane_yt_subfeed.thumbnail_handler import thumbnails_dl_and_paths
 from sane_yt_subfeed.uploads import Uploads
 from sane_yt_subfeed.gui.views.grid_view import GridView
 
 OS_PATH = os.path.dirname(__file__)
+ICO_PATH = os.path.join(OS_PATH, 'icons')
 
 
 class MainWindow(QMainWindow):
     uploads = None
-    gv = None
+    current_view = None
+    grid_view = None
+    subs_view = None
 
     def __init__(self):
         super().__init__()
@@ -61,7 +65,7 @@ class MainWindow(QMainWindow):
         funcs = [call_func2,call_func3,call_func4,call_func5,call_func6,call_func7]
 
         # Set function menu triggers
-        dump_urls.triggered.connect(self.dump_urls_clpbd)
+        dump_urls.triggered.connect(self.clipboard_copy_urls)
         dump_urls.setStatusTip('Copy URLs of all currently visible videos to clipboard')
         func_menu.addAction(dump_urls)
         dump_urls.setShortcut('Ctrl+D')
@@ -108,7 +112,7 @@ class MainWindow(QMainWindow):
         # qbtn.move(100, 50)
         #
         self.setWindowTitle('Sane Subscription Feed, yo!')
-        self.setWindowIcon(QIcon(os.path.join(OS_PATH, 'blu.ico')))
+        self.setWindowIcon(QIcon(os.path.join(ICO_PATH, 'blu.ico')))
         self.statusBar().showMessage('Ready.')
 
         # self.pbar = QProgressBar(self)
@@ -124,52 +128,133 @@ class MainWindow(QMainWindow):
         # self.setGeometry(300, 300, 280, 170)
         # self.setWindowTitle('QProgressBar')
 
-        # Function menu
-        view_menu = menubar.addMenu('&View')
-        # Function menu items
-        view_gv_m = QAction('Grid View', self)
-        view_gv_m.triggered.connect(self.view_grid)
-        view_gv_m.setStatusTip('View subscription feed as a grid')
-        view_gv_m.setShortcut('Ctrl+1')
+        # View action items
+        view_grid_view = QAction(QIcon(os.path.join(ICO_PATH, 'grid_blue.png')), 'Grid View', self)
+        view_grid_view.setShortcut('Ctrl+1')
+        view_grid_view.triggered.connect(self.view_grid)
+        view_grid_view.setStatusTip('View subscription feed as a grid')
 
-        view_menu.addAction(view_gv_m)
+        view_subs_view = QAction(QIcon(os.path.join(ICO_PATH, 'subs.png')), 'Subscriptions View', self)
+        view_subs_view.setShortcut('Ctrl+2')
+        view_subs_view.triggered.connect(self.view_subs)
+        view_subs_view.setStatusTip('View Subscriptions')
+
+        # View menu
+        view_menu = menubar.addMenu('&View')
+        view_menu.addAction(view_grid_view)
+        view_menu.addAction(view_subs_view)
 
         # Toolbar of different views
-        view_gv_t = QAction(QIcon(os.path.join(OS_PATH, 'grid_blue.png')), 'Grid View', self)
-        view_gv_t.setShortcut('Ctrl+1')
-        view_gv_t.setStatusTip('View subscription feed as a grid')
-        view_gv_t.triggered.connect(self.view_grid)
-
         toolbar = self.addToolBar('Views')
-        toolbar.addAction(view_gv_t)
+        toolbar.addAction(view_grid_view)
+        toolbar.addAction(view_subs_view)
 
         window_layout = QVBoxLayout()
-        self.gv = GridView(self.uploads, self.clipboard, self.statusBar())
+        # self.grid_view = self.spawn_grid_view()
+        # self.subs_view = self.spawn_subs_view()
         # print(grid)
         # window_layout.addWidget(gv)
-        self.setCentralWidget(self.gv)
+        # tmp_view = self.switch_view_destructively()
+        # self.current_view = tmp_view
+        # self.setCentralWidget(tmp_view)
+        self.view_subs()
         self.setLayout(window_layout)
         self.resize(1280, 800)  # Start at a sane 16:10 minsize since thumbs are scaling now
         self.show()
-        # gv.show()
 
-    def view_grid(self):
-        self.setCentralWidget(self.gv)
+    def spawn_grid_view(self):
+        """
+        Creates a new GridView(QWidget) instance
+        :return:
+        """
+        # self.grid_view = GridView(self.uploads, self.clipboard, self.statusBar())
+        return GridView(self.uploads, self.clipboard, self.statusBar())
+
+    def spawn_subs_view(self):
+        """
+        Creates a SubscriptionView(QWidget) instance
+        :return:
+        """
+        # self.subs_view = SubscriptionsView(self.uploads, self.clipboard, self.statusBar())
+        return SubscriptionsView(self.uploads, self.clipboard, self.statusBar())
+
+    @staticmethod
+    def clear_layout(layout):   # TODO: Unused
+        """
+        Deletes the given layout
+        :param layout:
+        :return:
+        """
+        while layout.count():
+            child = layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
+
+    @staticmethod
+    def hide_widget(widget):    # TODO: Deferred usage (Garbage collection issue)
+        widget.setHidden(True)
+
+    def switch_view_kindly(self, new_view):     # TODO: Deferred usage (Garbage collection issue)
+        """
+        Switch to a new view: Kind & Gentle edition.
+        Hide currently shown view and show new_view instead
+        :param new_view:
+        :return:
+        """
+        self.hide_widget(self.current_view)
+        if new_view.isHidden():
+            new_view.setHidden(False)
+        self.current_view = new_view
+        self.setCentralWidget(new_view)
         self.update()
 
-    def context_menu_vent(self, event):
+    def switch_view_destructively(self, new_view_spawn):
+        """
+        Switch to a new view: Destructive edition.
+        Sets the current view and CentralWidget to a spawned new view, The old view then gets brutally murdered by
+        PyQT5's ruthless garbage collection.
+        :param new_view_spawn:
+        :return:
+        """
+        self.current_view = new_view_spawn
+        self.setCentralWidget(new_view_spawn)
+        self.update()
+        return new_view_spawn
 
+    def view_grid(self):
+        """
+        Set View variable and CentralWidget
+        Expected result: Set CentralWidget to GridView
+        :return:
+        """
+        self.grid_view = self.switch_view_destructively(self.spawn_grid_view())
+
+    def view_subs(self):
+        """
+        Set View variable and CentralWidget
+        Expected result: Set CentralWidget to SubscriptionsView
+        :return:
+        """
+        self.subs_view = self.switch_view_destructively(self.spawn_subs_view())
+
+    def context_menu_event(self, event):     # TODO: Unused, planned usage in future
+        """
+        Context menu for right clicking video thumbnails and more.
+        :param event:
+        :return:
+        """
         cmenu = QMenu(self)
-
         copy_link_action = cmenu.addAction("Copy link")
         open_link_action = cmenu.addAction("Open link")
         close_action = cmenu.addAction("Close")
         action = cmenu.exec_(self.mapToGlobal(event.pos()))
 
-        if action == close_action:
-            qApp.quit()
-
-    def timer_event(self, e):
+    def timer_event(self, e):   # TODO: Unused, planned usage in future (progressbar auto-refresh-timer)
+        """
+        Runs a generic timer
+        :param e:
+        :return:
+        """
         if self.step >= 100:
             self.timer.stop()
             self.btn.setText('Finished')
@@ -178,7 +263,11 @@ class MainWindow(QMainWindow):
         self.step = self.step + 1
         self.pbar.setValue(self.step)
 
-    def do_action(self):
+    def timer_do_action(self):   # TODO: Unused, planned usage in future (progressbar auto-refresh-timer)
+        """
+        Tick that clock!
+        :return:
+        """
         if self.timer.isActive():
             self.timer.stop()
             self.btn.setText('Start')
@@ -186,7 +275,11 @@ class MainWindow(QMainWindow):
             self.timer.start(100, self)
             self.btn.setText('Stop')
 
-    def load_progress(self):
+    def timer_progressbar(self):   # TODO: Unused, planned usage in future (progressbar auto-refresh-timer)
+        """
+        Progress, progress, progress!
+        :return:
+        """
         if self.timer.isActive():
             self.step = self.step + 1
             self.pbar.setValue(self.step)
@@ -196,7 +289,7 @@ class MainWindow(QMainWindow):
             # self.timer.start(100, self)
             self.btn.setText('1')
 
-    def dump_urls_clpbd(self):
+    def clipboard_copy_urls(self):
         """
         Adds the url of each video in the view to a string, separated by \n and puts it on clipboard.
         :return:
@@ -204,7 +297,7 @@ class MainWindow(QMainWindow):
         grid_items = 20
         urls = ""
         for i in range(grid_items):
-            urls += "{}\n".format(self.gv.uploads.uploads[i].url_video)
+            urls += "{}\n".format(self.grid_view.uploads.uploads[i].url_video)
 
         print("Copied URLs to clipboard: \n{}".format(urls))
         self.clipboard.setText(urls)
@@ -229,9 +322,13 @@ class MainWindow(QMainWindow):
         print("Dummy Function 7")
 
     def refresh_list(self):
-        self.gv.uploads.get_uploads()
-        uploads = self.gv.uploads.uploads[:30]
-        thumbnails_dl_and_paths(self.gv.uploads.uploads[:30])
-        for q_label, video in zip(self.gv.q_labels, uploads):
+        """
+        Reload the subscription feed items, and redraw the GridView
+        :return:
+        """
+        self.grid_view.uploads.get_uploads()
+        uploads = self.grid_view.uploads.uploads[:30]
+        thumbnails_dl_and_paths(self.grid_view.uploads.uploads[:30])
+        for q_label, video in zip(self.grid_view.q_labels, uploads):
             q_label.set_video(video)
             q_label.update()
