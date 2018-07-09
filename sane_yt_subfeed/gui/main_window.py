@@ -1,18 +1,20 @@
 # !/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# PyCharm bug: PyCharm seems to be expecting the referenced module to be included in an __all__ = [] statement
+# std libs
 import os
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, \
-    QMenu, QProgressBar, QVBoxLayout
+# PyQt5 libs
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QVBoxLayout
 from PyQt5.QtGui import QIcon
 
+# Project internal libs
 from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
 from sane_yt_subfeed.thumbnail_handler import thumbnails_dl_and_paths
 from sane_yt_subfeed.uploads import Uploads
 from sane_yt_subfeed.gui.views.grid_view import GridView
 
+# Constants
 OS_PATH = os.path.dirname(__file__)
 ICO_PATH = os.path.join(OS_PATH, 'icons')
 
@@ -22,146 +24,107 @@ class MainWindow(QMainWindow):
     current_view = None
     grid_view = None
     subs_view = None
+    menus = None
 
-    def __init__(self):
+    # noinspection PyArgumentList
+    def __init__(self, dimensions=None, position=None):
         super().__init__()
-        # self.subfeed = subfeed
         self.uploads = Uploads()
         self.clipboard = QApplication.clipboard()
+        self.menus = {}
+        if dimensions:
+            self.dimensions = dimensions
+        else:
+            self.dimensions = [770, 700]
+        self.position = position
         self.init_ui()
 
     def init_ui(self):
-        exit_action = QAction(QIcon('exit.png'), '&Exit', self)
-        exit_action.setShortcut('Ctrl+Q')
-        exit_action.setStatusTip('Exit application')
-        exit_action.triggered.connect(qApp.quit)
-        #
-        self.statusBar()
-        #
-        sub_menu = QMenu('Import', self)
-        sub_action = QAction('Import mail', self)
-        sub_menu.addAction(sub_action)
-        #
-        new_action = QAction('New', self)
-        #
+        # Define a menu and status bar
         menubar = self.menuBar()
-        file_menu = menubar.addMenu('&File')
-        file_menu.addAction(new_action)
-        file_menu.addMenu(sub_menu)
-        file_menu.addAction(exit_action)
+        self.statusBar()
+
+        # File menu
+        self.add_menu(menubar, '&File')
+        self.add_submenu('&File', 'Exit', qApp.quit, shortcut='Ctrl+Q', tooltip='Exit application')
 
         # Function menu
-        func_menu = menubar.addMenu('&Function')
-
-        # Create Function menu items
-        dump_urls = QAction('Copy all URLs', self)
-        call_func2 = QAction('Function 2', self)
-        call_func3 = QAction('Function 3', self)
-        call_func4 = QAction('Function 4', self)
-        call_func5 = QAction('Function 5', self)
-        call_func6 = QAction('Function 6', self)
-        call_func7 = QAction('Function 7', self)
-        refresh_list = QAction('Refresh Feed', self)
-        funcs = [call_func2,call_func3,call_func4,call_func5,call_func6,call_func7]
+        self.add_menu(menubar, '&Function')
 
         # Set function menu triggers
-        dump_urls.triggered.connect(self.clipboard_copy_urls)
-        dump_urls.setStatusTip('Copy URLs of all currently visible videos to clipboard')
-        func_menu.addAction(dump_urls)
-        dump_urls.setShortcut('Ctrl+D')
-        call_func2.triggered.connect(self.func2)
-        call_func3.triggered.connect(self.func3)
-        call_func4.triggered.connect(self.func4)
-        call_func5.triggered.connect(self.func5)
-        call_func6.triggered.connect(self.func6)
-        call_func7.triggered.connect(self.func7)
-        refresh_list.triggered.connect(self.refresh_list)
-
-        counter = 2
-        for func in funcs:
-            # Set shortcut
-            # func.setShortcut('Ctrl+{}'.format(counter))
-
-            # Set status_bar on-hover message for func
-            func.setStatusTip('Execute Function {}'.format(counter))
-
-            # Add function to Function menu
-            func_menu.addAction(func)
-            counter += 1
+        self.add_submenu('&Function', 'Copy all URLs', self.clipboard_copy_urls, shortcut='Ctrl+D',
+                         tooltip='Copy URLs of all currently visible videos to clipboard')
 
         # refresh_list
-        refresh_list.setShortcut('Ctrl+R')
-        refresh_list.setStatusTip('Execute Function {}'.format(counter))
-        func_menu.addAction(refresh_list)
-
-
-
-        #
-        # QToolTip.setFont(QFont('SansSerif', 10))
-        #
-        # # self.setToolTip('This is a <b>QWidget</b> widget')
-        # btn = QPushButton('Button 1', self)
-        # btn.setToolTip('This is a <b>QPushButton</b> widget')
-        # btn.clicked.connect(self.button_clicked)
-        # btn.resize(btn.sizeHint())
-        # btn.move(10, 50)
-        #
-        # qbtn = QPushButton('Quit', self)
-        # qbtn.clicked.connect(QApplication.instance().quit)
-        # qbtn.resize(qbtn.sizeHint())
-        # qbtn.move(100, 50)
-        #
-        self.setWindowTitle('Sane Subscription Feed, yo!')
-        self.setWindowIcon(QIcon(os.path.join(ICO_PATH, 'blu.ico')))
-        self.statusBar().showMessage('Ready.')
-
-        # self.pbar = QProgressBar(self)
-        # self.pbar.setGeometry(30, 40, 200, 25)
-
-        # self.btn = QPushButton('Start', self)
-        # self.btn.move(40, 80)
-        # # self.btn.clicked.connect(self.doAction)
-        #
-        # self.timer = QBasicTimer()
-        # self.step = 0
-        #
-        # self.setGeometry(300, 300, 280, 170)
-        # self.setWindowTitle('QProgressBar')
-
-        # View action items
-        view_grid_view = QAction(QIcon(os.path.join(ICO_PATH, 'grid_blue.png')), 'Grid View', self)
-        view_grid_view.setShortcut('Ctrl+1')
-        view_grid_view.triggered.connect(self.view_grid)
-        view_grid_view.setStatusTip('View subscription feed as a grid')
-
-        view_subs_view = QAction(QIcon(os.path.join(ICO_PATH, 'subs.png')), 'Subscriptions View', self)
-        view_subs_view.setShortcut('Ctrl+2')
-        view_subs_view.triggered.connect(self.view_subs)
-        view_subs_view.setStatusTip('View Subscriptions')
+        self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
+                         tooltip='Refresh the subscription feed')
 
         # View menu
-        view_menu = menubar.addMenu('&View')
-        view_menu.addAction(view_grid_view)
-        view_menu.addAction(view_subs_view)
+        self.add_menu(menubar, '&View')
+        view_grid_view = self.add_submenu('&View', 'Grid', self.view_grid, shortcut='Ctrl+1',
+                                          tooltip='View subscription feed as a grid', icon='grid_blue.png')
+        view_subs_view = self.add_submenu('&View', 'Subscriptions', self.view_subs, shortcut='Ctrl+2',
+                                          tooltip='View Subscriptions', icon='subs.png')
 
         # Toolbar of different views
-        toolbar = self.addToolBar('Views')
+        toolbar = self.addToolBar('View')
         toolbar.addAction(view_grid_view)
         toolbar.addAction(view_subs_view)
 
+        # Set MainWindow properties
+        self.setWindowTitle('Sane-ish Subscription Feed')
+        self.setWindowIcon(QIcon(os.path.join(ICO_PATH, 'blu.ico')))
+        self.statusBar().showMessage('Ready.')
+        if self.dimensions:
+            self.resize(self.dimensions[0], self.dimensions[1])
+
+        # Set a default view and layout
         window_layout = QVBoxLayout()
-        # self.grid_view = self.spawn_grid_view()
-        # self.subs_view = self.spawn_subs_view()
-        # print(grid)
-        # window_layout.addWidget(gv)
-        # tmp_view = self.switch_view_destructively()
-        # self.current_view = tmp_view
-        # self.setCentralWidget(tmp_view)
         self.view_subs()
         self.setLayout(window_layout)
-        self.resize(1280, 800)  # Start at a sane 16:10 minsize since thumbs are scaling now
+
+        # Display the window
         self.show()
 
+    # Menu handling
+    def add_menu(self, menubar, name):
+        """
+        Adds a menu and an optional amount of submenus
+        :param menubar:
+        :param name:
+        :return:
+        """
+        self.menus[name] = menubar.addMenu(name)
+
+    def add_submenu(self, menu, name, action, shortcut=None, tooltip=None, icon=None):
+        """
+        Adds a submenu with optional properties to a menu
+        :param name:
+        :param icon: icon filename (with relative path)
+        :param tooltip: String
+        :param action: Function
+        :param shortcut: String on the form of '<key>+...n+key>' e.g. 'Ctrl+1'
+        :param menu:
+        :return:
+        """
+        if icon:
+            this_icon = QIcon(os.path.join(ICO_PATH, icon))
+            submenu = QAction(this_icon, name, self)
+        else:
+            submenu = QAction(name, self)
+        if shortcut:
+            submenu.setShortcut(shortcut)
+        if tooltip:
+            submenu.setStatusTip(tooltip)
+
+        submenu.triggered.connect(action)
+        if menu in self.menus:
+            self.menus[menu].addAction(submenu)
+        else:
+            raise ValueError("add_submenu('{}', '{}', ...) ERROR: '{}' not in menus dict!".format(menu, name, menu))
+        return submenu  # FIXME: Used by toolbar to avoid redefining items
+
+    # View handling
     def spawn_grid_view(self):
         """
         Creates a new GridView(QWidget) instance
@@ -179,22 +142,15 @@ class MainWindow(QMainWindow):
         return SubscriptionsView(self.uploads, self.clipboard, self.statusBar())
 
     @staticmethod
-    def clear_layout(layout):   # TODO: Unused
+    def hide_widget(widget):  # TODO: Deferred usage (Garbage collection issue)
         """
-        Deletes the given layout
-        :param layout:
+        Hides a widget/view
+        :param widget:
         :return:
         """
-        while layout.count():
-            child = layout.takeAt(0)
-            if child.widget():
-                child.widget().deleteLater()
-
-    @staticmethod
-    def hide_widget(widget):    # TODO: Deferred usage (Garbage collection issue)
         widget.setHidden(True)
 
-    def switch_view_kindly(self, new_view):     # TODO: Deferred usage (Garbage collection issue)
+    def switch_view_kindly(self, new_view):  # TODO: Deferred usage (Garbage collection issue)
         """
         Switch to a new view: Kind & Gentle edition.
         Hide currently shown view and show new_view instead
@@ -237,7 +193,35 @@ class MainWindow(QMainWindow):
         """
         self.subs_view = self.switch_view_destructively(self.spawn_subs_view())
 
-    def context_menu_event(self, event):     # TODO: Unused, planned usage in future
+    # Function menu functions
+    def clipboard_copy_urls(self):
+        """
+        Adds the url of each video in the view to a string, separated by newline and puts it on clipboard.
+        :return:
+        """
+        grid_items = 20
+        urls = ""
+        for i in range(grid_items):
+            urls += "{}\n".format(self.grid_view.uploads.uploads[i].url_video)
+
+        print("Copied URLs to clipboard: \n{}".format(urls))
+        self.clipboard.setText(urls)
+        self.statusBar().showMessage('Copied {} URLs to clipboard'.format(len(urls.splitlines())))
+
+    def refresh_list(self):
+        """
+        Reload the subscription feed items, and redraw the GridView
+        :return:
+        """
+        self.grid_view.uploads.get_uploads()
+        uploads = self.grid_view.uploads.uploads[:30]
+        thumbnails_dl_and_paths(self.grid_view.uploads.uploads[:30])
+        for q_label, video in zip(self.grid_view.q_labels, uploads):
+            q_label.set_video(video)
+            q_label.update()
+
+    # Unused functions
+    def context_menu_event(self, event):  # TODO: Unused, planned usage in future
         """
         Context menu for right clicking video thumbnails and more.
         :param event:
@@ -249,7 +233,7 @@ class MainWindow(QMainWindow):
         close_action = cmenu.addAction("Close")
         action = cmenu.exec_(self.mapToGlobal(event.pos()))
 
-    def timer_event(self, e):   # TODO: Unused, planned usage in future (progressbar auto-refresh-timer)
+    def timer_event(self, e):  # TODO: Unused, planned usage in future (progressbar auto-refresh-timer)
         """
         Runs a generic timer
         :param e:
@@ -263,7 +247,7 @@ class MainWindow(QMainWindow):
         self.step = self.step + 1
         self.pbar.setValue(self.step)
 
-    def timer_do_action(self):   # TODO: Unused, planned usage in future (progressbar auto-refresh-timer)
+    def timer_do_action(self):  # TODO: Unused, planned usage in future (progressbar auto-refresh-timer)
         """
         Tick that clock!
         :return:
@@ -275,7 +259,7 @@ class MainWindow(QMainWindow):
             self.timer.start(100, self)
             self.btn.setText('Stop')
 
-    def timer_progressbar(self):   # TODO: Unused, planned usage in future (progressbar auto-refresh-timer)
+    def timer_progressbar(self):  # TODO: Unused, planned usage in future (progressbar auto-refresh-timer)
         """
         Progress, progress, progress!
         :return:
@@ -289,46 +273,15 @@ class MainWindow(QMainWindow):
             # self.timer.start(100, self)
             self.btn.setText('1')
 
-    def clipboard_copy_urls(self):
+    # Misc cleanup handling
+    @staticmethod
+    def clear_layout(layout):  # TODO: Unused
         """
-        Adds the url of each video in the view to a string, separated by \n and puts it on clipboard.
+        Deletes the given layout
+        :param layout:
         :return:
         """
-        grid_items = 20
-        urls = ""
-        for i in range(grid_items):
-            urls += "{}\n".format(self.grid_view.uploads.uploads[i].url_video)
-
-        print("Copied URLs to clipboard: \n{}".format(urls))
-        self.clipboard.setText(urls)
-        self.statusBar().showMessage('Copied {} URLs to clipboard'.format(len(urls.splitlines())))
-
-    def func2(self):
-        print("Dummy Function 2")
-
-    def func3(self):
-        print("Dummy Function 3")
-
-    def func4(self):
-        print("Dummy Function 4")
-
-    def func5(self):
-        print("Dummy Function 5")
-
-    def func6(self):
-        print("Dummy Function 6")
-
-    def func7(self):
-        print("Dummy Function 7")
-
-    def refresh_list(self):
-        """
-        Reload the subscription feed items, and redraw the GridView
-        :return:
-        """
-        self.grid_view.uploads.get_uploads()
-        uploads = self.grid_view.uploads.uploads[:30]
-        thumbnails_dl_and_paths(self.grid_view.uploads.uploads[:30])
-        for q_label, video in zip(self.grid_view.q_labels, uploads):
-            q_label.set_video(video)
-            q_label.update()
+        while layout.count():
+            child = layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
