@@ -124,14 +124,24 @@ class MainWindow(QMainWindow):
         # self.setGeometry(300, 300, 280, 170)
         # self.setWindowTitle('QProgressBar')
 
+        # Function menu
+        view_menu = menubar.addMenu('&View')
+        # Function menu items
+        view_gv_m = QAction('Grid View', self)
+        view_gv_m.triggered.connect(self.view_grid)
+        view_gv_m.setStatusTip('View subscription feed as a grid')
+        view_gv_m.setShortcut('Ctrl+1')
+
+        view_menu.addAction(view_gv_m)
+
         # Toolbar of different views
-        view_gv = QAction(QIcon(os.path.join(OS_PATH, 'grid_blue.png')), 'Grid View', self)
-        view_gv.setShortcut('Ctrl+1')
-        view_gv.setStatusTip('View subscription feed as a grid')
-        view_gv.triggered.connect(self.view_grid)
+        view_gv_t = QAction(QIcon(os.path.join(OS_PATH, 'grid_blue.png')), 'Grid View', self)
+        view_gv_t.setShortcut('Ctrl+1')
+        view_gv_t.setStatusTip('View subscription feed as a grid')
+        view_gv_t.triggered.connect(self.view_grid)
 
         toolbar = self.addToolBar('Views')
-        toolbar.addAction(view_gv)
+        toolbar.addAction(view_gv_t)
 
         window_layout = QVBoxLayout()
         self.gv = GridView(self.uploads, self.clipboard, self.statusBar())
