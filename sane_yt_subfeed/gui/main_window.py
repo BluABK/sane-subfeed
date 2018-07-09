@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # PyCharm bug: PyCharm seems to be expecting the referenced module to be included in an __all__ = [] statement
+import os
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, \
     QMenu, QProgressBar, QVBoxLayout
@@ -10,6 +11,8 @@ from PyQt5.QtGui import QIcon
 from sane_yt_subfeed.thumbnail_handler import thumbnails_dl_and_paths
 from sane_yt_subfeed.uploads import Uploads
 from sane_yt_subfeed.gui.views.grid_view import GridView
+
+OS_PATH = os.path.dirname(__file__)
 
 
 class MainWindow(QMainWindow):
@@ -73,7 +76,7 @@ class MainWindow(QMainWindow):
         counter = 2
         for func in funcs:
             # Set shortcut
-            func.setShortcut('Ctrl+{}'.format(counter))
+            # func.setShortcut('Ctrl+{}'.format(counter))
 
             # Set status_bar on-hover message for func
             func.setStatusTip('Execute Function {}'.format(counter))
@@ -105,11 +108,11 @@ class MainWindow(QMainWindow):
         # qbtn.move(100, 50)
         #
         self.setWindowTitle('Sane Subscription Feed, yo!')
-        self.setWindowIcon(QIcon('blu.ico'))
+        self.setWindowIcon(QIcon(os.path.join(OS_PATH, 'blu.ico')))
         self.statusBar().showMessage('Ready.')
 
-        self.pbar = QProgressBar(self)
-        self.pbar.setGeometry(30, 40, 200, 25)
+        # self.pbar = QProgressBar(self)
+        # self.pbar.setGeometry(30, 40, 200, 25)
 
         # self.btn = QPushButton('Start', self)
         # self.btn.move(40, 80)
@@ -121,15 +124,28 @@ class MainWindow(QMainWindow):
         # self.setGeometry(300, 300, 280, 170)
         # self.setWindowTitle('QProgressBar')
 
-        windowLayout = QVBoxLayout()
+        # Toolbar of different views
+        view_gv = QAction(QIcon(os.path.join(OS_PATH, 'grid_blue.png')), 'Grid View', self)
+        view_gv.setShortcut('Ctrl+1')
+        view_gv.setStatusTip('View subscription feed as a grid')
+        view_gv.triggered.connect(self.view_grid)
+
+        toolbar = self.addToolBar('Views')
+        toolbar.addAction(view_gv)
+
+        window_layout = QVBoxLayout()
         self.gv = GridView(self.uploads, self.clipboard, self.statusBar())
         # print(grid)
-        # windowLayout.addWidget(gv)
+        # window_layout.addWidget(gv)
         self.setCentralWidget(self.gv)
-        self.setLayout(windowLayout)
+        self.setLayout(window_layout)
         self.resize(1280, 800)  # Start at a sane 16:10 minsize since thumbs are scaling now
         self.show()
         # gv.show()
+
+    def view_grid(self):
+        self.setCentralWidget(self.gv)
+        self.update()
 
     def context_menu_vent(self, event):
 
