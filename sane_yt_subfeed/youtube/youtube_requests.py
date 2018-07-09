@@ -114,10 +114,11 @@ def list_uploaded_videos(youtube_key, uploads_playlist_id):
     return videos
 
 
-def list_uploaded_videos_search(youtube_key, channel_id, search_pages):
+def list_uploaded_videos_search(youtube_key, channel_id, video_snippets, search_pages):
     """
     Get a list of videos through the API search()
     Quota cost: 100 units / response
+    :param video_snippets:
     :param search_pages:
     :param channel_id:
     :param youtube_key:
@@ -133,14 +134,7 @@ def list_uploaded_videos_search(youtube_key, channel_id, search_pages):
         # Grab information about each video.
         for search_result in playlistitems_list_response['items']:
             if search_result['id']['kind'] == 'youtube#video':
-                video = Video(search_result)
-                db_video = db_session.query(Video).get(video.video_id)
-                if db_video:
-                    # TODO update object
-                    pass
-                else:
-                    db_session.add(video)
-
+                video_snippets.append(search_result)
         if search_pages >= req_limit:
             break
         else:

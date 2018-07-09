@@ -5,7 +5,7 @@ from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_search
 
 class GetUploadsThread(threading.Thread):
 
-    def __init__(self, thread_id, youtube, channel_id, search_pages):
+    def __init__(self, thread_id, youtube, channel_id, video_snippets, search_pages):
         """
         Init GetUploadsThread
         :param thread_id:
@@ -14,6 +14,7 @@ class GetUploadsThread(threading.Thread):
         :param debug:
         """
         threading.Thread.__init__(self)
+        self.video_snippets = video_snippets
         self.thread_id = thread_id
         self.videos = []
         self.job_done = False
@@ -28,14 +29,12 @@ class GetUploadsThread(threading.Thread):
         :return:
         """
 
-
         # youtube = youtube_auth_keys()
 
         # self.videos = get_channel_uploads(self.youtube, channel_id)
-        self.videos = list_uploaded_videos_search(self.youtube, self.channel_id, self.search_pages)
+        self.videos = list_uploaded_videos_search(self.youtube, self.channel_id, self.video_snippets, self.search_pages)
 
         self.job_done = True
-
 
     def get_videos(self):
         """
