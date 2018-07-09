@@ -13,7 +13,6 @@ from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.functions import refresh_and_get_newest_videos
 from sane_yt_subfeed.gui.views.about_view import AboutView
 from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
-from sane_yt_subfeed.thumbnail_handler import thumbnails_dl_and_paths
 from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
 # from sane_yt_subfeed.uploads import Uploads
 from sane_yt_subfeed.gui.views.grid_view import GridView
