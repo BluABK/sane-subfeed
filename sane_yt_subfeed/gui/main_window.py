@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, \
     QMenu, QProgressBar, QVBoxLayout
 from PyQt5.QtGui import QIcon
 
+from sane_yt_subfeed.database.methods import filter_downloaded
 from sane_yt_subfeed.thumbnail_handler import thumbnails_dl_and_paths
 from sane_yt_subfeed.uploads import Uploads
 from sane_yt_subfeed.gui.views.grid_view import GridView
@@ -204,8 +205,8 @@ class MainWindow(QMainWindow):
 
     def refresh_list(self):
         self.gv.uploads.get_uploads()
-        uploads = self.gv.uploads.uploads[:30]
-        thumbnails_dl_and_paths(self.gv.uploads.uploads[:30])
+        uploads = filter_downloaded(self.gv.uploads.uploads, 40)
+        thumbnails_dl_and_paths(uploads)
         for q_label, video in zip(self.gv.q_labels, uploads):
             q_label.set_video(video)
             q_label.update()

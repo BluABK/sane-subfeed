@@ -21,6 +21,7 @@ defaults = {
     },
     'Gui': {
         'launch': 'Gui',
+        'hide_downloaded': 'True'
     },
     'Thumbnails': {
         '0': 'default',
