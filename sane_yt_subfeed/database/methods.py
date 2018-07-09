@@ -1,5 +1,5 @@
 from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.video import Video
+from sane_yt_subfeed.database.video import Video
 
 
 def filter_downloaded(vid_list, nr):
