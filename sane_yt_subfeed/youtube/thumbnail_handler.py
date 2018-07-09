@@ -103,7 +103,7 @@ def get_best_thumbnail(vid):
 
 
 def force_download_best(vid_id, vid_path):
-    url = 'https://i.ytimg.com/vi/{vid_id}/'.format_map(defaultdict(vid_id=video_id))
+    url = 'https://i.ytimg.com/vi/{vid_id}/'.format_map(defaultdict(vid_id=vid_id))
     print(url)
     for i in range(5):
         quality = read_config('Thumbnails', '{}'.format(i))
