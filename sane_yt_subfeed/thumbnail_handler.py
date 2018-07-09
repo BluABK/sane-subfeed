@@ -2,6 +2,7 @@ import os
 import shutil
 import threading
 import time
+from PIL import Image  # Image cropping (black barred thumbs, issue #11)
 
 from tqdm import tqdm
 
@@ -74,6 +75,8 @@ def download_file(url, path):
     http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
     with http.request('GET', url, preload_content=False) as r, open(path, 'wb') as out_file:
         shutil.copyfileobj(r, out_file)
+    # FIXME: Move crop to a proper place -- HACK: crop images as they get downloaded
+    crop_blackbars(path, quality='high')
 
 
 def get_best_thumbnail(vid):
@@ -85,7 +88,29 @@ def get_best_thumbnail(vid):
             return return_dict
     return {}
 
+
+def crop_blackbars(image_filename, quality='high'):
+    """
+    Crop certain thumbnails that come shipped with black bars above and under
+    Qualities affected by this affliction, and actions taken:
+        high: 480x360 with bars --> crop to 480x270
+
+    coords: A tuple of x/y coordinates (x1, y1, x2, y2) or (left, top, right, bottom)
+    :param image_path:
+    :param quality:
+    :return:
+    """
+
+    img = Image.open(image_filename)
+    coords = None
+    if quality == 'high':
+        coords = (0, 45, 480, (360-45))
+    cropped_img = img.crop(coords)
+    cropped_img.save(os.path.join(THUMBNAILS_PATH, image_filename))
+
+
 # if __name__ == "__main__":
+#     crop_blackbars(os.path.join(OS_PATH, 'test', 'before.jpg'))
 #     jesse_vids = load_pickle(os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
 # test_run = 0
 # for vid in jesse_vids:
