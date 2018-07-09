@@ -2,15 +2,18 @@
 import os
 import time
 
-from PyQt5.Qt import QClipboard
-from PyQt5.QtCore import QDate, QTime, QDateTime, Qt, QBasicTimer
-from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessageBox, QMainWindow, QAction, qApp, \
-    QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit
-from PyQt5.QtGui import QIcon, QFont, QPixmap, QPainter
+from PyQt5.QtWidgets import QWidget, QMessageBox, qApp, \
+    QMenu, QGridLayout, QLabel, QVBoxLayout, QLineEdit
+from PyQt5.QtGui import QPixmap, QPainter
+from sqlalchemy import desc
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.pickle_handler import PICKLE_PATH, dump_pickle, load_pickle
-from sane_yt_subfeed.thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path, thumbnails_dl_and_paths
+from sane_yt_subfeed.database.functions import refresh_and_get_newest_videos, \
+    get_newest_stored_videos
+from sane_yt_subfeed.database.orm import db_session
+from sane_yt_subfeed.database.video import Video
+from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
+from sane_yt_subfeed.youtube.update_videos import refresh_uploads
 
 
 class ExtendedQLabel(QLabel):
@@ -21,6 +24,7 @@ class ExtendedQLabel(QLabel):
         self.clipboard = clipboard
         self.status_bar = status_bar
         self.video = video
+        self.set_video(video)
         self.img_id = img_id
 
     def setPixmap(self, p):
@@ -44,6 +48,10 @@ class ExtendedQLabel(QLabel):
         print('clicked {:2d}: {} {} - {}'.format(self.img_id, self.video.url_video, self.video.channel_title,
                                                  self.video.title))
         self.clipboard.setText(self.video.url_video)
+        db_vid = db_session.query(Video).get(self.video.video_id)
+        self.video.downloaded = True
+        db_vid.downloaded = True
+        db_session.commit()
         self.status_bar.showMessage('Copied URL to clipboard: {} ({} - {})'.format(self.video.url_video,
                                                                                    self.video.channel_title,
                                                                                    self.video.title))
@@ -64,12 +72,11 @@ class ExtendedQLabel(QLabel):
 
 
 class GridView(QWidget):
-    uploads = None
     q_labels = []
 
-    def __init__(self, uploads, clipboard, status_bar):
+    def __init__(self, clipboard, status_bar, vid_limit=40):
         super().__init__()
-        self.uploads = uploads
+        self.vid_limit = vid_limit
         self.clipboard = clipboard
         self.status_bar = status_bar
         self.init_ui()
@@ -101,22 +108,23 @@ class GridView(QWidget):
         positions = [(i, j) for i in range(5) for j in range(4)]
 
         counter = 0
-        use_dummy_data = read_config('Debug', 'use_dummy_uploads')
-        if use_dummy_data:
-            self.uploads = load_pickle(os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
+        filter_dl = read_config('Gui', 'hide_downloaded')
+        start_with_stored_videos = read_config('Debug', 'start_with_stored_videos')
+
+        if start_with_stored_videos:
+            subscription_feed = get_newest_stored_videos(self.vid_limit, filter_downloaded=filter_dl)
         else:
-            self.uploads.get_uploads()
-            dump_pickle(self.uploads, os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
-        paths = thumbnails_dl_and_paths(self.uploads.uploads[:30])
+            subscription_feed = refresh_and_get_newest_videos(self.vid_limit, filter_downloaded=filter_dl)
+        thumbnails_dl_and_paths(subscription_feed)
         # print(positions)
         for position, video_layout in zip(positions, items):
             if counter >= len(items):
                 break
             if items == '':
                 continue
-            filename = paths[counter]
-            lbl = ExtendedQLabel(self, self.uploads.uploads[counter], counter, self.clipboard, self.status_bar)
-            lbl.set_video(self.uploads.uploads[counter])
+            # print(paths[counter])
+            filename = subscription_feed[counter].thumbnail_path
+            lbl = ExtendedQLabel(self, subscription_feed[counter], counter, self.clipboard, self.status_bar)
             self.q_labels.append(lbl)
             video_layout.addWidget(QLabel(filename))
             grid.addWidget(lbl, *position)

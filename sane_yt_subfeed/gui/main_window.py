@@ -9,10 +9,13 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QVB
 from PyQt5.QtGui import QIcon
 
 # Project internal libs
+from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.database.functions import refresh_and_get_newest_videos
 from sane_yt_subfeed.gui.views.about_view import AboutView
 from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
 from sane_yt_subfeed.thumbnail_handler import thumbnails_dl_and_paths
-from sane_yt_subfeed.uploads import Uploads
+from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
+# from sane_yt_subfeed.uploads import Uploads
 from sane_yt_subfeed.gui.views.grid_view import GridView
 
 # Constants
@@ -21,18 +24,17 @@ ICO_PATH = os.path.join(OS_PATH, 'icons')
 
 
 class MainWindow(QMainWindow):
-    uploads = None
     subs = []
     current_view = None
     grid_view = None
     subs_view = None
     about_view = None
     menus = None
+    gv = None
 
     # noinspection PyArgumentList
     def __init__(self, dimensions=None, position=None):
         super().__init__()
-        self.uploads = Uploads()
         for fakech in range(100):
             self.subs.append("Fake channel #{:3d}".format(fakech))
         self.clipboard = QApplication.clipboard()
@@ -142,7 +144,7 @@ class MainWindow(QMainWindow):
         :return:
         """
         # self.grid_view = GridView(self.uploads, self.clipboard, self.statusBar())
-        return GridView(self.uploads, self.clipboard, self.statusBar())
+        return GridView(self.clipboard, self.statusBar())
 
     def spawn_subs_view(self):
         """
@@ -203,7 +205,9 @@ class MainWindow(QMainWindow):
         Expected result: Set CentralWidget to GridView
         :return:
         """
-        self.grid_view = self.switch_view_destructively(self.spawn_grid_view())
+        #FIXME: hotfix for actions using self.gv(refresh and copy urls)
+        self.gv = self.spawn_grid_view()
+        self.grid_view = self.switch_view_destructively(self.gv)
 
     def view_subs(self):
         """
@@ -229,22 +233,17 @@ class MainWindow(QMainWindow):
         """
         grid_items = 20
         urls = ""
-        for i in range(grid_items):
-            urls += "{}\n".format(self.grid_view.uploads.uploads[i].url_video)
+        for q_label in self.gv.q_labels:
+            urls += "{}\n".format(q_label.video.url_video)
 
         print("Copied URLs to clipboard: \n{}".format(urls))
         self.clipboard.setText(urls)
         self.statusBar().showMessage('Copied {} URLs to clipboard'.format(len(urls.splitlines())))
 
     def refresh_list(self):
-        """
-        Reload the subscription feed items, and redraw the GridView
-        :return:
-        """
-        self.grid_view.uploads.get_uploads()
-        uploads = self.grid_view.uploads.uploads[:30]
-        thumbnails_dl_and_paths(self.grid_view.uploads.uploads[:30])
-        for q_label, video in zip(self.grid_view.q_labels, uploads):
+        hide_downloaded = read_config('Gui', 'hide_downloaded')
+        vid_list = refresh_and_get_newest_videos(40, hide_downloaded)
+        for q_label, video in zip(self.gv.q_labels, vid_list):
             q_label.set_video(video)
             q_label.update()
 
