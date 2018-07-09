@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, \
 from PyQt5.QtGui import QIcon
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.database.methods import filter_downloaded
+from sane_yt_subfeed.database.functions import filter_downloaded
 from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
 # from sane_yt_subfeed.uploads import Uploads
 from sane_yt_subfeed.gui.views.grid_view import GridView
@@ -122,7 +122,7 @@ class MainWindow(QMainWindow):
         # self.setWindowTitle('QProgressBar')
 
         windowLayout = QVBoxLayout()
-        self.gv = GridView(self.uploads, self.clipboard, self.statusBar())
+        self.gv = GridView(self.clipboard, self.statusBar())
         # print(grid)
         # windowLayout.addWidget(gv)
         self.setCentralWidget(self.gv)

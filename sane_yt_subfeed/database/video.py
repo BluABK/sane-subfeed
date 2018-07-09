@@ -21,6 +21,7 @@ class Video(PermanentBase):
     stats_time_elapsed = Column(String)
     thumbnails = Column(TextPickleType())
     downloaded = Column(Boolean)
+    search_item = Column(TextPickleType())
 
     def __init__(self, search_item):
         """
@@ -41,6 +42,7 @@ class Video(PermanentBase):
         # self.url_playlist_video = self.url_video + "&list=" + self.playlist_id
         self.downloaded = False
         self.thumbnails = search_item['snippet']['thumbnails']
+        self.search_item = search_item
         # self.determine_thumbnails(playlist_item.snippet.thumbnails)
 
     def determine_thumbnails(self, thumbnails_item):
