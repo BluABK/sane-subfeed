@@ -2,26 +2,13 @@ import datetime
 from sqlalchemy import Boolean, DateTime, ForeignKey, Column, Integer, String
 
 from sane_yt_subfeed.database.decorators import TextPickleType
+from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 from sane_yt_subfeed.database.orm import PermanentBase
 
 
-class Video(PermanentBase):
-    __tablename__ = 'video'
-    video_id = Column('video_id', String, primary_key=True)
-    channel_title = Column(String)
-    title = Column(String)
-    playlist_id = Column(String)
-    date_published = Column(DateTime)
-    description = Column(String)
-    thumbnail_path = Column(String)
-    playlist_pos = Column(String)
-    url_video = Column(String)
-    url_playlist_video = Column(String)
-    stats_time_elapsed = Column(String)
-    thumbnails = Column(TextPickleType())
-    downloaded = Column(Boolean)
-    search_item = Column(TextPickleType())
+class VideoD:
+    thumbnail_path = None
 
     def __init__(self, search_item):
         """
@@ -71,7 +58,7 @@ class Video(PermanentBase):
             self.thumbnails['available_quality'].append("maxres")  # 1280x720 px
             self.thumbnails['maxres'] = thumbnails_item['maxres']
 
-    def to_video_d(self):
-        video_d = Video(self.search_item)
-        video_d.downloaded = self.downloaded
-        video_d.thumbnail_path = self.thumbnail_path
+    def to_video(self):
+        video = Video(self.search_item)
+        video.downloaded = self.downloaded
+        video.thumbnail_path = self.thumbnail_path
