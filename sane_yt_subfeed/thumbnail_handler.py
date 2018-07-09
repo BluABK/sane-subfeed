@@ -26,7 +26,6 @@ class DownloadThumbnail(threading.Thread):
         vid_path = os.path.join(OS_PATH, 'resources', 'thumbnails', '{}.jpg'.format(self.video.video_id))
         if not os.path.exists(vid_path):
             thumbnail_dict = get_best_thumbnail(self.video)
-            # print(thumbnail_dict)
             download_file(thumbnail_dict['url'], vid_path)
         # TODO check if path exists before starting thread, and move vid_path out of thread
         self.video.thumbnail_path = vid_path

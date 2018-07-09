@@ -118,7 +118,8 @@ def list_uploaded_videos(youtube_key, uploads_playlist_id):
 
 def list_uploaded_videos_search(youtube_key, channel_id, search_pages):
     """
-    Get a list of videos in a playlist
+    Get a list of videos through the API search()
+    Quota cost: 100 units / response
     :param search_pages:
     :param channel_id:
     :param youtube_key:
