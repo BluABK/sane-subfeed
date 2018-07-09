@@ -24,11 +24,12 @@ defaults = {
         'hide_downloaded': 'True'
     },
     'Thumbnails': {
-        '0': 'default',
+        'force_download_best': 'False',
+        '0': 'maxres',
         '1': 'medium',
-        '2': 'high',
-        '3': 'standard',
-        '4': 'maxres'
+        '2': 'default',
+        '3': 'high',
+        '4': 'standard'
     },
     'Threading': {
         'img_threads': '100',

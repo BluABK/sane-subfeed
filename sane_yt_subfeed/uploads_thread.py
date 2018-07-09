@@ -30,8 +30,7 @@ class GetUploadsThread(threading.Thread):
         Override threading.Thread.run() with its own code
         :return:
         """
-        channel_title = self.channel['snippet']['title']
-        channel_id = self.channel['snippet']['resourceId']['channelId']
+        channel_title = self.channel.title
         if self.debug:
             print("Starting #%s for channel: %s" % (self.thread_id, channel_title), end='')
             if self.info:
@@ -41,7 +40,7 @@ class GetUploadsThread(threading.Thread):
         # youtube = youtube_auth_keys()
 
         # self.videos = get_channel_uploads(self.youtube, channel_id)
-        self.videos = list_uploaded_videos_search(self.youtube, channel_id, self.search_pages)
+        self.videos = list_uploaded_videos_search(self.youtube, self.channel, self.search_pages)
 
         self.job_done = True
         if self.debug:
