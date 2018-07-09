@@ -1,19 +1,16 @@
 # PyCharm bug: PyCharm seems to be expecting the referenced module to be included in an __all__ = [] statement
 import os
-import time
 
-from PyQt5.Qt import QClipboard
-from PyQt5.QtCore import QDate, QTime, QDateTime, Qt, QBasicTimer
-from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessageBox, QMainWindow, QAction, qApp, \
-    QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit
-from PyQt5.QtGui import QIcon, QFont, QPixmap, QPainter
+from PyQt5.QtWidgets import QWidget, QMessageBox, qApp, \
+    QMenu, QGridLayout, QLabel, QVBoxLayout, QLineEdit
+from PyQt5.QtGui import QPixmap, QPainter
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.methods import filter_downloaded
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.pickle_handler import PICKLE_PATH, dump_pickle, load_pickle
-from sane_yt_subfeed.thumbnail_handler import download_thumbnails_threaded, get_thumbnail_path, thumbnails_dl_and_paths
-from sane_yt_subfeed.video import Video
+from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
+from sane_yt_subfeed.database.video import Video
 
 
 class ExtendedQLabel(QLabel):

@@ -12,6 +12,7 @@ keys_private.json
 *.pkl
 config.ini
 .db
+.db-journal
 
 # python
 __pycache__

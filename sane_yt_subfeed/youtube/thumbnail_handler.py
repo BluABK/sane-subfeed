@@ -3,7 +3,6 @@ import shutil
 import threading
 import time
 from collections import defaultdict
-from typing import List
 
 from tqdm import tqdm
 
@@ -13,7 +12,7 @@ import urllib3
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.pickle_handler import load_pickle, PICKLE_PATH
-from sane_yt_subfeed.video import Video
+from sane_yt_subfeed.database.video import Video
 
 OS_PATH = os.path.dirname(__file__)
 THUMBNAILS_PATH = os.path.join(OS_PATH, 'resources', 'thumbnails')
