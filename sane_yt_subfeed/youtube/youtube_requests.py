@@ -1,12 +1,10 @@
-import json
-import os
-import time
-
 from sane_yt_subfeed.authentication import youtube_auth_oauth
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.pickle_handler import dump_pickle, PICKLE_PATH, load_sub_list, load_youtube, dump_youtube, dump_sub_list
+from sane_yt_subfeed.database.models import Channel
+from sane_yt_subfeed.database.orm import db_session
+from sane_yt_subfeed.pickle_handler import load_sub_list, load_youtube, dump_youtube, dump_sub_list
 from sane_yt_subfeed.print_functions import remove_empty_kwargs
-from sane_yt_subfeed.video import Video
+from sane_yt_subfeed.database.video import Video
 import datetime
 
 YOUTUBE_URL = "https://www.youtube.com/"
@@ -23,7 +21,7 @@ def get_channel_uploads(youtube_key, channel_id):
     :return: list_uploaded_videos(channel_uploads_playlist_id, debug=debug, limit=limit)
     """
     # Get channel
-    channel = channels_list_by_id(youtube_key, part='snippet,contentDetails,statistics',
+    channel = channels_list_by_id(youtube_key, part='contentDetails',
                                   id=channel_id)  # FIXME: stats unnecessary?
 
     # Get ID of uploads playlist
@@ -97,7 +95,7 @@ def list_uploaded_videos(youtube_key, uploads_playlist_id):
             #     for v in videos:
             #         print("{}: {}".format(counter, v.title))
             #         counter += 1
-                # dump_pickle(videos, os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
+            # dump_pickle(videos, os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
             # if len(videos) > 0 and videos[0].channel_title == "Jesse Cox":
             #     # for vid in videos:
             #     playlistitems_list_request_2 = youtube_key.search().list(
@@ -106,7 +104,7 @@ def list_uploaded_videos(youtube_key, uploads_playlist_id):
             #     for item in response['items']:
             #         print(item['snippet']['title'])
             # #   print(videos[0].thumbnails)
-                # dump_pickle(videos, os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
+            # dump_pickle(videos, os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
             return videos
         else:
             req_nr += 1
@@ -128,9 +126,7 @@ def list_uploaded_videos_search(youtube_key, channel_id, search_pages):
     # Retrieve the list of videos uploaded to the authenticated user's channel.
     playlistitems_list_request = youtube_key.search().list(
         maxResults=50, part='snippet', channelId=channel_id, order='date')
-
     req_limit = 1
-    videos = []
     while playlistitems_list_request:
         playlistitems_list_response = playlistitems_list_request.execute()
 
@@ -138,22 +134,24 @@ def list_uploaded_videos_search(youtube_key, channel_id, search_pages):
         for search_result in playlistitems_list_response['items']:
             if search_result['id']['kind'] == 'youtube#video':
                 video = Video(search_result)
-                # print('{}: {}'.format(video.channel_title, video.title))
-                # print(format(playlist_item))
-                videos.append(video)
+                db_video = db_session.query(Video).get(video.video_id)
+                if db_video:
+                    # TODO update object
+                    pass
+                else:
+                    db_session.add(video)
 
         if search_pages >= req_limit:
-            return videos
+            break
         else:
             search_pages += 1
 
         playlistitems_list_request = youtube_key.playlistItems().list_next(
             playlistitems_list_request, playlistitems_list_response)
+    db_session.commit()
 
-    return videos
 
-
-def get_subscriptions(youtube_oauth):
+def get_remote_subscriptions(youtube_oauth):
     """
     Get a list of the authenticated user's subscriptions.
     :param youtube_oauth:
@@ -175,34 +173,42 @@ def get_subscriptions(youtube_oauth):
             # if page['snippet']['title'] == "Jesse Cox":
             #     print('Jesse Cox: {}'.format(page['snippet']['resourceId']['channelId']))
             # print(page['snippet']['title'])
-            subs.append(page)
+            channel = Channel(page['snippet'])
+            db_video = db_session.query(Channel).get(channel.id)
+            if db_video:
+                # TODO update object
+                subs.append(channel)
+            else:
+                db_session.add(channel)
+                subs.append(channel)
         # print("-- Page --")
         # Keep traversing pages # FIXME: Add limitation
         subscription_list_request = youtube_oauth.playlistItems().list_next(
             subscription_list_request, subscription_list_response)
-
+    db_session.commit()
     return subs
 
 
-def cached_authenticated_get_subscriptions():
-    cached_subs = read_config('Debug', 'cached_subs')
+def get_subscriptions(cached_subs):
     if cached_subs:
-        try:
-            temp_subscriptions = load_sub_list()
-        except FileNotFoundError:
-            try:
-                youtube_oauth = load_youtube()
-            except FileNotFoundError:
-                youtube_oauth = youtube_auth_oauth()
-                dump_youtube(youtube_oauth)
-            temp_subscriptions = get_subscriptions(youtube_oauth)
-            dump_sub_list(temp_subscriptions)
+        return get_stored_subscriptions()
     else:
-        try:
-            youtube_oauth = load_youtube()
-            temp_subscriptions = get_subscriptions(youtube_oauth)
-        except FileNotFoundError:
-            youtube_oauth = youtube_auth_oauth()
-            dump_youtube(youtube_oauth)
-            temp_subscriptions = get_subscriptions(youtube_oauth)
+        return get_remote_subscriptions_cached_oauth()
+
+
+def get_stored_subscriptions():
+    channels = db_session.query(Channel).all()
+    if len(channels) < 1:
+        return get_remote_subscriptions_cached_oauth()
+    return channels
+
+
+def get_remote_subscriptions_cached_oauth():
+    try:
+        youtube_oauth = load_youtube()
+        temp_subscriptions = get_remote_subscriptions(youtube_oauth)
+    except FileNotFoundError:
+        youtube_oauth = youtube_auth_oauth()
+        dump_youtube(youtube_oauth)
+        temp_subscriptions = get_remote_subscriptions(youtube_oauth)
     return temp_subscriptions

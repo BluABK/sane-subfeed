@@ -18,6 +18,7 @@ requests==2.19.1
 requests-oauthlib==1.0.0
 rsa==3.4.2
 six==1.11.0
+SQLAlchemy==1.2.9
 tqdm==4.23.4
 uritemplate==3.0.0
 urllib3==1.23
