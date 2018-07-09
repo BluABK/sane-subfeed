@@ -1,5 +1,6 @@
 from sane_yt_subfeed.authentication import youtube_auth_oauth
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.pickle_handler import load_sub_list, load_youtube, dump_youtube, dump_sub_list
@@ -89,36 +90,21 @@ def list_uploaded_videos(youtube_key, uploads_playlist_id):
                 req_limit += 1
 
         if req_nr >= req_limit:
-            # if len(videos) > 0 and videos[0].channel_title == "SYFY":
-            #     print('{}: {}'.format(videos[0].channel_title, req_nr))
-            #     counter = 0
-            #     for v in videos:
-            #         print("{}: {}".format(counter, v.title))
-            #         counter += 1
-            # dump_pickle(videos, os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
-            # if len(videos) > 0 and videos[0].channel_title == "Jesse Cox":
-            #     # for vid in videos:
-            #     playlistitems_list_request_2 = youtube_key.search().list(
-            #         maxResults=50, part='snippet', channelId='UCCbfB3cQtkEAiKfdRQnfQvw', order='date')
-            #     response = playlistitems_list_request_2.execute()
-            #     for item in response['items']:
-            #         print(item['snippet']['title'])
-            # #   print(videos[0].thumbnails)
-            # dump_pickle(videos, os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
-            return videos
+
+            return
         else:
             req_nr += 1
         playlistitems_list_request = youtube_key.playlistItems().list_next(
             playlistitems_list_request, playlistitems_list_response)
 
-    return videos
+    return
 
 
-def list_uploaded_videos_search(youtube_key, channel_id, video_snippets, search_pages):
+def list_uploaded_videos_search(youtube_key, channel_id, videos, search_pages):
     """
     Get a list of videos through the API search()
     Quota cost: 100 units / response
-    :param video_snippets:
+    :param videos:
     :param search_pages:
     :param channel_id:
     :param youtube_key:
@@ -134,7 +120,7 @@ def list_uploaded_videos_search(youtube_key, channel_id, video_snippets, search_
         # Grab information about each video.
         for search_result in playlistitems_list_response['items']:
             if search_result['id']['kind'] == 'youtube#video':
-                video_snippets.append(search_result)
+                videos.append(VideoD(search_result))
         if search_pages >= req_limit:
             break
         else:
