@@ -2,6 +2,7 @@ import time
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.orm import db_session
+from sane_yt_subfeed.database.threaded_db_operations import UpdateVideosThreadSnippets
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.generate_keys import GenerateKeys
 from sane_yt_subfeed.pickle_handler import load_batch_build_key, dump_batch_build_key
@@ -20,7 +21,7 @@ def refresh_uploads():
 
     thread_increment = 0
     thread_list = []
-    video_snippets = []
+    videos = []
     cached_subs = read_config('Debug', 'cached_subs')
     subscriptions = get_subscriptions(cached_subs)
     youtube_keys = load_keys(subscriptions)
@@ -28,7 +29,7 @@ def refresh_uploads():
     print("Creating YouTube service object from API_KEY for %s channels:" % len(subscriptions))
     channels_limit = read_config('Debug', 'channels_limit')
     for channel, youtube in tqdm(zip(subscriptions, youtube_keys)):
-        thread = GetUploadsThread(thread_increment, youtube, channel.id, video_snippets, 1)
+        thread = GetUploadsThread(thread_increment, youtube, channel.id, videos, 1)
         thread_list.append(thread)
         thread_increment += 1
         if 0 < channels_limit <= thread_increment:
@@ -42,18 +43,9 @@ def refresh_uploads():
     print("\nCollecting data from %s threads:" % len(thread_list))
     for t in tqdm(thread_list):
         t.join()
-    time.sleep(0.01)
 
-    for snippet in video_snippets:
-        video = Video(snippet)
-        db_video = db_session.query(Video).get(video.video_id)
-        if db_video:
-            # TODO update object
-            pass
-        else:
-            db_session.add(video)
-    db_session.commit()
-    db_session.remove()
+    time.sleep(0.1)
+    return sorted(videos, key=lambda video: video.date_published, reverse=True)
 
 
 def load_keys(subs):
