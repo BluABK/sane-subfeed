@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QVB
 from PyQt5.QtGui import QIcon
 
 # Project internal libs
+from sane_yt_subfeed.gui.views.about_view import AboutView
 from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
 from sane_yt_subfeed.thumbnail_handler import thumbnails_dl_and_paths
 from sane_yt_subfeed.uploads import Uploads
@@ -21,15 +22,19 @@ ICO_PATH = os.path.join(OS_PATH, 'icons')
 
 class MainWindow(QMainWindow):
     uploads = None
+    subs = []
     current_view = None
     grid_view = None
     subs_view = None
+    about_view = None
     menus = None
 
     # noinspection PyArgumentList
     def __init__(self, dimensions=None, position=None):
         super().__init__()
         self.uploads = Uploads()
+        for fakech in range(100):
+            self.subs.append("Fake channel #{:3d}".format(fakech))
         self.clipboard = QApplication.clipboard()
         self.menus = {}
         if dimensions:
@@ -37,6 +42,7 @@ class MainWindow(QMainWindow):
         else:
             self.dimensions = [770, 700]
         self.position = position
+
         self.init_ui()
 
     def init_ui(self):
@@ -66,10 +72,15 @@ class MainWindow(QMainWindow):
         view_subs_view = self.add_submenu('&View', 'Subscriptions', self.view_subs, shortcut='Ctrl+2',
                                           tooltip='View Subscriptions', icon='subs.png')
 
+        # Help menu
+        self.add_menu(menubar, '&Help')
+        view_about_view = self.add_submenu('&Help', 'About', self.view_about, shortcut='F1', tooltip='About me')
+
         # Toolbar of different views
         toolbar = self.addToolBar('View')
         toolbar.addAction(view_grid_view)
         toolbar.addAction(view_subs_view)
+        toolbar.addAction(view_about_view)
 
         # Set MainWindow properties
         self.setWindowTitle('Sane-ish Subscription Feed')
@@ -80,7 +91,7 @@ class MainWindow(QMainWindow):
 
         # Set a default view and layout
         window_layout = QVBoxLayout()
-        self.view_subs()
+        self.view_grid()
         self.setLayout(window_layout)
 
         # Display the window
@@ -135,11 +146,20 @@ class MainWindow(QMainWindow):
 
     def spawn_subs_view(self):
         """
-        Creates a SubscriptionView(QWidget) instance
+        Creates a new SubscriptionView(QWidget) instance
         :return:
         """
         # self.subs_view = SubscriptionsView(self.uploads, self.clipboard, self.statusBar())
-        return SubscriptionsView(self.uploads, self.clipboard, self.statusBar())
+        return SubscriptionsView(self.subs, self.clipboard, self.statusBar())
+
+    # Note: Keep putting this one at the end of spawns
+    def spawn_about_view(self):
+        """
+        Creates a new AboutView(QWidget) instance
+        :return:
+        """
+        # self.subs_view = SubscriptionsView(self.uploads, self.clipboard, self.statusBar())
+        return AboutView()
 
     @staticmethod
     def hide_widget(widget):  # TODO: Deferred usage (Garbage collection issue)
@@ -192,6 +212,14 @@ class MainWindow(QMainWindow):
         :return:
         """
         self.subs_view = self.switch_view_destructively(self.spawn_subs_view())
+
+    def view_about(self):
+        """
+        Set View variable and CentralWidget
+        Expected result: Set CentralWidget to AboutView
+        :return:
+        """
+        self.about_view = self.switch_view_destructively(self.spawn_about_view())
 
     # Function menu functions
     def clipboard_copy_urls(self):

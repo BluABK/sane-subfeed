@@ -1,11 +1,7 @@
 import os
-import time
 
-from PyQt5.Qt import QClipboard
-from PyQt5.QtCore import QDate, QTime, QDateTime, Qt, QBasicTimer
-from PyQt5.QtWidgets import QApplication, QWidget, QToolTip, QPushButton, QMessageBox, QMainWindow, QAction, qApp, \
-    QMenu, QGridLayout, QProgressBar, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit, QTextEdit
-from PyQt5.QtGui import QIcon, QFont, QPixmap, QPainter
+# from PyQt5.QtGui import QListWidgetItem
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QListWidget, QListWidgetItem
 
 from sane_yt_subfeed.config_handler import read_config
 
@@ -22,8 +18,13 @@ class SubscriptionsView(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        # textbox = QTextEdit()
         layout = QVBoxLayout()
+        self.setLayout(layout)
+        subtable = QListWidget()
+        layout.addWidget(subtable)
+        # for sub in self.subs:
+        subtable.addItems(self.subs)
+        subtable.show()
 
         self.show()
 
