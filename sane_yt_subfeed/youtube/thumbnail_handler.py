@@ -166,7 +166,7 @@ def crop_blackbars(image_filename, quality='high'):
 
 def quality_404_check(img):
     """
-    Checks is the given image matches the YouTube 404: Thumbnail not found image
+    Checks if the given image matches the YouTube 404: Thumbnail not found image
     :param img:
     :return: True if given image equals YouTube's 404 image
     """
