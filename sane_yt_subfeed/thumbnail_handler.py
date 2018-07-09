@@ -2,6 +2,7 @@ import os
 import shutil
 import threading
 import time
+from collections import defaultdict
 from typing import List
 
 from tqdm import tqdm
@@ -28,9 +29,12 @@ class DownloadThumbnail(threading.Thread):
     def run(self):
         vid_path = os.path.join(OS_PATH, 'resources', 'thumbnails', '{}.jpg'.format(self.video.video_id))
         if not os.path.exists(vid_path):
-            thumbnail_dict = get_best_thumbnail(self.video)
-            # print(thumbnail_dict)
-            download_file(thumbnail_dict['url'], vid_path)
+            force_dl_best = read_config('Thumbnails', 'force_download_best')
+            if force_dl_best:
+                force_download_best(self.video, vid_path)
+            else:
+                thumbnail_dict = get_best_thumbnail(self.video)
+                download_file(thumbnail_dict['url'], vid_path)
         # TODO check if path exists before starting thread, and move vid_path out of thread
         self.video.thumbnail_path = vid_path
         self.thread_list.remove(self)
@@ -48,12 +52,8 @@ def download_thumbnails_threaded(vid_list):
         t = DownloadThumbnail(video, thread_list)
         thread_list.append(t)
         t.start()
-        # print(len(thread_list))
         while len(thread_list) >= thread_limit:
-            # print(len(thread_list))
             time.sleep(0.0001)
-            # thread = thread_list.pop(0)
-            # thread.join()
     for thread in thread_list:
         thread.join()
     for vid in vid_list:
@@ -94,14 +94,18 @@ def get_best_thumbnail(vid):
             return return_dict
     return {}
 
-# if __name__ == "__main__":
-#     jesse_vids = load_pickle(os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
-# test_run = 0
-# for vid in jesse_vids:
-#     thumbnail_dict = get_best_thumbnail(vid)
-#     path = os.path.join(OS_PATH, 'resources', 'thumbnails', '{}.jpg'.format(vid.video_id))
-#     # download_file(thumbnail_dict['url'], path)
-#     if test_run == 2:
-#         break
-#     test_run += 1
-# print(download_thumbnails_threaded(jesse_vids))
+
+def force_download_best(vid, vid_path):
+    url = 'https://i.ytimg.com/vi/{vid_id}/'.format_map(defaultdict(vid_id=vid.video_id))
+    print(url)
+    for i in range(5):
+        quality = read_config('Thumbnails', '{}'.format(i))
+        if quality == 'maxres':
+            try:
+                temp_url = url + '{url_quality}.jpg'.format_map(defaultdict(url_quality='maxresdefault'))
+                print(temp_url)
+                print(url)
+                download_file(temp_url, vid_path)
+            except Exception as e:
+                raise e
+

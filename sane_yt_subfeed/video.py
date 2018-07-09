@@ -1,33 +1,9 @@
 import datetime
-import json
-
-import sqlalchemy
 from sqlalchemy import Boolean, DateTime, ForeignKey, Column, Integer, String
 
-
-from sqlalchemy.orm import relationship, backref
-
+from sane_yt_subfeed.database.decorators import TextPickleType
 from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
-
-from sqlalchemy.types import TypeDecorator
 from sane_yt_subfeed.database.orm import PermanentBase
-
-SIZE = 256
-
-class TextPickleType(TypeDecorator):
-
-    impl = sqlalchemy.Text(SIZE)
-
-    def process_bind_param(self, value, dialect):
-        if value is not None:
-            value = json.dumps(value)
-
-        return value
-
-    def process_result_value(self, value, dialect):
-        if value is not None:
-            value = json.loads(value)
-        return value
 
 
 class Video(PermanentBase):
@@ -78,20 +54,20 @@ class Video(PermanentBase):
         self.thumbnails['available_quality'] = []
         # Check which quality thumbnails actually exist for this video
         if 'default' in thumbnails_item.keys():
-            self.thumbnails['available_quality'].append("default")      # 120x90 px
+            self.thumbnails['available_quality'].append("default")  # 120x90 px
             self.thumbnails['default'] = thumbnails_item['default']
         if 'medium' in thumbnails_item.keys():
-            self.thumbnails['available_quality'].append("medium")       # 320x180 px
+            self.thumbnails['available_quality'].append("medium")  # 320x180 px
             self.thumbnails['medium'] = thumbnails_item['medium']
         if 'high' in thumbnails_item.keys():
-            self.thumbnails['available_quality'].append("high")         # 480x360 px
+            self.thumbnails['available_quality'].append("high")  # 480x360 px
             self.thumbnails['high'] = thumbnails_item['high']
         if 'standard' in thumbnails_item.keys():
-            self.thumbnails['available_quality'].append("standard")     # 640x480 px
+            self.thumbnails['available_quality'].append("standard")  # 640x480 px
             self.thumbnails['standard'] = thumbnails_item['standard']
         if 'maxres' in thumbnails_item.keys():
-            self.thumbnails['available_quality'].append("maxres")       # 1280x720 px
+            self.thumbnails['available_quality'].append("maxres")  # 1280x720 px
             self.thumbnails['maxres'] = thumbnails_item['maxres']
 
     def set_stats(self, stats):
-            self.stats_time_elapsed = stats
+        self.stats_time_elapsed = stats

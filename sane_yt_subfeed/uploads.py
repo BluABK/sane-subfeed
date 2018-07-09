@@ -85,18 +85,7 @@ class Uploads:
         print("\nCollecting data from %s threads:" % len(thread_list))
         for t in tqdm(thread_list):
             t.join()
-            videos.extend(t.get_videos())
 
-        session = db_session()
-        for video in videos:
-            db_video = session.query(Video).get(video.video_id)
-            if db_video:
-                # TODO opdate object
-                # db_video.update_object(video)
-                pass
-            else:
-                session.add(video)
-        session.commit()
 
         # return OrderedDict(sorted(videos.items(), reverse=True))
         return sorted(videos, key=lambda video: video.date_published, reverse=True)

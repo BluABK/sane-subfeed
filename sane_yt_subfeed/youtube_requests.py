@@ -4,6 +4,7 @@ import time
 
 from sane_yt_subfeed.authentication import youtube_auth_oauth
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.pickle_handler import dump_pickle, PICKLE_PATH, load_sub_list, load_youtube, dump_youtube, dump_sub_list
 from sane_yt_subfeed.print_functions import remove_empty_kwargs
@@ -129,7 +130,6 @@ def list_uploaded_videos_search(youtube_key, channel_id, search_pages):
     playlistitems_list_request = youtube_key.search().list(
         maxResults=50, part='snippet', channelId=channel_id, order='date')
     req_limit = 1
-    videos = []
     while playlistitems_list_request:
         playlistitems_list_response = playlistitems_list_request.execute()
 
@@ -137,20 +137,21 @@ def list_uploaded_videos_search(youtube_key, channel_id, search_pages):
         for search_result in playlistitems_list_response['items']:
             if search_result['id']['kind'] == 'youtube#video':
                 video = Video(search_result)
-
-                # print('{}: {}'.format(video.channel_title, video.title))
-                # print(format(playlist_item))
-                videos.append(video)
+                db_video = db_session.query(Video).get(video.video_id)
+                if db_video:
+                    # TODO update object
+                    pass
+                else:
+                    db_session.add(video)
 
         if search_pages >= req_limit:
-            return videos
+            break
         else:
             search_pages += 1
 
         playlistitems_list_request = youtube_key.playlistItems().list_next(
             playlistitems_list_request, playlistitems_list_response)
 
-    return videos
 
 
 def get_subscriptions(youtube_oauth):
@@ -175,12 +176,19 @@ def get_subscriptions(youtube_oauth):
             # if page['snippet']['title'] == "Jesse Cox":
             #     print('Jesse Cox: {}'.format(page['snippet']['resourceId']['channelId']))
             # print(page['snippet']['title'])
-            subs.append(page)
+            channel = Channel(page['snippet'])
+            db_video = db_session.query(Video).get(channel.id)
+            if db_video:
+                # TODO opdate object
+                subs.append(channel)
+            else:
+                db_session.add(channel)
+                subs.append(channel)
         # print("-- Page --")
         # Keep traversing pages # FIXME: Add limitation
         subscription_list_request = youtube_oauth.playlistItems().list_next(
             subscription_list_request, subscription_list_response)
-
+    db_session.commit()
     return subs
 
 
