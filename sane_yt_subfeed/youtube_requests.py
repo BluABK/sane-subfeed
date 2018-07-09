@@ -137,9 +137,7 @@ def list_uploaded_videos_search(youtube_key, channel_id, search_pages):
         for search_result in playlistitems_list_response['items']:
             if search_result['id']['kind'] == 'youtube#video':
                 video = Video(search_result)
-                db_session.add(video)
-                db_session.commit()
-                db_session.close()
+
                 # print('{}: {}'.format(video.channel_title, video.title))
                 # print(format(playlist_item))
                 videos.append(video)

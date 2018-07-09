@@ -3,15 +3,14 @@ import json
 
 import sqlalchemy
 from sqlalchemy import Boolean, DateTime, ForeignKey, Column, Integer, String
-from datetime import datetime
 
 
 from sqlalchemy.orm import relationship, backref
 
-from sane_yt_subfeed.database.orm import Base
 from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 
 from sqlalchemy.types import TypeDecorator
+from sane_yt_subfeed.database.orm import PermanentBase
 
 SIZE = 256
 
@@ -31,14 +30,13 @@ class TextPickleType(TypeDecorator):
         return value
 
 
-class Video(Base):
-    __tablename__ = 'Video'
-    video_id_key = Column('video_id_key', Integer, primary_key=True)
-    video_id = Column(String)
+class Video(PermanentBase):
+    __tablename__ = 'video'
+    video_id = Column('video_id', String, primary_key=True)
     channel_title = Column(String)
     title = Column(String)
     playlist_id = Column(String)
-    date_published = Column(String)
+    date_published = Column(DateTime)
     description = Column(String)
     thumbnail_path = Column(String)
     playlist_pos = Column(String)
@@ -52,9 +50,9 @@ class Video(Base):
         Creates a Video object from a YouTube playlist_item
         :param search_item:
         """
+        self.video_id = search_item['id']['videoId']
         self.channel_title = search_item['snippet']['channelTitle']
         self.title = search_item['snippet']['title']
-        self.video_id = search_item['id']['videoId']
         str_date = search_item['snippet']['publishedAt']
         self.date_published = datetime.datetime.strptime(str_date, '%Y-%m-%dT%H:%M:%S.000Z')
         self.description = search_item['snippet']['description']
