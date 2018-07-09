@@ -8,11 +8,11 @@ from PyQt5.QtGui import QPixmap, QPainter
 from sqlalchemy import desc
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.database.functions import filter_downloaded
+from sane_yt_subfeed.database.functions import refresh_and_get_newest_videos, \
+    get_newest_stored_videos
 from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.pickle_handler import PICKLE_PATH, dump_pickle, load_pickle
-from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
 from sane_yt_subfeed.database.video import Video
+from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
 from sane_yt_subfeed.youtube.update_videos import refresh_uploads
 
 
@@ -74,8 +74,9 @@ class ExtendedQLabel(QLabel):
 class GridView(QWidget):
     q_labels = []
 
-    def __init__(self,clipboard, status_bar):
+    def __init__(self, clipboard, status_bar, vid_limit=40):
         super().__init__()
+        self.vid_limit = vid_limit
         self.clipboard = clipboard
         self.status_bar = status_bar
         self.init_ui()
@@ -107,17 +108,13 @@ class GridView(QWidget):
         positions = [(i, j) for i in range(5) for j in range(4)]
 
         counter = 0
+        filter_dl = read_config('Gui', 'hide_downloaded')
         start_with_stored_videos = read_config('Debug', 'start_with_stored_videos')
-        if not start_with_stored_videos:
-            refresh_uploads()
-        subscription_feed = db_session.query(Video).order_by(desc(Video.date_published)).limit(200).all()
-        if start_with_stored_videos and len(subscription_feed) == 0:
-            refresh_uploads()
-            subscription_feed = db_session.query(Video).order_by(desc(Video.date_published)).limit(200).all()
-        time.sleep(0.01)
-        if read_config('Gui', 'hide_downloaded'):
-            subscription_feed = filter_downloaded(subscription_feed, 40)
 
+        if start_with_stored_videos:
+            subscription_feed = get_newest_stored_videos(self.vid_limit, filter_downloaded=filter_dl)
+        else:
+            subscription_feed = refresh_and_get_newest_videos(self.vid_limit, filter_downloaded=filter_dl)
         thumbnails_dl_and_paths(subscription_feed)
         # print(positions)
         for position, video_layout in zip(positions, items):

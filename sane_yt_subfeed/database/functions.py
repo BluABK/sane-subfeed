@@ -1,15 +1,22 @@
+from sqlalchemy import desc
+
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
+from sane_yt_subfeed.youtube.update_videos import refresh_uploads
 
 
-def filter_downloaded(vid_list, nr):
-    return_list = []
-    for vid in vid_list:
-        # TODO do not need this vid query, if they are connected to db
-        db_vid = db_session.query(Video).get(vid.video_id)
-        if not db_vid.downloaded:
-            return_list.append(vid)
-        if len(return_list) >= nr:
-            return return_list
-    raise IndexError
+def get_newest_stored_videos(limit, filter_downloaded=False):
+    if filter_downloaded:
+        return db_session.query(Video).order_by(desc(Video.date_published)).filter(Video.downloaded != '1').limit(
+            limit).all()
+    else:
+        return db_session.query(Video).order_by(desc(Video.date_published)).limit(limit).all()
 
+
+def refresh_and_get_newest_videos(limit, filter_downloaded=False):
+    refresh_uploads()
+    if filter_downloaded:
+        return db_session.query(Video).order_by(desc(Video.date_published)).filter(Video.downloaded != '1').limit(
+            limit).all()
+    else:
+        return db_session.query(Video).order_by(desc(Video.date_published)).limit(limit).all()
