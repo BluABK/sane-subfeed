@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, \
 from PyQt5.QtGui import QIcon
 
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.database.functions import refresh_and_get_newest_videos
 from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
 # from sane_yt_subfeed.uploads import Uploads
 from sane_yt_subfeed.gui.views.grid_view import GridView
@@ -176,8 +177,8 @@ class MainWindow(QMainWindow):
         """
         grid_items = 20
         urls = ""
-        for i in range(grid_items):
-            urls += "{}\n".format(self.gv.uploads.uploads[i].url_video)
+        for q_label in self.gv.q_labels:
+            urls += "{}\n".format(q_label.video.url_video)
 
         print("Copied URLs to clipboard: \n{}".format(urls))
         self.clipboard.setText(urls)
@@ -202,12 +203,8 @@ class MainWindow(QMainWindow):
         print("Dummy Function 7")
 
     def refresh_list(self):
-        self.gv.uploads.get_uploads()
-        if read_config('Gui', 'hide_downloaded'):
-            uploads = filter_downloaded(self.gv.uploads.uploads, 40)
-        else:
-            uploads = self.gv.uploads.uploads[:40]
-        thumbnails_dl_and_paths(uploads)
-        for q_label, video in zip(self.gv.q_labels, uploads):
+        hide_downloaded = read_config('Gui', 'hide_downloaded')
+        vid_list = refresh_and_get_newest_videos(40, hide_downloaded)
+        for q_label, video in zip(self.gv.q_labels, vid_list):
             q_label.set_video(video)
             q_label.update()

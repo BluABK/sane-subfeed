@@ -20,28 +20,20 @@ THUMBNAILS_PATH = os.path.join(OS_PATH, '..', 'resources', 'thumbnails')
 
 class DownloadThumbnail(threading.Thread):
 
-    def __init__(self, thread_list, video_id, lock):
+    def __init__(self, thread_list, video_id, force_dl_best, thumbnail_dict):
         threading.Thread.__init__(self)
-        self.lock = lock
         self.thread_list = thread_list
         self.video_id = video_id
+        self.force_dl_best = force_dl_best
+        self.thumbnail_dict = thumbnail_dict
 
     def run(self):
-        video = db_session.query(Video).get(self.video_id)
-        vid_path = os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(video.video_id))
+        vid_path = os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(self.video_id))
         if not os.path.exists(vid_path):
-            force_dl_best = read_config('Thumbnails', 'force_download_best')
-            if force_dl_best:
-                force_download_best(video, vid_path)
+            if self.force_dl_best:
+                force_download_best(self.video_id, vid_path)
             else:
-                thumbnail_dict = get_best_thumbnail(video)
-                download_file(thumbnail_dict['url'], vid_path)
-        # TODO check if path exists before starting thread, and move vid_path out of thread
-        self.lock.acquire()
-        video.thumbnail_path = vid_path
-        db_session.commit()
-        self.lock.release()
-        self.thread_list.remove(self)
+                download_file(self.thumbnail_dict['url'], vid_path)
 
 
 def get_thumbnail_path(vid):
@@ -52,9 +44,12 @@ def download_thumbnails_threaded(vid_list):
     thread_list = []
     thread_limit = int(read_config('Threading', 'img_threads'))
     print("\nStarting thumbnail download threads")
-    lock = threading.Lock()
-    for video in tqdm(vid_list):
-        t = DownloadThumbnail(thread_list, video.video_id, lock)
+    force_dl_best = read_config('Thumbnails', 'force_download_best')
+    for vid in vid_list:
+        vid_path = os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(vid.video_id))
+        vid.thumbnail_path = vid_path
+        thumbnail_dict = get_best_thumbnail(vid)
+        t = DownloadThumbnail(thread_list, vid.video_id, force_dl_best, thumbnail_dict)
         thread_list.append(t)
         t.start()
         while len(thread_list) >= thread_limit:
@@ -63,6 +58,20 @@ def download_thumbnails_threaded(vid_list):
     print("\nWaiting for download threads to finish")
     for t in tqdm(thread_list):
         t.join()
+
+    print("\nAll threads done")
+    db_session.commit()
+
+def set_thumbnail(video):
+    vid_path = os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(video.video_id))
+    if not os.path.exists(vid_path):
+        force_dl_best = read_config('Thumbnails', 'force_download_best')
+        if force_dl_best:
+            force_download_best(video, vid_path)
+        else:
+            thumbnail_dict = get_best_thumbnail(video)
+            download_file(thumbnail_dict['url'], vid_path)
+    video.thumbnail_path = vid_path
 
 
 def thumbnails_dl_and_paths(vid_list):
@@ -93,8 +102,8 @@ def get_best_thumbnail(vid):
     return {}
 
 
-def force_download_best(vid, vid_path):
-    url = 'https://i.ytimg.com/vi/{vid_id}/'.format_map(defaultdict(vid_id=vid.video_id))
+def force_download_best(vid_id, vid_path):
+    url = 'https://i.ytimg.com/vi/{vid_id}/'.format_map(defaultdict(vid_id=video_id))
     print(url)
     for i in range(5):
         quality = read_config('Thumbnails', '{}'.format(i))

@@ -196,7 +196,10 @@ def get_subscriptions(cached_subs):
 
 
 def get_stored_subscriptions():
-    return db_session.query(Channel).all()
+    channels = db_session.query(Channel).all()
+    if len(channels) < 1:
+        return get_remote_subscriptions_cached_oauth()
+    return channels
 
 
 def get_remote_subscriptions_cached_oauth():
