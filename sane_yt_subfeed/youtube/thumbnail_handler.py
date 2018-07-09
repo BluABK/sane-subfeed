@@ -15,27 +15,32 @@ from sane_yt_subfeed.pickle_handler import load_pickle, PICKLE_PATH
 from sane_yt_subfeed.database.video import Video
 
 OS_PATH = os.path.dirname(__file__)
-THUMBNAILS_PATH = os.path.join(OS_PATH, 'resources', 'thumbnails')
+THUMBNAILS_PATH = os.path.join(OS_PATH, '..', 'resources', 'thumbnails')
 
 
 class DownloadThumbnail(threading.Thread):
 
-    def __init__(self, video, thread_list):
+    def __init__(self, thread_list, video_id, lock):
         threading.Thread.__init__(self)
-        self.video = video
+        self.lock = lock
         self.thread_list = thread_list
+        self.video_id = video_id
 
     def run(self):
-        vid_path = os.path.join(OS_PATH, 'resources', 'thumbnails', '{}.jpg'.format(self.video.video_id))
+        video = db_session.query(Video).get(self.video_id)
+        vid_path = os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(video.video_id))
         if not os.path.exists(vid_path):
             force_dl_best = read_config('Thumbnails', 'force_download_best')
             if force_dl_best:
-                force_download_best(self.video, vid_path)
+                force_download_best(video, vid_path)
             else:
-                thumbnail_dict = get_best_thumbnail(self.video)
+                thumbnail_dict = get_best_thumbnail(video)
                 download_file(thumbnail_dict['url'], vid_path)
         # TODO check if path exists before starting thread, and move vid_path out of thread
-        self.video.thumbnail_path = vid_path
+        self.lock.acquire()
+        video.thumbnail_path = vid_path
+        db_session.commit()
+        self.lock.release()
         self.thread_list.remove(self)
 
 
@@ -47,19 +52,13 @@ def download_thumbnails_threaded(vid_list):
     thread_list = []
     thread_limit = int(read_config('Threading', 'img_threads'))
     print("\nStarting thumbnail download threads")
+    lock = threading.Lock()
     for video in tqdm(vid_list):
-        t = DownloadThumbnail(video, thread_list)
+        t = DownloadThumbnail(thread_list, video.video_id, lock)
         thread_list.append(t)
         t.start()
         while len(thread_list) >= thread_limit:
             time.sleep(0.0001)
-    for thread in thread_list:
-        thread.join()
-    for vid in vid_list:
-        db_vid = db_session.query(Video).get(vid.video_id)
-        db_vid.thumbnail_path = vid.thumbnail_path
-    # vid_list : List[Video]
-    db_session().commit()
 
     print("\nWaiting for download threads to finish")
     for t in tqdm(thread_list):

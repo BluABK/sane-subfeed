@@ -202,9 +202,9 @@ def get_stored_subscriptions():
 def get_remote_subscriptions_cached_oauth():
     try:
         youtube_oauth = load_youtube()
-        temp_subscriptions = get_subscriptions(youtube_oauth)
+        temp_subscriptions = get_remote_subscriptions(youtube_oauth)
     except FileNotFoundError:
         youtube_oauth = youtube_auth_oauth()
         dump_youtube(youtube_oauth)
-        temp_subscriptions = get_subscriptions(youtube_oauth)
+        temp_subscriptions = get_remote_subscriptions(youtube_oauth)
     return temp_subscriptions

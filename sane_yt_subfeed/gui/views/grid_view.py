@@ -1,16 +1,19 @@
 # PyCharm bug: PyCharm seems to be expecting the referenced module to be included in an __all__ = [] statement
 import os
+import time
 
 from PyQt5.QtWidgets import QWidget, QMessageBox, qApp, \
     QMenu, QGridLayout, QLabel, QVBoxLayout, QLineEdit
 from PyQt5.QtGui import QPixmap, QPainter
+from sqlalchemy import desc
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.database.methods import filter_downloaded
+from sane_yt_subfeed.database.functions import filter_downloaded
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.pickle_handler import PICKLE_PATH, dump_pickle, load_pickle
 from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
 from sane_yt_subfeed.database.video import Video
+from sane_yt_subfeed.youtube.update_videos import refresh_uploads
 
 
 class ExtendedQLabel(QLabel):
@@ -21,6 +24,7 @@ class ExtendedQLabel(QLabel):
         self.clipboard = clipboard
         self.status_bar = status_bar
         self.video = video
+        self.set_video(video)
         self.img_id = img_id
 
     def setPixmap(self, p):
@@ -68,12 +72,10 @@ class ExtendedQLabel(QLabel):
 
 
 class GridView(QWidget):
-    uploads = None
     q_labels = []
 
-    def __init__(self, uploads, clipboard, status_bar):
+    def __init__(self,clipboard, status_bar):
         super().__init__()
-        self.uploads = uploads
         self.clipboard = clipboard
         self.status_bar = status_bar
         self.init_ui()
@@ -105,21 +107,18 @@ class GridView(QWidget):
         positions = [(i, j) for i in range(5) for j in range(4)]
 
         counter = 0
-        use_dummy_data = read_config('Debug', 'use_dummy_uploads')
-        if use_dummy_data:
-            try:
-                self.uploads = load_pickle(os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
-            except FileNotFoundError:
-                self.uploads.get_uploads()
-                dump_pickle(self.uploads, os.path.join(PICKLE_PATH, 'uploads_dump.pkl'))
-        else:
-            self.uploads.get_uploads()
+        start_with_stored_videos = read_config('Debug', 'start_with_stored_videos')
+        if not start_with_stored_videos:
+            refresh_uploads()
+        subscription_feed = db_session.query(Video).order_by(desc(Video.date_published)).limit(200).all()
+        if start_with_stored_videos and len(subscription_feed) == 0:
+            refresh_uploads()
+            subscription_feed = db_session.query(Video).order_by(desc(Video.date_published)).limit(200).all()
+        time.sleep(0.01)
         if read_config('Gui', 'hide_downloaded'):
-            uploads = filter_downloaded(self.uploads.uploads, 40)
-        else:
-            uploads = self.uploads.uploads[:40]
+            subscription_feed = filter_downloaded(subscription_feed, 40)
 
-        paths = thumbnails_dl_and_paths(uploads)
+        thumbnails_dl_and_paths(subscription_feed)
         # print(positions)
         for position, video_layout in zip(positions, items):
             if counter >= len(items):
@@ -127,9 +126,8 @@ class GridView(QWidget):
             if items == '':
                 continue
             # print(paths[counter])
-            filename = paths[counter]
-            lbl = ExtendedQLabel(self, self.uploads.uploads[counter], counter, self.clipboard, self.status_bar)
-            lbl.set_video(self.uploads.uploads[counter])
+            filename = subscription_feed[counter].thumbnail_path
+            lbl = ExtendedQLabel(self, subscription_feed[counter], counter, self.clipboard, self.status_bar)
             self.q_labels.append(lbl)
             video_layout.addWidget(QLabel(filename))
             grid.addWidget(lbl, *position)
