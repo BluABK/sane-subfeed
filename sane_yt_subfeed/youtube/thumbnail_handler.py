@@ -4,6 +4,7 @@ import threading
 import time
 from collections import defaultdict
 from PIL import Image  # Image cropping (black barred thumbs, issue #11)
+from PIL import ImageChops
 
 from tqdm import tqdm
 
@@ -93,8 +94,11 @@ def download_file(url, path, crop=False, quality=None):
     with http.request('GET', url, preload_content=False) as r, open(path, 'wb') as out_file:
         shutil.copyfileobj(r, out_file)
     # FIXME: Move crop to a proper place -- HACK: crop images as they get downloaded
+    if quality_404_check(path):
+        return False
     if crop:
         crop_blackbars(path, quality=quality)
+    return True
 
 
 def get_best_thumbnail(vid):
@@ -109,17 +113,34 @@ def get_best_thumbnail(vid):
 
 def force_download_best(vid_id, vid_path):
     url = 'https://i.ytimg.com/vi/{vid_id}/'.format_map(defaultdict(vid_id=vid_id))
-    print(url)
     for i in range(5):
         quality = read_config('Thumbnails', '{}'.format(i))
         if quality == 'maxres':
-            try:
-                temp_url = url + '{url_quality}.jpg'.format_map(defaultdict(url_quality='maxresdefault'))
-                print(temp_url)
-                print(url)
-                download_file(temp_url, vid_path, crop=False)
-            except Exception as e:
-                raise e
+            temp_url = url + '{url_quality}.jpg'.format_map(defaultdict(url_quality='maxresdefault'))
+            if download_file(temp_url, vid_path, crop=False, quality=quality):
+                # Got 404 image, try lower quality
+                break
+        if quality == 'standard':
+            temp_url = url + '{url_quality}.jpg'.format_map(defaultdict(url_quality='sddefault'))
+            if download_file(temp_url, vid_path, crop=False, quality=quality):
+                # Got 404 image, try lower quality
+                break
+        if quality == 'high':
+            temp_url = url + '{url_quality}.jpg'.format_map(defaultdict(url_quality='hqdefault'))
+            if download_file(temp_url, vid_path, crop=True, quality=quality):
+                # Got 404 image, try lower quality
+                break
+        if quality == 'medium':
+            temp_url = url + '{url_quality}.jpg'.format_map(defaultdict(url_quality='mqdefault'))
+            if download_file(temp_url, vid_path, crop=True, quality=quality):
+                # Got 404 image, try lower quality
+                break
+        if quality == 'default':
+            temp_url = url + '{url_quality}.jpg'.format_map(defaultdict(url_quality='default'))
+            if download_file(temp_url, vid_path, crop=True, quality=quality):
+                # Got 404 image, try lower quality... Oh wait there is none! uh-oh....
+                print("ERROR: force_download_best() tried to go lower than 'default' quality!")
+                break
 
 
 def crop_blackbars(image_filename, quality='high'):
@@ -141,3 +162,14 @@ def crop_blackbars(image_filename, quality='high'):
         coords = (0, 45, 480, (360-45))
     cropped_img = img.crop(coords)
     cropped_img.save(os.path.join(THUMBNAILS_PATH, image_filename))
+
+
+def quality_404_check(img):
+    """
+    Checks is the given image matches the YouTube 404: Thumbnail not found image
+    :param img:
+    :return: True if given image equals YouTube's 404 image
+    """
+    img_404 = Image.open(os.path.join(OS_PATH, '..', 'resources', 'quality404.jpg'))
+    img_cmp = Image.open(img)
+    return ImageChops.difference(img_cmp, img_404).getbbox() is None
