@@ -1,13 +1,16 @@
 import os
 
 # from PyQt5.QtGui import QListWidgetItem
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem
+# from PyQt5.QtCore.Qt import ItemIsEnabled
+# from PyQt5 import QtCore
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QGridLayout
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.select_operations import get_newest_stored_videos
 
 
-class ListView(QWidget):
+class ListDetailedView(QWidget):
     vid_limit = None
     subfeed_table = None
     videos = None
@@ -34,23 +37,27 @@ class ListView(QWidget):
 
     def create_table_subfeed(self):
         self.subfeed_table = QTableWidget()
+        self.subfeed_table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         # ch | title | url | date | repr(desc) | missed | downloaded
         self.subfeed_table.setRowCount(len(self.videos))
         self.subfeed_table.setColumnCount(7)
         for row in range(len(self.videos)):    # row
-            print("{}, 0 = {}".format(row, self.videos[row].title))
-            for column in range(self.subfeed_table.columnCount()):  # col
+            # print("{}, 0 = {}".format(row, self.videos[row].title))
+            # for column in range(self.subfeed_table.columnCount()):  # col
                 # setItem(X, Y, content)
                 # print("\t{}, {} = metadata of {}, 0".format(row, column, row))
-                self.subfeed_table.setItem(row, column, QTableWidgetItem(self.videos[row].channel_title))
-                self.subfeed_table.setItem(row, column, QTableWidgetItem(self.videos[row].title))
-                self.subfeed_table.setItem(row, column, QTableWidgetItem(self.videos[row].url_video))
-                self.subfeed_table.setItem(row, column,
-                                      QTableWidgetItem(self.videos[row].date_published.isoformat(' ').split('.')[0]))
-                self.subfeed_table.setItem(row, column, QTableWidgetItem(repr(self.videos[row].description)))
-                # subfeed_table.setItem(row, column, videos[row].missed)
-                self.subfeed_table.setItem(row, column, QTableWidgetItem("Not Implemented"))   # TODO: Implement
-                self.subfeed_table.setItem(row, column, QTableWidgetItem(self.videos[row].downloaded))
+            item = QTableWidgetItem(self.videos[row].channel_title)
+            # item.setFlags(QtCore.Qt.ItemIsEditable)
+            self.subfeed_table.setItem(row, 0, item)
+
+            self.subfeed_table.setItem(row, 1, QTableWidgetItem(self.videos[row].title))
+            self.subfeed_table.setItem(row, 2, QTableWidgetItem(self.videos[row].url_video))
+            self.subfeed_table.setItem(row, 3,
+                                  QTableWidgetItem(self.videos[row].date_published.isoformat(' ').split('.')[0]))
+            self.subfeed_table.setItem(row, 4, QTableWidgetItem(repr(self.videos[row].description)))
+            # subfeed_table.setItem(row, column, videos[row].missed)
+            self.subfeed_table.setItem(row, 5, QTableWidgetItem("Not Implemented"))   # TODO: Implement
+            self.subfeed_table.setItem(row, 6, QTableWidgetItem(str(self.videos[row].downloaded)))
 
         # table selection change
         self.subfeed_table.doubleClicked.connect(self.on_click)
