@@ -6,6 +6,8 @@ from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 
 class VideoD:
     thumbnail_path = None
+    playlist_pos = None
+    url_playlist_video = None
 
     def __init__(self, search_item):
         """
@@ -61,3 +63,7 @@ class VideoD:
         video.thumbnail_path = self.thumbnail_path
         return video
 
+    @staticmethod
+    def playlist_item_new_video_d(playlist_item):
+        playlist_item['id'] = playlist_item['snippet']['resourceId']
+        return VideoD(playlist_item)
