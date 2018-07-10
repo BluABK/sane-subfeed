@@ -3,7 +3,6 @@ import os
 # from PyQt5.QtGui import QListWidgetItem
 # from PyQt5.QtCore.Qt import ItemIsEnabled
 # from PyQt5 import QtCore
-from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QGridLayout
 
 from sane_yt_subfeed.config_handler import read_config
@@ -37,7 +36,7 @@ class ListDetailedView(QWidget):
 
     def create_table_subfeed(self):
         self.subfeed_table = QTableWidget()
-        self.subfeed_table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+        self.subfeed_table.setEditTriggers(QTableWidget.NoEditTriggers)
         # ch | title | url | date | repr(desc) | missed | downloaded
         self.subfeed_table.setRowCount(len(self.videos))
         self.subfeed_table.setColumnCount(7)
