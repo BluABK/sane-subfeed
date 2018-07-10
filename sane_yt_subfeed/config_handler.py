@@ -18,7 +18,8 @@ defaults = {
         'cached_subs': 'True',
         'start_with_stored_videos': 'False',
         'channels_limit': '-1',
-        'use_playlistItems': 'True'
+        'use_playlistItems': 'True',
+        'disable_tooltips': 'False'
     },
     'Gui': {
         'launch': 'Gui',
