@@ -3,9 +3,9 @@ from timeit import default_timer
 from sqlalchemy import desc
 
 from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.database.threaded_db_operations import UpdateVideosThreadSnippets
+from sane_yt_subfeed.database.insert_operations import UpdateVideosThread
 from sane_yt_subfeed.database.video import Video
-from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
+from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths, download_thumbnails_threaded
 from sane_yt_subfeed.youtube.update_videos import refresh_uploads
 
 
@@ -26,7 +26,7 @@ def compare_db_filtered(videos, limit):
             if db_vid.downloaded:
                 continue
             else:
-                return_list.append(db_vid)
+                return_list.append(db_vid.to_video_d())
                 counter += 1
         else:
             return_list.append(video)
@@ -37,10 +37,12 @@ def compare_db_filtered(videos, limit):
 
 
 def refresh_and_get_newest_videos(limit, filter_downloaded=False):
-    return_list = refresh_uploads()
+    videos = refresh_uploads()
     if filter_downloaded:
-        return_list = compare_db_filtered(return_list, limit)
-    thumbnails_dl_and_paths(return_list)
-    db_thread = UpdateVideosThreadSnippets(return_list)
-    db_thread.start()
+        return_list = compare_db_filtered(videos, limit)
+    else:
+        return_list = videos[:limit]
+    return_list = download_thumbnails_threaded(return_list)
+    videos.extend(return_list)
+    UpdateVideosThread(videos).start()
     return return_list

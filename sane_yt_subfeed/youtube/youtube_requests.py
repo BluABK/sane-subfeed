@@ -128,7 +128,6 @@ def list_uploaded_videos_search(youtube_key, channel_id, videos, search_pages):
 
         playlistitems_list_request = youtube_key.playlistItems().list_next(
             playlistitems_list_request, playlistitems_list_response)
-    db_session.commit()
 
 
 def get_remote_subscriptions(youtube_oauth):

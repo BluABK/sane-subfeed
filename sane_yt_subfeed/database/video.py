@@ -75,3 +75,8 @@ class Video(PermanentBase):
         video_d = Video(self.search_item)
         video_d.downloaded = self.downloaded
         video_d.thumbnail_path = self.thumbnail_path
+        return video_d
+
+    def video_d_update(self, video_d):
+        self.thumbnail_path = video_d.thumbnail_path
+        self.downloaded = video_d.downloaded

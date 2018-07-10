@@ -13,6 +13,7 @@ import urllib3
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.orm import db_session
+from sane_yt_subfeed.database.insert_operations import UpdateVideosThread
 from sane_yt_subfeed.pickle_handler import load_pickle, PICKLE_PATH
 from sane_yt_subfeed.database.video import Video
 
@@ -22,18 +23,19 @@ THUMBNAILS_PATH = os.path.join(OS_PATH, '..', 'resources', 'thumbnails')
 
 class DownloadThumbnail(threading.Thread):
 
-    def __init__(self, thread_list, video_id, force_dl_best, thumbnail_dict):
+    def __init__(self, thread_list, video, force_dl_best, thumbnail_dict):
         threading.Thread.__init__(self)
         self.thread_list = thread_list
-        self.video_id = video_id
+        self.video = video
         self.force_dl_best = force_dl_best
         self.thumbnail_dict = thumbnail_dict
 
     def run(self):
-        vid_path = os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(self.video_id))
+        vid_path = os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(self.video.video_id))
+        self.video.thumbnail_path = vid_path
         if not os.path.exists(vid_path):
             if self.force_dl_best:
-                force_download_best(self.video_id, vid_path)
+                force_download_best(self.video)
             else:
                 download_file(self.thumbnail_dict['url'], vid_path, crop=True, quality='high')
 
@@ -48,10 +50,8 @@ def download_thumbnails_threaded(vid_list):
     print("\nStarting thumbnail download threads")
     force_dl_best = read_config('Thumbnails', 'force_download_best')
     for vid in vid_list:
-        vid_path = os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(vid.video_id))
-        vid.thumbnail_path = vid_path
         thumbnail_dict = get_best_thumbnail(vid)
-        t = DownloadThumbnail(thread_list, vid.video_id, force_dl_best, thumbnail_dict)
+        t = DownloadThumbnail(thread_list, vid, force_dl_best, thumbnail_dict)
         thread_list.append(t)
         t.start()
         while len(thread_list) >= thread_limit:
@@ -62,7 +62,8 @@ def download_thumbnails_threaded(vid_list):
         t.join()
 
     print("\nAll threads done")
-    db_session.commit()
+    return vid_list
+    # db_session.commit()
 
 
 def set_thumbnail(video):
@@ -70,7 +71,7 @@ def set_thumbnail(video):
     if not os.path.exists(vid_path):
         force_dl_best = read_config('Thumbnails', 'force_download_best')
         if force_dl_best:
-            force_download_best(video, vid_path)
+            force_download_best(video)
         else:
             thumbnail_dict = get_best_thumbnail(video)
             download_file(thumbnail_dict['url'], vid_path)
@@ -111,8 +112,9 @@ def get_best_thumbnail(vid):
     return {}
 
 
-def force_download_best(vid_id, vid_path):
-    url = 'https://i.ytimg.com/vi/{vid_id}/'.format_map(defaultdict(vid_id=vid_id))
+def force_download_best(video):
+    vid_path = video.thumbnail_path
+    url = 'https://i.ytimg.com/vi/{vid_id}/'.format_map(defaultdict(vid_id=video.video_id))
     for i in range(5):
         quality = read_config('Thumbnails', '{}'.format(i))
         if quality == 'maxres':
