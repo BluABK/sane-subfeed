@@ -13,6 +13,7 @@ class Channel(PermanentBase):
     downloaded_thumbnail = Column(String)
     thumbnails = Column(TextPickleType())
     snippet = Column(TextPickleType)
+    playlist_id = Column(String)
 
     tests = relationship('Test', back_populates='channel')
     costs = relationship('RunCost', back_populates='channel')

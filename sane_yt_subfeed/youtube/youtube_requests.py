@@ -5,7 +5,6 @@ from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.pickle_handler import load_sub_list, load_youtube, dump_youtube, dump_sub_list
 from sane_yt_subfeed.print_functions import remove_empty_kwargs
-from sane_yt_subfeed.database.video import Video
 import datetime
 
 YOUTUBE_URL = "https://www.youtube.com/"
@@ -14,9 +13,11 @@ YOUTUBE_PARM_PLIST = "playlist?list ="
 YT_VIDEO_URL = YOUTUBE_URL + YOUTUBE_PARM_VIDEO
 
 
-def get_channel_uploads(youtube_key, channel_id):
+def get_channel_uploads(youtube_key, channel_id, videos, req_limit):
     """
     Get a channel's "Uploaded videos" playlist, given channel ID.
+    :param req_limit:
+    :param videos:
     :param youtube_key:
     :param channel_id:
     :return: list_uploaded_videos(channel_uploads_playlist_id, debug=debug, limit=limit)
@@ -26,10 +27,11 @@ def get_channel_uploads(youtube_key, channel_id):
                                   id=channel_id)  # FIXME: stats unnecessary?
 
     # Get ID of uploads playlist
+    # TODO: store channel_id in channel, making one less extra request
     channel_uploads_playlist_id = channel['items'][0]['contentDetails']['relatedPlaylists']['uploads']
 
     # Get playlistListResponse item of uploads playlist
-    return list_uploaded_videos(youtube_key, channel_uploads_playlist_id)
+    return list_uploaded_videos(youtube_key, videos, req_limit, channel_uploads_playlist_id)
 
 
 def channels_list_by_id(youtube_key, **kwargs):
@@ -46,9 +48,11 @@ def channels_list_by_id(youtube_key, **kwargs):
     return response
 
 
-def list_uploaded_videos(youtube_key, uploads_playlist_id):
+def list_uploaded_videos(youtube_key, videos, req_limit, uploads_playlist_id):
     """
     Get a list of videos in a playlist
+    :param req_limit:
+    :param videos:
     :param youtube_key:
     :param uploads_playlist_id:
     :return: [list(dict): videos, dict: statistics]
@@ -57,74 +61,47 @@ def list_uploaded_videos(youtube_key, uploads_playlist_id):
     playlistitems_list_request = youtube_key.playlistItems().list(
         maxResults=50, part='snippet', playlistId=uploads_playlist_id)
 
-    # TODO fix debug
-    # if self.debug:
-    #     print('Videos in list %s' % uploads_playlist_id)
-    req_nr = 1
-    req_limit = 1
-    videos = []
-    since_last_vid_limit = int(read_config('Requests', 'since_last_vid_limit'))
-    min_diff_time = int(read_config('Requests', 'min_diff_time'))
-
+    searched_pages = 0
     while playlistitems_list_request:
-        playlistitems_list_response = playlistitems_list_request.execute()
-
-        # Grab information about each video.
-        for playlist_item in playlistitems_list_response['items']:
-            video = Video(playlist_item)
-            videos.append(video)
-
-        if len(videos) > 0:
-            max_time = videos[0].date_published
-            min_time = videos[0].date_published
-            for vid in videos:
-                vid_date = vid.date_published
-                if vid_date > max_time:
-                    max_time = vid_date
-                if vid_date < min_time:
-                    min_time = vid_date
-            time_diff = max_time - min_time
-            last_vid_diff = datetime.datetime.now() - max_time
-            if time_diff < datetime.timedelta(days=min_diff_time) and last_vid_diff < datetime.timedelta(
-                    days=since_last_vid_limit):
-                req_limit += 1
-
-        if req_nr >= req_limit:
-
-            return
-        else:
-            req_nr += 1
-        playlistitems_list_request = youtube_key.playlistItems().list_next(
-            playlistitems_list_request, playlistitems_list_response)
-
-    return
-
-
-def list_uploaded_videos_search(youtube_key, channel_id, videos, search_pages):
-    """
-    Get a list of videos through the API search()
-    Quota cost: 100 units / response
-    :param videos:
-    :param search_pages:
-    :param channel_id:
-    :param youtube_key:
-    :return: [list(dict): videos, dict: statistics]
-    """
-    # Retrieve the list of videos uploaded to the authenticated user's channel.
-    playlistitems_list_request = youtube_key.search().list(
-        maxResults=50, part='snippet', channelId=channel_id, order='date')
-    req_limit = 1
-    while playlistitems_list_request:
+        searched_pages += 1
         playlistitems_list_response = playlistitems_list_request.execute()
 
         # Grab information about each video.
         for search_result in playlistitems_list_response['items']:
+            videos.append(VideoD.playlist_item_new_video_d(search_result))
+        if searched_pages >= req_limit:
+            break
+
+        playlistitems_list_request = youtube_key.playlistItems().list_next(
+            playlistitems_list_request, playlistitems_list_response)
+
+
+def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit):
+    """
+    Get a list of videos through the API search()
+    Quota cost: 100 units / response
+    :param videos:
+    :param req_limit:
+    :param channel_id:
+    :param youtube_key:
+    :return: [list(dict): videos, dict: statistics]
+    """
+    print('search')
+    # Retrieve the list of videos uploaded to the authenticated user's channel.
+    playlistitems_list_request = youtube_key.search().list(
+        maxResults=50, part='snippet', channelId=channel_id, order='date')
+    search_pages = 0
+    while playlistitems_list_request:
+        search_pages += 1
+        playlistitems_list_response = playlistitems_list_request.execute()
+
+        # Grab information about each video.
+        for search_result in playlistitems_list_response['items']:
+            print(search_result)
             if search_result['id']['kind'] == 'youtube#video':
                 videos.append(VideoD(search_result))
         if search_pages >= req_limit:
             break
-        else:
-            search_pages += 1
 
         playlistitems_list_request = youtube_key.playlistItems().list_next(
             playlistitems_list_request, playlistitems_list_response)
