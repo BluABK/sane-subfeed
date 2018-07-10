@@ -16,6 +16,7 @@ from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
 from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
 # from sane_yt_subfeed.uploads import Uploads
 from sane_yt_subfeed.gui.views.grid_view import GridView
+from sane_yt_subfeed.gui.views.list_view import ListView
 
 # Constants
 OS_PATH = os.path.dirname(__file__)
@@ -27,9 +28,9 @@ class MainWindow(QMainWindow):
     current_view = None
     grid_view = None
     subs_view = None
+    list_view = None
     about_view = None
     menus = None
-    gv = None
 
     # noinspection PyArgumentList
     def __init__(self, dimensions=None, position=None):
@@ -70,7 +71,9 @@ class MainWindow(QMainWindow):
         self.add_menu(menubar, '&View')
         view_grid_view = self.add_submenu('&View', 'Grid', self.view_grid, shortcut='Ctrl+1',
                                           tooltip='View subscription feed as a grid', icon='grid_blue.png')
-        view_subs_view = self.add_submenu('&View', 'Subscriptions', self.view_subs, shortcut='Ctrl+2',
+        view_list_view = self.add_submenu('&View', 'List', self.view_list, shortcut='Ctrl+2',
+                                          tooltip='View subscription feed as a list')
+        view_subs_view = self.add_submenu('&View', 'Subscriptions', self.view_subs, shortcut='Ctrl+3',
                                           tooltip='View Subscriptions', icon='subs.png')
 
         # Help menu
@@ -80,6 +83,7 @@ class MainWindow(QMainWindow):
         # Toolbar of different views
         toolbar = self.addToolBar('View')
         toolbar.addAction(view_grid_view)
+        toolbar.addAction(view_list_view)
         toolbar.addAction(view_subs_view)
         toolbar.addAction(view_about_view)
 
@@ -153,6 +157,13 @@ class MainWindow(QMainWindow):
         # self.subs_view = SubscriptionsView(self.uploads, self.clipboard, self.statusBar())
         return SubscriptionsView(self.subs, self.clipboard, self.statusBar())
 
+    def spawn_list_view(self):
+        """
+        Creates a new ListView
+        :return:
+        """
+        return ListView(self.clipboard, self.statusBar())
+
     # Note: Keep putting this one at the end of spawns
     def spawn_about_view(self):
         """
@@ -200,26 +211,29 @@ class MainWindow(QMainWindow):
 
     def view_grid(self):
         """
-        Set View variable and CentralWidget
-        Expected result: Set CentralWidget to GridView
+        Set View variable and CentralWidget to GridView
         :return:
         """
-        #FIXME: hotfix for actions using self.gv(refresh and copy urls)
-        self.gv = self.spawn_grid_view()
-        self.grid_view = self.switch_view_destructively(self.gv)
+        # FIXME: hotfix for actions using self.grid_view(refresh and copy urls)
+        self.grid_view = self.switch_view_destructively(self.spawn_grid_view())
 
     def view_subs(self):
         """
-        Set View variable and CentralWidget
-        Expected result: Set CentralWidget to SubscriptionsView
+        Set View variable and CentralWidget to SubscriptionsView
         :return:
         """
         self.subs_view = self.switch_view_destructively(self.spawn_subs_view())
 
+    def view_list(self):
+        """
+        Set View variable and CentralWidget to ListView
+        :return:
+        """
+        self.list_view = self.switch_view_destructively(self.spawn_list_view())
+
     def view_about(self):
         """
-        Set View variable and CentralWidget
-        Expected result: Set CentralWidget to AboutView
+        Set View variable and CentralWidget to AboutView
         :return:
         """
         self.about_view = self.switch_view_destructively(self.spawn_about_view())
@@ -232,7 +246,7 @@ class MainWindow(QMainWindow):
         """
         grid_items = 20
         urls = ""
-        for q_label in self.gv.q_labels:
+        for q_label in self.grid_view.q_labels:
             urls += "{}\n".format(q_label.video.url_video)
 
         print("Copied URLs to clipboard: \n{}".format(urls))
@@ -242,7 +256,7 @@ class MainWindow(QMainWindow):
     def refresh_list(self):
         hide_downloaded = read_config('Gui', 'hide_downloaded')
         vid_list = refresh_and_get_newest_videos(40, hide_downloaded)
-        for q_label, video in zip(self.gv.q_labels, vid_list):
+        for q_label, video in zip(self.grid_view.q_labels, vid_list):
             q_label.set_video(video)
             q_label.update()
 

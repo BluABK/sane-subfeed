@@ -1,7 +1,7 @@
 import os
 
 # from PyQt5.QtGui import QListWidgetItem
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QListWidget, QListWidgetItem
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QListWidget, QListWidgetItem, QHBoxLayout
 
 from sane_yt_subfeed.config_handler import read_config
 
@@ -18,13 +18,16 @@ class SubscriptionsView(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        layout = QVBoxLayout()
+        layout = QHBoxLayout()
         self.setLayout(layout)
-        subtable = QListWidget()
-        layout.addWidget(subtable)
+        sublist = QListWidget()
+        sublist2 = QListWidget()
+        layout.addWidget(sublist)
+        layout.addWidget(sublist2)
         # for sub in self.subs:
-        subtable.addItems(self.subs)
-        subtable.show()
+        sublist.addItems(self.subs)
+        sublist2.addItems(reversed(self.subs))
+        sublist.show()
 
         self.show()
 

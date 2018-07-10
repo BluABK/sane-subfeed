@@ -10,6 +10,12 @@ from sane_yt_subfeed.youtube.update_videos import refresh_uploads
 
 
 def get_newest_stored_videos(limit, filter_downloaded=False):
+    """
+
+    :param limit:
+    :param filter_downloaded:
+    :return: list(Video) # FIXME: Should be VideoD!!
+    """
     if filter_downloaded:
         return db_session.query(Video).order_by(desc(Video.date_published)).filter(Video.downloaded != '1').limit(
             limit).all()
