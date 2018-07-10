@@ -16,7 +16,7 @@ from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
 from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
 # from sane_yt_subfeed.uploads import Uploads
 from sane_yt_subfeed.gui.views.grid_view import GridView
-from sane_yt_subfeed.gui.views.list_view import ListView
+from sane_yt_subfeed.gui.views.list_detailed_view import ListDetailedView
 
 # Constants
 OS_PATH = os.path.dirname(__file__)
@@ -71,7 +71,7 @@ class MainWindow(QMainWindow):
         self.add_menu(menubar, '&View')
         view_grid_view = self.add_submenu('&View', 'Grid', self.view_grid, shortcut='Ctrl+1',
                                           tooltip='View subscription feed as a grid', icon='grid_blue.png')
-        view_list_view = self.add_submenu('&View', 'List', self.view_list, shortcut='Ctrl+2',
+        view_list_detailed_view = self.add_submenu('&View', 'Detailed List', self.view_list, shortcut='Ctrl+2',
                                           tooltip='View subscription feed as a list')
         view_subs_view = self.add_submenu('&View', 'Subscriptions', self.view_subs, shortcut='Ctrl+3',
                                           tooltip='View Subscriptions', icon='subs.png')
@@ -83,7 +83,7 @@ class MainWindow(QMainWindow):
         # Toolbar of different views
         toolbar = self.addToolBar('View')
         toolbar.addAction(view_grid_view)
-        toolbar.addAction(view_list_view)
+        toolbar.addAction(view_list_detailed_view)
         toolbar.addAction(view_subs_view)
         toolbar.addAction(view_about_view)
 
@@ -162,7 +162,7 @@ class MainWindow(QMainWindow):
         Creates a new ListView
         :return:
         """
-        return ListView(self.clipboard, self.statusBar())
+        return ListDetailedView(self.clipboard, self.statusBar())
 
     # Note: Keep putting this one at the end of spawns
     def spawn_about_view(self):
