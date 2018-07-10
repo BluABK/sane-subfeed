@@ -118,6 +118,7 @@ class ListTiledView(QWidget):
     def init_ui(self):
         # The layouts
         layout_container = QVBoxLayout()
+        # layout_container = QGridLayout()
         layout_video_item = QVBoxLayout()
         layout_video_item_header = QHBoxLayout()
         layout_video_item_body = QHBoxLayout()
@@ -139,21 +140,37 @@ class ListTiledView(QWidget):
         filter_dl = read_config('Gui', 'hide_downloaded')
         videos = get_newest_stored_videos(self.vid_limit, filter_downloaded=filter_dl)
 
-        counter = 0
-        for video in videos:
-            layout_video_item_header.addWidget(dummy1_chico)
-            layout_video_item_header.addWidget(QLabel(video.channel_title))
+        # DUMMY TESTING
+        for i in range(5):
+            layout_video_item_header.addWidget(QLabel('ICO.bork'))
+            layout_video_item_header.addWidget(QLabel('video.channel_title'))
 
-            thumb_filename = video.thumbnail_path
-            thumb_label = ExtendedQLabel(self, video, counter, self.clipboard, self.status_bar)
-            self.eqlabels.append(thumb_label)
-            # layout_video_item_body.addWidget(QLabel(thumb_filename))
+            # thumb_filename = video.thumbnail_path
+            # thumb_label = ExtendedQLabel(self, video, counter, self.clipboard, self.status_bar)
+            # self.eqlabels.append(thumb_label)
+            layout_video_item_body.addWidget(QLabel('thumb_filename'))
             layout_video_item_body.addWidget(QLabel('Dummy Thumb'))
-            layout_video_item_body_info.addWidget(QLabel(video.title))
+            layout_video_item_body_info.addWidget(QLabel('video.title'))
             layout_video_item_body_info_stats.addWidget(QLabel('NaN views'))
-            layout_video_item_body_info_stats.addWidget(QLabel(video.date_published.isoformat(' ').split('.')[0]))
+            layout_video_item_body_info_stats.addWidget(QLabel('video.date_published'))
             layout_video_item_body_info_stats.addWidget(QLabel('No Other info specified'))
-            layout_video_item_body_info.addWidget(QLabel(video.description))
+            layout_video_item_body_info.addWidget(QLabel('video.description'))
+
+        # counter = 0
+        # for video in videos:
+        #     layout_video_item_header.addWidget(dummy1_chico)
+        #     layout_video_item_header.addWidget(QLabel(video.channel_title))
+        #
+        #     thumb_filename = video.thumbnail_path
+        #     thumb_label = ExtendedQLabel(self, video, counter, self.clipboard, self.status_bar)
+        #     self.eqlabels.append(thumb_label)
+        #     # layout_video_item_body.addWidget(QLabel(thumb_filename))
+        #     layout_video_item_body.addWidget(QLabel('Dummy Thumb'))
+        #     layout_video_item_body_info.addWidget(QLabel(video.title))
+        #     layout_video_item_body_info_stats.addWidget(QLabel('NaN views'))
+        #     layout_video_item_body_info_stats.addWidget(QLabel(video.date_published.isoformat(' ').split('.')[0]))
+        #     layout_video_item_body_info_stats.addWidget(QLabel('No Other info specified'))
+        #     layout_video_item_body_info.addWidget(QLabel(video.description))
 
             # layout_video_item_body_info.addLayout(layout_video_item_body_info_stats)
             # layout_video_item.addLayout(layout_video_item_header)
@@ -161,7 +178,7 @@ class ListTiledView(QWidget):
             # layout_video_item.addLayout(layout_video_item_body)
             # layout_container.addLayout(layout_video_item)
 
-            counter += 1
+            # counter += 1
         layout_container.addLayout(layout_video_item)
         layout_video_item.addLayout(layout_video_item_header)
         layout_video_item_body_info.addLayout(layout_video_item_body_info_stats)
