@@ -8,7 +8,8 @@ from PyQt5.QtGui import QPixmap, QPainter
 from sqlalchemy import desc
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.database.functions import refresh_and_get_newest_videos, \
+from sane_yt_subfeed.database.insert_operations import UpdateVideo
+from sane_yt_subfeed.database.select_operations import refresh_and_get_newest_videos, \
     get_newest_stored_videos
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
@@ -48,10 +49,8 @@ class ExtendedQLabel(QLabel):
         print('clicked {:2d}: {} {} - {}'.format(self.img_id, self.video.url_video, self.video.channel_title,
                                                  self.video.title))
         self.clipboard.setText(self.video.url_video)
-        db_vid = db_session.query(Video).get(self.video.video_id)
         self.video.downloaded = True
-        db_vid.downloaded = True
-        db_session.commit()
+        UpdateVideo(self.video, update_existing=True).start()
         self.status_bar.showMessage('Copied URL to clipboard: {} ({} - {})'.format(self.video.url_video,
                                                                                    self.video.channel_title,
                                                                                    self.video.title))
@@ -115,7 +114,6 @@ class GridView(QWidget):
             subscription_feed = get_newest_stored_videos(self.vid_limit, filter_downloaded=filter_dl)
         else:
             subscription_feed = refresh_and_get_newest_videos(self.vid_limit, filter_downloaded=filter_dl)
-        thumbnails_dl_and_paths(subscription_feed)
         # print(positions)
         for position, video_layout in zip(positions, items):
             if counter >= len(items):
