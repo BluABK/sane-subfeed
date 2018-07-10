@@ -37,7 +37,8 @@ class ExtendedQLabel(QLabel):
         self.setPixmap(QPixmap(video.thumbnail_path))
 
     def set_tool_tip(self):
-        self.setToolTip("{}: {}".format(self.video.channel_title, self.video.title))
+        if not read_config('Debug', 'disable_tooltips'):
+            self.setToolTip("{}: {}".format(self.video.channel_title, self.video.title))
 
     def paintEvent(self, event):
         if self.p:
