@@ -11,14 +11,12 @@ class Video(PermanentBase):
     video_id = Column('video_id', String, primary_key=True)
     channel_title = Column(String)
     title = Column(String)
-    playlist_id = Column(String)
     date_published = Column(DateTime)
     description = Column(String)
     thumbnail_path = Column(String)
     playlist_pos = Column(String)
     url_video = Column(String)
     url_playlist_video = Column(String)
-    stats_time_elapsed = Column(String)
     thumbnails = Column(TextPickleType())
     downloaded = Column(Boolean)
     search_item = Column(TextPickleType())
@@ -71,11 +69,19 @@ class Video(PermanentBase):
             self.thumbnails['available_quality'].append("maxres")  # 1280x720 px
             self.thumbnails['maxres'] = thumbnails_item['maxres']
 
-    def to_video_d(self):
-        video_d = Video(self.search_item)
-        video_d.downloaded = self.downloaded
-        video_d.thumbnail_path = self.thumbnail_path
+    @staticmethod
+    def to_video_d(video):
+        video_d = Video(video.search_item)
+        video_d.downloaded = video.downloaded
+        video_d.thumbnail_path = video.thumbnail_path
         return video_d
+
+    @staticmethod
+    def to_video_ds(videos):
+        video_ds = []
+        for video in videos:
+            video_ds.append(video)
+        return video_ds
 
     def video_d_update(self, video_d):
         self.thumbnail_path = video_d.thumbnail_path

@@ -3,7 +3,7 @@ from timeit import default_timer
 from sqlalchemy import desc
 
 from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.database.insert_operations import UpdateVideosThread
+from sane_yt_subfeed.database.write_operations import UpdateVideosThread
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths, download_thumbnails_threaded
 from sane_yt_subfeed.youtube.update_videos import refresh_uploads
@@ -17,10 +17,12 @@ def get_newest_stored_videos(limit, filter_downloaded=False):
     :return: list(Video) # FIXME: Should be VideoD!!
     """
     if filter_downloaded:
-        return db_session.query(Video).order_by(desc(Video.date_published)).filter(Video.downloaded != '1').limit(
+        db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(Video.downloaded != '1').limit(
             limit).all()
     else:
-        return db_session.query(Video).order_by(desc(Video.date_published)).limit(limit).all()
+        db_videos = db_session.query(Video).order_by(desc(Video.date_published)).limit(limit).all()
+    db_session.remove()
+    return Video.to_video_ds(db_videos)
 
 
 def compare_db_filtered(videos, limit):
@@ -32,23 +34,24 @@ def compare_db_filtered(videos, limit):
             if db_vid.downloaded:
                 continue
             else:
-                return_list.append(db_vid.to_video_d())
+                return_list.append(db_vid.to_video_d(video))
                 counter += 1
         else:
             return_list.append(video)
             counter += 1
         if counter >= limit:
             break
+    db_session.remove()
     return return_list
 
 
 def refresh_and_get_newest_videos(limit, filter_downloaded=False):
     videos = refresh_uploads()
+    UpdateVideosThread(videos).start()
     if filter_downloaded:
         return_list = compare_db_filtered(videos, limit)
     else:
         return_list = videos[:limit]
     return_list = download_thumbnails_threaded(return_list)
-    videos.extend(return_list)
-    UpdateVideosThread(videos).start()
+    UpdateVideosThread(return_list)
     return return_list

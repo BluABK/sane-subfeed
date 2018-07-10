@@ -2,7 +2,7 @@ import time
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.database.insert_operations import UpdateVideosThread
+from sane_yt_subfeed.database.write_operations import UpdateVideosThread
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.generate_keys import GenerateKeys
 from sane_yt_subfeed.pickle_handler import load_batch_build_key, dump_batch_build_key
