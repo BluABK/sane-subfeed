@@ -1,6 +1,3 @@
-import os
-import time
-
 from PyQt5.QtWidgets import QWidget, QMessageBox, qApp, \
     QMenu, QGridLayout, QLabel, QVBoxLayout, QLineEdit
 from PyQt5.QtGui import QPixmap, QPainter
@@ -10,10 +7,6 @@ from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.insert_operations import UpdateVideo
 from sane_yt_subfeed.database.select_operations import refresh_and_get_newest_videos, \
     get_newest_stored_videos
-from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.database.video import Video
-from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
-from sane_yt_subfeed.youtube.update_videos import refresh_uploads
 
 
 class ExtendedQLabel(QLabel):
@@ -70,61 +63,42 @@ class ExtendedQLabel(QLabel):
         self.b.insertPlainText(text + '\n')
 
 
-class GridView(QWidget):
-    q_labels = []
+class ListTiledView(QWidget):
+    """
+    |------------------------------------------------------------------------------------------------------------------|
+    |  ChannelICO?                  | Channel title                                                                    |
+    |------------------------------------------------------------------------------------------------------------------|
+    |           T          l        | Video title                                                                      |
+    |             h       i         |----------------------------------------------------------------------------------|
+    |              u     a          | View count | Date published | Other                                              |
+    |                m  n           |----------------------------------------------------------------------------------|
+    |                  b            | Video description                                                                |
+    |-------------------------------|----------------------------------------------------------------------------------|
 
-    def __init__(self, clipboard, status_bar, vid_limit=40):
+    VBox(HBox(ico, ch_title), HBox(thumb, VBox(video_title, HBox(views, date, other), desc))
+
+    VBox(
+        HBox(ico, ch_title), HBox(thumb, VBox(video_title, HBox(views, date, other), desc)
+        )
+
+    VBox(
+        HBox(
+            ico, ch_title
+            ), HBox(
+                                thumb, VBox(
+                                            video_title, HBox(
+                                                                views, date, other
+                                                             ), desc
+                                            )
+                    )
+    """
+    def __init__(self):
         super().__init__()
-        self.vid_limit = vid_limit
-        self.clipboard = clipboard
-        self.status_bar = status_bar
         self.init_ui()
 
     def init_ui(self):
-        # self.setGeometry(500, 500, 300, 220)
-
         grid = QGridLayout()
-        grid.setSpacing(10)
+        # grid.setSpacing(10)
 
-        sublayout = QVBoxLayout()
-        label1 = QLabel('AAAAAAAAAAAAAAAA')
-        line_edit1 = QLineEdit()
-        sublayout.addWidget(label1)
-        # sublayout.addWidget(line_edit1)
-        # grid.addLayout(sublayout, 4, 0, 1, 3)
 
-        self.setLayout(grid)
-
-        # video_item = "Video.thumb"
-        video_item = sublayout
-        items = [video_item, video_item, video_item, video_item, video_item, video_item,
-                 video_item, video_item, video_item, video_item, video_item, video_item,
-                 video_item, video_item, video_item, video_item, video_item, video_item,
-                 video_item, video_item, video_item, video_item, video_item, video_item,
-                 video_item, video_item, video_item, video_item, video_item, video_item,
-                 video_item, video_item, video_item, video_item, video_item, video_item]
-
-        positions = [(i, j) for i in range(5) for j in range(4)]
-
-        counter = 0
-        filter_dl = read_config('Gui', 'hide_downloaded')
-        start_with_stored_videos = read_config('Debug', 'start_with_stored_videos')
-
-        if start_with_stored_videos:
-            subscription_feed = get_newest_stored_videos(self.vid_limit, filter_downloaded=filter_dl)
-        else:
-            subscription_feed = refresh_and_get_newest_videos(self.vid_limit, filter_downloaded=filter_dl)
-        # print(positions)
-        for position, video_layout in zip(positions, items):
-            if counter >= len(items):
-                break
-            if items == '':
-                continue
-            # print(paths[counter])
-            filename = subscription_feed[counter].thumbnail_path
-            lbl = ExtendedQLabel(self, subscription_feed[counter], counter, self.clipboard, self.status_bar)
-            self.q_labels.append(lbl)
-            video_layout.addWidget(QLabel(filename))
-            grid.addWidget(lbl, *position)
-
-            counter += 1
+        self.show()
