@@ -27,6 +27,7 @@ def cli(no_gui):
 
         # Set the exception hook to our wrapping function
         sys.excepthook = my_exception_hook
+
         run_with_gui()
 
 

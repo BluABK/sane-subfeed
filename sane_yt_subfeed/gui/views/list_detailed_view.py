@@ -1,92 +1,114 @@
-import os
+# PyQt5 libs
+from PyQt5.QtWidgets import *
 
-# from PyQt5.QtGui import QListWidgetItem
-# from PyQt5.QtCore.Qt import ItemIsEnabled
-# from PyQt5 import QtCore
-from PyQt5.QtGui import QStandardItemModel
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QGridLayout, QTableView
-
+# Project internal libs
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.select_operations import get_newest_stored_videos
-
-
-class SubFeedTableWidget(QTableWidget):
-    header_labels = None
-
-    def __init__(self, parent, header_labels):
-        QTableWidget.__init__(self, parent)
-        self.header_labels = header_labels
-
-    def setModel(self, *args, **kwargs):
-        m = QStandardItemModel()
-        m.setHorizontalHeaderLabels(self.header_labels)
-        # self.setModel(m)
-        self.model = m
 
 
 class ListDetailedView(QWidget):
     vid_limit = None
     subfeed_table = None
+    table_items = None
     videos = None
+    headers = None
 
-    def __init__(self, clipboard, status_bar, vid_limit=40):
+    def __init__(self, clipboard, status_bar, vid_limit=40, headers=None):
+        """
+        ListDetailedView, a table representation of relevant parts of the Subscription Feed
+        :param clipboard:
+        :param status_bar:
+        :param vid_limit:
+        """
         super().__init__()
         self.config_file = None
         self.clipboard = clipboard
         self.status_bar = status_bar
         self.vid_limit = vid_limit
+        if headers:
+            self.headers = headers
+        else:
+            self.headers = ['Channel', 'Title', 'URL', 'Published', 'Description', 'Missed?', 'Dismissed?']
         self.init_ui()
 
     def init_ui(self):
+        """
+        Initialize the UI
+        :return:
+        """
         layout = QVBoxLayout()
         self.setLayout(layout)
-        # subfeed_table = QTableWidget()
-
-        filter_dl = read_config('Gui', 'hide_downloaded')
-        self.videos = get_newest_stored_videos(self.vid_limit, filter_downloaded=filter_dl)
+        self.get_videos()
         self.create_table_subfeed()
         layout.addWidget(self.subfeed_table)
 
         self.show()
 
     def create_table_subfeed(self):
-        m = QStandardItemModel()
-        m.setHorizontalHeaderLabels(['Channel', 'Title', 'URL', 'Published', 'Description', 'Missed?', 'Dismissed?'])
-        tv = QTableView()
-        self.subfeed_table = SubFeedTableWidget(self, ['Channel', 'Title', 'URL', 'Published', 'Description', 'Missed?', 'Dismissed?'])
-        self.subfeed_table.setModel()
-        # self.subfeed_table.setHorizontalHeaderLabels(['Channel', 'Title', 'URL', 'Published', 'Description', 'Missed?', 'Dismissed?'])
-        # self.subfeed_table = QTableView()
-        # self.subfeed_table.setModel(m)
+        """
+        Creates the Subscription Feed (as a list) table.
+        NB: get_videos() *has* to run before this function is called.
+        :return:
+        """
+        self.subfeed_table = QTableWidget()
         self.subfeed_table.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.subfeed_table.setSortingEnabled(True)
         self.subfeed_table.setRowCount(len(self.videos))
         self.subfeed_table.setColumnCount(7)
-        for row in range(len(self.videos)):    # row
-            # print("{}, 0 = {}".format(row, self.videos[row].title))
-            # for column in range(self.subfeed_table.columnCount()):  # col
-                # setItem(X, Y, content)
-                # print("\t{}, {} = metadata of {}, 0".format(row, column, row))
-            item = QTableWidgetItem(self.videos[row].channel_title)
-            # item.setFlags(QtCore.Qt.ItemIsEditable)
-            self.subfeed_table.setItem(row, 0, item)
 
+        # Set the Headers
+
+        self.subfeed_table.setHorizontalHeaderLabels(self.headers)
+        self.subfeed_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)     # Title
+        self.subfeed_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)     # Date
+
+        # self.subfeed_table.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+        # Set the tooltips to headings
+        for i in range(len(self.headers)):
+            self.subfeed_table.horizontalHeaderItem(i).setToolTip(self.headers[i])
+
+        self.table_items = []
+        for row in range(len(self.videos)):  # row
+            item = QTableWidgetItem(self.videos[row].channel_title)
+            self.table_items.append(item)
+            self.subfeed_table.setItem(row, 0, item)
             self.subfeed_table.setItem(row, 1, QTableWidgetItem(self.videos[row].title))
             self.subfeed_table.setItem(row, 2, QTableWidgetItem(self.videos[row].url_video))
             self.subfeed_table.setItem(row, 3,
-                                  QTableWidgetItem(self.videos[row].date_published.isoformat(' ').split('.')[0]))
-            self.subfeed_table.setItem(row, 4, QTableWidgetItem(repr(self.videos[row].description)))
-            # subfeed_table.setItem(row, column, videos[row].missed)
-            self.subfeed_table.setItem(row, 5, QTableWidgetItem("Not Implemented"))   # TODO: Implement
-            self.subfeed_table.setItem(row, 6, QTableWidgetItem(str(self.videos[row].downloaded)))
+                                       QTableWidgetItem(self.videos[row].date_published.isoformat(' ').split('.')[0]))
+            self.subfeed_table.setItem(row, 4, QTableWidgetItem(self.videos[row].description))
+            self.subfeed_table.setItem(row, 5, QTableWidgetItem("Not Implemented"))  # TODO: Implement missed
+            self.subfeed_table.setItem(row, 6, QTableWidgetItem("Yes" if self.videos[row].downloaded else "No"))
+
+            # Enable table sorting after the table has been populated otherwise sorting may interfere with the
+            # insertion order (see setItem() for details)
+            self.subfeed_table.setSortingEnabled(True)
+
+        # self.subfeed_table.resizeColumnsToContents()
 
         # table selection change
-        self.subfeed_table.doubleClicked.connect(self.on_click)
+        self.subfeed_table.doubleClicked.connect(self.on_doubleclick)
 
         self.subfeed_table.show()
-        # return self.table
 
-    def on_click(self):
+    def on_doubleclick(self):
+        """
+        Cell double-clicked action
+        :return:
+        """
+        self.copy_selection_to_clipboard()
+
+    def copy_selection_to_clipboard(self):
+        """
+        Copy current selection to clipboard
+        :return:
+        """
         for currentQTableWidgetItem in self.subfeed_table.selectedItems():
             self.clipboard.setText(currentQTableWidgetItem.text())
 
+    def get_videos(self):
+        """
+        Retrieve a list of VideoD objects
+        :return:
+        """
+        filter_dl = read_config('Gui', 'hide_downloaded')
+        self.videos = get_newest_stored_videos(self.vid_limit, filter_downloaded=filter_dl)
