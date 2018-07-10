@@ -64,9 +64,7 @@ class ListDetailedView(QWidget):
         self.subfeed_table.show()
         # return self.table
 
-    # @pyqtSlot()
     def on_click(self):
-        print("\n")
         for currentQTableWidgetItem in self.subfeed_table.selectedItems():
-            print(currentQTableWidgetItem.row(), currentQTableWidgetItem.column(), currentQTableWidgetItem.text())
+            self.clipboard.setText(currentQTableWidgetItem.text())
 
