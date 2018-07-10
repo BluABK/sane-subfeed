@@ -8,8 +8,8 @@ from PyQt5.QtGui import QPixmap, QPainter
 from sqlalchemy import desc
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.database.insert_operations import UpdateVideo
-from sane_yt_subfeed.database.select_operations import refresh_and_get_newest_videos, \
+from sane_yt_subfeed.database.write_operations import UpdateVideo
+from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_videos, \
     get_newest_stored_videos
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
