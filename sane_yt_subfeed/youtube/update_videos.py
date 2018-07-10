@@ -2,7 +2,7 @@ import time
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.database.threaded_db_operations import UpdateVideosThreadSnippets
+from sane_yt_subfeed.database.insert_operations import UpdateVideosThread
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.generate_keys import GenerateKeys
 from sane_yt_subfeed.pickle_handler import load_batch_build_key, dump_batch_build_key
@@ -44,7 +44,6 @@ def refresh_uploads():
     for t in tqdm(thread_list):
         t.join()
 
-    time.sleep(0.1)
     return sorted(videos, key=lambda video: video.date_published, reverse=True)
 
 
