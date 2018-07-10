@@ -38,11 +38,11 @@ def compare_db_filtered(videos, limit):
 
 def refresh_and_get_newest_videos(limit, filter_downloaded=False):
     videos = refresh_uploads()
+    UpdateVideosThread(videos).start()
     if filter_downloaded:
         return_list = compare_db_filtered(videos, limit)
     else:
         return_list = videos[:limit]
     return_list = download_thumbnails_threaded(return_list)
     videos.extend(return_list)
-    UpdateVideosThread(videos).start()
     return return_list
