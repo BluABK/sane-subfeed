@@ -3,10 +3,25 @@ import os
 # from PyQt5.QtGui import QListWidgetItem
 # from PyQt5.QtCore.Qt import ItemIsEnabled
 # from PyQt5 import QtCore
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QGridLayout
+from PyQt5.QtGui import QStandardItemModel
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QGridLayout, QTableView
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.select_operations import get_newest_stored_videos
+
+
+class SubFeedTableWidget(QTableWidget):
+    header_labels = None
+
+    def __init__(self, parent, header_labels):
+        QTableWidget.__init__(self, parent)
+        self.header_labels = header_labels
+
+    def setModel(self, *args, **kwargs):
+        m = QStandardItemModel()
+        m.setHorizontalHeaderLabels(self.header_labels)
+        # self.setModel(m)
+        self.model = m
 
 
 class ListDetailedView(QWidget):
@@ -35,9 +50,16 @@ class ListDetailedView(QWidget):
         self.show()
 
     def create_table_subfeed(self):
-        self.subfeed_table = QTableWidget()
+        m = QStandardItemModel()
+        m.setHorizontalHeaderLabels(['Channel', 'Title', 'URL', 'Published', 'Description', 'Missed?', 'Dismissed?'])
+        tv = QTableView()
+        self.subfeed_table = SubFeedTableWidget(self, ['Channel', 'Title', 'URL', 'Published', 'Description', 'Missed?', 'Dismissed?'])
+        self.subfeed_table.setModel()
+        # self.subfeed_table.setHorizontalHeaderLabels(['Channel', 'Title', 'URL', 'Published', 'Description', 'Missed?', 'Dismissed?'])
+        # self.subfeed_table = QTableView()
+        # self.subfeed_table.setModel(m)
         self.subfeed_table.setEditTriggers(QTableWidget.NoEditTriggers)
-        # ch | title | url | date | repr(desc) | missed | downloaded
+        self.subfeed_table.setSortingEnabled(True)
         self.subfeed_table.setRowCount(len(self.videos))
         self.subfeed_table.setColumnCount(7)
         for row in range(len(self.videos)):    # row
