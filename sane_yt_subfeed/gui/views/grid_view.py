@@ -89,18 +89,20 @@ class ExtendedQLabel(QLabel):
         Mark the video as downloaded
         :return:
         """
-        print('clicked {:2d}: {} {} - {}'.format(self.img_id, self.video.url_video, self.video.channel_title,
-                                                 self.video.title))
+        print('Mark downloaded: {:2d}: {} {} - {}'.format(self.img_id, self.video.url_video, self.video.channel_title,
+                                                          self.video.title))
         self.video.downloaded = True
         UpdateVideo(self.video, update_existing=True).start()
         self.copy_url()
 
-    def mark_discarded(self):    # FIXME: Discard instead of set downloaded property
+    def mark_discarded(self):
         """
         Mark the video as discarded
         :return:
         """
-        self.video.downloaded = True
+        print('Mark discarded: {:2d}: {} {} - {}'.format(self.img_id, self.video.url_video, self.video.channel_title,
+                                                         self.video.title))
+        self.video.discarded = True
         UpdateVideo(self.video, update_existing=True).start()
         self.status_bar.showMessage('Dismissed: {} ({} - {})'.format(self.video.url_video,
                                                                      self.video.channel_title,
