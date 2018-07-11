@@ -24,7 +24,9 @@ defaults = {
     },
     'Gui': {
         'launch': 'Gui',
-        'hide_downloaded': 'True'
+        'hide_downloaded': 'True',
+        'grid_view_x': '5',
+        'grid_view_y': '4'
     },
     'Thumbnails': {
         'force_download_best': 'False',
