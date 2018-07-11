@@ -55,12 +55,6 @@ class MainWindow(QMainWindow):
         self.subs_view = SubscriptionsView(self, self.subs, self.clipboard, self.statusBar())
         self.about_view = AboutView(self)
 
-        self.central_widget.addWidget(self.grid_view)
-        self.central_widget.addWidget(self.list_detailed_view)
-        self.central_widget.addWidget(self.list_tiled_view)
-        self.central_widget.addWidget(self.subs_view)
-        self.central_widget.addWidget(self.about_view)
-        self.central_widget.setCurrentWidget(self.grid_view)
 
         self.init_ui()
 
@@ -120,6 +114,12 @@ class MainWindow(QMainWindow):
         # self.setLayout(window_layout)
 
         # Display the window
+        self.central_widget.addWidget(self.grid_view)
+        self.central_widget.addWidget(self.list_detailed_view)
+        self.central_widget.addWidget(self.list_tiled_view)
+        self.central_widget.addWidget(self.subs_view)
+        self.central_widget.addWidget(self.about_view)
+        self.central_widget.setCurrentWidget(self.grid_view)
         self.show()
 
     # Menu handling
