@@ -18,12 +18,13 @@ class Channel(PermanentBase):
     tests = relationship('Test', back_populates='channel')
     costs = relationship('RunCost', back_populates='channel')
 
-    def __init__(self, youtube_response):
+    def __init__(self, youtube_response, playlist_id):
         self.id = youtube_response['resourceId']['channelId']
         self.title = youtube_response['title']
         self.description = youtube_response['description']
         self.thumbnails = youtube_response['thumbnails']
         self.snippet = youtube_response
+        self.playlist_id = playlist_id
 
 
 class Test(PermanentBase):

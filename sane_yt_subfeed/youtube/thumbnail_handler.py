@@ -47,7 +47,6 @@ def get_thumbnail_path(vid):
 def download_thumbnails_threaded(vid_list):
     thread_list = []
     thread_limit = int(read_config('Threading', 'img_threads'))
-    print("\nStarting thumbnail download threads")
     force_dl_best = read_config('Thumbnails', 'force_download_best')
     for vid in vid_list:
         thumbnail_dict = get_best_thumbnail(vid)
@@ -57,11 +56,9 @@ def download_thumbnails_threaded(vid_list):
         while len(thread_list) >= thread_limit:
             time.sleep(0.0001)
 
-    print("\nWaiting for download threads to finish")
-    for t in tqdm(thread_list):
+    for t in tqdm(thread_list, desc="Waiting on thumbnail threads", disable=read_config('Debug', 'disable_tqdm')):
         t.join()
 
-    print("\nAll threads done")
     # UpdateVideosThread(vid_list).start()
     return vid_list
     # db_session.commit()

@@ -19,6 +19,7 @@ defaults = {
         'start_with_stored_videos': 'False',
         'channels_limit': '-1',
         'use_playlistItems': 'True',
+        'disable_tqdm': 'True',
         'disable_tooltips': 'False'
     },
     'Gui': {

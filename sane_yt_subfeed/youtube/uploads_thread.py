@@ -1,12 +1,13 @@
 import threading
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_search, get_channel_uploads
+from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_search, get_channel_uploads, \
+    list_uploaded_videos
 
 
 class GetUploadsThread(threading.Thread):
 
-    def __init__(self, thread_id, youtube, channel_id, videos, req_limit):
+    def __init__(self, thread_id, youtube, channel_id, playlist_id, videos, req_limit):
         """
         Init GetUploadsThread
         :param thread_id:
@@ -21,6 +22,7 @@ class GetUploadsThread(threading.Thread):
         self.youtube = youtube
         self.req_limit = req_limit
         self.channel_id = channel_id
+        self.playlist_id = playlist_id
 
     # TODO: Handle failed requests
     def run(self):
@@ -34,7 +36,7 @@ class GetUploadsThread(threading.Thread):
         # self.videos = get_channel_uploads(self.youtube, channel_id)
         use_playlist_items = read_config('Debug', 'use_playlistItems')
         if use_playlist_items:
-            get_channel_uploads(self.youtube, self.channel_id, self.videos, self.req_limit)
+            list_uploaded_videos(self.youtube, self.videos, self.playlist_id,  self.req_limit)
         else:
             list_uploaded_videos_search(self.youtube, self.channel_id, self.videos, self.req_limit)
 
