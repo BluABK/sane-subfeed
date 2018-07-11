@@ -29,10 +29,10 @@ defaults = {
     'Thumbnails': {
         'force_download_best': 'False',
         '0': 'maxres',
-        '1': 'medium',
-        '2': 'default',
-        '3': 'high',
-        '4': 'standard'
+        '1': 'standard',
+        '2': 'high',
+        '3': 'medium',
+        '4': 'default'
     },
     'Threading': {
         'img_threads': '100',
