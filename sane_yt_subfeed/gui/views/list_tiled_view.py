@@ -113,76 +113,124 @@ class ListTiledView(QWidget):
         self.vid_limit = vid_limit
         self.clipboard = clipboard
         self.status_bar = status_bar
-        self.init_ui()
 
-    def init_ui(self):
         # The layouts
-        layout_container = QVBoxLayout()
+        main_layout = QVBoxLayout()
+        main_layout.setSpacing(10)
+        self.setLayout(main_layout)
+
+        header_layout = QHBoxLayout()
+        body_layout = QHBoxLayout()
+
+        main_layout.addLayout(header_layout)
+        main_layout.addLayout(body_layout)
+
+        description_layout = QVBoxLayout()
+        image_layout = QVBoxLayout()
+
+
+        body_layout.addLayout(image_layout)
+        body_layout.addLayout(description_layout)
+
+        video_title_layout = QHBoxLayout()
+        more_layout = QHBoxLayout()
+        published_layout = QHBoxLayout()
+
+
+        description_layout.addLayout(video_title_layout)
+        description_layout.addLayout(more_layout)
+        description_layout.addLayout(published_layout)
+
+
+        video_title = QLabel('video title')
+        view_count = QLabel('View count')
+        date = QLabel('date')
+        published = QLabel('more')
+        view_description = QLabel('view description')
+        image_label = QLabel('image')
+        icon_label = QLabel('icon')
+        title_label = QLabel('title')
+
+        header_layout.addWidget(icon_label)
+        header_layout.addWidget(title_label)
+        image_layout.addWidget(image_label)
+
+        video_title_layout.addWidget(video_title)
+        more_layout.addWidget(view_count)
+        more_layout.addWidget(date)
+        more_layout.addWidget(published)
+        description_layout.addWidget(view_description)
         # layout_container = QGridLayout()
-        layout_video_item = QVBoxLayout()
-        layout_video_item_header = QHBoxLayout()
-        layout_video_item_body = QHBoxLayout()
-        layout_video_item_body_info = QVBoxLayout()
-        layout_video_item_body_info_stats = QHBoxLayout()
-        self.setLayout(layout_container)
-
-
-        # #### DUMMY SECTION ######
-        dummies = ['Alica Skipper', 'Collette Halstead', 'Melonie Wirth', 'Theo Alonso', 'Alex Golden', 'Brande Taber',
-                   'Hank Doty', 'Dominque Baumgartner', 'Charlsie Stoner', 'Lovella Mckee']
-        # Dummy Video Item 1
-        # dummy1_chico = QLabel(QIcon(os.path.join(DUMMY_ICO_PATH, 'd1.png')))
-        dummy1_chico = QLabel('ICO.bork')
-        dummy1_chtitle = QLabel(dummies[0])
-        # dummy1_thumb = ExtendedQLabel(self, subscription_feed[counter], counter, self.clipboard, self.status_bar)
-        # self.eq_labels.append(dummy1_thumb)
-
-        filter_dl = read_config('Gui', 'hide_downloaded')
-        videos = get_newest_stored_videos(self.vid_limit, filter_downloaded=filter_dl)
-
-        # DUMMY TESTING
-        for i in range(5):
-            layout_video_item_header.addWidget(QLabel('ICO.bork'))
-            layout_video_item_header.addWidget(QLabel('video.channel_title'))
-
-            # thumb_filename = video.thumbnail_path
-            # thumb_label = ExtendedQLabel(self, video, counter, self.clipboard, self.status_bar)
-            # self.eqlabels.append(thumb_label)
-            layout_video_item_body.addWidget(QLabel('thumb_filename'))
-            layout_video_item_body.addWidget(QLabel('Dummy Thumb'))
-            layout_video_item_body_info.addWidget(QLabel('video.title'))
-            layout_video_item_body_info_stats.addWidget(QLabel('NaN views'))
-            layout_video_item_body_info_stats.addWidget(QLabel('video.date_published'))
-            layout_video_item_body_info_stats.addWidget(QLabel('No Other info specified'))
-            layout_video_item_body_info.addWidget(QLabel('video.description'))
-
-        # counter = 0
-        # for video in videos:
-        #     layout_video_item_header.addWidget(dummy1_chico)
-        #     layout_video_item_header.addWidget(QLabel(video.channel_title))
+        # layout_video_item_header = QHBoxLayout()
+        # layout_video_item_body = QHBoxLayout()
+        # layout_video_item_body_info = QVBoxLayout()
+        # layout_video_item_body_info_stats = QHBoxLayout()
         #
-        #     thumb_filename = video.thumbnail_path
-        #     thumb_label = ExtendedQLabel(self, video, counter, self.clipboard, self.status_bar)
-        #     self.eqlabels.append(thumb_label)
-        #     # layout_video_item_body.addWidget(QLabel(thumb_filename))
+        #
+        # # #### DUMMY SECTION ######
+        # dummies = ['Alica Skipper', 'Collette Halstead', 'Melonie Wirth', 'Theo Alonso', 'Alex Golden', 'Brande Taber',
+        #            'Hank Doty', 'Dominque Baumgartner', 'Charlsie Stoner', 'Lovella Mckee']
+        # # Dummy Video Item 1
+        # # dummy1_chico = QLabel(QIcon(os.path.join(DUMMY_ICO_PATH, 'd1.png')))
+        # dummy1_chico = QLabel('ICO.bork')
+        # dummy1_chtitle = QLabel(dummies[0])
+        # # dummy1_thumb = ExtendedQLabel(self, subscription_feed[counter], counter, self.clipboard, self.status_bar)
+        # # self.eq_labels.append(dummy1_thumb)
+        #
+        # filter_dl = read_config('Gui', 'hide_downloaded')
+        # videos = get_newest_stored_videos(self.vid_limit, filter_downloaded=filter_dl)
+        #
+        # # DUMMY TESTING
+        # for i in range(5):
+        #     layout_video_item_header.addWidget(QLabel('ICO.bork'))
+        #     layout_video_item_header.addWidget(QLabel('video.channel_title'))
+        #
+        #     # thumb_filename = video.thumbnail_path
+        #     # thumb_label = ExtendedQLabel(self, video, counter, self.clipboard, self.status_bar)
+        #     # self.eqlabels.append(thumb_label)
+        #     layout_video_item_body.addWidget(QLabel('thumb_filename'))
         #     layout_video_item_body.addWidget(QLabel('Dummy Thumb'))
-        #     layout_video_item_body_info.addWidget(QLabel(video.title))
+        #     layout_video_item_body_info.addWidget(QLabel('video.title'))
         #     layout_video_item_body_info_stats.addWidget(QLabel('NaN views'))
-        #     layout_video_item_body_info_stats.addWidget(QLabel(video.date_published.isoformat(' ').split('.')[0]))
+        #     layout_video_item_body_info_stats.addWidget(QLabel('video.date_published'))
         #     layout_video_item_body_info_stats.addWidget(QLabel('No Other info specified'))
-        #     layout_video_item_body_info.addWidget(QLabel(video.description))
-
-            # layout_video_item_body_info.addLayout(layout_video_item_body_info_stats)
-            # layout_video_item.addLayout(layout_video_item_header)
-            # layout_video_item_body.addLayout(layout_video_item_body_info)
-            # layout_video_item.addLayout(layout_video_item_body)
-            # layout_container.addLayout(layout_video_item)
-
-            # counter += 1
-        layout_container.addLayout(layout_video_item)
-        layout_video_item.addLayout(layout_video_item_header)
-        layout_video_item_body_info.addLayout(layout_video_item_body_info_stats)
-        layout_video_item_body.addLayout(layout_video_item_body_info)
-        layout_video_item.addLayout(layout_video_item_body)
+        #     layout_video_item_body_info.addWidget(QLabel('video.description'))
+        #
+        # # counter = 0
+        # # for video in videos:
+        # #     layout_video_item_header.addWidget(dummy1_chico)
+        # #     layout_video_item_header.addWidget(QLabel(video.channel_title))
+        # #
+        # #     thumb_filename = video.thumbnail_path
+        # #     thumb_label = ExtendedQLabel(self, video, counter, self.clipboard, self.status_bar)
+        # #     self.eqlabels.append(thumb_label)
+        # #     # layout_video_item_body.addWidget(QLabel(thumb_filename))
+        # #     layout_video_item_body.addWidget(QLabel('Dummy Thumb'))
+        # #     layout_video_item_body_info.addWidget(QLabel(video.title))
+        # #     layout_video_item_body_info_stats.addWidget(QLabel('NaN views'))
+        # #     layout_video_item_body_info_stats.addWidget(QLabel(video.date_published.isoformat(' ').split('.')[0]))
+        # #     layout_video_item_body_info_stats.addWidget(QLabel('No Other info specified'))
+        # #     layout_video_item_body_info.addWidget(QLabel(video.description))
+        #
+        #     # layout_video_item_body_info.addLayout(layout_video_item_body_info_stats)
+        #     # layout_video_item.addLayout(layout_video_item_header)
+        #     # layout_video_item_body.addLayout(layout_video_item_body_info)
+        #     # layout_video_item.addLayout(layout_video_item_body)
+        #     # layout_container.addLayout(layout_video_item)
+        #
+        #     # counter += 1
+        # layout_video_item.addLayout(layout_video_item_header)
+        # layout_video_item_body_info.addLayout(layout_video_item_body_info_stats)
+        # layout_video_item_body.addLayout(layout_video_item_body_info)
+        # layout_video_item.addLayout(layout_video_item_body)
 
         self.show()
+
+        # def generate_header():
+        #     return_item = QWidget()
+        #     layout = QHBoxLayout()
+        #     layout.addWidget(QLabel('channelICO'))
+        #     layout.addWidget(QLabel('channel title'))
+        #     return_item.setLayout(QHBoxLayout())
+        #     return_item.update()
+        #     return return_item
