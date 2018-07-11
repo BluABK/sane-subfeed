@@ -49,12 +49,12 @@ class GetUploadsThread(threading.Thread):
                     used_list = True
                     db_session.remove()
                     counter += 1
-                    list_uploaded_videos(self.youtube, self.videos, self.playlist_id, self.req_limit)
+                    list_uploaded_videos_search(self.youtube, self.channel_id, self.videos, self.req_limit)
                     break
             if not used_list:
                 counter += 1
                 db_session.remove()
-                list_uploaded_videos_search(self.youtube, self.channel_id, self.videos, self.req_limit)
+                list_uploaded_videos(self.youtube, self.videos, self.playlist_id, self.req_limit)
             if counter > 1:
                 raise ResourceWarning
         else:
