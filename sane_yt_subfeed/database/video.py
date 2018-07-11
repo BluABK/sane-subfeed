@@ -19,6 +19,7 @@ class Video(PermanentBase):
     url_playlist_video = Column(String)
     thumbnails = Column(TextPickleType())
     downloaded = Column(Boolean)
+    discarded = Column(Boolean)
     search_item = Column(TextPickleType())
 
     def __init__(self, search_item):
@@ -74,6 +75,7 @@ class Video(PermanentBase):
         video_d = Video(video.search_item)
         video_d.downloaded = video.downloaded
         video_d.thumbnail_path = video.thumbnail_path
+        video_d.discarded = video.discarded
         return video_d
 
     @staticmethod
@@ -86,3 +88,4 @@ class Video(PermanentBase):
     def video_d_update(self, video_d):
         self.thumbnail_path = video_d.thumbnail_path
         self.downloaded = video_d.downloaded
+        self.discarded = video_d.discarded

@@ -8,6 +8,8 @@ class VideoD:
     thumbnail_path = None
     playlist_pos = None
     url_playlist_video = None
+    discarded = False
+    downloaded = False
 
     def __init__(self, search_item):
         """
@@ -26,7 +28,6 @@ class VideoD:
 
         self.url_video = YOUTUBE_URL_BASE + YOUTUBE_URL_PART_VIDEO + self.video_id
         # self.url_playlist_video = self.url_video + "&list=" + self.playlist_id
-        self.downloaded = False
         self.thumbnails = search_item['snippet']['thumbnails']
         self.search_item = search_item
         # self.determine_thumbnails(playlist_item.snippet.thumbnails)
@@ -61,6 +62,7 @@ class VideoD:
         video = Video(self.search_item)
         video.downloaded = self.downloaded
         video.thumbnail_path = self.thumbnail_path
+        video.discarded = self.discarded
         return video
 
     @staticmethod
