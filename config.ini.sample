@@ -12,7 +12,9 @@ disable_tooltips = False
 disable_tqdm = True
 
 [Requests]
-
+use_tests = False
+miss_limit = 10
+test_pages = 2
 
 [Thumbnails]
 force_download_best = False
@@ -24,3 +26,4 @@ force_download_best = False
 
 [Threading]
 img_threads = 200
+
