@@ -1,6 +1,8 @@
 import threading
 
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.database.models import Channel
+from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_search, get_channel_uploads, \
     list_uploaded_videos
 
@@ -34,11 +36,34 @@ class GetUploadsThread(threading.Thread):
         # youtube = youtube_auth_keys()
 
         # self.videos = get_channel_uploads(self.youtube, channel_id)
-        use_playlist_items = read_config('Debug', 'use_playlistItems')
-        if use_playlist_items:
-            list_uploaded_videos(self.youtube, self.videos, self.playlist_id,  self.req_limit)
+
+        use_tests = read_config('Requests', 'use_tests')
+        if use_tests:
+            channel = db_session.query(Channel).get(self.channel_id)
+            miss = read_config('Requests', 'miss_limit')
+            pages = read_config('Requests', 'test_pages')
+            used_list = False
+            counter = 0
+            for test in channel.tests:
+                if test.test_miss < miss or test.test_pages > pages:
+                    print('{} - {}: {}, {}'.format(channel.title, channel.id, test.test_miss, test.test_pages))
+                    used_list = True
+                    db_session.remove()
+                    counter += 1
+                    list_uploaded_videos(self.youtube, self.videos, self.playlist_id, self.req_limit)
+                    break
+            if not used_list:
+                counter += 1
+                db_session.remove()
+                list_uploaded_videos_search(self.youtube, self.channel_id, self.videos, self.req_limit)
+            if counter > 1:
+                raise ResourceWarning
         else:
-            list_uploaded_videos_search(self.youtube, self.channel_id, self.videos, self.req_limit)
+            use_playlist_items = read_config('Debug', 'use_playlistItems')
+            if use_playlist_items:
+                list_uploaded_videos(self.youtube, self.videos, self.playlist_id, self.req_limit)
+            else:
+                list_uploaded_videos_search(self.youtube, self.channel_id, self.videos, self.req_limit)
 
         self.job_done = True
 

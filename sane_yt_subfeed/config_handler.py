@@ -12,6 +12,9 @@ parser.read(CONFIG_PATH)
 
 defaults = {
     'Requests': {
+        'miss_limit': '10',
+        'test_pages': '2',
+        'use_tests': 'True'
     },
     'Debug': {
         'debug': 'False',
