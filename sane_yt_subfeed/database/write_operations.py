@@ -5,13 +5,14 @@ from sqlalchemy import text
 
 from sane_yt_subfeed.database import video
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
+from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session, engine
 from sane_yt_subfeed.database.video import Video
 
 lock = threading.Lock()
 
 
-def update_statement_full(db_video):
+def update_video_statement_full(db_video):
     return Video.__table__.update().where("video_id = '{}'".format(db_video.video_id)).values(
         video_id=db_video.video_id,
         channel_title=db_video.channel_title,
@@ -25,6 +26,19 @@ def update_statement_full(db_video):
         thumbnails=db_video.thumbnails,
         downloaded=db_video.downloaded,
         search_item=db_video.search_item)
+
+
+def update_channel_from_remote(channel):
+    return Channel.__table__.update().where("id = '{}'".format(channel.id)).values(
+        title=channel.title, description=channel.description, snippet=channel.snippet, playlist_id=channel.id)
+
+
+def engine_execute_first(stmt):
+    return engine.execute(stmt).first()
+
+
+def get_channel_by_id_stmt(channel):
+    return Channel.__table__.select().where(text("id = '{}'".format(channel.id)))
 
 
 def get_video_by_id_stmt(video_d):
@@ -64,7 +78,7 @@ class UpdateVideosThread(threading.Thread):
             db_video = engine.execute(stmt).first()
             if db_video:
                 if self.update_existing:
-                    items_to_update.append(update_statement_full(db_video))
+                    items_to_update.append(update_video_statement_full(db_video))
                 else:
                     pass
             else:
@@ -103,7 +117,7 @@ class UpdateVideo(threading.Thread):
         db_video = engine.execute(stmt).first()
         if db_video:
             if self.update_existing:
-                engine.execute(update_statement_full(self.video_d))
+                engine.execute(update_video_statement_full(self.video_d))
             else:
                 pass
         else:
