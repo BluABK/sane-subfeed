@@ -76,8 +76,7 @@ class ListDetailedView(QWidget):
                                        QTableWidgetItem(self.videos[row].date_published.isoformat(' ').split('.')[0]))
             self.subfeed_table.setItem(row, 4, QTableWidgetItem(self.videos[row].description))
             self.subfeed_table.setItem(row, 5, QTableWidgetItem("Not Implemented"))  # TODO: Implement missed
-            # self.subfeed_table.setItem(row, 6, QTableWidgetItem("Yes" if self.videos[row].downloaded else "No"))
-            self.subfeed_table.setItem(row, 6, QTableWidgetItem(str(self.videos[row].downloaded)))
+            self.subfeed_table.setItem(row, 6, QTableWidgetItem("Yes" if self.videos[row].downloaded else "No"))
             self.subfeed_table.setItem(row, 7, QTableWidgetItem("Yes" if self.videos[row].discarded else "No"))
 
             # Enable table sorting after the table has been populated otherwise sorting may interfere with the
@@ -111,5 +110,4 @@ class ListDetailedView(QWidget):
         Retrieve a list of VideoD objects
         :return:
         """
-        filter_dl = read_config('Gui', 'hide_downloaded')
-        self.videos = get_newest_stored_videos(self.vid_limit, filter_downloaded=filter_dl)
+        self.videos = get_newest_stored_videos(self.vid_limit)

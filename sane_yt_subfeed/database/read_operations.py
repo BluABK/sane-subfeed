@@ -14,7 +14,7 @@ def get_newest_stored_videos(limit, filter_downloaded=False):
 
     :param limit:
     :param filter_downloaded:
-    :return: list(Video) # FIXME: Should be VideoD!!
+    :return: list(VideoD)
     """
     if filter_downloaded:
         db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(Video.downloaded != '1').limit(
