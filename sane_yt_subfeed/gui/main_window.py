@@ -5,7 +5,7 @@
 import os
 
 # PyQt5 libs
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QVBoxLayout, QStackedWidget
 from PyQt5.QtGui import QIcon
 
 # Project internal libs
@@ -46,6 +46,13 @@ class MainWindow(QMainWindow):
         else:
             self.dimensions = [770, 700]
         self.position = position
+        self.central_widget = QStackedWidget()
+        self.setCentralWidget(self.central_widget)
+        self.grid_view = GridView(self, self.clipboard, self.statusBar())
+        self.central_widget.addWidget(self.grid_view)
+        self.list_tiled_view = ListTiledView(self, self.clipboard, self.statusBar())
+        self.central_widget.addWidget(self.list_tiled_view)
+        self.central_widget.setCurrentWidget(self.grid_view)
 
         self.init_ui()
 
@@ -99,10 +106,10 @@ class MainWindow(QMainWindow):
         if self.dimensions:
             self.resize(self.dimensions[0], self.dimensions[1])
 
-        # Set a default view and layout
-        window_layout = QVBoxLayout()
-        self.view_grid()
-        self.setLayout(window_layout)
+        # # Set a default view and layout
+        # window_layout = QVBoxLayout()
+        # self.view_grid()
+        # self.setLayout(window_layout)
 
         # Display the window
         self.show()
@@ -227,7 +234,7 @@ class MainWindow(QMainWindow):
         :return:
         """
         # FIXME: hotfix for actions using self.grid_view(refresh and copy urls)
-        self.grid_view = self.switch_view_destructively(self.spawn_grid_view())
+        self.central_widget.setCurrentWidget(self.grid_view)
 
     def view_subs(self):
         """
@@ -248,7 +255,7 @@ class MainWindow(QMainWindow):
         Set View variable and CentralWidget to ListTiledView
         :return:
         """
-        self.list_tiled_view = self.switch_view_destructively(self.spawn_list_tiled_view())
+        self.central_widget.setCurrentWidget(self.list_tiled_view)
 
     def view_about(self):
         """
