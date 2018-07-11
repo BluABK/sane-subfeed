@@ -2,14 +2,17 @@ import sys
 
 import click
 
-from sane_yt_subfeed.main import run_with_gui, run_print
+from sane_yt_subfeed.main import run_with_gui, run_print, run_channels_test
 
 
 @click.option(u'--no_gui', is_flag=True)
+@click.option(u'--test_channels', is_flag=True)
 @click.command()
-def cli(no_gui):
+def cli(no_gui, test_channels):
     if no_gui:
         run_print()
+    if test_channels:
+        run_channels_test()
     else:
         """
         PyQT raises and catches exceptions, but doesn't pass them along. 
