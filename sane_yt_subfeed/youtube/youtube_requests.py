@@ -7,8 +7,8 @@ from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session, engine
-from sane_yt_subfeed.database.write_operations import update_channel_from_remote, get_channel_by_id_stmt, \
-    engine_execute_first, engine_execute
+from sane_yt_subfeed.database.write_operations import engine_execute_first, engine_execute
+from sane_yt_subfeed.database.engine_statements import update_channel_from_remote, get_channel_by_id_stmt
 from sane_yt_subfeed.pickle_handler import load_sub_list, load_youtube, dump_youtube, dump_sub_list
 from sane_yt_subfeed.print_functions import remove_empty_kwargs
 import datetime

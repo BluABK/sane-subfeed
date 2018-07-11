@@ -7,8 +7,8 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.video import Video
-from sane_yt_subfeed.database.write_operations import update_video_statement_full, get_video_by_id_stmt, \
-    get_channel_by_id_stmt
+from sane_yt_subfeed.database.engine_statements import update_video_statement_full, get_channel_by_id_stmt, \
+    get_video_by_id_stmt
 
 engine = create_engine('sqlite:///../resources/permanents.db', convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
