@@ -82,7 +82,22 @@ def list_uploaded_videos(youtube_key, videos, uploads_playlist_id, req_limit):
             playlistitems_list_request, playlistitems_list_response)
 
 
-def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit):
+def list_uploaded_videos_page(youtube_key, videos, uploads_playlist_id, playlistitems_list_request=None):
+    if not playlistitems_list_request:
+        playlistitems_list_request = youtube_key.playlistItems().list(
+            maxResults=50, part='snippet', playlistId=uploads_playlist_id)
+
+    playlistitems_list_response = playlistitems_list_request.execute()
+
+    # Grab information about each video.
+    for search_result in playlistitems_list_response['items']:
+        videos.append(VideoD.playlist_item_new_video_d(search_result))
+
+    return youtube_key.playlistItems().list_next(
+        playlistitems_list_request, playlistitems_list_response)
+
+
+def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit, live_videos=True):
     """
     Get a list of videos through the API search()
     Quota cost: 100 units / response
@@ -92,7 +107,6 @@ def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit):
     :param youtube_key:
     :return: [list(dict): videos, dict: statistics]
     """
-    print('search')
     # Retrieve the list of videos uploaded to the authenticated user's channel.
     playlistitems_list_request = youtube_key.search().list(
         maxResults=50, part='snippet', channelId=channel_id, order='date')
@@ -103,7 +117,10 @@ def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit):
 
         # Grab information about each video.
         for search_result in playlistitems_list_response['items']:
-            print(search_result)
+            live_broadcast_snippet = search_result['snippet']['liveBroadcastContent']
+            live_broadcast = live_broadcast_snippet == 'none'
+            if (not live_videos) and (not live_broadcast):
+                break
             if search_result['id']['kind'] == 'youtube#video':
                 videos.append(VideoD(search_result))
         if search_pages >= req_limit:
