@@ -46,7 +46,6 @@ class GetUploadsThread(threading.Thread):
             counter = 0
             for test in channel.tests:
                 if test.test_miss < miss or test.test_pages > pages:
-                    print('{} - {}: {}, {}'.format(channel.title, channel.id, test.test_miss, test.test_pages))
                     used_list = True
                     db_session.remove()
                     counter += 1

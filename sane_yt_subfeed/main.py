@@ -1,5 +1,6 @@
 import datetime
 import sys
+import threading
 import time
 
 from PyQt5.QtWidgets import QApplication
@@ -44,13 +45,45 @@ def run_print():
 def run_channels_test():
     subscriptions = get_subscriptions(cached_subs)
     youtube_keys = load_keys(subscriptions)
+    test_threads = []
+    results = []
     for subscription, youtube_key in tqdm(zip(subscriptions, youtube_keys),
-                                          desc="Testing channels with playlistItem and search",
+                                          desc="Starting miss and pages tests",
                                           total=len(subscriptions)):
+        test = RunTestsThreaded(subscription, youtube_key, results)
+        test.start()
+        test_threads.append(test)
+    for thread in tqdm(test_threads, desc="Waiting for test threads"):
+        thread.join()
+
+    for result in results:
+        test = Test(result[0], result[1], result[2], result[3])
+        db_session.add(test)
+    db_session.commit()
+    db_session.remove()
+
+
+class RunTestsThreaded(threading.Thread):
+
+    def __init__(self, subscription, youtube_key, results):
+        """
+        Init GetUploadsThread
+        :param thread_id:
+        :param channel:
+        :param info:
+        :param debug:
+        """
+        threading.Thread.__init__(self)
+        self.subscription = subscription
+        self.youtube_key = youtube_key
+        self.results = results
+
+    # TODO: Handle failed requests
+    def run(self):
         search_videos = []
-        list_uploaded_videos_search(youtube_key, subscription.id, search_videos, 2, live_videos=False)
+        list_uploaded_videos_search(self.youtube_key, self.subscription.id, search_videos, 2, live_videos=False)
         playlist_videos = []
-        next_page = list_uploaded_videos_page(youtube_key, playlist_videos, subscription.playlist_id)
+        next_page = list_uploaded_videos_page(self.youtube_key, playlist_videos, self.subscription.playlist_id)
 
         test_miss = 0
         for search_video in search_videos:
@@ -85,7 +118,9 @@ def run_channels_test():
             test_pages += 1
             if test_pages > 30:
                 break
-            next_page = list_uploaded_videos_page(youtube_key, playlist_videos, subscription.playlist_id,
+            next_page = list_uploaded_videos_page(self.youtube_key, playlist_videos, self.subscription.playlist_id,
                                                   playlistitems_list_request=next_page)
-        db_session.add(Test(datetime.datetime.now(), test_pages, test_miss, subscription))
-        db_session.commit()
+
+        result = [datetime.datetime.now(), test_pages, test_miss, self.subscription]
+        self.results.append(result)
+
