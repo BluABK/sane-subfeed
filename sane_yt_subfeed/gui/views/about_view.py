@@ -68,5 +68,3 @@ class AboutView(QWidget):
         # layout.addWidget(QLabel(image_filename))
         # layout.addWidget(lbl)
 
-        self.show()
-

@@ -42,7 +42,6 @@ class ListDetailedView(QWidget):
         self.create_table_subfeed()
         layout.addWidget(self.subfeed_table)
 
-        self.show()
 
     def create_table_subfeed(self):
         """
