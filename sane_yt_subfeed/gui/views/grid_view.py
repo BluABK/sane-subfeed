@@ -1,19 +1,14 @@
 import os
 import time
 
-from PyQt5.QtWidgets import QWidget, QMessageBox, qApp, \
-    QMenu, QGridLayout, QLabel, QVBoxLayout, QLineEdit
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QWidget, qApp, QMenu, QGridLayout, QLabel, QVBoxLayout, QLineEdit, QApplication
 from PyQt5.QtGui import QPixmap, QPainter
-from sqlalchemy import desc
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.write_operations import UpdateVideo
 from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_videos, \
     get_newest_stored_videos
-from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.database.video import Video
-from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
-from sane_yt_subfeed.youtube.update_videos import refresh_uploads
 
 
 class ExtendedQLabel(QLabel):
@@ -45,22 +40,71 @@ class ExtendedQLabel(QLabel):
             painter.setRenderHint(QPainter.SmoothPixmapTransform)
             painter.drawPixmap(self.rect(), self.p)
 
-    def mouseReleaseEvent(self, ev):
-        print('clicked {:2d}: {} {} - {}'.format(self.img_id, self.video.url_video, self.video.channel_title,
-                                                 self.video.title))
+    def mousePressEvent(self, QMouseEvent):
+        """
+        Override mousePressEvent to support mouse button actions
+        :param QMouseEvent:
+        :return:
+        """
+        if QMouseEvent.button() == Qt.MidButton:
+            self.mark_discarded()
+        elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
+            print("Not Implemented: Select video")
+        elif QMouseEvent.button() == Qt.LeftButton:
+            self.mark_downloaded()
+
+    def contextMenuEvent(self, event):
+        """
+        Override context menu event to set own custom menu
+        :param event:
+        :return:
+        """
+        menu = QMenu(self)
+        copy_url_action = menu.addAction("Copy link")
+        downloaded_item_action = menu.addAction("Copy link and mark as downloaded")
+        discard_item_action = menu.addAction("Discard video")
+        quit_action = menu.addAction("Quit")
+        action = menu.exec_(self.mapToGlobal(event.pos()))
+        if action == copy_url_action:
+            self.copy_url()
+        elif action == downloaded_item_action:
+            self.mark_downloaded()
+        elif action == discard_item_action:
+            self.mark_discarded()
+        elif action == quit_action:
+            qApp.quit()
+
+    def copy_url(self):
+        """
+        Copy selected video URL(s) to clipboard
+        :return:
+        """
         self.clipboard.setText(self.video.url_video)
-        self.video.downloaded = True
-        UpdateVideo(self.video, update_existing=True).start()
         self.status_bar.showMessage('Copied URL to clipboard: {} ({} - {})'.format(self.video.url_video,
                                                                                    self.video.channel_title,
                                                                                    self.video.title))
 
-    def contextMenuEvent(self, event):
-        menu = QMenu(self)
-        quitAction = menu.addAction("Quit")
-        action = menu.exec_(self.mapToGlobal(event.pos()))
-        if action == quitAction:
-            qApp.quit()
+    def mark_downloaded(self):
+        """
+        Mark the video as downloaded
+        :return:
+        """
+        print('clicked {:2d}: {} {} - {}'.format(self.img_id, self.video.url_video, self.video.channel_title,
+                                                 self.video.title))
+        self.video.downloaded = True
+        UpdateVideo(self.video, update_existing=True).start()
+        self.copy_url()
+
+    def mark_discarded(self):    # FIXME: Discard instead of set downloaded property
+        """
+        Mark the video as discarded
+        :return:
+        """
+        self.video.downloaded = True
+        UpdateVideo(self.video, update_existing=True).start()
+        self.status_bar.showMessage('Dismissed: {} ({} - {})'.format(self.video.url_video,
+                                                                     self.video.channel_title,
+                                                                     self.video.title))
 
     # Get the system clipboard contents
     def clipboard_changed(self):
@@ -72,6 +116,8 @@ class ExtendedQLabel(QLabel):
 
 class GridView(QWidget):
     q_labels = []
+    items_x = None
+    items_y = None
 
     def __init__(self, parent, clipboard, status_bar, vid_limit=40):
         super(GridView, self).__init__(parent)
@@ -96,6 +142,7 @@ class GridView(QWidget):
         self.setLayout(grid)
 
         # video_item = "Video.thumb"
+        # FIXME: Will break if user specifies a grid larger than this list
         video_item = sublayout
         items = [video_item, video_item, video_item, video_item, video_item, video_item,
                  video_item, video_item, video_item, video_item, video_item, video_item,
@@ -104,7 +151,10 @@ class GridView(QWidget):
                  video_item, video_item, video_item, video_item, video_item, video_item,
                  video_item, video_item, video_item, video_item, video_item, video_item]
 
-        positions = [(i, j) for i in range(5) for j in range(4)]
+        self.items_x = read_config('Gui', 'grid_view_x')
+        self.items_y = read_config('Gui', 'grid_view_y')
+
+        positions = [(i, j) for i in range(self.items_x) for j in range(self.items_y)]
 
         counter = 0
         filter_dl = read_config('Gui', 'hide_downloaded')
@@ -126,7 +176,7 @@ class GridView(QWidget):
         for position, video_layout in zip(positions, items):
             if counter >= len(items):
                 break
-            if items == '':
+            if items == '':  # FIXME: Replace with None for making a blank slot, and also implement better.
                 continue
             # print(paths[counter])
             filename = subscription_feed[counter].thumbnail_path
