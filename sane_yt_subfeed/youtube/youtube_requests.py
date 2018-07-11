@@ -101,6 +101,7 @@ def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit, live
     """
     Get a list of videos through the API search()
     Quota cost: 100 units / response
+    :param live_videos:
     :param videos:
     :param req_limit:
     :param channel_id:
@@ -153,7 +154,7 @@ def get_remote_subscriptions(youtube_oauth):
                          disable=read_config('Debug', 'disable_tqdm')):
             # Get channel
             channel_respone = channels_list_by_id(youtube_oauth, part='contentDetails',
-                                          id=page['snippet']['resourceId']['channelId'])
+                                                  id=page['snippet']['resourceId']['channelId'])
 
             # Get ID of uploads playlist
             channel_uploads_playlist_id = channel_respone['items'][0]['contentDetails']['relatedPlaylists']['uploads']
