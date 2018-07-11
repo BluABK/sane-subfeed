@@ -48,10 +48,18 @@ class MainWindow(QMainWindow):
         self.position = position
         self.central_widget = QStackedWidget()
         self.setCentralWidget(self.central_widget)
+
         self.grid_view = GridView(self, self.clipboard, self.statusBar())
-        self.central_widget.addWidget(self.grid_view)
+        self.list_detailed_view = ListDetailedView(self, self.clipboard, self.statusBar())
         self.list_tiled_view = ListTiledView(self, self.clipboard, self.statusBar())
+        self.subs_view = SubscriptionsView(self, self.subs, self.clipboard, self.statusBar())
+        self.about_view = AboutView(self)
+
+        self.central_widget.addWidget(self.grid_view)
+        self.central_widget.addWidget(self.list_detailed_view)
         self.central_widget.addWidget(self.list_tiled_view)
+        self.central_widget.addWidget(self.subs_view)
+        self.central_widget.addWidget(self.about_view)
         self.central_widget.setCurrentWidget(self.grid_view)
 
         self.init_ui()
@@ -241,14 +249,14 @@ class MainWindow(QMainWindow):
         Set View variable and CentralWidget to SubscriptionsView
         :return:
         """
-        self.subs_view = self.switch_view_destructively(self.spawn_subs_view())
+        self.central_widget.setCurrentWidget(self.subs_view)
 
     def view_list_detailed(self):
         """
         Set View variable and CentralWidget to ListDetailedView
         :return:
         """
-        self.list_detailed_view = self.switch_view_destructively(self.spawn_list_detailed_view())
+        self.central_widget.setCurrentWidget(self.list_detailed_view)
 
     def view_list_tiled(self):
         """
@@ -262,7 +270,7 @@ class MainWindow(QMainWindow):
         Set View variable and CentralWidget to AboutView
         :return:
         """
-        self.about_view = self.switch_view_destructively(self.spawn_about_view())
+        self.central_widget.setCurrentWidget(self.about_view)
 
     # Function menu functions
     def clipboard_copy_urls(self):
