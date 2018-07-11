@@ -113,14 +113,12 @@ class UpdateVideo(threading.Thread):
 
 
 def check_for_unique(vid_list):
-    print('vid_list before compare: {}'.format(len(vid_list)))
     compare_set = set()
     for vid in vid_list:
         if vid.video_id in compare_set:
             vid_list.remove(vid)
         else:
             compare_set.add(vid.video_id)
-    print('vid_list after compare: {}'.format(len(vid_list)))
     return vid_list
 
 
