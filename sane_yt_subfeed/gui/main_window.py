@@ -5,7 +5,7 @@
 import os
 
 # PyQt5 libs
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QVBoxLayout, QStackedWidget
 from PyQt5.QtGui import QIcon
 
 # Project internal libs
@@ -17,6 +17,7 @@ from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
 # from sane_yt_subfeed.uploads import Uploads
 from sane_yt_subfeed.gui.views.grid_view import GridView
 from sane_yt_subfeed.gui.views.list_detailed_view import ListDetailedView
+from sane_yt_subfeed.gui.views.list_tiled_view import ListTiledView
 
 # Constants
 OS_PATH = os.path.dirname(__file__)
@@ -28,7 +29,8 @@ class MainWindow(QMainWindow):
     current_view = None
     grid_view = None
     subs_view = None
-    list_view = None
+    list_detailed_view = None
+    list_tiled_view = None
     about_view = None
     menus = None
 
@@ -44,6 +46,21 @@ class MainWindow(QMainWindow):
         else:
             self.dimensions = [770, 700]
         self.position = position
+        self.central_widget = QStackedWidget()
+        self.setCentralWidget(self.central_widget)
+
+        self.grid_view = GridView(self, self.clipboard, self.statusBar())
+        self.list_detailed_view = ListDetailedView(self, self.clipboard, self.statusBar())
+        self.list_tiled_view = ListTiledView(self, self.clipboard, self.statusBar())
+        self.subs_view = SubscriptionsView(self, self.subs, self.clipboard, self.statusBar())
+        self.about_view = AboutView(self)
+
+        self.central_widget.addWidget(self.grid_view)
+        self.central_widget.addWidget(self.list_detailed_view)
+        self.central_widget.addWidget(self.list_tiled_view)
+        self.central_widget.addWidget(self.subs_view)
+        self.central_widget.addWidget(self.about_view)
+        self.central_widget.setCurrentWidget(self.grid_view)
 
         self.init_ui()
 
@@ -71,9 +88,11 @@ class MainWindow(QMainWindow):
         self.add_menu(menubar, '&View')
         view_grid_view = self.add_submenu('&View', 'Grid', self.view_grid, shortcut='Ctrl+1',
                                           tooltip='View subscription feed as a grid', icon='grid_blue.png')
-        view_list_detailed_view = self.add_submenu('&View', 'Detailed List', self.view_list, shortcut='Ctrl+2',
-                                          tooltip='View subscription feed as a list')
-        view_subs_view = self.add_submenu('&View', 'Subscriptions', self.view_subs, shortcut='Ctrl+3',
+        view_list_detailed_view = self.add_submenu('&View', 'Detailed List', self.view_list_detailed, shortcut='Ctrl+2',
+                                                   tooltip='View subscription feed as a detailed list')
+        view_list_tiled_view = self.add_submenu('&View', 'Tiled List', self.view_list_tiled, shortcut='Ctrl+3',
+                                                tooltip='View subscription feed as a tiled list')
+        view_subs_view = self.add_submenu('&View', 'Subscriptions', self.view_subs, shortcut='Ctrl+4',
                                           tooltip='View Subscriptions', icon='subs.png')
 
         # Help menu
@@ -84,6 +103,7 @@ class MainWindow(QMainWindow):
         toolbar = self.addToolBar('View')
         toolbar.addAction(view_grid_view)
         toolbar.addAction(view_list_detailed_view)
+        toolbar.addAction(view_list_tiled_view)
         toolbar.addAction(view_subs_view)
         toolbar.addAction(view_about_view)
 
@@ -94,10 +114,10 @@ class MainWindow(QMainWindow):
         if self.dimensions:
             self.resize(self.dimensions[0], self.dimensions[1])
 
-        # Set a default view and layout
-        window_layout = QVBoxLayout()
-        self.view_grid()
-        self.setLayout(window_layout)
+        # # Set a default view and layout
+        # window_layout = QVBoxLayout()
+        # self.view_grid()
+        # self.setLayout(window_layout)
 
         # Display the window
         self.show()
@@ -157,12 +177,19 @@ class MainWindow(QMainWindow):
         # self.subs_view = SubscriptionsView(self.uploads, self.clipboard, self.statusBar())
         return SubscriptionsView(self.subs, self.clipboard, self.statusBar())
 
-    def spawn_list_view(self):
+    def spawn_list_detailed_view(self):
         """
-        Creates a new ListView
+        Creates a new ListDetailsView
         :return:
         """
         return ListDetailedView(self.clipboard, self.statusBar())
+
+    def spawn_list_tiled_view(self):
+        """
+        Creates a new ListTiledView
+        :return:
+        """
+        return ListTiledView(self.clipboard, self.statusBar())
 
     # Note: Keep putting this one at the end of spawns
     def spawn_about_view(self):
@@ -215,28 +242,35 @@ class MainWindow(QMainWindow):
         :return:
         """
         # FIXME: hotfix for actions using self.grid_view(refresh and copy urls)
-        self.grid_view = self.switch_view_destructively(self.spawn_grid_view())
+        self.central_widget.setCurrentWidget(self.grid_view)
 
     def view_subs(self):
         """
         Set View variable and CentralWidget to SubscriptionsView
         :return:
         """
-        self.subs_view = self.switch_view_destructively(self.spawn_subs_view())
+        self.central_widget.setCurrentWidget(self.subs_view)
 
-    def view_list(self):
+    def view_list_detailed(self):
         """
-        Set View variable and CentralWidget to ListView
+        Set View variable and CentralWidget to ListDetailedView
         :return:
         """
-        self.list_view = self.switch_view_destructively(self.spawn_list_view())
+        self.central_widget.setCurrentWidget(self.list_detailed_view)
+
+    def view_list_tiled(self):
+        """
+        Set View variable and CentralWidget to ListTiledView
+        :return:
+        """
+        self.central_widget.setCurrentWidget(self.list_tiled_view)
 
     def view_about(self):
         """
         Set View variable and CentralWidget to AboutView
         :return:
         """
-        self.about_view = self.switch_view_destructively(self.spawn_about_view())
+        self.central_widget.setCurrentWidget(self.about_view)
 
     # Function menu functions
     def clipboard_copy_urls(self):
