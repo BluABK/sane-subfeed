@@ -17,7 +17,8 @@ def update_video_statement_full(db_video):
         url_playlist_video=db_video.url_playlist_video,
         thumbnails=db_video.thumbnails,
         downloaded=db_video.downloaded,
-        search_item=db_video.search_item)
+        search_item=db_video.search_item,
+        discarded=db_video.discarded)
 
 
 def update_channel_from_remote(channel):
@@ -39,4 +40,4 @@ def insert_item(video):
             "description": video.description, "thumbnail_path": video.thumbnail_path,
             "playlist_pos": video.playlist_pos, "url_video": video.url_video,
             "url_playlist_video": video.url_playlist_video, "thumbnails": video.thumbnails,
-            "downloaded": video.downloaded, "search_item": video.search_item}
+            "downloaded": video.downloaded, "search_item": video.search_item, "discarded": video.discarded}
