@@ -1,34 +1,18 @@
 import threading
-from timeit import default_timer
 
-from sqlalchemy import text
-
-from sane_yt_subfeed.database import video
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
-from sane_yt_subfeed.database.orm import db_session, engine
+from sane_yt_subfeed.database.engine_statements import update_video_statement_full, get_video_by_id_stmt, insert_item
+from sane_yt_subfeed.database.orm import engine
 from sane_yt_subfeed.database.video import Video
 
 lock = threading.Lock()
 
 
-def update_statement_full(db_video):
-    return Video.__table__.update().where("video_id = '{}'".format(db_video.video_id)).values(
-        video_id=db_video.video_id,
-        channel_title=db_video.channel_title,
-        title=db_video.title,
-        date_published=db_video.date_published,
-        description=db_video.description,
-        thumbnail_path=db_video.thumbnail_path,
-        playlist_pos=db_video.playlist_pos,
-        url_video=db_video.url_video,
-        url_playlist_video=db_video.url_playlist_video,
-        thumbnails=db_video.thumbnails,
-        downloaded=db_video.downloaded,
-        search_item=db_video.search_item)
+def engine_execute_first(stmt):
+    return engine.execute(stmt).first()
 
-
-def get_video_by_id_stmt(video_d):
-    return Video.__table__.select().where(text("video_id = '{}'".format(video_d.video_id)))
+def engine_execute(stmt):
+    engine.execute(stmt)
 
 
 class UpdateVideosThread(threading.Thread):
@@ -64,7 +48,7 @@ class UpdateVideosThread(threading.Thread):
             db_video = engine.execute(stmt).first()
             if db_video:
                 if self.update_existing:
-                    items_to_update.append(update_statement_full(db_video))
+                    items_to_update.append(update_video_statement_full(db_video))
                 else:
                     pass
             else:
@@ -103,7 +87,7 @@ class UpdateVideo(threading.Thread):
         db_video = engine.execute(stmt).first()
         if db_video:
             if self.update_existing:
-                engine.execute(update_statement_full(self.video_d))
+                engine.execute(update_video_statement_full(self.video_d))
             else:
                 pass
         else:
@@ -113,21 +97,12 @@ class UpdateVideo(threading.Thread):
 
 
 def check_for_unique(vid_list):
-    print('vid_list before compare: {}'.format(len(vid_list)))
     compare_set = set()
     for vid in vid_list:
         if vid.video_id in compare_set:
             vid_list.remove(vid)
         else:
             compare_set.add(vid.video_id)
-    print('vid_list after compare: {}'.format(len(vid_list)))
     return vid_list
 
 
-def insert_item(video):
-    return {"video_id": video.video_id, "channel_title": video.channel_title,
-            'title': video.title, "date_published": video.date_published,
-            "description": video.description, "thumbnail_path": video.thumbnail_path,
-            "playlist_pos": video.playlist_pos, "url_video": video.url_video,
-            "url_playlist_video": video.url_playlist_video, "thumbnails": video.thumbnails,
-            "downloaded": video.downloaded, "search_item": video.search_item}
