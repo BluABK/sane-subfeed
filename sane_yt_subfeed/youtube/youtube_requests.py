@@ -8,7 +8,7 @@ from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session, engine
 from sane_yt_subfeed.database.write_operations import update_channel_from_remote, get_channel_by_id_stmt, \
-    engine_execute_first
+    engine_execute_first, engine_execute
 from sane_yt_subfeed.pickle_handler import load_sub_list, load_youtube, dump_youtube, dump_sub_list
 from sane_yt_subfeed.print_functions import remove_empty_kwargs
 import datetime
@@ -54,7 +54,7 @@ def channels_list_by_id(youtube_key, **kwargs):
     return response
 
 
-def list_uploaded_videos(youtube_key, videos, req_limit, uploads_playlist_id):
+def list_uploaded_videos(youtube_key, videos, uploads_playlist_id, req_limit):
     """
     Get a list of videos in a playlist
     :param req_limit:
@@ -135,15 +135,15 @@ def get_remote_subscriptions(youtube_oauth):
         for page in tqdm(subscription_list_response['items'], desc="Adding and updating channels by page",
                          disable=read_config('Debug', 'disable_tqdm')):
             # Get channel
-            channel = channels_list_by_id(youtube_oauth, part='contentDetails',
-                                          id=page['snippet']['channelId'])
+            channel_respone = channels_list_by_id(youtube_oauth, part='contentDetails',
+                                          id=page['snippet']['resourceId']['channelId'])
 
             # Get ID of uploads playlist
-            channel_uploads_playlist_id = channel['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+            channel_uploads_playlist_id = channel_respone['items'][0]['contentDetails']['relatedPlaylists']['uploads']
             channel = Channel(page['snippet'], channel_uploads_playlist_id)
             db_channel = engine_execute_first(get_channel_by_id_stmt(channel))
             if db_channel:
-                update_stmts.append(update_channel_from_remote(db_channel))
+                engine_execute(update_channel_from_remote(channel))
                 subs.append(channel)
             else:
                 # TODO: change to sqlalchemy core stmt
