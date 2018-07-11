@@ -18,7 +18,6 @@ YT_VIDEO_URL = YOUTUBE_URL + YOUTUBE_PARM_VIDEO
 
 
 def refresh_uploads():
-
     thread_increment = 0
     thread_list = []
     videos = []
@@ -26,9 +25,9 @@ def refresh_uploads():
     subscriptions = get_subscriptions(cached_subs)
     youtube_keys = load_keys(subscriptions)
 
-    print("Creating YouTube service object from API_KEY for %s channels:" % len(subscriptions))
     channels_limit = read_config('Debug', 'channels_limit')
-    for channel, youtube in tqdm(zip(subscriptions, youtube_keys)):
+    for channel, youtube in tqdm(zip(subscriptions, youtube_keys), desc="Creating video update threads",
+                                 disable=read_config('Debug', 'disable_tqdm')):
         thread = GetUploadsThread(thread_increment, youtube, channel.id, videos, 1)
         thread_list.append(thread)
         thread_increment += 1
@@ -36,12 +35,10 @@ def refresh_uploads():
             break
         # if thread_increment >= thread_limit:
         #     break
-    print("\nStarting threads:")
-    for t in tqdm(thread_list):
+    for t in tqdm(thread_list, desc="Starting video update threads", disable=read_config('Debug', 'disable_tqdm')):
         t.start()
 
-    print("\nCollecting data from %s threads:" % len(thread_list))
-    for t in tqdm(thread_list):
+    for t in tqdm(thread_list, desc="Waiting for video update threads", disable=read_config('Debug', 'disable_tqdm')):
         t.join()
 
     return sorted(videos, key=lambda video: video.date_published, reverse=True)
@@ -68,13 +65,11 @@ def generate_keys(key_number):
     keys = []
     threads = []
 
-    print("\nStarting key generation threads:")
-    for _ in tqdm(range(key_number)):
+    for _ in tqdm(range(key_number), desc="Starting key generation threads", disable=read_config('Debug', 'disable_tqdm')):
         t = GenerateKeys(keys)
         t.start()
         threads.append(t)
 
-    print("\nClosing key generation threads:")
-    for t in tqdm(threads):
+    for t in tqdm(threads, desc="Waiting for key generation threads", disable=read_config('Debug', 'disable_tqdm')):
         t.join()
     return keys
