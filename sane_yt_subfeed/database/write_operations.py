@@ -30,12 +30,14 @@ def update_video_statement_full(db_video):
 
 def update_channel_from_remote(channel):
     return Channel.__table__.update().where("id = '{}'".format(channel.id)).values(
-        title=channel.title, description=channel.description, snippet=channel.snippet, playlist_id=channel.id)
+        title=channel.title, description=channel.description, snippet=channel.snippet, playlist_id=channel.playlist_id)
 
 
 def engine_execute_first(stmt):
     return engine.execute(stmt).first()
 
+def engine_execute(stmt):
+    engine.execute(stmt)
 
 def get_channel_by_id_stmt(channel):
     return Channel.__table__.select().where(text("id = '{}'".format(channel.id)))

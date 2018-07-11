@@ -28,7 +28,7 @@ def refresh_uploads():
     channels_limit = read_config('Debug', 'channels_limit')
     for channel, youtube in tqdm(zip(subscriptions, youtube_keys), desc="Creating video update threads",
                                  disable=read_config('Debug', 'disable_tqdm')):
-        thread = GetUploadsThread(thread_increment, youtube, channel.id, videos, 1)
+        thread = GetUploadsThread(thread_increment, youtube, channel.id, channel.playlist_id, videos, 1)
         thread_list.append(thread)
         thread_increment += 1
         if 0 < channels_limit <= thread_increment:
