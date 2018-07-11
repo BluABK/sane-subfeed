@@ -25,13 +25,15 @@ def get_newest_stored_videos(limit, filter_downloaded=False):
     return Video.to_video_ds(db_videos)
 
 
-def compare_db_filtered(videos, limit):
+def compare_db_filtered(videos, limit, discarded=False, downloaded=False):
     return_list = []
     counter = 0
     for video in videos:
         db_vid = db_session.query(Video).get(video.video_id)
         if db_vid:
-            if db_vid.downloaded:
+            if db_vid.downloaded and downloaded:
+                continue
+            elif db_vid.discarded and discarded:
                 continue
             else:
                 return_list.append(db_vid.to_video_d(video))
@@ -49,7 +51,7 @@ def refresh_and_get_newest_videos(limit, filter_downloaded=False):
     videos = refresh_uploads()
     UpdateVideosThread(videos).start()
     if filter_downloaded:
-        return_list = compare_db_filtered(videos, limit)
+        return_list = compare_db_filtered(videos, limit, True, True)
     else:
         return_list = videos[:limit]
     return_list = download_thumbnails_threaded(return_list)
