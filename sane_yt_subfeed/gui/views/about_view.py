@@ -43,8 +43,8 @@ class AboutView(QWidget):
     q_labels = []
 
     # noinspection PyArgumentList
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent):
+        super(AboutView, self).__init__(parent)
         self.init_ui()
 
     def init_ui(self):

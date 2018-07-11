@@ -73,8 +73,8 @@ class ExtendedQLabel(QLabel):
 class GridView(QWidget):
     q_labels = []
 
-    def __init__(self, clipboard, status_bar, vid_limit=40):
-        super().__init__()
+    def __init__(self, parent, clipboard, status_bar, vid_limit=40):
+        super(GridView, self).__init__(parent)
         self.vid_limit = vid_limit
         self.clipboard = clipboard
         self.status_bar = status_bar

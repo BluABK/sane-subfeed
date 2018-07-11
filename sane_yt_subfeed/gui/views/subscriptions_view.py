@@ -9,8 +9,8 @@ from sane_yt_subfeed.config_handler import read_config
 class SubscriptionsView(QWidget):
     subs = None
 
-    def __init__(self, subs, clipboard, status_bar):
-        super().__init__()
+    def __init__(self, parent, subs, clipboard, status_bar):
+        super(SubscriptionsView, self).__init__(parent)
         self.config_file = None
         self.clipboard = clipboard
         self.status_bar = status_bar
