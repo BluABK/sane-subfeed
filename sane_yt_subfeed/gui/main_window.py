@@ -55,7 +55,6 @@ class MainWindow(QMainWindow):
         self.subs_view = SubscriptionsView(self, self.subs, self.clipboard, self.statusBar())
         self.about_view = AboutView(self)
 
-
         self.init_ui()
 
     def init_ui(self):

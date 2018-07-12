@@ -37,7 +37,8 @@ class DownloadThumbnail(threading.Thread):
             if self.force_dl_best:
                 force_download_best(self.video)
             else:
-                download_file(self.thumbnail_dict['url'], vid_path, crop=True, quality='high')
+                quality = get_best_thumbnail(self.video)
+                download_file(self.thumbnail_dict['url'], vid_path, crop=True, quality=quality)
 
 
 def get_thumbnail_path(vid):
@@ -96,7 +97,7 @@ def download_file(url, path, crop=False, quality=None):
     if quality_404_check(path):
         return False
     if crop:
-        crop_blackbars(path, quality=quality)
+        crop_blackbars(path, quality)
     return True
 
 
@@ -143,7 +144,7 @@ def force_download_best(video):
                 break
 
 
-def crop_blackbars(image_filename, quality='high'):
+def crop_blackbars(image_filename, quality):
     """
     Crop certain thumbnails that come shipped with black bars above and under
     Qualities affected by this affliction, and actions taken:
