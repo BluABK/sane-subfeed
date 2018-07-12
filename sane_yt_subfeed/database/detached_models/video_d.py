@@ -1,6 +1,6 @@
 import datetime
 
-from sane_yt_subfeed.database.video import Video
+import sane_yt_subfeed.database.video as video_file
 from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 
 
@@ -59,7 +59,7 @@ class VideoD:
             self.thumbnails['maxres'] = thumbnails_item['maxres']
 
     def to_video(self):
-        video = Video(self.search_item)
+        video = video_file.Video(self.search_item)
         video.downloaded = self.downloaded
         video.thumbnail_path = self.thumbnail_path
         video.discarded = self.discarded

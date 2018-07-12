@@ -2,6 +2,7 @@ import datetime
 from sqlalchemy import Boolean, DateTime, ForeignKey, Column, Integer, String
 
 from sane_yt_subfeed.database.decorators import TextPickleType
+from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 from sane_yt_subfeed.database.orm import PermanentBase
 
@@ -72,7 +73,7 @@ class Video(PermanentBase):
 
     @staticmethod
     def to_video_d(video):
-        video_d = Video(video.search_item)
+        video_d = VideoD(video.search_item)
         video_d.downloaded = video.downloaded
         video_d.thumbnail_path = video.thumbnail_path
         video_d.discarded = video.discarded

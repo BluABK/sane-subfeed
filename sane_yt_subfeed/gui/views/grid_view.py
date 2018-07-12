@@ -48,13 +48,12 @@ class ExtendedQLabel(QLabel):
         :param QMouseEvent:
         :return:
         """
-        self.parent.main_model.grid_view_listener.tileDownloaded.emit(self.video, self.id)
-        # if QMouseEvent.button() == Qt.MidButton:
-        #     self.mark_discarded()
-        # elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
-        #     print("Not Implemented: Select video")
-        # elif QMouseEvent.button() == Qt.LeftButton:
-        #     self.mark_downloaded()
+        if QMouseEvent.button() == Qt.MidButton:
+            self.mark_discarded()
+        elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
+            print("Not Implemented: Select video")
+        elif QMouseEvent.button() == Qt.LeftButton:
+            self.mark_downloaded()
 
     def contextMenuEvent(self, event):
         """
@@ -92,10 +91,10 @@ class ExtendedQLabel(QLabel):
         Mark the video as downloaded
         :return:
         """
-        print('Mark downloaded: {:2d}: {} {} - {}'.format(self.img_id, self.video.url_video, self.video.channel_title,
+        print('Mark downloaded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
                                                           self.video.title))
         self.video.downloaded = True
-        UpdateVideo(self.video, update_existing=True).start()
+        self.parent.main_model.grid_view_listener.tileDownloaded.emit(self.video, self.id)
         self.copy_url()
 
     def mark_discarded(self):
@@ -103,10 +102,10 @@ class ExtendedQLabel(QLabel):
         Mark the video as discarded
         :return:
         """
-        print('Mark discarded: {:2d}: {} {} - {}'.format(self.img_id, self.video.url_video, self.video.channel_title,
+        print('Mark discarded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
                                                          self.video.title))
         self.video.discarded = True
-        UpdateVideo(self.video, update_existing=True).start()
+        self.parent.main_model.grid_view_listener.tileDiscarded.emit(self.video, self.id)
         self.status_bar.showMessage('Dismissed: {} ({} - {})'.format(self.video.url_video,
                                                                      self.video.channel_title,
                                                                      self.video.title))
