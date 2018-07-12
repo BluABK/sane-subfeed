@@ -2,7 +2,6 @@ from PyQt5.QtCore import QThread
 
 # FIXME: imp*
 from sane_yt_subfeed.controller.listeners import *
-from sane_yt_subfeed.controller.test import MainWindowListener
 
 
 class MainModel:
@@ -24,11 +23,11 @@ class MainModel:
         self.database_listener.moveToThread(self.db_thread)
         self.db_thread.start()
 
-        self.m_window_listener = MWindowListener(self)
-        self.m_w_thread = QThread()
-        self.m_w_thread.setObjectName('m_w_thread')
-        self.m_window_listener.moveToThread(self.m_w_thread)
-        self.m_w_thread.start()
+        self.main_window_listener = MainWindowListener(self)
+        self.main_w_thread = QThread()
+        self.main_w_thread.setObjectName('main_w_thread')
+        self.main_window_listener.moveToThread(self.main_w_thread)
+        self.main_w_thread.start()
 
     def hide_video_item(self, index):
         del self.filtered_videos[index]
