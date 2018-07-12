@@ -38,7 +38,7 @@ class GridViewListener(QObject):
             time.sleep(2)
 
 
-class MWindowListener(QObject):
+class MainWindowListener(QObject):
     refreshVideos = pyqtSignal()
 
     def __init__(self, model):
