@@ -61,6 +61,40 @@ def read_config(section, option):
         return ast.literal_eval(defaults[section][option])
 
 
+def read_entire_config():
+    """
+    Reads the entire config file into a nested dict-list-dict
+    :return:
+    """
+    config = {}
+    for section in parser.sections():
+        # print("[{}]".format(section))
+        config[section] = []
+        section_option = {}
+        for option in parser.options(section):
+            value = read_config(section, option)
+            section_option[option] = value
+            config[section].append(section_option)
+
+    return config
+
+
+def get_sections():
+    """
+    Returns config sections
+    :return:
+    """
+    return parser.sections()
+
+
+def get_options(section):
+    """
+    Returns config sections
+    :return:
+    """
+    return parser.options(section)
+
+
 def set_config(section, key, value):
     parser.set(section, key, value)
 
