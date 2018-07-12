@@ -1,8 +1,10 @@
 import os
 
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel
+# from PyQt5 import Qt
+from PyQt5.QtCore import Qt     # PyCharm bug: Anything from QtCore will fail detection, but it *is* there.
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox
 
-from sane_yt_subfeed.config_handler import read_config, read_entire_config, get_sections, get_options
+from sane_yt_subfeed.config_handler import read_config, set_config, read_entire_config, get_sections, get_options
 
 
 class ConfigView(QWidget):
@@ -35,7 +37,10 @@ class ConfigView(QWidget):
         deco_r = "】 ███████████████████████"
         section_label_0 = QLabel('{}GUI{}'.format(deco_l, deco_r))
         option_label_0 = QLabel('Launch GUI?')
-        value_label_0 = QLabel(str(read_config('Gui', 'launch_gui')))
+        # value_label_0 = QLabel(str(read_config('Gui', 'launch_gui')))
+        value_label_0 = QCheckBox("(Default: {})".format(str(read_config('Gui', 'launch_gui'))), self)
+        value_label_0.setCheckState(2 if read_config('Gui', 'launch_gui') else 1)
+        value_label_0.stateChanged.connect(self.check_box_gui_launch_gui)
         option_label_1 = QLabel('Hide downloaded videos from feed')
         value_label_1 = QLabel(str(read_config('Gui', 'hide_downloaded')))
         option_label_2 = QLabel('Grid view X')
@@ -148,3 +153,99 @@ class ConfigView(QWidget):
         section_offset += 1
         layout.addWidget(option_label_20, (section_offset + 20), 0)
         layout.addWidget(value_label_20, (section_offset + 20), 1)
+
+    @staticmethod
+    def check_box_section_template(state):
+        """
+        Toggles the given setting between True and False
+        :param state: 0=unchecked, 1=tristate?, 2=checked
+        :return:
+        """
+        if state == Qt.Checked:
+            set_config('', '', '')
+        else:
+            set_config('', '', '')
+
+    @staticmethod
+    def check_box_gui_launch_gui(state):
+        """
+        Toggles the given setting between True and False
+        :param state: 0=unchecked, 1=tristate?, 2=checked
+        :return:
+        """
+        if state == Qt.Checked:
+            set_config('Gui', 'launch_gui', 'True')
+        else:
+            set_config('Gui', 'launch_gui', 'False')
+
+    @staticmethod
+    def check_box_gui_hide_downloaded(state):
+        """
+        Toggles the given setting between True and False
+        :param state: 0=unchecked, 1=tristate?, 2=checked
+        :return:
+        """
+        if state == Qt.Checked:
+            set_config('Gui', 'hide_downloaded', 'True')
+        else:
+            set_config('Gui', 'hide_downloaded', 'False')
+
+    @staticmethod
+    def check_box_debug_start_with_stored_videos(state):
+        """
+        Toggles the given setting between True and False
+        :param state: 0=unchecked, 1=tristate?, 2=checked
+        :return:
+        """
+        if state == Qt.Checked:
+            set_config('Debug', 'start_with_stored_videos', 'True')
+        else:
+            set_config('Debug', 'start_with_stored_videos', 'False')
+
+    @staticmethod
+    def check_box_debug_use_playlistitems(state):
+        """
+        Toggles the given setting between True and False
+        :param state: 0=unchecked, 1=tristate?, 2=checked
+        :return:
+        """
+        if state == Qt.Checked:
+            set_config('Debug', 'use_playlistitems', 'True')
+        else:
+            set_config('Debug', 'use_playlistitems', 'False')
+
+    @staticmethod
+    def disable_tooltips(state):
+        """
+        Toggles the given setting between True and False
+        :param state: 0=unchecked, 1=tristate?, 2=checked
+        :return:
+        """
+        if state == Qt.Checked:
+            set_config('Debug', 'disable_tooltips', 'True')
+        else:
+            set_config('Debug', 'disable_tooltips', 'False')
+
+    @staticmethod
+    def check_box_debug_disable_tqdm(state):
+        """
+        Toggles the given setting between True and False
+        :param state: 0=unchecked, 1=tristate?, 2=checked
+        :return:
+        """
+        if state == Qt.Checked:
+            set_config('Debug', 'disable_tqdm', 'True')
+        else:
+            set_config('Debug', 'disable_tqdm', 'False')
+
+    @staticmethod
+    def check_box_requests_use_tests(state):
+        """
+        Toggles the given setting between True and False
+        :param state: 0=unchecked, 1=tristate?, 2=checked
+        :return:
+        """
+        if state == Qt.Checked:
+            set_config('Requests', 'use_tests', 'True')
+        else:
+            set_config('Requests', 'use_tests', 'False')

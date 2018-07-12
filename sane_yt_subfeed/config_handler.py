@@ -95,6 +95,15 @@ def get_options(section):
     return parser.options(section)
 
 
-def set_config(section, key, value):
-    parser.set(section, key, value)
+def set_config(section, option, value):
+    """
+    Sets the givenm option's value
+    :param section:
+    :param option:
+    :param value:
+    :return:
+    """
+    parser.set(section, option, value)
+    with open(CONFIG_PATH, 'w') as config:
+        parser.write(config)
 
