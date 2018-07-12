@@ -5,11 +5,10 @@ from sane_yt_subfeed.controller.listeners import GridViewListener, DatabaseListe
 
 class MainModel:
 
-    def __init__(self, videos, grid, filtered_grid):
+    def __init__(self, videos, filtered_videos):
         super().__init__()
         self.videos = videos
-        self.grid = grid
-        self.filtered_grid = filtered_grid
+        self.filtered_videos = filtered_videos
 
         self.grid_view_listener = GridViewListener(self)
         self.grid_thread = QThread()
@@ -23,5 +22,5 @@ class MainModel:
         self.grid_view_listener.moveToThread(self.db_thread)
         self.db_thread.start()
 
-    def hide_grid_view_item(self, video, x, y):
-        print('{}{}{}'.format(video, x, y))
+    def hide_video_item(self, index):
+        del self.filtered_videos[index]
