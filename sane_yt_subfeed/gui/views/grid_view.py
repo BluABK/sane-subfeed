@@ -166,26 +166,9 @@ class GridView(QWidget):
 
         positions = [(i, j) for i in range(self.items_x) for j in range(self.items_y)]
 
-        counter = 0
-        # filter_dl = read_config('Gui', 'hide_downloaded')
-        # start_with_stored_videos = read_config('Debug', 'start_with_stored_videos')
-
-        # if start_with_stored_videos:
-        #     subscription_feed = get_newest_stored_videos(self.vid_limit, filter_downloaded=filter_dl)
-        #     if len(subscription_feed) < 1:
-        #         print('Used start_with_stored_videos=True, but there where no stored videos found')
-        #         print('Get new videos? (y)')
-        #         user_response = input()
-        #         if user_response == 'n':
-        #             exit(1)
-        #         else:
-        #             subscription_feed = refresh_and_get_newest_videos(self.vid_limit, filter_downloaded=filter_dl)
-        # else:
-        #     subscription_feed = refresh_and_get_newest_videos(self.vid_limit, filter_downloaded=filter_dl)
-        # print(positions)
-
         subscription_feed = self.main_model.filtered_videos
 
+        counter = 0
         for position, video_layout in zip(positions, items):
             if counter >= len(items):
                 break
@@ -201,7 +184,6 @@ class GridView(QWidget):
             counter += 1
 
     def videos_changed(self):
-        print('got videos changed')
         for q_label, video in zip(self.q_labels, self.main_model.filtered_videos):
             q_label.set_video(video)
             q_label.update()

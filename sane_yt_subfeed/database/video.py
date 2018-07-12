@@ -82,7 +82,7 @@ class Video(PermanentBase):
     def to_video_ds(videos):
         video_ds = []
         for video in videos:
-            video_ds.append(video)
+            video_ds.append(Video.to_video_d(video))
         return video_ds
 
     def video_d_update(self, video_d):
