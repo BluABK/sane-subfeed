@@ -11,7 +11,7 @@ from sane_yt_subfeed.database.write_operations import UpdateVideo
 
 class GridViewListener(QObject):
     tileDownloaded = pyqtSignal(VideoD, int)
-    tileDiscarded = pyqtSignal()
+    tileDiscarded = pyqtSignal(VideoD, int)
     hiddenVideosChanged = pyqtSignal()
 
     def __init__(self, model):
@@ -25,14 +25,13 @@ class GridViewListener(QObject):
     def tile_downloaded(self, video: Video, index):
         self.model.hide_video_item(index)
         self.hiddenVideosChanged.emit()
-        UpdateVideo(video)
+        UpdateVideo(video, update_existing=True).start()
 
-
-    @pyqtSlot()
-    def tile_discarded(self):
-        print('hi')
-        time.sleep(2)
-        print('hello')
+    @pyqtSlot(VideoD, int)
+    def tile_discarded(self, video: Video, index):
+        self.model.hide_video_item(index)
+        self.hiddenVideosChanged.emit()
+        UpdateVideo(video, update_existing=True).start()
 
     def run(self):
         while True:

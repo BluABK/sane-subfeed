@@ -23,7 +23,7 @@ def get_newest_stored_videos(limit, filter_downloaded=False):
         db_videos = db_session.query(Video).order_by(desc(Video.date_published)).limit(limit).all()
     videos = Video.to_video_ds(db_videos)
     db_session.remove()
-    return Video.to_video_ds(videos)
+    return videos
 
 
 def compare_db_filtered(videos, limit, discarded=False, downloaded=False):
