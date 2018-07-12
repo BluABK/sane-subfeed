@@ -60,7 +60,7 @@ def download_thumbnails_threaded(vid_list):
         t.join()
 
     # UpdateVideosThread(vid_list).start()
-    return vid_list
+    # return vid_list
     # db_session.commit()
 
 

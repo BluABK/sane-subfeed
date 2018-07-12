@@ -48,7 +48,7 @@ class UpdateVideosThread(threading.Thread):
             db_video = engine.execute(stmt).first()
             if db_video:
                 if self.update_existing:
-                    items_to_update.append(update_video_statement_full(db_video))
+                    engine.execute(update_video_statement_full(video_d))
                 else:
                     pass
             else:
@@ -59,8 +59,9 @@ class UpdateVideosThread(threading.Thread):
 
         if len(items_to_add) > 0:
             engine.execute(Video.__table__.insert(), items_to_add)
-        if len(items_to_update) > 0:
-            engine.execute(items_to_update)
+        # FIXME: https://stackoverflow.com/questions/25694234/bulk-update-in-sqlalchemy-core-using-where
+        # if len(items_to_update) > 0:
+        #     engine.execute(items_to_update)
         lock.release()
 
 

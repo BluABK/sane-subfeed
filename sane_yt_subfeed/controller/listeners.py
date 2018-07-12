@@ -6,10 +6,11 @@ from PyQt5.QtWidgets import *
 
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.video import Video
+from sane_yt_subfeed.database.write_operations import UpdateVideo
 
 
 class GridViewListener(QObject):
-    tileDownloaded = pyqtSignal(Video, int)
+    tileDownloaded = pyqtSignal(VideoD, int)
     tileDiscarded = pyqtSignal()
     hiddenVideosChanged = pyqtSignal()
 
@@ -24,6 +25,7 @@ class GridViewListener(QObject):
     def tile_downloaded(self, video: Video, index):
         self.model.hide_video_item(index)
         self.hiddenVideosChanged.emit()
+        UpdateVideo(video)
 
 
     @pyqtSlot()
