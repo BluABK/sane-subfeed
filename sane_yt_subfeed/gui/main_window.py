@@ -12,6 +12,7 @@ from PyQt5.QtGui import QIcon
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_videos
 from sane_yt_subfeed.gui.views.about_view import AboutView
+from sane_yt_subfeed.gui.views.config_view import ConfigView
 from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
 from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
 # from sane_yt_subfeed.uploads import Uploads
@@ -53,6 +54,7 @@ class MainWindow(QMainWindow):
         self.list_detailed_view = ListDetailedView(self, self.clipboard, self.statusBar())
         self.list_tiled_view = ListTiledView(self, self.clipboard, self.statusBar())
         self.subs_view = SubscriptionsView(self, self.subs, self.clipboard, self.statusBar())
+        self.config_view = ConfigView(self, self.clipboard, self.statusBar())
         self.about_view = AboutView(self)
 
         self.init_ui()
@@ -66,6 +68,8 @@ class MainWindow(QMainWindow):
         self.add_menu(menubar, '&File')
         self.add_submenu('&File', 'Exit', qApp.quit, shortcut='Ctrl+Q', tooltip='Exit application')
 
+        view_config_view = self.add_submenu('&File', 'Preferences', self.view_config, shortcut='Ctrl+P',
+                                            tooltip='Change application settings')
         # Function menu
         self.add_menu(menubar, '&Function')
 
@@ -117,6 +121,7 @@ class MainWindow(QMainWindow):
         self.central_widget.addWidget(self.list_detailed_view)
         self.central_widget.addWidget(self.list_tiled_view)
         self.central_widget.addWidget(self.subs_view)
+        self.central_widget.addWidget(self.config_view)
         self.central_widget.addWidget(self.about_view)
         self.central_widget.setCurrentWidget(self.grid_view)
         self.show()
@@ -159,45 +164,52 @@ class MainWindow(QMainWindow):
             raise ValueError("add_submenu('{}', '{}', ...) ERROR: '{}' not in menus dict!".format(menu, name, menu))
         return submenu  # FIXME: Used by toolbar to avoid redefining items
 
-    # View handling
-    def spawn_grid_view(self):
-        """
-        Creates a new GridView(QWidget) instance
-        :return:
-        """
-        # self.grid_view = GridView(self.uploads, self.clipboard, self.statusBar())
-        return GridView(self.clipboard, self.statusBar())
-
-    def spawn_subs_view(self):
-        """
-        Creates a new SubscriptionView(QWidget) instance
-        :return:
-        """
-        # self.subs_view = SubscriptionsView(self.uploads, self.clipboard, self.statusBar())
-        return SubscriptionsView(self.subs, self.clipboard, self.statusBar())
-
-    def spawn_list_detailed_view(self):
-        """
-        Creates a new ListDetailsView
-        :return:
-        """
-        return ListDetailedView(self.clipboard, self.statusBar())
-
-    def spawn_list_tiled_view(self):
-        """
-        Creates a new ListTiledView
-        :return:
-        """
-        return ListTiledView(self.clipboard, self.statusBar())
-
-    # Note: Keep putting this one at the end of spawns
-    def spawn_about_view(self):
-        """
-        Creates a new AboutView(QWidget) instance
-        :return:
-        """
-        # self.subs_view = SubscriptionsView(self.uploads, self.clipboard, self.statusBar())
-        return AboutView()
+    # # View handling
+    # def spawn_grid_view(self):
+    #     """
+    #     Creates a new GridView(QWidget) instance
+    #     :return:
+    #     """
+    #     # self.grid_view = GridView(self.uploads, self.clipboard, self.statusBar())
+    #     return GridView(self.clipboard, self.statusBar())
+    #
+    # def spawn_subs_view(self):
+    #     """
+    #     Creates a new SubscriptionView(QWidget) instance
+    #     :return:
+    #     """
+    #     # self.subs_view = SubscriptionsView(self.uploads, self.clipboard, self.statusBar())
+    #     return SubscriptionsView(self.subs, self.clipboard, self.statusBar())
+    #
+    # def spawn_list_detailed_view(self):
+    #     """
+    #     Creates a new ListDetailsView
+    #     :return:
+    #     """
+    #     return ListDetailedView(self.clipboard, self.statusBar())
+    #
+    # def spawn_list_tiled_view(self):
+    #     """
+    #     Creates a new ListTiledView
+    #     :return:
+    #     """
+    #     return ListTiledView(self.clipboard, self.statusBar())
+    #
+    # def spawn_config_view(self):
+    #     """
+    #     Creates a new ConfigView
+    #     :return:
+    #     """
+    #     return ConfigView(self.clipboard, self.statusBar())
+    #
+    # # Note: Keep putting this one at the end of spawns
+    # def spawn_about_view(self):
+    #     """
+    #     Creates a new AboutView(QWidget) instance
+    #     :return:
+    #     """
+    #     # self.subs_view = SubscriptionsView(self.uploads, self.clipboard, self.statusBar())
+    #     return AboutView()
 
     @staticmethod
     def hide_widget(widget):  # TODO: Deferred usage (Garbage collection issue)
@@ -263,6 +275,13 @@ class MainWindow(QMainWindow):
         :return:
         """
         self.central_widget.setCurrentWidget(self.list_tiled_view)
+
+    def view_config(self):
+        """
+        Set View variable and CentralWidget to ConfigView
+        :return:
+        """
+        self.central_widget.setCurrentWidget(self.config_view)
 
     def view_about(self):
         """
