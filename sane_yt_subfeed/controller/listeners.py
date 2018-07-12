@@ -4,7 +4,9 @@ import time
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
+from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
+from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_videos
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideo
 
@@ -52,7 +54,12 @@ class MainWindowListener(QObject):
 
     @pyqtSlot()
     def refresh_videos(self):
-        print('refresh')
+        hide_downloaded = read_config('Gui', 'hide_downloaded')
+        if hide_downloaded:
+            self.model.filtered_videos = refresh_and_get_newest_videos(self.model.videos_limit, hide_downloaded)
+            self.model.grid_view_listener.hiddenVideosChanged.emit()
+        else:
+            self.model.videos = refresh_and_get_newest_videos(self.model.videos_limit, hide_downloaded)
 
 
 class DatabaseListener(QObject):
