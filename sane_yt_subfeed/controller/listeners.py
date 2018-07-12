@@ -38,7 +38,36 @@ class GridViewListener(QObject):
             time.sleep(2)
 
 
+class MWindowListener(QObject):
+    refreshVideos = pyqtSignal()
+
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
+        self.refreshVideos.connect(self.refresh_videos)
+
+    def run(self):
+        while True:
+            time.sleep(2)
+
+    @pyqtSlot()
+    def refresh_videos(self):
+        print('refresh')
+
 
 class DatabaseListener(QObject):
     databaseUpdated = pyqtSignal()
+    refreshVideos = pyqtSignal()
 
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
+        self.refreshVideos.connect(self.refresh_videos)
+
+    def run(self):
+        while True:
+            time.sleep(2)
+
+    @pyqtSlot()
+    def refresh_videos(self):
+        print('refresh')
