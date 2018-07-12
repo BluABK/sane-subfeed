@@ -32,7 +32,7 @@ defaults = {
         'grid_view_y': '4'
     },
     'Thumbnails': {
-        'force_download_best': 'False',
+        'force_download_best': 'True',
         '0': 'maxres',
         '1': 'standard',
         '2': 'high',
