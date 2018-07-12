@@ -10,6 +10,7 @@ from PyQt5.QtGui import QIcon
 
 # Project internal libs
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_videos
 from sane_yt_subfeed.gui.views.about_view import AboutView
 from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
@@ -35,7 +36,7 @@ class MainWindow(QMainWindow):
     menus = None
 
     # noinspection PyArgumentList
-    def __init__(self, main_model, dimensions=None, position=None):
+    def __init__(self, main_model: MainModel, dimensions=None, position=None):
         super().__init__()
         self.main_model = main_model
 
@@ -77,8 +78,10 @@ class MainWindow(QMainWindow):
                          tooltip='Copy URLs of all currently visible videos to clipboard')
 
         # refresh_list
-        self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
-                         tooltip='Refresh the subscription feed')
+        # self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
+        #                  tooltip='Refresh the subscription feed'
+        # self.add_submenu('&Function', 'Refresh Feed', self.main_model.main_window_listener.refreshVideos.emit(), shortcut='Ctrl+R',
+        #                  tooltip='Refresh the subscription feed')
 
         # View menu
         self.add_menu(menubar, '&View')
