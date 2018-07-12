@@ -21,6 +21,7 @@ class ExtendedQLabel(QLabel):
         self.video = video
         self.set_video(video)
         self.img_id = img_id
+        self.parent = parent
 
     def setPixmap(self, p):
         self.p = p
@@ -46,12 +47,15 @@ class ExtendedQLabel(QLabel):
         :param QMouseEvent:
         :return:
         """
-        if QMouseEvent.button() == Qt.MidButton:
-            self.mark_discarded()
-        elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
-            print("Not Implemented: Select video")
-        elif QMouseEvent.button() == Qt.LeftButton:
-            self.mark_downloaded()
+        self.parent.controller.grid_view_listener.tileDownloaded.emit(self.video, 1, 2)
+        time.sleep(2)
+        print('Title changed to: {}'.format(self.video.title))
+        # if QMouseEvent.button() == Qt.MidButton:
+        #     self.mark_discarded()
+        # elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
+        #     print("Not Implemented: Select video")
+        # elif QMouseEvent.button() == Qt.LeftButton:
+        #     self.mark_downloaded()
 
     def contextMenuEvent(self, event):
         """
@@ -121,12 +125,13 @@ class GridView(QWidget):
     items_x = None
     items_y = None
 
-    def __init__(self, parent, clipboard, status_bar, vid_limit=40):
+    def __init__(self, parent, controller, clipboard, status_bar, vid_limit=40):
         super(GridView, self).__init__(parent)
         self.vid_limit = vid_limit
         self.clipboard = clipboard
         self.status_bar = status_bar
         self.init_ui()
+        self.controller = controller
 
     def init_ui(self):
         # self.setGeometry(500, 500, 300, 220)

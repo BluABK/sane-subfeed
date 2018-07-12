@@ -9,6 +9,7 @@ from timeit import default_timer
 
 from tqdm import tqdm
 
+from sane_yt_subfeed.controller.controller import Controller
 from sane_yt_subfeed.database.models import Test
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.gui.main_window import MainWindow
@@ -29,10 +30,8 @@ print_statistics = True
 # Create controller object
 
 def run_with_gui():
-    app = QApplication(sys.argv)
-    ex = MainWindow()
-    # ex = GridView(subscription_feed[:20])
-    app.exec_()
+    controller = Controller()
+    controller.run()
 
 
 def run_print():

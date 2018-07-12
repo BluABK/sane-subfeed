@@ -54,7 +54,7 @@ class AboutView(QWidget):
         img_filename = os.path.join(IMG_PATH, 'about.png')
         img = ExtendedQLabel(self, img_filename)
         img.set_image(img_filename)
-        img.show()
+        # img.show()
         self.q_labels.append(img)
         layout.addWidget(img)
         # img.setPixmap(QPixmap(img_filename))

@@ -88,7 +88,7 @@ class ListDetailedView(QWidget):
         # table selection change
         self.subfeed_table.doubleClicked.connect(self.on_doubleclick)
 
-        self.subfeed_table.show()
+        # self.subfeed_table.show()
 
     def on_doubleclick(self):
         """
