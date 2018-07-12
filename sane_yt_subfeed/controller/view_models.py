@@ -32,6 +32,6 @@ class MainModel:
 
     def hide_video_item(self, index):
         del self.filtered_videos[index]
-        if self.filtered_videos < self.videos_limit:
+        if len(self.filtered_videos) < self.videos_limit:
             # TODO: implement this with listener
             print('Filtered videos less than videos limit: TODO')
