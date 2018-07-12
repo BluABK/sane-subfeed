@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QWidget, qApp, QMenu, QGridLayout, QLabel, QVBoxLayo
 from PyQt5.QtGui import QPixmap, QPainter
 
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.database.write_operations import UpdateVideo
 from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_videos, \
     get_newest_stored_videos
@@ -13,14 +14,14 @@ from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_vide
 
 class ExtendedQLabel(QLabel):
 
-    def __init__(self, parent, video, img_id, clipboard, status_bar):
+    def __init__(self, parent, video, id, clipboard, status_bar):
         QLabel.__init__(self, parent)
         # self.clipboard().dataChanged.connect(self.clipboard_changed)
         self.clipboard = clipboard
         self.status_bar = status_bar
         self.video = video
         self.set_video(video)
-        self.img_id = img_id
+        self.id = id
         self.parent = parent
 
     def setPixmap(self, p):
@@ -47,9 +48,7 @@ class ExtendedQLabel(QLabel):
         :param QMouseEvent:
         :return:
         """
-        self.parent.controller.grid_view_listener.tileDownloaded.emit(self.video, 1, 2)
-        time.sleep(2)
-        print('Title changed to: {}'.format(self.video.title))
+        self.parent.main_model.grid_view_listener.tileDownloaded.emit(self.video, self.id)
         # if QMouseEvent.button() == Qt.MidButton:
         #     self.mark_discarded()
         # elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
@@ -124,17 +123,21 @@ class GridView(QWidget):
     q_labels = []
     items_x = None
     items_y = None
+    main_model = None
 
-    def __init__(self, parent, controller, clipboard, status_bar, vid_limit=40):
+    def __init__(self, parent, main_model: MainModel, clipboard, status_bar, vid_limit=40):
         super(GridView, self).__init__(parent)
         self.vid_limit = vid_limit
         self.clipboard = clipboard
         self.status_bar = status_bar
+        self.main_model = main_model
+
         self.init_ui()
-        self.controller = controller
 
     def init_ui(self):
         # self.setGeometry(500, 500, 300, 220)
+
+        self.main_model.grid_view_listener.hiddenVideosChanged.connect(self.videos_changed)
 
         grid = QGridLayout()
         grid.setSpacing(10)
@@ -164,22 +167,25 @@ class GridView(QWidget):
         positions = [(i, j) for i in range(self.items_x) for j in range(self.items_y)]
 
         counter = 0
-        filter_dl = read_config('Gui', 'hide_downloaded')
-        start_with_stored_videos = read_config('Debug', 'start_with_stored_videos')
+        # filter_dl = read_config('Gui', 'hide_downloaded')
+        # start_with_stored_videos = read_config('Debug', 'start_with_stored_videos')
 
-        if start_with_stored_videos:
-            subscription_feed = get_newest_stored_videos(self.vid_limit, filter_downloaded=filter_dl)
-            if len(subscription_feed) < 1:
-                print('Used start_with_stored_videos=True, but there where no stored videos found')
-                print('Get new videos? (y)')
-                user_response = input()
-                if user_response == 'n':
-                    exit(1)
-                else:
-                    subscription_feed = refresh_and_get_newest_videos(self.vid_limit, filter_downloaded=filter_dl)
-        else:
-            subscription_feed = refresh_and_get_newest_videos(self.vid_limit, filter_downloaded=filter_dl)
+        # if start_with_stored_videos:
+        #     subscription_feed = get_newest_stored_videos(self.vid_limit, filter_downloaded=filter_dl)
+        #     if len(subscription_feed) < 1:
+        #         print('Used start_with_stored_videos=True, but there where no stored videos found')
+        #         print('Get new videos? (y)')
+        #         user_response = input()
+        #         if user_response == 'n':
+        #             exit(1)
+        #         else:
+        #             subscription_feed = refresh_and_get_newest_videos(self.vid_limit, filter_downloaded=filter_dl)
+        # else:
+        #     subscription_feed = refresh_and_get_newest_videos(self.vid_limit, filter_downloaded=filter_dl)
         # print(positions)
+
+        subscription_feed = self.main_model.filtered_videos
+
         for position, video_layout in zip(positions, items):
             if counter >= len(items):
                 break
@@ -193,3 +199,9 @@ class GridView(QWidget):
             grid.addWidget(lbl, *position)
 
             counter += 1
+
+    def videos_changed(self):
+        print('got videos changed')
+        for q_label, video in zip(self.q_labels, self.main_model.filtered_videos):
+            q_label.set_video(video)
+            q_label.update()

@@ -9,8 +9,9 @@ from sane_yt_subfeed.database.video import Video
 
 
 class GridViewListener(QObject):
-    tileDownloaded = pyqtSignal(Video, int, int)
+    tileDownloaded = pyqtSignal(Video, int)
     tileDiscarded = pyqtSignal()
+    hiddenVideosChanged = pyqtSignal()
 
     def __init__(self, model):
         super().__init__()
@@ -19,9 +20,11 @@ class GridViewListener(QObject):
         self.tileDownloaded.connect(self.tile_downloaded)
         self.tileDiscarded.connect(self.tile_discarded)
 
-    @pyqtSlot(VideoD, int, int)
-    def tile_downloaded(self, video: Video, x, y):
-        self.model.hide_grid_view_item(video, x, y)
+    @pyqtSlot(VideoD, int)
+    def tile_downloaded(self, video: Video, index):
+        self.model.hide_video_item(index)
+        self.hiddenVideosChanged.emit()
+
 
     @pyqtSlot()
     def tile_discarded(self):

@@ -35,9 +35,9 @@ class MainWindow(QMainWindow):
     menus = None
 
     # noinspection PyArgumentList
-    def __init__(self, controller, dimensions=None, position=None):
+    def __init__(self, main_model, dimensions=None, position=None):
         super().__init__()
-        self.controller = controller
+        self.main_model = main_model
 
         for fakech in range(100):
             self.subs.append("Fake channel #{:3d}".format(fakech))
@@ -51,7 +51,7 @@ class MainWindow(QMainWindow):
         self.central_widget = QStackedWidget()
         self.setCentralWidget(self.central_widget)
 
-        self.grid_view = GridView(self, controller, self.clipboard, self.statusBar())
+        self.grid_view = GridView(self, main_model, self.clipboard, self.statusBar())
         self.list_detailed_view = ListDetailedView(self, self.clipboard, self.statusBar())
         self.list_tiled_view = ListTiledView(self, self.clipboard, self.statusBar())
         self.subs_view = SubscriptionsView(self, self.subs, self.clipboard, self.statusBar())
