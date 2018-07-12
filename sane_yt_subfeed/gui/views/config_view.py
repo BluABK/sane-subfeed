@@ -1,58 +1,34 @@
 import os
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, qApp, QMenu, QGridLayout, QLabel, QVBoxLayout, QLineEdit, QApplication, QHBoxLayout
-from PyQt5.QtGui import QPixmap, QPainter
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel
 
 from sane_yt_subfeed.config_handler import read_config, read_entire_config, get_sections, get_options
 
 
 class ConfigView(QWidget):
+    """
+    Configuration widget
+    """
 
     def __init__(self, parent, clipboard, status_bar):
+        """
+        A GUI Widget that reads and sets config.ini settings
+        :param parent:
+        :param clipboard:
+        :param status_bar:
+        """
         super(ConfigView, self).__init__(parent)
-        # self.config_file = None
         self.clipboard = clipboard
         self.status_bar = status_bar
         self.init_ui()
 
     def init_ui(self):
+        """
+        Initialize UI
+        :return:
+        """
         layout = QGridLayout()
-        option_layout = QHBoxLayout()
         self.setLayout(layout)
-
-        config = read_entire_config()
-        print(config)
-        items = []
-        for section in config:
-            for i in range(len(config[section])):
-                items.append(option_layout)
-
-        positions = [(i, j) for i in range(len(items)) for j in range(2)]
-
-        counter = 0
-        # for section, options_list in config:        # {[section: [options]}
-        #     for options_dict in options_list:       # [options]
-        #         for option, value in options_dict:  # {option: value}
-        config = {}
-        # for section in get_sections():
-        #     # print("[{}]".format(section))
-        #     config[section] = []
-        #     section_option = {}
-        #     for option in get_options(section):
-        #         value = read_config(section, option)
-        #         section_option[option] = value
-        #         config[section].append(section_option)
-
-                # for position, option_layout in zip(positions, items):
-                #     if option == '':  # FIXME: Replace with None for making a blank slot, and also implement better.
-                #         continue
-                #     option_label = QLabel(option)
-                #     option_layout.addWidget(option_label)
-                #     layout.addWidget(option_layout, *position)
-                #     option_layout.addWidget(QLabel(str(value)))
-
-
 
         # Section [Gui]
         deco_l = "███████████████████████ 【"
@@ -118,67 +94,57 @@ class ConfigView(QWidget):
         layout.addWidget(section_label_0, (section_offset + 0), 0)
         section_offset += 1
         layout.addWidget(option_label_0, (section_offset + 0), 0)
+        layout.addWidget(value_label_0, (section_offset + 0), 1)
         layout.addWidget(option_label_1, (section_offset + 1), 0)
+        layout.addWidget(value_label_1, (section_offset + 1), 1)
         layout.addWidget(option_label_2, (section_offset + 2), 0)
+        layout.addWidget(value_label_2, (section_offset + 2), 1)
         layout.addWidget(option_label_3, (section_offset + 3), 0)
+        layout.addWidget(value_label_3, (section_offset + 3), 1)
 
         layout.addWidget(section_label_1, (section_offset + 4), 0)
         section_offset += 1
         layout.addWidget(option_label_4, (section_offset + 4), 0)
+        layout.addWidget(value_label_4, (section_offset + 4), 1)
         layout.addWidget(option_label_5, (section_offset + 5), 0)
+        layout.addWidget(value_label_5, (section_offset + 5), 1)
         layout.addWidget(option_label_6, (section_offset + 6), 0)
+        layout.addWidget(value_label_6, (section_offset + 6), 1)
         layout.addWidget(option_label_7, (section_offset + 7), 0)
+        layout.addWidget(value_label_7, (section_offset + 7), 1)
         layout.addWidget(option_label_8, (section_offset + 8), 0)
+        layout.addWidget(value_label_8, (section_offset + 8), 1)
         layout.addWidget(option_label_9, (section_offset + 9), 0)
+        layout.addWidget(value_label_9, (section_offset + 9), 1)
+        layout.addWidget(value_label_9, (section_offset + 9), 1)
         layout.addWidget(option_label_10, (section_offset + 10), 0)
+        layout.addWidget(value_label_10, (section_offset + 10), 1)
 
         layout.addWidget(section_label_2, (section_offset + 11), 0)
         section_offset += 1
         layout.addWidget(option_label_11, (section_offset + 11), 0)
+        layout.addWidget(value_label_11, (section_offset + 11), 1)
         layout.addWidget(option_label_12, (section_offset + 12), 0)
+        layout.addWidget(value_label_12, (section_offset + 12), 1)
         layout.addWidget(option_label_13, (section_offset + 13), 0)
+        layout.addWidget(value_label_13, (section_offset + 13), 1)
 
         layout.addWidget(section_label_3, (section_offset + 14), 0)
         section_offset += 1
         layout.addWidget(option_label_14, (section_offset + 14), 0)
+        layout.addWidget(value_label_14, (section_offset + 14), 1)
         layout.addWidget(option_label_15, (section_offset + 15), 0)
+        layout.addWidget(value_label_15, (section_offset + 15), 1)
         layout.addWidget(option_label_16, (section_offset + 16), 0)
+        layout.addWidget(value_label_16, (section_offset + 16), 1)
         layout.addWidget(option_label_17, (section_offset + 17), 0)
+        layout.addWidget(value_label_17, (section_offset + 17), 1)
         layout.addWidget(option_label_18, (section_offset + 18), 0)
+        layout.addWidget(value_label_18, (section_offset + 18), 1)
         layout.addWidget(option_label_19, (section_offset + 19), 0)
+        layout.addWidget(value_label_19, (section_offset + 19), 1)
 
         layout.addWidget(section_label_4, (section_offset + 20), 0)
         section_offset += 1
         layout.addWidget(option_label_20, (section_offset + 20), 0)
-
-        # # Section [Gui]
-        # layout.addWidget(QLabel('launch_gui'), (0, 0)) # = True
-        # layout.addWidget(QLabel('hide_downloaded'), (1, 0)) # = True
-        # layout.addWidget(QLabel('grid_view'), (2, 0)) # _x = 5
-        # layout.addWidget(QLabel('grid_view'), (3, 0)) # _y = 4
-        #
-        # # Section [Debug]
-        # layout.addWidget(QLabel('debug'), (4, 0)) #  = False
-        # layout.addWidget(QLabel('cached_subs'), (5, 0)) #  = True
-        # layout.addWidget(QLabel('start_with_stored_videos'), (6, 0)) #  = False
-        # layout.addWidget(QLabel('channels_limit'), (7, 0)) #  = -1
-        # layout.addWidget(QLabel('use_playlistItems'), (8, 0)) #  = True
-        # layout.addWidget(QLabel('disable_tooltips'), (9, 0)) #  = False
-        # layout.addWidget(QLabel('disable_tqdm'), (10, 0)) #  = True
-        #
-        # # Section [Requests]
-        # layout.addWidget(QLabel('use_tests'), (11, 0)) #  = False
-        # layout.addWidget(QLabel('miss_limit'), (12, 0)) #  = 10
-        # layout.addWidget(QLabel('test_pages'), (13, 0)) #  = 2
-        #
-        # # Section [Thumbnails]
-        # layout.addWidget(QLabel('force_download_best'), (14, 0)) #  = True
-        # layout.addWidget(QLabel('0'), (15, 0)) #  = maxres
-        # layout.addWidget(QLabel('1'), (16, 0)) #  = standard
-        # layout.addWidget(QLabel('2'), (17, 0)) #  = high
-        # layout.addWidget(QLabel('3'), (18, 0)) #  = medium
-        # layout.addWidget(QLabel('4'), (19, 0)) #  = default
-        #
-        # # Section [Threading]
-        # layout.addWidget(QLabel('img_threads'), (20, 0)) #   = 200
-
+        layout.addWidget(value_label_20, (section_offset + 20), 1)
