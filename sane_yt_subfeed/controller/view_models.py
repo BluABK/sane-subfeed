@@ -6,8 +6,9 @@ from sane_yt_subfeed.controller.listeners import *
 
 class MainModel:
 
-    def __init__(self, videos, filtered_videos):
+    def __init__(self, videos, filtered_videos, videos_limit):
         super().__init__()
+        self.videos_limit = videos_limit
         self.videos = videos
         self.filtered_videos = filtered_videos
 
@@ -31,3 +32,6 @@ class MainModel:
 
     def hide_video_item(self, index):
         del self.filtered_videos[index]
+        if self.filtered_videos < self.videos_limit:
+            # TODO: implement this with listener
+            print('Filtered videos less than videos limit: TODO')

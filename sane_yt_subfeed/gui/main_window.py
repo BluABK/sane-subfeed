@@ -80,8 +80,8 @@ class MainWindow(QMainWindow):
         # refresh_list
         # self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
         #                  tooltip='Refresh the subscription feed'
-        # self.add_submenu('&Function', 'Refresh Feed', self.main_model.main_window_listener.refreshVideos.emit(), shortcut='Ctrl+R',
-        #                  tooltip='Refresh the subscription feed')
+        self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
+                         tooltip='Refresh the subscription feed')
 
         # View menu
         self.add_menu(menubar, '&View')
@@ -293,12 +293,8 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage('Copied {} URLs to clipboard'.format(len(urls.splitlines())))
 
     def refresh_list(self):
-        # hide_downloaded = read_config('Gui', 'hide_downloaded')
-        # vid_list = refresh_and_get_newest_videos(40, hide_downloaded)
-        # for q_label, video in zip(self.grid_view.q_labels, vid_list):
-        #     q_label.set_video(video)
-        #     q_label.update()
-        self.controller.grid_view_listener.tileDiscarded.emit()
+
+        self.main_model.main_window_listener.refreshVideos.emit()
 
     # Unused functions
     def context_menu_event(self, event):  # TODO: Unused, planned usage in future
