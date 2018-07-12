@@ -121,7 +121,7 @@ class GridView(QWidget):
     items_x = None
     items_y = None
 
-    def __init__(self, parent, clipboard, status_bar, vid_limit=40):
+    def __init__(self, parent, clipboard, status_bar, vid_limit=100):
         super(GridView, self).__init__(parent)
         self.vid_limit = vid_limit
         self.clipboard = clipboard
@@ -151,12 +151,15 @@ class GridView(QWidget):
                  video_item, video_item, video_item, video_item, video_item, video_item,
                  video_item, video_item, video_item, video_item, video_item, video_item,
                  video_item, video_item, video_item, video_item, video_item, video_item,
+                 video_item, video_item, video_item, video_item, video_item, video_item,
+                 video_item, video_item, video_item, video_item, video_item, video_item,
+                 video_item, video_item, video_item, video_item, video_item, video_item,
                  video_item, video_item, video_item, video_item, video_item, video_item]
 
         self.items_x = read_config('Gui', 'grid_view_x')
         self.items_y = read_config('Gui', 'grid_view_y')
 
-        positions = [(i, j) for i in range(self.items_x) for j in range(self.items_y)]
+        positions = [(i, j) for i in range(self.items_y) for j in range(self.items_x)]
 
         counter = 0
         filter_dl = read_config('Gui', 'hide_downloaded')
