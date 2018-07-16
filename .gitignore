@@ -16,6 +16,7 @@ config.ini
 
 # python
 __pycache__
+*.pyc
 
 # gui mess
 *.jpg
