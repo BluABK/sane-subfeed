@@ -61,7 +61,7 @@ class AboutView(QWidget):
 
         # img.show()
 
-        # lbl = ExtendedQLabel(self)
+        # lbl = VideoTile(self)
         # lbl.set_image(image_filename)
         # lbl.show()
         # self.q_labels.append(lbl)
