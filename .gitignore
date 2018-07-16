@@ -23,3 +23,6 @@ __pycache__
 
 # 404 Thumbnail
 !quality404.jpg
+
+# logs
+logs/
