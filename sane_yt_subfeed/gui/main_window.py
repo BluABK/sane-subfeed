@@ -10,6 +10,7 @@ from PyQt5.QtGui import QIcon
 
 # Project internal libs
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_videos
 from sane_yt_subfeed.gui.views.about_view import AboutView
 from sane_yt_subfeed.gui.views.config_view import ConfigView
@@ -36,8 +37,10 @@ class MainWindow(QMainWindow):
     menus = None
 
     # noinspection PyArgumentList
-    def __init__(self, dimensions=None, position=None):
+    def __init__(self, main_model: MainModel, dimensions=None, position=None):
         super().__init__()
+        self.main_model = main_model
+
         for fakech in range(100):
             self.subs.append("Fake channel #{:3d}".format(fakech))
         self.clipboard = QApplication.clipboard()
@@ -50,7 +53,7 @@ class MainWindow(QMainWindow):
         self.central_widget = QStackedWidget()
         self.setCentralWidget(self.central_widget)
 
-        self.grid_view = GridView(self, self.clipboard, self.statusBar())
+        self.grid_view = GridView(self, main_model, self.clipboard, self.statusBar())
         self.list_detailed_view = ListDetailedView(self, self.clipboard, self.statusBar())
         self.list_tiled_view = ListTiledView(self, self.clipboard, self.statusBar())
         self.subs_view = SubscriptionsView(self, self.subs, self.clipboard, self.statusBar())
@@ -78,6 +81,8 @@ class MainWindow(QMainWindow):
                          tooltip='Copy URLs of all currently visible videos to clipboard')
 
         # refresh_list
+        # self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
+        #                  tooltip='Refresh the subscription feed'
         self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
                          tooltip='Refresh the subscription feed')
 
@@ -124,7 +129,7 @@ class MainWindow(QMainWindow):
         self.central_widget.addWidget(self.config_view)
         self.central_widget.addWidget(self.about_view)
         self.central_widget.setCurrentWidget(self.grid_view)
-        self.show()
+
 
     # Menu handling
     def add_menu(self, menubar, name):
@@ -306,11 +311,7 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage('Copied {} URLs to clipboard'.format(len(urls.splitlines())))
 
     def refresh_list(self):
-        hide_downloaded = read_config('Gui', 'hide_downloaded')
-        vid_list = refresh_and_get_newest_videos(40, hide_downloaded)
-        for q_label, video in zip(self.grid_view.q_labels, vid_list):
-            q_label.set_video(video)
-            q_label.update()
+        self.main_model.main_window_listener.refreshVideos.emit()
 
     # Unused functions
     def context_menu_event(self, event):  # TODO: Unused, planned usage in future
