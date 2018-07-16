@@ -26,7 +26,6 @@ class Controller:
         # self.thread.start()
         # self.grid_view_listener.moveToThread(self.thread)
 
-
     def run(self):
         filter_dl = read_config('Gui', 'hide_downloaded')
         start_with_stored_videos = read_config('Debug', 'start_with_stored_videos')
@@ -48,4 +47,3 @@ class Controller:
         window = MainWindow(model)
         window.show()
         app.exec_()
-
