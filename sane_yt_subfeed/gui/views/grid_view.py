@@ -10,6 +10,7 @@ from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.database.write_operations import UpdateVideo
 from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_videos, \
     get_newest_stored_videos
+from sane_yt_subfeed.log_handler import logger
 
 
 class ExtendedQLabel(QLabel):
@@ -91,7 +92,7 @@ class ExtendedQLabel(QLabel):
         Mark the video as downloaded
         :return:
         """
-        print('Mark downloaded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
+        logger.info('Mark downloaded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
                                                           self.video.title))
         self.video.downloaded = True
         self.parent.main_model.grid_view_listener.tileDownloaded.emit(self.video, self.id)
@@ -102,7 +103,7 @@ class ExtendedQLabel(QLabel):
         Mark the video as discarded
         :return:
         """
-        print('Mark discarded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
+        logger.info('Mark discarded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
                                                          self.video.title))
         self.video.discarded = True
         self.parent.main_model.grid_view_listener.tileDiscarded.emit(self.video, self.id)
@@ -113,7 +114,7 @@ class ExtendedQLabel(QLabel):
     # Get the system clipboard contents
     def clipboard_changed(self):
         text = self.clipboard().text()
-        print(text)
+        logger.info(text)
 
         self.b.insertPlainText(text + '\n')
 
@@ -134,6 +135,7 @@ class GridView(QWidget):
         self.init_ui()
 
     def init_ui(self):
+        logger.info("Initializing GridView UI")
         # self.setGeometry(500, 500, 300, 220)
 
         self.main_model.grid_view_listener.hiddenVideosChanged.connect(self.videos_changed)
