@@ -20,6 +20,7 @@ from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
 from sane_yt_subfeed.gui.views.grid_view import GridView
 from sane_yt_subfeed.gui.views.list_detailed_view import ListDetailedView
 from sane_yt_subfeed.gui.views.list_tiled_view import ListTiledView
+from sane_yt_subfeed.log_handler import logger
 
 # Constants
 OS_PATH = os.path.dirname(__file__)
@@ -129,7 +130,6 @@ class MainWindow(QMainWindow):
         self.central_widget.addWidget(self.config_view)
         self.central_widget.addWidget(self.about_view)
         self.central_widget.setCurrentWidget(self.grid_view)
-
 
     # Menu handling
     def add_menu(self, menubar, name):
@@ -311,6 +311,7 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage('Copied {} URLs to clipboard'.format(len(urls.splitlines())))
 
     def refresh_list(self):
+        logger.info("Reloading subfeed")
         self.main_model.main_window_listener.refreshVideos.emit()
 
     # Unused functions
