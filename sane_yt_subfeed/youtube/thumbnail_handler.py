@@ -38,7 +38,10 @@ class DownloadThumbnail(threading.Thread):
                 force_download_best(self.video)
             else:
                 quality = get_best_thumbnail(self.video)
-                download_file(self.thumbnail_dict['url'], vid_path, crop=True, quality=quality)
+                crop = False
+                if 'standard' in quality['quality'] or 'high' in quality['quality'] or 'default' in quality['quality']:
+                    crop = True
+                download_file(self.thumbnail_dict['url'], vid_path, crop=crop, quality=quality['quality'])
 
 
 def get_thumbnail_path(vid):
@@ -73,7 +76,11 @@ def set_thumbnail(video):
             force_download_best(video)
         else:
             thumbnail_dict = get_best_thumbnail(video)
-            download_file(thumbnail_dict['url'], vid_path)
+            crop = False
+            if 'standard' in thumbnail_dict['quality'] or 'high' in thumbnail_dict['quality'] or 'default' in \
+                    thumbnail_dict['quality']:
+                crop = True
+            download_file(thumbnail_dict['url'], vid_path, quality=thumbnail_dict['quality'], crop=crop)
     video.thumbnail_path = vid_path
 
 
@@ -93,7 +100,6 @@ def download_file(url, path, crop=False, quality=None):
     http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
     with http.request('GET', url, preload_content=False) as r, open(path, 'wb') as out_file:
         shutil.copyfileobj(r, out_file)
-    # FIXME: Move crop to a proper place -- HACK: crop images as they get downloaded
     if quality_404_check(path):
         return False
     if crop:
@@ -123,7 +129,7 @@ def force_download_best(video):
                 break
         if quality == 'standard':
             temp_url = url + '{url_quality}.jpg'.format_map(defaultdict(url_quality='sddefault'))
-            if download_file(temp_url, vid_path, crop=False, quality=quality):
+            if download_file(temp_url, vid_path, crop=True, quality=quality):
                 # Got 404 image, try lower quality
                 break
         if quality == 'high':
@@ -133,7 +139,7 @@ def force_download_best(video):
                 break
         if quality == 'medium':
             temp_url = url + '{url_quality}.jpg'.format_map(defaultdict(url_quality='mqdefault'))
-            if download_file(temp_url, vid_path, crop=True, quality=quality):
+            if download_file(temp_url, vid_path, crop=False, quality=quality):
                 # Got 404 image, try lower quality
                 break
         if quality == 'default':
@@ -154,7 +160,6 @@ def crop_blackbars(image_filename, quality):
 
     coords: A tuple of x/y coordinates (x1, y1, x2, y2) or (left, top, right, bottom)
     :param image_filename:
-    :param image_path:
     :param quality:
     :return:
     """
