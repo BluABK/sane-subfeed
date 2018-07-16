@@ -16,6 +16,7 @@ from sane_yt_subfeed.gui.main_window import MainWindow
 from sane_yt_subfeed.youtube.update_videos import refresh_uploads, load_keys
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions, list_uploaded_videos, \
     list_uploaded_videos_search, list_uploaded_videos_page
+from sane_yt_subfeed.log_handler import logger
 
 cached_subs = True
 global_debug = False
@@ -30,6 +31,7 @@ print_statistics = True
 # Create controller object
 
 def run_with_gui():
+    logger.info('Running with GUI')
     controller = Controller()
     controller.run()
 
@@ -42,6 +44,7 @@ def run_print():
 
 
 def run_channels_test():
+    logger.info('Running Channels test')
     subscriptions = get_subscriptions(cached_subs)
     youtube_keys = load_keys(subscriptions)
     test_threads = []

@@ -3,6 +3,7 @@ import sys
 import click
 
 from sane_yt_subfeed.main import run_with_gui, run_print, run_channels_test
+from sane_yt_subfeed.log_handler import logger
 
 
 @click.option(u'--no_gui', is_flag=True)
@@ -24,9 +25,10 @@ def cli(no_gui, test_channels):
         def my_exception_hook(exctype, value, traceback):
             # Print the error and traceback
             print('QT override:\n', exctype, value, traceback)
+            logger.exception(value, exctype, traceback)
             # Call the normal Exception hook after
             sys._excepthook(exctype, value, traceback)
-            sys.exit(1)
+            # sys.exit(1)
 
         # Set the exception hook to our wrapping function
         sys.excepthook = my_exception_hook
@@ -34,5 +36,5 @@ def cli(no_gui, test_channels):
         run_with_gui()
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # FIXME: Dead code, since __main__.py?
     cli()
