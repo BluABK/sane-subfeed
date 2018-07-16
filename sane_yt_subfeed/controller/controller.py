@@ -41,7 +41,7 @@ class Controller:
                     subscription_feed = refresh_and_get_newest_videos(self.vid_limit, filter_downloaded=filter_dl)
         else:
             subscription_feed = refresh_and_get_newest_videos(self.vid_limit, filter_downloaded=filter_dl)
-        model = MainModel([], subscription_feed, 200)
+        model = MainModel([], subscription_feed, self.vid_limit)
 
         app = QApplication(sys.argv)
         window = MainWindow(model)

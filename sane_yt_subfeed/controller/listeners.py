@@ -52,17 +52,19 @@ class MainWindowListener(QObject):
     def run(self):
         while True:
             time.sleep(2)
+            logger.debug('MainWindowListener: is alive')
+        logger.error('MainWindowListener finished')
 
     @pyqtSlot()
     def refresh_videos(self):
         logger.info("Reloading subfeed")
         hide_downloaded = read_config('Gui', 'hide_downloaded')
         if hide_downloaded:
-            self.model.filtered_videos = refresh_and_get_newest_videos(self.model.videos_limit, hide_downloaded)
+            self.model.remote_update_videos()
             self.model.grid_view_listener.hiddenVideosChanged.emit()
         else:
-            self.model.videos = refresh_and_get_newest_videos(self.model.videos_limit, hide_downloaded)
-
+            self.model.remote_update_videos()
+            logger.debug('MainWindowListener: not implemented disabled hide_downloaded')
 
 class DatabaseListener(QObject):
     databaseUpdated = pyqtSignal()
