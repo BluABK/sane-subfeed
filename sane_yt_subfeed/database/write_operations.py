@@ -83,7 +83,7 @@ class UpdateVideo(threading.Thread):
         :return:
         """
         # start = default_timer()
-        # lock.acquire()
+        lock.acquire()
         stmt = get_video_by_id_stmt(VideoD.to_video(self.video_d))
         db_video = engine.execute(stmt).first()
         if db_video:
@@ -94,7 +94,7 @@ class UpdateVideo(threading.Thread):
         else:
             engine.execute(Video.__table__.insert(), insert_item(self.video_d))
         print('Updated: {}'.format(self.video_d.title))
-        # lock.release()
+        lock.release()
 
 
 def check_for_unique(vid_list):

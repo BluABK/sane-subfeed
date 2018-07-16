@@ -42,6 +42,7 @@ class DownloadThumbnail(threading.Thread):
                 if 'standard' in quality['quality'] or 'high' in quality['quality'] or 'default' in quality['quality']:
                     crop = True
                 download_file(self.thumbnail_dict['url'], vid_path, crop=crop, quality=quality['quality'])
+        self.thread_list.remove(self)
 
 
 def get_thumbnail_path(vid):
@@ -52,14 +53,14 @@ def download_thumbnails_threaded(vid_list):
     thread_list = []
     thread_limit = int(read_config('Threading', 'img_threads'))
     force_dl_best = read_config('Thumbnails', 'force_download_best')
-    for vid in vid_list:
+    for vid in tqdm(vid_list, desc="Starting thumbnail threads", disable=read_config('Debug', 'disable_tqdm')):
         thumbnail_dict = get_best_thumbnail(vid)
         t = DownloadThumbnail(thread_list, vid, force_dl_best, thumbnail_dict)
         thread_list.append(t)
         t.start()
         while len(thread_list) >= thread_limit:
             time.sleep(0.0001)
-
+    time.sleep(0.01)
     for t in tqdm(thread_list, desc="Waiting on thumbnail threads", disable=read_config('Debug', 'disable_tqdm')):
         t.join()
 

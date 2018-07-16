@@ -32,6 +32,7 @@ class ExtendedQLabel(QLabel):
         self.video = video
         self.set_tool_tip()
         self.setPixmap(QPixmap(video.thumbnail_path))
+        self.update()
 
     def set_tool_tip(self):
         if not read_config('Debug', 'disable_tooltips'):
@@ -125,9 +126,8 @@ class GridView(QWidget):
     items_y = None
     main_model = None
 
-    def __init__(self, parent, main_model: MainModel, clipboard, status_bar, vid_limit=40):
+    def __init__(self, parent, main_model: MainModel, clipboard, status_bar):
         super(GridView, self).__init__(parent)
-        self.vid_limit = vid_limit
         self.clipboard = clipboard
         self.status_bar = status_bar
         self.main_model = main_model
@@ -188,6 +188,7 @@ class GridView(QWidget):
             counter += 1
 
     def videos_changed(self):
+        logger.info('GridView: Updating tiles')
         for q_label, video in zip(self.q_labels, self.main_model.filtered_videos):
             q_label.set_video(video)
-            q_label.update()
+            # q_label.update()
