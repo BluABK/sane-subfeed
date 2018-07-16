@@ -94,7 +94,7 @@ class ExtendedQLabel(QLabel):
         :return:
         """
         logger.info('Mark downloaded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
-                                                          self.video.title))
+                                                                self.video.title))
         self.video.downloaded = True
         self.parent.main_model.grid_view_listener.tileDownloaded.emit(self.video, self.id)
         self.copy_url()
@@ -105,7 +105,7 @@ class ExtendedQLabel(QLabel):
         :return:
         """
         logger.info('Mark discarded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
-                                                         self.video.title))
+                                                               self.video.title))
         self.video.discarded = True
         self.parent.main_model.grid_view_listener.tileDiscarded.emit(self.video, self.id)
         self.status_bar.showMessage('Dismissed: {} ({} - {})'.format(self.video.url_video,
@@ -136,59 +136,29 @@ class GridView(QWidget):
 
     def init_ui(self):
         logger.info("Initializing GridView UI")
-        # self.setGeometry(500, 500, 300, 220)
 
         self.main_model.grid_view_listener.hiddenVideosChanged.connect(self.videos_changed)
 
         grid = QGridLayout()
         grid.setSpacing(10)
-
-        sublayout = QVBoxLayout()
-        label1 = QLabel('AAAAAAAAAAAAAAAA')
-        line_edit1 = QLineEdit()
-        sublayout.addWidget(label1)
-        # sublayout.addWidget(line_edit1)
-        # grid.addLayout(sublayout, 4, 0, 1, 3)
-
         self.setLayout(grid)
-
-        # video_item = "Video.thumb"
-        # FIXME: Will break if user specifies a grid larger than this list
-        video_item = sublayout
-        items = [video_item, video_item, video_item, video_item, video_item, video_item,
-                 video_item, video_item, video_item, video_item, video_item, video_item,
-                 video_item, video_item, video_item, video_item, video_item, video_item,
-                 video_item, video_item, video_item, video_item, video_item, video_item,
-                 video_item, video_item, video_item, video_item, video_item, video_item,
-                 video_item, video_item, video_item, video_item, video_item, video_item,
-                 video_item, video_item, video_item, video_item, video_item, video_item,
-                 video_item, video_item, video_item, video_item, video_item, video_item,
-                 video_item, video_item, video_item, video_item, video_item, video_item]
 
         self.items_x = read_config('Gui', 'grid_view_x')
         self.items_y = read_config('Gui', 'grid_view_y')
 
-        positions = [(i, j) for i in range(self.items_y) for j in range(self.items_x)]
-
         subscription_feed = self.main_model.filtered_videos
 
         counter = 0
-        for position, video_layout in zip(positions, items):
-            if counter >= len(items):
+        positions = [(i, j) for i in range(self.items_y) for j in range(self.items_x)]
+        for position in positions:
+            if counter >= len(positions):
                 break
-            if items == '':  # FIXME: Replace with None for making a blank slot, and also implement better.
-                continue
-            # print(paths[counter])
-            filename = subscription_feed[counter].thumbnail_path
             lbl = ExtendedQLabel(self, subscription_feed[counter], counter, self.clipboard, self.status_bar)
             self.q_labels.append(lbl)
-            video_layout.addWidget(QLabel(filename))
             grid.addWidget(lbl, *position)
-
             counter += 1
 
     def videos_changed(self):
         logger.info('GridView: Updating tiles')
         for q_label, video in zip(self.q_labels, self.main_model.filtered_videos):
             q_label.set_video(video)
-            # q_label.update()
