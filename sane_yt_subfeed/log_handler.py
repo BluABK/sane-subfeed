@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import os
 import logging
 
@@ -20,13 +23,15 @@ logger.setLevel(logging.DEBUG)
 # create file handler which logs even debug messages
 if not os.path.exists(LOGDIR):
     os.makedirs(LOGDIR)
-fh = logging.FileHandler(os.path.join(LOGDIR, 'debug.log'))
+fh = logging.FileHandler(os.path.join(LOGDIR, 'debug.log'), encoding="UTF-8")
 fh.setLevel(logging.DEBUG)
 # create console handler with a higher log level
 ch = logging.StreamHandler()
 ch.setLevel(logging.ERROR)
+# patch the default logging formatter to use unicode format string
+logging._defaultFormatter = logging.Formatter(u"%(message)s")
 # create formatter and add it to the handlers
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter(u'%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 fh.setFormatter(formatter)
 ch.setFormatter(formatter)
 # add the handlers to the logger
