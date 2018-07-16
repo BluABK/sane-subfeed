@@ -27,6 +27,6 @@ class SubscriptionsView(QWidget):
         # for sub in self.subs:
         sublist.addItems(self.subs)
         sublist2.addItems(reversed(self.subs))
-        sublist.show()
+        # sublist.show()
 
 
