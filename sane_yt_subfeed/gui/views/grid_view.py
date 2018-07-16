@@ -13,10 +13,10 @@ from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_vide
 from sane_yt_subfeed.log_handler import logger
 
 
-class ExtendedQLabel(QLabel):
+class VideoTile(QWidget):
 
     def __init__(self, parent, video, id, clipboard, status_bar):
-        QLabel.__init__(self, parent)
+        QWidget.__init__(self, parent)
         # self.clipboard().dataChanged.connect(self.clipboard_changed)
         self.clipboard = clipboard
         self.status_bar = status_bar
@@ -153,7 +153,7 @@ class GridView(QWidget):
         for position in positions:
             if counter >= len(positions):
                 break
-            lbl = ExtendedQLabel(self, subscription_feed[counter], counter, self.clipboard, self.status_bar)
+            lbl = VideoTile(self, subscription_feed[counter], counter, self.clipboard, self.status_bar)
             self.q_labels.append(lbl)
             grid.addWidget(lbl, *position)
             counter += 1
