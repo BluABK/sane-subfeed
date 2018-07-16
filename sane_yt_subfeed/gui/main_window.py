@@ -311,7 +311,6 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage('Copied {} URLs to clipboard'.format(len(urls.splitlines())))
 
     def refresh_list(self):
-        logger.info("Reloading subfeed")
         self.main_model.main_window_listener.refreshVideos.emit()
 
     # Unused functions

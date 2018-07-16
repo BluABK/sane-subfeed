@@ -9,6 +9,7 @@ from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_videos
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideo
+from sane_yt_subfeed.log_handler import logger
 
 
 class GridViewListener(QObject):
@@ -54,6 +55,7 @@ class MainWindowListener(QObject):
 
     @pyqtSlot()
     def refresh_videos(self):
+        logger.info("Reloading subfeed")
         hide_downloaded = read_config('Gui', 'hide_downloaded')
         if hide_downloaded:
             self.model.filtered_videos = refresh_and_get_newest_videos(self.model.videos_limit, hide_downloaded)
