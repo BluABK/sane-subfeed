@@ -148,7 +148,9 @@ def crop_blackbars(image_filename, quality):
     """
     Crop certain thumbnails that come shipped with black bars above and under
     Qualities affected by this affliction, and actions taken:
-        high: 480x360 with bars --> crop to 480x270
+        high:       480x360 with bars --> crop to 480x270
+        standard:   640x480 with bars --> crop to 640x360
+        default:    120x90  with bars --> crop to 120x68
 
     coords: A tuple of x/y coordinates (x1, y1, x2, y2) or (left, top, right, bottom)
     :param image_filename:
@@ -159,8 +161,12 @@ def crop_blackbars(image_filename, quality):
 
     img = Image.open(image_filename)
     coords = None
-    if quality == 'high':
+    if quality == 'standard':
+        coords = (0, 60, 640, (480-60))
+    elif quality == 'high':
         coords = (0, 45, 480, (360-45))
+    elif quality == 'default':
+        coords = (0, 11, 120, (90-11))
     cropped_img = img.crop(coords)
     cropped_img.save(os.path.join(THUMBNAILS_PATH, image_filename))
 
