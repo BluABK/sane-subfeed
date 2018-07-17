@@ -41,9 +41,16 @@ class Controller:
                     subscription_feed = refresh_and_get_newest_videos(self.vid_limit, filter_downloaded=filter_dl)
         else:
             subscription_feed = refresh_and_get_newest_videos(self.vid_limit, filter_downloaded=filter_dl)
+
         model = MainModel([], subscription_feed, self.vid_limit)
 
+        grid_view_x = read_config('Gui', 'grid_view_x')
+        grid_view_y = read_config('Gui', 'grid_view_y')
+        tile_pref_height = read_config('Gui', 'tile_pref_height')
+        tile_pref_width = read_config('Gui', 'tile_pref_width')
+        dimensions = [grid_view_x*tile_pref_width, grid_view_y*tile_pref_height]
+
         app = QApplication(sys.argv)
-        window = MainWindow(model)
+        window = MainWindow(model, dimensions=dimensions)
         window.show()
         app.exec_()
