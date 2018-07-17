@@ -34,10 +34,18 @@ class ThumbnailTile(QLabel):
 
 class TitleTile(QLabel):
 
-    def __init__(self, parent):
-        QLabel.__init__(self, parent)
+    def __init__(self, text, parent):
+        QLabel.__init__(self, text)
         self.parent = parent
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+    def update_font(self):
+        t_font = self.font()
+        t_font.setPixelSize(self.parent.height() * 0.07)
+        self.setFont(t_font)
+        metrics = QFontMetrics(t_font)
+        elided = metrics.elidedText(self.parent.video.title, Qt.ElideRight, self.width() * 1.7)
+        self.setText(elided)
 
     # def paintEvent( self, event ):
     #     painter = QPainter(self)
@@ -50,16 +58,16 @@ class TitleTile(QLabel):
 
 class ChannelTile(QLabel):
 
-    def __init__(self, parent):
-        QLabel.__init__(self, parent)
+    def __init__(self, text, parent):
+        QLabel.__init__(self, text)
         self.parent = parent
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
 
 class DateTile(QLabel):
 
-    def __init__(self, parent):
-        QLabel.__init__(self, parent)
+    def __init__(self, text, parent):
+        QLabel.__init__(self, text)
         self.parent = parent
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
@@ -67,7 +75,7 @@ class DateTile(QLabel):
 class VideoTile(QWidget):
 
     def __init__(self, parent, video, id, clipboard, status_bar):
-        QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent=parent)
         self.clipboard = clipboard
         self.status_bar = status_bar
         self.video = video
@@ -81,15 +89,15 @@ class VideoTile(QWidget):
         self.thumbnail_widget = ThumbnailTile(self)
         self.layout.addWidget(self.thumbnail_widget, 1)
 
-        self.title_widget = TitleTile(video.title)
+        self.title_widget = TitleTile(video.title, self)
         self.title_widget.setWordWrap(True)
         self.layout.addWidget(self.title_widget)
 
-        self.channel_widget = ChannelTile(video.channel_title)
+        self.channel_widget = ChannelTile(video.channel_title, self)
         self.channel_widget.setWordWrap(True)
         self.layout.addWidget(self.channel_widget)
 
-        self.date_widget = DateTile('')
+        self.date_widget = DateTile('', self)
         self.date_widget.setWordWrap(True)
         self.layout.addWidget(self.date_widget)
 
@@ -104,12 +112,7 @@ class VideoTile(QWidget):
         c_font.setPixelSize(self.height() * 0.07)
         self.channel_widget.setFont(c_font)
 
-        t_font = self.title_widget.font()
-        t_font.setPixelSize(self.height() * 0.07)
-        self.title_widget.setFont(t_font)
-        metrics = QFontMetrics(t_font)
-        elided = metrics.elidedText(self.video.title, Qt.ElideRight, self.title_widget.width()*1.7)
-        self.title_widget.setText(elided)
+        self.title_widget.update_font()
 
         d_font = self.date_widget.font()
         d_font.setPixelSize(self.height() * 0.07)
@@ -124,7 +127,7 @@ class VideoTile(QWidget):
         self.video = video
         self.set_tool_tip()
         # self.setPixmap(QPixmap(video.thumbnail_path))
-        self.title_widget.setText(self.video.title)
+        self.title_widget.update_font()
         self.channel_widget.setText(self.video.channel_title)
 
         vid_age = datetime.datetime.now() - self.video.date_published
@@ -142,7 +145,6 @@ class VideoTile(QWidget):
                 self.setPalette(pal)
 
         self.thumbnail_widget.setPixmap(QPixmap(video.thumbnail_path))
-
 
         self.update()
 
