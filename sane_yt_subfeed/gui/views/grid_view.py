@@ -124,6 +124,8 @@ class VideoTile(QWidget):
         self.id = id
         self.parent = parent
 
+        maxsize = read_config('Gui', 'tile_pref_height')
+        # self.setMaximumSize(maxsize, maxsize)
         # self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.layout = QVBoxLayout()
@@ -144,34 +146,20 @@ class VideoTile(QWidget):
 
         self.setLayout(self.layout)
 
-        self.set_video(video)
+        self.set_video(video, first_run=True)
 
     def resizeEvent(self, event):
-        # self.thumbnail_widget.set
-
-        # c_font = self.channel_widget.font()
-        # c_font.setPixelSize(self.height() * 0.07)
-        # self.channel_widget.setFont(c_font)
         self.title_widget.update_font()
 
         self.channel_widget.update_font()
 
         self.date_widget.update_font()
 
-        # d_font = self.date_widget.font()
-        # d_font.setPixelSize(self.height() * 0.07)
-        # self.date_widget.setFont(d_font)
-
-        # self.title_widget.setFixedHeight(self.height()/5)
-        # self.channel_widget.setFixedHeight(self.height()*(2/20))
-        # self.date_widget.setFixedHeight(self.height()*(2/20))
-        # self.thumbnail_widget.update()
-
-    def set_video(self, video):
+    def set_video(self, video, first_run=False):
         self.video = video
         self.set_tool_tip()
-        # self.setPixmap(QPixmap(video.thumbnail_path))
-        self.title_widget.update_font()
+        if not first_run:
+            self.title_widget.update_font()
         self.channel_widget.setText(self.video.channel_title)
 
         vid_age = datetime.datetime.now() - self.video.date_published
