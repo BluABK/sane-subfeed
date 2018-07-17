@@ -2,9 +2,10 @@ import datetime
 import os
 import time
 
+from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, qApp, QMenu, QGridLayout, QLabel, QVBoxLayout, QLineEdit, QApplication, QSizePolicy
-from PyQt5.QtGui import QPixmap, QPainter, QFontMetrics, QPalette
+from PyQt5.QtGui import QPixmap, QPainter, QFontMetrics, QPalette, QFont
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.view_models import MainModel
@@ -31,29 +32,38 @@ class ThumbnailTile(QLabel):
             painter.setRenderHint(QPainter.SmoothPixmapTransform)
             painter.drawPixmap(self.rect(), self.p)
 
+    def resizeEvent(self, *args, **kwargs):
+        margins = self.parent.layout.getContentsMargins()
+        self.setGeometry(margins[0], margins[1], self.parent.width() - 2 * margins[2],
+                         (self.parent.height() - (4 * margins[1] + 4 * margins[3])) * 0.6)
+
 
 class TitleTile(QLabel):
 
     def __init__(self, text, parent):
         QLabel.__init__(self, text)
         self.parent = parent
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setWordWrap(True)
+        self.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        t_font = self.font()
+        t_font.setWeight(QFont.DemiBold)
+        t_font.setStyleHint(QFont.Helvetica)
+        self.setFont(t_font)
 
     def update_font(self):
         t_font = self.font()
-        t_font.setPixelSize(self.parent.height() * 0.07)
+        margins = self.parent.layout.getContentsMargins()
+        t_font.setPixelSize((self.height()-margins[1]-margins[3])*0.45)
         self.setFont(t_font)
         metrics = QFontMetrics(t_font)
-        elided = metrics.elidedText(self.parent.video.title, Qt.ElideRight, self.width() * 1.7)
+        elided = metrics.elidedText(self.parent.video.title, Qt.ElideRight, self.width() * 1.9)
         self.setText(elided)
 
-    # def paintEvent( self, event ):
-    #     painter = QPainter(self)
-    #
-    #     metrics = QFontMetrics(self.font())
-    #     elided  = metrics.elidedText(self.text(), Qt.ElideRight, self.width()*1.9)
-    #
-    #     painter.drawText(self.rect(), self.alignment(), elided, Qt.TextWordWrap)
+    def resizeEvent(self, *args, **kwargs):
+        margins = self.parent.layout.getContentsMargins()
+        prev_h = (self.parent.height() - (4 * margins[1] + 4 * margins[3])) * 0.6
+        self.setGeometry(margins[0], prev_h + (2 * margins[1] + margins[3]), self.parent.width() - 2 * margins[2],
+                         (self.parent.height() - (4 * margins[1] + 4 * margins[3])) * 0.2)
 
 
 class ChannelTile(QLabel):
@@ -61,16 +71,48 @@ class ChannelTile(QLabel):
     def __init__(self, text, parent):
         QLabel.__init__(self, text)
         self.parent = parent
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        t_font = self.font()
+        t_font.setStyleHint(QFont.Helvetica)
+        self.setFont(t_font)
 
+    def resizeEvent(self, *args, **kwargs):
+        margins = self.parent.layout.getContentsMargins()
+        prev_h = (self.parent.height() - (4 * margins[1] + 4 * margins[3])) * 0.2 + (
+                    self.parent.height() - (4 * margins[1] + 4 * margins[3])) * 0.6
+        self.setGeometry(margins[0], prev_h + (3 * margins[1] + 2 * margins[3]), self.parent.width() - 2 * margins[2],
+                         (self.parent.height() - (4 * margins[1] + 4 * margins[3])) * 0.09)
+
+    def update_font(self):
+        t_font = self.font()
+        margins = self.parent.layout.getContentsMargins()
+        t_font.setPixelSize((self.height()-margins[1]-margins[3]))
+        self.setFont(t_font)
 
 class DateTile(QLabel):
 
     def __init__(self, text, parent):
         QLabel.__init__(self, text)
         self.parent = parent
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        t_font = self.font()
+        t_font.setStyleHint(QFont.Helvetica)
+        self.setFont(t_font)
 
+    def resizeEvent(self, *args, **kwargs):
+        margins = self.parent.layout.getContentsMargins()
+        prev_h = (self.parent.height() - (4 * margins[1] + 4 * margins[3])) * 0.2 + (
+                    self.parent.height() - (4 * margins[1] + 4 * margins[3])) * 0.6 + (
+                             self.parent.height() - (4 * margins[1] + 4 * margins[3])) * 0.09
+        self.setGeometry(margins[0], prev_h + (4 * margins[1] + 3 * margins[3]), self.parent.width() - 2 * margins[2],
+                         (self.parent.height() - (4 * margins[1] + 4 * margins[3])) * 0.09)
+
+    def update_font(self):
+        t_font = self.font()
+        margins = self.parent.layout.getContentsMargins()
+        t_font.setPixelSize((self.height()-margins[1]-margins[3]))
+        self.setFont(t_font)
+        # metrics = QFontMetrics(t_font)
+        # elided = metrics.elidedText(self.parent.video.title, Qt.ElideRight, self.width() * 0.9)
+        # self.setText(elided)
 
 class VideoTile(QWidget):
 
@@ -82,23 +124,22 @@ class VideoTile(QWidget):
         self.id = id
         self.parent = parent
 
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        # self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.layout = QVBoxLayout()
-        self.layout.setContentsMargins(3, 3, 3, 3)
+        self.layout.setContentsMargins(3, 3, 3, 0)
         self.thumbnail_widget = ThumbnailTile(self)
         self.layout.addWidget(self.thumbnail_widget, 1)
 
         self.title_widget = TitleTile(video.title, self)
-        self.title_widget.setWordWrap(True)
         self.layout.addWidget(self.title_widget)
 
         self.channel_widget = ChannelTile(video.channel_title, self)
-        self.channel_widget.setWordWrap(True)
+        # self.channel_widget.setWordWrap(True)
         self.layout.addWidget(self.channel_widget)
 
         self.date_widget = DateTile('', self)
-        self.date_widget.setWordWrap(True)
+        # self.date_widget.setWordWrap(True)
         self.layout.addWidget(self.date_widget)
 
         self.setLayout(self.layout)
@@ -108,15 +149,18 @@ class VideoTile(QWidget):
     def resizeEvent(self, event):
         # self.thumbnail_widget.set
 
-        c_font = self.channel_widget.font()
-        c_font.setPixelSize(self.height() * 0.07)
-        self.channel_widget.setFont(c_font)
-
+        # c_font = self.channel_widget.font()
+        # c_font.setPixelSize(self.height() * 0.07)
+        # self.channel_widget.setFont(c_font)
         self.title_widget.update_font()
 
-        d_font = self.date_widget.font()
-        d_font.setPixelSize(self.height() * 0.07)
-        self.date_widget.setFont(d_font)
+        self.channel_widget.update_font()
+
+        self.date_widget.update_font()
+
+        # d_font = self.date_widget.font()
+        # d_font.setPixelSize(self.height() * 0.07)
+        # self.date_widget.setFont(d_font)
 
         # self.title_widget.setFixedHeight(self.height()/5)
         # self.channel_widget.setFixedHeight(self.height()*(2/20))
@@ -263,6 +307,7 @@ class GridView(QWidget):
             if counter >= len(positions):
                 break
             lbl = VideoTile(self, subscription_feed[counter], counter, self.clipboard, self.status_bar)
+
             self.q_labels.append(lbl)
             grid.addWidget(lbl, *position)
             counter += 1
