@@ -102,12 +102,12 @@ class VideoTile(QWidget):
         c_font = self.channel_widget.font()
         c_font.setPixelSize(self.height() * 0.07)
         self.channel_widget.setFont(c_font)
-        metrics = QFontMetrics(c_font)
 
         t_font = self.title_widget.font()
         t_font.setPixelSize(self.height() * 0.07)
         self.title_widget.setFont(t_font)
-        elided = metrics.elidedText(self.video.title, Qt.ElideRight, self.width() * 1.5)
+        metrics = QFontMetrics(t_font)
+        elided = metrics.elidedText(self.video.title, Qt.ElideRight, self.title_widget.width()*1.7)
         self.title_widget.setText(elided)
 
         d_font = self.date_widget.font()
