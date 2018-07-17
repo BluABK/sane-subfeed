@@ -246,7 +246,6 @@ class GridView(QWidget):
         self.main_model.grid_view_listener.hiddenVideosChanged.connect(self.videos_changed)
 
         grid = QGridLayout()
-        # FIXME: QLabels don't fill
         grid.setContentsMargins(5, 5, 5, 5)
         grid.setSpacing(0)
         self.setLayout(grid)
