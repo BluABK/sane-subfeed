@@ -77,6 +77,7 @@ class VideoTile(QWidget):
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.layout = QVBoxLayout()
+        self.layout.setContentsMargins(3, 3, 3, 3)
         self.thumbnail_widget = ThumbnailTile(self)
         self.layout.addWidget(self.thumbnail_widget, 1)
 
@@ -246,6 +247,7 @@ class GridView(QWidget):
 
         grid = QGridLayout()
         # FIXME: QLabels don't fill
+        grid.setContentsMargins(5, 5, 5, 5)
         grid.setSpacing(0)
         self.setLayout(grid)
 
