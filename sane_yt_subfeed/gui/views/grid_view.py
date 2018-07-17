@@ -4,7 +4,7 @@ import time
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, qApp, QMenu, QGridLayout, QLabel, QVBoxLayout, QLineEdit, QApplication, QSizePolicy
-from PyQt5.QtGui import QPixmap, QPainter
+from PyQt5.QtGui import QPixmap, QPainter, QFontMetrics
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.view_models import MainModel
@@ -19,6 +19,7 @@ class ThumbnailTile(QLabel):
     def __init__(self, parent):
         QLabel.__init__(self, parent)
         self.parent = parent
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         # self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
     def setPixmap(self, p):
@@ -36,6 +37,15 @@ class TitleTile(QLabel):
     def __init__(self, parent):
         QLabel.__init__(self, parent)
         self.parent = parent
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+    # def paintEvent( self, event ):
+    #     painter = QPainter(self)
+    #
+    #     metrics = QFontMetrics(self.font())
+    #     elided  = metrics.elidedText(self.text(), Qt.ElideRight, self.width()*1.9)
+    #
+    #     painter.drawText(self.rect(), self.alignment(), elided, Qt.TextWordWrap)
 
 
 class ChannelTile(QLabel):
@@ -43,6 +53,7 @@ class ChannelTile(QLabel):
     def __init__(self, parent):
         QLabel.__init__(self, parent)
         self.parent = parent
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
 
 class DateTile(QLabel):
@@ -50,6 +61,7 @@ class DateTile(QLabel):
     def __init__(self, parent):
         QLabel.__init__(self, parent)
         self.parent = parent
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
 
 class VideoTile(QWidget):
@@ -88,16 +100,19 @@ class VideoTile(QWidget):
         # self.thumbnail_widget.set
 
         c_font = self.channel_widget.font()
-        c_font.setPixelSize(self.height() * 0.06)
+        c_font.setPixelSize(self.height() * 0.07)
         self.channel_widget.setFont(c_font)
+        metrics = QFontMetrics(c_font)
 
         t_font = self.title_widget.font()
-        t_font.setPixelSize(self.height() * 0.06)
-        self.title_widget.setFont(c_font)
+        t_font.setPixelSize(self.height() * 0.07)
+        self.title_widget.setFont(t_font)
+        elided = metrics.elidedText(self.video.title, Qt.ElideRight, self.width() * 1.5)
+        self.title_widget.setText(elided)
 
         d_font = self.date_widget.font()
-        d_font.setPixelSize(self.height() * 0.06)
-        self.date_widget.setFont(c_font)
+        d_font.setPixelSize(self.height() * 0.07)
+        self.date_widget.setFont(d_font)
 
         # self.title_widget.setFixedHeight(self.height()/5)
         # self.channel_widget.setFixedHeight(self.height()*(2/20))
