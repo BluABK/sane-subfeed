@@ -32,7 +32,7 @@ defaults = {
         'grid_view_y': '4',
         'grey_old_videos': 'True',
         'enable_grid_resize': 'True',
-        'tile_pref_heigh': '150',
+        'tile_pref_height': '150',
         'tile_pref_width': '180'
     },
     'Thumbnails': {
