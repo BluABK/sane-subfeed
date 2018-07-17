@@ -114,8 +114,6 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('Sane-ish Subscription Feed')
         self.setWindowIcon(QIcon(os.path.join(ICO_PATH, 'blu.ico')))
         self.statusBar().showMessage('Ready.')
-        if self.dimensions:
-            self.resize(self.dimensions[0], self.dimensions[1])
 
         # # Set a default view and layout
         # window_layout = QVBoxLayout()
@@ -130,6 +128,11 @@ class MainWindow(QMainWindow):
         self.central_widget.addWidget(self.config_view)
         self.central_widget.addWidget(self.about_view)
         self.central_widget.setCurrentWidget(self.grid_view)
+
+        if self.dimensions:
+            self.resize(self.dimensions[0], self.dimensions[1])
+
+
 
     # Menu handling
     def add_menu(self, menubar, name):
