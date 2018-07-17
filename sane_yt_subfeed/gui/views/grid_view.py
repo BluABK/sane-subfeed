@@ -128,10 +128,15 @@ class VideoTile(QWidget):
 
         vid_age = datetime.datetime.now() - self.video.date_published
         self.date_widget.setText(format(vid_age))
-        if vid_age > datetime.timedelta(days=1):
-            if read_config('Gui', 'grey_old_videos'):
+        if read_config('Gui', 'grey_old_videos'):
+            if vid_age > datetime.timedelta(days=1):
                 pal = self.palette()
                 pal.setColor(QPalette.Background, Qt.lightGray)
+                self.setAutoFillBackground(True)
+                self.setPalette(pal)
+            else:
+                pal = self.palette()
+                pal.setColor(QPalette.Background, Qt.white)
                 self.setAutoFillBackground(True)
                 self.setPalette(pal)
 
