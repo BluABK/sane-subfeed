@@ -339,9 +339,7 @@ class GridView(QWidget):
                 self.q_labels.append(lbl)
             counter += 1
         if len(positions) < len(self.q_labels):
-            time.sleep(0.1)
             widgets_to_delete = self.q_labels[len(positions):]
             self.q_labels = self.q_labels[:len(positions)]
-            time.sleep(0.1)
             for widget in widgets_to_delete:
                 widget.deleteLater()
