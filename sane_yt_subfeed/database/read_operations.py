@@ -18,7 +18,7 @@ def get_newest_stored_videos(limit, filter_downloaded=False):
     """
     if filter_downloaded:
         db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(
-            Video.downloaded != '1' and Video.discarded != '1').limit(
+            Video.downloaded != '1', Video.discarded != '1').limit(
             limit).all()
     else:
         db_videos = db_session.query(Video).order_by(desc(Video.date_published)).limit(limit).all()
