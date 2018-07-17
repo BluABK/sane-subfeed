@@ -84,7 +84,7 @@ class MainWindow(QMainWindow):
         # refresh_list
         # self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
         #                  tooltip='Refresh the subscription feed'
-        self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
+        refresh_feed = self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
                          tooltip='Refresh the subscription feed')
 
         # View menu
@@ -109,6 +109,7 @@ class MainWindow(QMainWindow):
         toolbar.addAction(view_list_tiled_view)
         toolbar.addAction(view_subs_view)
         toolbar.addAction(view_about_view)
+        toolbar.addAction(refresh_feed)
 
         # Set MainWindow properties
         self.setWindowTitle('Sane-ish Subscription Feed')
