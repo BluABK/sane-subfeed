@@ -126,8 +126,8 @@ class VideoTile(QWidget):
 
         pref_height = read_config('Gui', 'tile_pref_height')
         pref_width = read_config('Gui', 'tile_pref_height')
-        self.setMaximumSize(pref_width*1.4, pref_height*1.4)
-        self.setMinimumSize(pref_width*0.6, pref_height*0.6)
+        # self.setMaximumSize(pref_width*1.4, pref_height*1.4)
+        # self.setMinimumSize(pref_width*0.6, pref_height*0.6)
         # self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.layout = QVBoxLayout()
@@ -275,6 +275,7 @@ class GridView(QWidget):
         self.main_model = main_model
         self.pref_tile_height = read_config('Gui', 'tile_pref_height')
         self.pref_tile_width = read_config('Gui', 'tile_pref_width')
+        self.resize_enabled = read_config('Gui', 'enable_grid_resize')
 
         self.grid = QGridLayout()
         self.init_ui()
@@ -301,7 +302,7 @@ class GridView(QWidget):
             lbl = VideoTile(self, subscription_feed[counter], counter, self.clipboard, self.status_bar)
 
             self.q_labels.append(lbl)
-            self.grid.addWidget(lbl, *position)
+            self.grid.addWidget(lbl, *position, 1, 1)
             counter += 1
 
     def videos_changed(self):
@@ -310,22 +311,37 @@ class GridView(QWidget):
             q_label.set_video(video)
 
     def resizeEvent(self, QResizeEvent):
-        if self.width() > self.items_x*self.pref_tile_width:
-            self.add_row()
+        if self.resize_enabled:
+            if self.width() > self.items_x*self.pref_tile_width*1.2:
+                self.items_x += 1
+                self.update_grid()
+            elif self.width() < self.items_x*self.pref_tile_width*0.8:
+                self.items_x -= 1
+                self.update_grid()
+            elif self.height() > self.items_y*self.pref_tile_height*1.2:
+                self.items_y += 1
+                self.update_grid()
+            elif self.height() < self.items_y*self.pref_tile_height*0.8:
+                self.items_y -= 1
+                self.update_grid()
 
-    def add_row(self):
+    def update_grid(self):
         subscription_feed = self.main_model.filtered_videos
         counter = 0
-        self.items_x += 1
         positions = [(i, j) for i in range(self.items_y) for j in range(self.items_x)]
         for position in positions:
-            if counter >= len(positions):
-                break
 
             if counter < len(self.q_labels):
-                self.grid.addWidget(self.q_labels[counter], *position)
+                self.grid.addWidget(self.q_labels[counter], *position, 1, 1)
             else:
                 lbl = VideoTile(self, subscription_feed[counter], counter, self.clipboard, self.status_bar)
-                self.grid.addWidget(lbl, *position)
+                self.grid.addWidget(lbl, *position, 1, 1)
                 self.q_labels.append(lbl)
             counter += 1
+        if len(positions) < len(self.q_labels):
+            time.sleep(0.1)
+            widgets_to_delete = self.q_labels[len(positions):]
+            self.q_labels = self.q_labels[:len(positions)]
+            time.sleep(0.1)
+            for widget in widgets_to_delete:
+                widget.deleteLater()
