@@ -29,7 +29,8 @@ defaults = {
         'launch': 'Gui',
         'hide_downloaded': 'True',
         'grid_view_x': '5',
-        'grid_view_y': '4'
+        'grid_view_y': '4',
+        'grey_old_videos': 'True'
     },
     'Thumbnails': {
         'force_download_best': 'True',
