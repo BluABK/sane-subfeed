@@ -1,8 +1,9 @@
+import datetime
 import os
 import time
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, qApp, QMenu, QGridLayout, QLabel, QVBoxLayout, QLineEdit, QApplication
+from PyQt5.QtWidgets import QWidget, qApp, QMenu, QGridLayout, QLabel, QVBoxLayout, QLineEdit, QApplication, QSizePolicy
 from PyQt5.QtGui import QPixmap, QPainter
 
 from sane_yt_subfeed.config_handler import read_config
@@ -13,36 +14,112 @@ from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_vide
 from sane_yt_subfeed.log_handler import logger
 
 
-class VideoTile(QWidget):
+class ThumbnailTile(QLabel):
 
-    def __init__(self, parent, video, id, clipboard, status_bar):
-        QWidget.__init__(self, parent)
-        # self.clipboard().dataChanged.connect(self.clipboard_changed)
-        self.clipboard = clipboard
-        self.status_bar = status_bar
-        self.video = video
-        self.set_video(video)
-        self.id = id
+    def __init__(self, parent):
+        QLabel.__init__(self, parent)
         self.parent = parent
+        # self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
     def setPixmap(self, p):
         self.p = p
-
-    def set_video(self, video):
-        self.video = video
-        self.set_tool_tip()
-        self.setPixmap(QPixmap(video.thumbnail_path))
-        self.update()
-
-    def set_tool_tip(self):
-        if not read_config('Debug', 'disable_tooltips'):
-            self.setToolTip("{}: {}".format(self.video.channel_title, self.video.title))
 
     def paintEvent(self, event):
         if self.p:
             painter = QPainter(self)
             painter.setRenderHint(QPainter.SmoothPixmapTransform)
             painter.drawPixmap(self.rect(), self.p)
+
+
+class TitleTile(QLabel):
+
+    def __init__(self, parent):
+        QLabel.__init__(self, parent)
+        self.parent = parent
+
+
+class ChannelTile(QLabel):
+
+    def __init__(self, parent):
+        QLabel.__init__(self, parent)
+        self.parent = parent
+
+
+class DateTile(QLabel):
+
+    def __init__(self, parent):
+        QLabel.__init__(self, parent)
+        self.parent = parent
+
+
+class VideoTile(QWidget):
+
+    def __init__(self, parent, video, id, clipboard, status_bar):
+        QWidget.__init__(self, parent)
+        self.clipboard = clipboard
+        self.status_bar = status_bar
+        self.video = video
+        self.id = id
+        self.parent = parent
+
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        self.layout = QVBoxLayout()
+        self.thumbnail_widget = ThumbnailTile(self)
+        self.layout.addWidget(self.thumbnail_widget, 1)
+
+        self.title_widget = TitleTile(video.title)
+        self.title_widget.setWordWrap(True)
+        self.layout.addWidget(self.title_widget)
+
+        self.channel_widget = ChannelTile(video.channel_title)
+        self.channel_widget.setWordWrap(True)
+        self.layout.addWidget(self.channel_widget)
+
+        self.date_widget = DateTile('')
+        self.date_widget.setWordWrap(True)
+        self.layout.addWidget(self.date_widget)
+
+        self.setLayout(self.layout)
+
+        self.set_video(video)
+
+    def resizeEvent(self, event):
+        # self.thumbnail_widget.set
+
+        c_font = self.channel_widget.font()
+        c_font.setPixelSize(self.height() * 0.06)
+        self.channel_widget.setFont(c_font)
+
+        t_font = self.title_widget.font()
+        t_font.setPixelSize(self.height() * 0.06)
+        self.title_widget.setFont(c_font)
+
+        d_font = self.date_widget.font()
+        d_font.setPixelSize(self.height() * 0.06)
+        self.date_widget.setFont(c_font)
+
+        # self.title_widget.setFixedHeight(self.height()/5)
+        # self.channel_widget.setFixedHeight(self.height()*(2/20))
+        # self.date_widget.setFixedHeight(self.height()*(2/20))
+        # self.thumbnail_widget.update()
+
+    def set_video(self, video):
+        self.video = video
+        self.set_tool_tip()
+        # self.setPixmap(QPixmap(video.thumbnail_path))
+        self.title_widget.setText(self.video.title)
+        self.channel_widget.setText(self.video.channel_title)
+
+        vid_age = datetime.datetime.now() - self.video.date_published
+        self.date_widget.setText(format(vid_age))
+
+        self.thumbnail_widget.setPixmap(QPixmap(video.thumbnail_path))
+        self.update()
+
+    def set_tool_tip(self):
+        if not read_config('Debug', 'disable_tooltips'):
+            self.setToolTip("{}: {}".format(self.video.channel_title, self.video.title))
 
     def mousePressEvent(self, QMouseEvent):
         """
@@ -140,7 +217,8 @@ class GridView(QWidget):
         self.main_model.grid_view_listener.hiddenVideosChanged.connect(self.videos_changed)
 
         grid = QGridLayout()
-        grid.setSpacing(10)
+        # FIXME: QLabels don't fill
+        grid.setSpacing(0)
         self.setLayout(grid)
 
         self.items_x = read_config('Gui', 'grid_view_x')
