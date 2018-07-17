@@ -4,7 +4,7 @@ import time
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, qApp, QMenu, QGridLayout, QLabel, QVBoxLayout, QLineEdit, QApplication, QSizePolicy
-from PyQt5.QtGui import QPixmap, QPainter, QFontMetrics
+from PyQt5.QtGui import QPixmap, QPainter, QFontMetrics, QPalette
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.view_models import MainModel
@@ -128,8 +128,16 @@ class VideoTile(QWidget):
 
         vid_age = datetime.datetime.now() - self.video.date_published
         self.date_widget.setText(format(vid_age))
+        if vid_age > datetime.timedelta(days=1):
+            if read_config('Gui', 'grey_old_videos'):
+                pal = self.palette()
+                pal.setColor(QPalette.Background, Qt.lightGray)
+                self.setAutoFillBackground(True)
+                self.setPalette(pal)
 
         self.thumbnail_widget.setPixmap(QPixmap(video.thumbnail_path))
+
+
         self.update()
 
     def set_tool_tip(self):
