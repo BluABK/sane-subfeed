@@ -5,6 +5,8 @@
 import os
 
 # PyQt5 libs
+from subprocess import check_output
+
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QVBoxLayout, QStackedWidget
 from PyQt5.QtGui import QIcon
 
@@ -117,7 +119,11 @@ class MainWindow(QMainWindow):
         toolbar.addAction(view_about_view)
 
         # Set MainWindow properties
-        self.setWindowTitle('Sane Subscription Feed')
+        app_title = 'Sane Subscription Feed'
+        version = self.determine_version()
+        if version:
+            app_title += " v{}".format(version)
+        self.setWindowTitle(app_title)
         self.setWindowIcon(QIcon(os.path.join(ICO_PATH, 'yubbtubbz-padding.ico')))
         self.statusBar().showMessage('Ready.')
 
@@ -137,6 +143,46 @@ class MainWindow(QMainWindow):
 
         # if self.dimensions:
         #     self.resize(self.dimensions[0], self.dimensions[1])
+
+    # Internal
+    def determine_version(self):
+        """
+        Attempt to determine current release version based on VERSION.txt (and git)
+        :return:
+        """
+        version_str = None
+        git_branchtag = self.get_git_tag()
+        try:
+            with open(os.path.join(OS_PATH, '..', '..', 'VERSION.txt'), 'r') as version_file:
+                version = version_file.readline()
+                if git_branchtag:
+                    version_str = "{} [{}]".format(str(version), git_branchtag)
+                else:
+                    version_str = str(version)
+        except:     # FIXME: PEP8 -- Too broad except clause
+            pass
+
+        return version_str
+
+    def get_git_tag(self):
+        """
+        Gets git branch/commit_tag if in a git environment
+        :return:
+        """
+        branchtag = None
+        try:
+            branchtag = check_output("git rev-parse --abbrev-ref HEAD", shell=True).decode("UTF-8").strip('\n') + ' / '
+        except:     # FIXME: PEP8 -- Too broad except clause
+            pass
+        try:
+            branchtag += check_output("git log -n 1 --pretty=format:%h", shell=True).decode("UTF-8").strip('\n')
+        except:     # FIXME: PEP8 -- Too broad except clause
+            pass
+
+        return branchtag
+
+
+
 
     # Menu handling
     def add_menu(self, menubar, name):
@@ -175,53 +221,6 @@ class MainWindow(QMainWindow):
         else:
             raise ValueError("add_submenu('{}', '{}', ...) ERROR: '{}' not in menus dict!".format(menu, name, menu))
         return submenu  # FIXME: Used by toolbar to avoid redefining items
-
-    # # View handling
-    # def spawn_grid_view(self):
-    #     """
-    #     Creates a new GridView(QWidget) instance
-    #     :return:
-    #     """
-    #     # self.grid_view = GridView(self.uploads, self.clipboard, self.statusBar())
-    #     return GridView(self.clipboard, self.statusBar())
-    #
-    # def spawn_subs_view(self):
-    #     """
-    #     Creates a new SubscriptionView(QWidget) instance
-    #     :return:
-    #     """
-    #     # self.subs_view = SubscriptionsView(self.uploads, self.clipboard, self.statusBar())
-    #     return SubscriptionsView(self.subs, self.clipboard, self.statusBar())
-    #
-    # def spawn_list_detailed_view(self):
-    #     """
-    #     Creates a new ListDetailsView
-    #     :return:
-    #     """
-    #     return ListDetailedView(self.clipboard, self.statusBar())
-    #
-    # def spawn_list_tiled_view(self):
-    #     """
-    #     Creates a new ListTiledView
-    #     :return:
-    #     """
-    #     return ListTiledView(self.clipboard, self.statusBar())
-    #
-    # def spawn_config_view(self):
-    #     """
-    #     Creates a new ConfigView
-    #     :return:
-    #     """
-    #     return ConfigView(self.clipboard, self.statusBar())
-    #
-    # # Note: Keep putting this one at the end of spawns
-    # def spawn_about_view(self):
-    #     """
-    #     Creates a new AboutView(QWidget) instance
-    #     :return:
-    #     """
-    #     # self.subs_view = SubscriptionsView(self.uploads, self.clipboard, self.statusBar())
-    #     return AboutView()
 
     @staticmethod
     def hide_widget(widget):  # TODO: Deferred usage (Garbage collection issue)
