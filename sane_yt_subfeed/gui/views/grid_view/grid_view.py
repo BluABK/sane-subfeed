@@ -1,5 +1,6 @@
 import time
 
+from PyQt5 import sip
 from PyQt5.QtWidgets import QWidget, QGridLayout
 
 from sane_yt_subfeed.config_handler import read_config
@@ -42,18 +43,20 @@ class GridView(QWidget):
         self.items_x = read_config('Gui', 'grid_view_x')
         self.items_y = read_config('Gui', 'grid_view_y')
 
-        subscription_feed = self.main_model.filtered_videos
 
-        counter = 0
-        positions = [(i, j) for i in range(self.items_y) for j in range(self.items_x)]
-        for position in positions:
-            if counter >= len(positions):
-                break
-            lbl = VideoTile(self, subscription_feed[counter], counter, self.clipboard, self.status_bar)
-
-            self.q_labels.append(lbl)
-            self.grid.addWidget(lbl, *position)
-            counter += 1
+        self.update_grid()
+        # subscription_feed = self.main_model.filtered_videos
+        #
+        # counter = 0
+        # positions = [(i, j) for i in range(self.items_y) for j in range(self.items_x)]
+        # for position in positions:
+        #     if counter >= len(positions):
+        #         break
+        #     lbl = VideoTile(self, subscription_feed[counter], counter, self.clipboard, self.status_bar)
+        #
+        #     self.q_labels.append(lbl)
+        #     self.grid.addWidget(lbl, *position)
+        #     counter += 1
 
     def videos_changed(self):
         logger.info('GridView: Updating tiles')
@@ -95,4 +98,6 @@ class GridView(QWidget):
             widgets_to_delete = self.q_labels[len(positions):]
             self.q_labels = self.q_labels[:len(positions)]
             for widget in widgets_to_delete:
-                widget.deleteLater()
+                self.grid.removeWidget(widget)
+                sip.delete(widget)
+                # widget.deleteLater()
