@@ -2,7 +2,7 @@ import datetime
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette, QPixmap
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QApplication, QMenu, qApp
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QApplication, QMenu, qApp, QSizePolicy
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.gui.views.grid_view.thumbnail_tile import ThumbnailTile
@@ -22,44 +22,40 @@ class VideoTile(QWidget):
         self.id = id
         self.parent = parent
 
-        pref_height = read_config('Gui', 'tile_pref_height')
-        pref_width = read_config('Gui', 'tile_pref_height')
-        # self.setMaximumSize(pref_width*1.4, pref_height*1.4)
-        # self.setMinimumSize(pref_width*0.6, pref_height*0.6)
-        # self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.pref_height = read_config('Gui', 'tile_pref_height')
+        self.pref_width = read_config('Gui', 'tile_pref_height')
+        self.setFixedSize(self.pref_width, self.pref_height)
 
         self.layout = QVBoxLayout()
-        self.layout.setContentsMargins(3, 3, 3, 0)
+        self.layout.setContentsMargins(0, 0, 0, 4)
         self.thumbnail_widget = ThumbnailTile(self)
-        self.layout.addWidget(self.thumbnail_widget, 1)
+        self.layout.addWidget(self.thumbnail_widget)
 
         self.title_widget = TitleTile(video.title, self)
         self.layout.addWidget(self.title_widget)
 
         self.channel_widget = ChannelTile(video.channel_title, self)
-        # self.channel_widget.setWordWrap(True)
         self.layout.addWidget(self.channel_widget)
 
         self.date_widget = DateTile('', self)
-        # self.date_widget.setWordWrap(True)
         self.layout.addWidget(self.date_widget)
 
         self.setLayout(self.layout)
 
-        self.set_video(video, first_run=True)
+        self.set_video(video)
 
     def resizeEvent(self, event):
-        self.title_widget.update_font()
+        pass
+        # self.title_widget.update_font()
+        #
+        # self.channel_widget.update_font()
+        #
+        # self.date_widget.update_font()
 
-        self.channel_widget.update_font()
-
-        self.date_widget.update_font()
-
-    def set_video(self, video, first_run=False):
+    def set_video(self, video):
         self.video = video
         self.set_tool_tip()
-        if not first_run:
-            self.title_widget.update_font()
+        self.title_widget.update_font()
         self.channel_widget.setText(self.video.channel_title)
 
         vid_age = datetime.datetime.now() - self.video.date_published
