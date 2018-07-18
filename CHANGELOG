@@ -1,0 +1,15 @@
+v0.2.0-dev
+- Added this changelog \o/
+- Added feature: Versioning
+- Added feature: Colouring of *new* videos in GridView
+- Added feature: Reload subscriptions list on demand from GUI
+- Added feature: Text (title, channel, date) on video tiles in GridView
+- SubscriptionsView is now a table that practically mimics the DBs 'Channel' tbl
+- Video tiles in GridView now have a fixed size and spawn new if space allows
+- Fixed a lot of icons and related gfx
+- Misc file/folder restructuring
+- HOTFIX: Only one resizeEvent on a big change
+- BUG: Grid resize has issues if started > 2x2
+
+v0.1.0-dev
+Initial release/tag
