@@ -17,7 +17,7 @@ from sane_yt_subfeed.gui.views.config_view import ConfigView
 from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
 from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
 # from sane_yt_subfeed.uploads import Uploads
-from sane_yt_subfeed.gui.views.grid_view import GridView
+from sane_yt_subfeed.gui.views.grid_view.grid_view import GridView
 from sane_yt_subfeed.gui.views.list_detailed_view import ListDetailedView
 from sane_yt_subfeed.gui.views.list_tiled_view import ListTiledView
 from sane_yt_subfeed.log_handler import logger
