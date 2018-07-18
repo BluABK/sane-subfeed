@@ -100,4 +100,5 @@ class GridView(QWidget):
             for widget in widgets_to_delete:
                 self.grid.removeWidget(widget)
                 sip.delete(widget)
+        self.resizeEvent('')
                 # widget.deleteLater()
