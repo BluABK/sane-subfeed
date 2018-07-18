@@ -85,25 +85,27 @@ class MainWindow(QMainWindow):
         # self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
         #                  tooltip='Refresh the subscription feed'
         refresh_feed = self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
-                         tooltip='Refresh the subscription feed')
+                                        tooltip='Refresh the subscription feed', icon='refresh.png')
 
         refresh_subs = self.add_submenu('&Function', 'Reload Subscriptions &List', self.refresh_subs, shortcut='Ctrl+L',
-                                        tooltip='Fetch a new subscriptions list')
+                                        tooltip='Fetch a new subscriptions list', icon='refresh_subs.png')
 
         # View menu
         self.add_menu(menubar, '&View')
         view_grid_view = self.add_submenu('&View', 'Grid', self.view_grid, shortcut='Ctrl+1',
-                                          tooltip='View subscription feed as a grid', icon='grid_blue.png')
+                                          tooltip='View subscription feed as a grid', icon='grid.png')
         view_list_detailed_view = self.add_submenu('&View', 'Detailed List', self.view_list_detailed, shortcut='Ctrl+2',
-                                                   tooltip='View subscription feed as a detailed list')
+                                                   tooltip='View subscription feed as a detailed list',
+                                                   icon='table.png')
         view_list_tiled_view = self.add_submenu('&View', 'Tiled List', self.view_list_tiled, shortcut='Ctrl+3',
-                                                tooltip='View subscription feed as a tiled list')
+                                                tooltip='View subscription feed as a tiled list', icon='tiled_list.png')
         view_subs_view = self.add_submenu('&View', 'Subscriptions', self.view_subs, shortcut='Ctrl+4',
                                           tooltip='View Subscriptions', icon='subs.png')
 
         # Help menu
         self.add_menu(menubar, '&Help')
-        view_about_view = self.add_submenu('&Help', 'About', self.view_about, shortcut='F1', tooltip='About me')
+        view_about_view = self.add_submenu('&Help', 'About', self.view_about, shortcut='F1', tooltip='About me',
+                                           icon='about.png')
 
         # Toolbar of different views
         toolbar = self.addToolBar('View')
@@ -111,12 +113,12 @@ class MainWindow(QMainWindow):
         toolbar.addAction(view_list_detailed_view)
         toolbar.addAction(view_list_tiled_view)
         toolbar.addAction(view_subs_view)
-        toolbar.addAction(view_about_view)
         toolbar.addAction(refresh_feed)
+        toolbar.addAction(view_about_view)
 
         # Set MainWindow properties
         self.setWindowTitle('Sane-ish Subscription Feed')
-        self.setWindowIcon(QIcon(os.path.join(ICO_PATH, 'blu.ico')))
+        self.setWindowIcon(QIcon(os.path.join(ICO_PATH, 'yubbtubbz-padding.ico')))
         self.statusBar().showMessage('Ready.')
 
         # # Set a default view and layout
@@ -135,8 +137,6 @@ class MainWindow(QMainWindow):
 
         if self.dimensions:
             self.resize(self.dimensions[0], self.dimensions[1])
-
-
 
     # Menu handling
     def add_menu(self, menubar, name):
