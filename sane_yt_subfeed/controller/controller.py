@@ -48,7 +48,8 @@ class Controller:
         grid_view_y = read_config('Gui', 'grid_view_y')
         tile_pref_height = read_config('Gui', 'tile_pref_height')
         tile_pref_width = read_config('Gui', 'tile_pref_width')
-        dimensions = [grid_view_x*tile_pref_width, grid_view_y*tile_pref_height]
+        # FIXME: static buffer
+        dimensions = [grid_view_x*tile_pref_width+10, grid_view_y*tile_pref_height+10]
 
         app = QApplication(sys.argv)
         window = MainWindow(model, dimensions=dimensions)
