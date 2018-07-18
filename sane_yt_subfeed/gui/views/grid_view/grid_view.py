@@ -1,3 +1,5 @@
+import time
+
 from PyQt5.QtWidgets import QWidget, QGridLayout
 
 from sane_yt_subfeed.config_handler import read_config
@@ -14,6 +16,10 @@ class GridView(QWidget):
 
     def __init__(self, parent, main_model: MainModel, clipboard, status_bar):
         super(GridView, self).__init__(parent)
+        self.setMinimumSize(0,0)
+        self.parent = parent
+        self.buffer = 10
+        self.bar_correction = 0
         self.clipboard = clipboard
         self.status_bar = status_bar
         self.main_model = main_model
@@ -29,7 +35,7 @@ class GridView(QWidget):
 
         self.main_model.grid_view_listener.hiddenVideosChanged.connect(self.videos_changed)
 
-        self.grid.setContentsMargins(5, 5, 5, 5)
+        self.grid.setContentsMargins(5, 5, 0, 0)
         self.grid.setSpacing(0)
         self.setLayout(self.grid)
 
@@ -46,7 +52,7 @@ class GridView(QWidget):
             lbl = VideoTile(self, subscription_feed[counter], counter, self.clipboard, self.status_bar)
 
             self.q_labels.append(lbl)
-            self.grid.addWidget(lbl, *position, 1, 1)
+            self.grid.addWidget(lbl, *position)
             counter += 1
 
     def videos_changed(self):
@@ -56,16 +62,19 @@ class GridView(QWidget):
 
     def resizeEvent(self, QResizeEvent):
         if self.resize_enabled:
-            if self.width() > self.items_x*self.pref_tile_width*1.2:
+            margins = self.grid.getContentsMargins()
+            height = self.height()
+            other = (self.items_y+1)*self.pref_tile_height+margins[1]+margins[3]+self.buffer
+            if self.width() > ((self.items_x+1)*self.pref_tile_width+margins[0]+margins[2]+self.buffer):
                 self.items_x += 1
                 self.update_grid()
-            elif self.width() < self.items_x*self.pref_tile_width*0.8:
+            elif self.width() <= self.items_x*self.pref_tile_width+margins[0]+margins[2]+self.buffer/3:
                 self.items_x -= 1
                 self.update_grid()
-            elif self.height() > self.items_y*self.pref_tile_height*1.2:
+            elif self.height()-self.bar_correction > (self.items_y+1)*self.pref_tile_height+margins[1]+margins[3]+self.buffer:
                 self.items_y += 1
                 self.update_grid()
-            elif self.height() < self.items_y*self.pref_tile_height*0.8:
+            elif self.height()-self.bar_correction <= self.items_y*self.pref_tile_height+margins[1]+margins[3]+self.buffer/3:
                 self.items_y -= 1
                 self.update_grid()
 
@@ -76,10 +85,10 @@ class GridView(QWidget):
         for position in positions:
 
             if counter < len(self.q_labels):
-                self.grid.addWidget(self.q_labels[counter], *position, 1, 1)
+                self.grid.addWidget(self.q_labels[counter], *position)
             else:
                 lbl = VideoTile(self, subscription_feed[counter], counter, self.clipboard, self.status_bar)
-                self.grid.addWidget(lbl, *position, 1, 1)
+                self.grid.addWidget(lbl, *position)
                 self.q_labels.append(lbl)
             counter += 1
         if len(positions) < len(self.q_labels):
