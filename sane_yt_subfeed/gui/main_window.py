@@ -87,6 +87,9 @@ class MainWindow(QMainWindow):
         refresh_feed = self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
                          tooltip='Refresh the subscription feed')
 
+        refresh_subs = self.add_submenu('&Function', 'Reload Subscriptions &List', self.refresh_subs, shortcut='Ctrl+L',
+                                        tooltip='Fetch a new subscriptions list')
+
         # View menu
         self.add_menu(menubar, '&View')
         view_grid_view = self.add_submenu('&View', 'Grid', self.view_grid, shortcut='Ctrl+1',
@@ -315,7 +318,18 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage('Copied {} URLs to clipboard'.format(len(urls.splitlines())))
 
     def refresh_list(self):
+        """
+        Refresh the subscription feed
+        :return:
+        """
         self.main_model.main_window_listener.refreshVideos.emit()
+
+    def refresh_subs(self):
+        """
+        Fetch a new list of subscriptions
+        :return:
+        """
+        self.main_model.main_window_listener.refreshSubs.emit()
 
     # Unused functions
     def context_menu_event(self, event):  # TODO: Unused, planned usage in future
