@@ -135,8 +135,8 @@ class MainWindow(QMainWindow):
         self.central_widget.addWidget(self.about_view)
         self.central_widget.setCurrentWidget(self.grid_view)
 
-        if self.dimensions:
-            self.resize(self.dimensions[0], self.dimensions[1])
+        # if self.dimensions:
+        #     self.resize(self.dimensions[0], self.dimensions[1])
 
     # Menu handling
     def add_menu(self, menubar, name):
