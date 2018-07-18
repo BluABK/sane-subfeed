@@ -153,11 +153,11 @@ def get_remote_subscriptions(youtube_oauth):
         for page in tqdm(subscription_list_response['items'], desc="Adding and updating channels by page",
                          disable=read_config('Debug', 'disable_tqdm')):
             # Get channel
-            channel_respone = channels_list_by_id(youtube_oauth, part='contentDetails',
-                                                  id=page['snippet']['resourceId']['channelId'])
+            channel_response = channels_list_by_id(youtube_oauth, part='contentDetails',
+                                                   id=page['snippet']['resourceId']['channelId'])
 
             # Get ID of uploads playlist
-            channel_uploads_playlist_id = channel_respone['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+            channel_uploads_playlist_id = channel_response['items'][0]['contentDetails']['relatedPlaylists']['uploads']
             channel = Channel(page['snippet'], channel_uploads_playlist_id)
             db_channel = engine_execute_first(get_channel_by_id_stmt(channel))
             if db_channel:

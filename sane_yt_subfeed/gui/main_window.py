@@ -57,7 +57,7 @@ class MainWindow(QMainWindow):
         self.grid_view = GridView(self, main_model, self.clipboard, self.statusBar())
         self.list_detailed_view = ListDetailedView(self, self.clipboard, self.statusBar())
         self.list_tiled_view = ListTiledView(self, self.clipboard, self.statusBar())
-        self.subs_view = SubscriptionsView(self, self.subs, self.clipboard, self.statusBar())
+        self.subs_view = SubscriptionsView(self, self.clipboard, self.statusBar())
         self.config_view = ConfigView(self, self.clipboard, self.statusBar())
         self.about_view = AboutView(self)
 
@@ -117,7 +117,7 @@ class MainWindow(QMainWindow):
         toolbar.addAction(view_about_view)
 
         # Set MainWindow properties
-        self.setWindowTitle('Sane-ish Subscription Feed')
+        self.setWindowTitle('Sane Subscription Feed')
         self.setWindowIcon(QIcon(os.path.join(ICO_PATH, 'yubbtubbz-padding.ico')))
         self.statusBar().showMessage('Ready.')
 
