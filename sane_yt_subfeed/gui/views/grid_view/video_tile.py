@@ -23,7 +23,7 @@ class VideoTile(QWidget):
         self.parent = parent
 
         self.pref_height = read_config('Gui', 'tile_pref_height')
-        self.pref_width = read_config('Gui', 'tile_pref_height')
+        self.pref_width = read_config('Gui', 'tile_pref_width')
         self.setFixedSize(self.pref_width, self.pref_height)
 
         self.layout = QVBoxLayout()

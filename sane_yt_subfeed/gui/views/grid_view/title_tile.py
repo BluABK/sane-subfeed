@@ -27,7 +27,7 @@ class TitleTile(QLabel):
     def update_font(self):
 
         metrics = QFontMetrics(self.font())
-        elided = metrics.elidedText(self.parent.video.title, Qt.ElideRight, self.width() * 1.9)
+        elided = metrics.elidedText(self.parent.video.title, Qt.ElideRight, self.width() * 1.8)
         self.setText(elided)
 
     # def resizeEvent(self, *args, **kwargs):
