@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt     # PyCharm bug: Anything from QtCore will fail detection, but it *is* there.
+from PyQt5.QtCore import Qt  # PyCharm bug: Anything from QtCore will fail detection, but it *is* there.
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox
 
 from sane_yt_subfeed.config_handler import read_config, set_config, read_entire_config, get_sections, get_options
@@ -26,6 +26,30 @@ def gui_hide_downloaded(state):
         set_config('Gui', 'hide_downloaded', 'True')
     else:
         set_config('Gui', 'hide_downloaded', 'False')
+
+
+def gui_grey_old_videos(state):
+    """
+    Toggles the given setting between True and False
+    :param state: 0=unchecked, 1=tristate?, 2=checked
+    :return:
+    """
+    if state == Qt.Checked:
+        set_config('Gui', 'grey_old_videos', 'True')
+    else:
+        set_config('Gui', 'grey_old_videos', 'False')
+
+
+def gui_enable_grid_resize(state):
+    """
+    Toggles the given setting between True and False
+    :param state: 0=unchecked, 1=tristate?, 2=checked
+    :return:
+    """
+    if state == Qt.Checked:
+        set_config('Gui', 'enable_grid_resize', 'True')
+    else:
+        set_config('Gui', 'enable_grid_resize', 'False')
 
 
 def debug_toggle(state):

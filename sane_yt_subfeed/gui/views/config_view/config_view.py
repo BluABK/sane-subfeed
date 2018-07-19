@@ -50,7 +50,7 @@ class ConfigView(QWidget):
         self.populate_options()
         mismatch = get_size() - self.offset
         if mismatch != 0:
-            logger.warning("ConfigView is missing {} options!".format(mismatch))
+            logger.warning("ConfigView is missing {} entries!".format(mismatch))
 
     def add_section(self, name):
         """
@@ -102,11 +102,16 @@ class ConfigView(QWidget):
         """
         # Section [Gui]
         self.add_section('{}GUI{}'.format(self.deco_l, self.deco_r))
-        self.launch_gui = self.add_option_checkbox('Launch GUI?', 'Gui', 'launch_gui', checkbox.gui_launch_gui)
+        self.launch_gui = self.add_option_checkbox('Launch GUI', 'Gui', 'launch_gui', checkbox.gui_launch_gui)
         self.hide_downloaded_vids = self.add_option_checkbox('Hide downloaded videos from feed', 'Gui',
                                                              'hide_downloaded', checkbox.gui_hide_downloaded)
         self.add_option_inactive('Grid view X', 'Gui', 'grid_view_x')
         self.add_option_inactive('Grid view Y', 'Gui', 'grid_view_y')
+        self.add_option_checkbox('Grey background on old (1d+) videos', 'Gui', 'grey_old_videos',
+                                 checkbox.gui_grey_old_videos)
+        self.add_option_checkbox('Enable grid resizing', 'Gui', 'enable_grid_resize', checkbox.gui_enable_grid_resize)
+        self.add_option_inactive('Grid tile preferred height (px)', 'Gui', 'tile_pref_height')
+        self.add_option_inactive('Grid tile preferred width (px)', 'Gui', 'tile_pref_width')
 
         # Section [Debug]
         self.add_section('{}Debug{}'.format(self.deco_l, self.deco_r))
