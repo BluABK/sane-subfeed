@@ -153,7 +153,7 @@ class MainWindow(QMainWindow):
         version_str = None
         git_branchtag = self.get_git_tag()
         try:
-            with open(os.path.join(OS_PATH, '..', '..', 'VERSION.txt'), 'r') as version_file:
+            with open(os.path.join(OS_PATH, '..', '..', 'VERSION'), 'r') as version_file:
                 version = version_file.readline()
                 if git_branchtag:
                     version_str = "{} [{}]".format(str(version), git_branchtag)
