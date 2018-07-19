@@ -159,7 +159,7 @@ class MainWindow(QMainWindow):
                     version_str = "{} [{}]".format(str(version), git_branchtag)
                 else:
                     version_str = str(version)
-        except:     # FIXME: PEP8 -- Too broad except clause
+        except:  # FIXME: PEP8 -- Too broad except clause
             pass
 
         return version_str
@@ -172,17 +172,14 @@ class MainWindow(QMainWindow):
         branchtag = None
         try:
             branchtag = check_output("git rev-parse --abbrev-ref HEAD", shell=True).decode("UTF-8").strip('\n') + ' / '
-        except:     # FIXME: PEP8 -- Too broad except clause
+        except:  # FIXME: PEP8 -- Too broad except clause
             pass
         try:
             branchtag += check_output("git log -n 1 --pretty=format:%h", shell=True).decode("UTF-8").strip('\n')
-        except:     # FIXME: PEP8 -- Too broad except clause
+        except:  # FIXME: PEP8 -- Too broad except clause
             pass
 
         return branchtag
-
-
-
 
     # Menu handling
     def add_menu(self, menubar, name):
