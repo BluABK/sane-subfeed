@@ -1,9 +1,10 @@
 # PyQt5
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox
 
 # Internal
 from sane_yt_subfeed.config_handler import read_config, defaults, get_size
-import sane_yt_subfeed.gui.views.config_view.checkbox as checkbox
+# import sane_yt_subfeed.gui.views.config_view.checkbox as checkbox
+from sane_yt_subfeed.gui.views.config_view import checkbox, combobox
 from sane_yt_subfeed.log_handler import logger
 
 
@@ -95,23 +96,67 @@ class ConfigView(QWidget):
 
         return value  # Needed for connected listeners etc
 
+    def add_option_combobox(self, description, cfg_section, cfg_option, value_listener, items, numeric=True):
+        """
+        Add an option w/ value to the ConfigView layout and increment the grid offset.
+        :param numeric:
+        :param items:
+        :param cfg_option:
+        :param cfg_section:
+        :param value_listener:
+        :param description:
+        :return:
+        """
+        if numeric:
+            items = [str(i) for i in items]
+            if items[0] == 'Disabled':
+                value_offset = -1
+            elif int(items[0]) == 0:
+                value_offset = 0
+            elif int(items[0]) == 1:
+                value_offset = 1
+            else:
+                value_offset = 1
+            current_value = (read_config(cfg_section, cfg_option) - value_offset)
+            print(current_value)
+
+        else:
+            current_value = items.index(read_config(cfg_section, cfg_option))
+        option = QLabel(description)
+        # value = QCheckBox("(Default: {})".format(str(defaults[cfg_section][cfg_option])), self)
+        value = QComboBox()
+        value.addItems(items)
+        value.setCurrentIndex(current_value)
+        value.activated.connect(value_listener)
+        self.layout.addWidget(option, self.offset, 0)
+        self.layout.addWidget(value, self.offset, 1)
+        self.offset += 1
+
+        return value  # Needed for connected listeners etc
+
     def populate_options(self):
         """
         Populate the layout with sections, options and (editable) values
         :return:
         """
+        combox_w_disabled = list(range(-1, 1000))
+        combox_w_disabled[0] = 'Disabled'
+        thumb_qualities = ['maxres', 'standard', 'high', 'medium', 'default']
         # Section [Gui]
         self.add_section('{}GUI{}'.format(self.deco_l, self.deco_r))
         self.launch_gui = self.add_option_checkbox('Launch GUI', 'Gui', 'launch_gui', checkbox.gui_launch_gui)
         self.hide_downloaded_vids = self.add_option_checkbox('Hide downloaded videos from feed', 'Gui',
                                                              'hide_downloaded', checkbox.gui_hide_downloaded)
-        self.add_option_inactive('Grid view X', 'Gui', 'grid_view_x')
-        self.add_option_inactive('Grid view Y', 'Gui', 'grid_view_y')
+        self.add_option_combobox('Grid view X', 'Gui', 'grid_view_x', combobox.gui_grid_view_x, list(range(1, 100)))
+        self.add_option_combobox('Grid view Y', 'Gui', 'grid_view_y', combobox.gui_grid_view_y, list(range(1, 100)))
         self.add_option_checkbox('Grey background on old (1d+) videos', 'Gui', 'grey_old_videos',
                                  checkbox.gui_grey_old_videos)
         self.add_option_checkbox('Enable grid resizing', 'Gui', 'enable_grid_resize', checkbox.gui_enable_grid_resize)
-        self.add_option_inactive('Grid tile preferred height (px)', 'Gui', 'tile_pref_height')
-        self.add_option_inactive('Grid tile preferred width (px)', 'Gui', 'tile_pref_width')
+
+        self.add_option_combobox('Grid tile height (px)', 'Gui', 'tile_pref_height',
+                                 combobox.gui_tile_pref_height, list(range(1, 1000)))
+        self.add_option_combobox('Grid tile width (px)', 'Gui', 'tile_pref_width',
+                                 combobox.gui_tile_pref_width, list(range(1, 1000)))
 
         # Section [Debug]
         self.add_section('{}Debug{}'.format(self.deco_l, self.deco_r))
@@ -121,7 +166,8 @@ class ConfigView(QWidget):
         self.start_with_cached_vids = self.add_option_checkbox('Start with cached videos', 'Debug',
                                                                'start_with_stored_videos',
                                                                checkbox.debug_start_with_stored_videos)
-        self.add_option_inactive('Channel limit', 'Debug', 'channels_limit')
+        self.add_option_combobox('Channel limit', 'Debug', 'channels_limit', combobox.debug_channels_limit,
+                                 combox_w_disabled)
         self.use_playlist_items = self.add_option_checkbox('Use playlistItems', 'Debug', 'use_playlistitems',
                                                            checkbox.debug_use_playlistitems)
         self.disable_tooltips = self.add_option_checkbox('Disable tooltips', 'Debug', 'disable_tooltips',
@@ -132,20 +178,28 @@ class ConfigView(QWidget):
         # Section [Requests]
         self.add_section('{}Requests{}'.format(self.deco_l, self.deco_r))
         self.use_tests = self.add_option_checkbox('Use tests', 'Requests', 'use_tests', checkbox.requests_use_tests)
-        self.add_option_inactive('Missed video limit', 'Requests', 'miss_limit')
-        self.add_option_inactive('Test pages', 'Requests', 'test_pages')
+        self.add_option_combobox('Missed video limit', 'Requests', 'miss_limit', combobox.requests_miss_limit,
+                                 list(range(0, 201)))
+        self.add_option_combobox('Test pages', 'Requests', 'test_pages', combobox.requests_test_pages,
+                                 list(range(0, 201)))
 
         # Section [Thumbnails]
         self.add_section('{}Thumbnails{}'.format(self.deco_l, self.deco_r))
         self.force_dl_best_thumb = self.add_option_checkbox('Force download best quality, based on prioritised list',
                                                             'Thumbnails', 'force_download_best',
                                                             checkbox.thumbnails_force_download_best)
-        self.add_option_inactive('1. Priority', 'Thumbnails', '0')
-        self.add_option_inactive('2. Priority', 'Thumbnails', '1')
-        self.add_option_inactive('3. Priority', 'Thumbnails', '2')
-        self.add_option_inactive('4. Priority', 'Thumbnails', '3')
-        self.add_option_inactive('5. Priority', 'Thumbnails', '4')
+        self.add_option_combobox('1. Priority', 'Thumbnails', '0', combobox.thumbnails_priority_1, thumb_qualities,
+                                 numeric=False)
+        self.add_option_combobox('2. Priority', 'Thumbnails', '1', combobox.thumbnails_priority_2, thumb_qualities,
+                                 numeric=False)
+        self.add_option_combobox('3. Priority', 'Thumbnails', '2', combobox.thumbnails_priority_3, thumb_qualities,
+                                 numeric=False)
+        self.add_option_combobox('4. Priority', 'Thumbnails', '3', combobox.thumbnails_priority_4, thumb_qualities,
+                                 numeric=False)
+        self.add_option_combobox('5. Priority', 'Thumbnails', '4', combobox.thumbnails_priority_5, thumb_qualities,
+                                 numeric=False)
 
         # Section [Threading]
         self.add_section('{}Threading{}'.format(self.deco_l, self.deco_r))
-        self.add_option_inactive('Image/thumbnail download thread limit', 'Threading', 'img_threads')
+        self.add_option_combobox('Image/thumbnail download thread limit', 'Threading', 'img_threads',
+                                 combobox.threading_img_threads, list(range(1, 1001)))
