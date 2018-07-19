@@ -2,8 +2,9 @@
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox
 
 # Internal
-from sane_yt_subfeed.config_handler import read_config, defaults
+from sane_yt_subfeed.config_handler import read_config, defaults, get_size
 import sane_yt_subfeed.gui.views.config_view.checkbox as checkbox
+from sane_yt_subfeed.log_handler import logger
 
 
 class ConfigView(QWidget):
@@ -46,8 +47,10 @@ class ConfigView(QWidget):
         """
         self.layout = QGridLayout()
         self.setLayout(self.layout)
-
         self.populate_options()
+        mismatch = get_size() - self.offset
+        if mismatch != 0:
+            logger.warning("ConfigView is missing {} options!".format(mismatch))
 
     def add_section(self, name):
         """

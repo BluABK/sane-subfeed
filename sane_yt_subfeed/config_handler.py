@@ -99,6 +99,20 @@ def get_options(section):
     return parser.options(section)
 
 
+def get_size():
+    """
+    Sums up sections and options
+    :return:
+    """
+    size = 0
+    for section in parser.sections():
+        size += 1
+        for option in parser.options(section):
+            size += 1
+
+    return size
+
+
 def set_config(section, option, value):
     """
     Sets the givenm option's value
