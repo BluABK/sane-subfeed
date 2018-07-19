@@ -1,10 +1,11 @@
 import os
 
 # from PyQt5 import Qt
-from PyQt5.QtCore import Qt     # PyCharm bug: Anything from QtCore will fail detection, but it *is* there.
+from PyQt5.QtCore import Qt  # PyCharm bug: Anything from QtCore will fail detection, but it *is* there.
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox
 
 from sane_yt_subfeed.config_handler import read_config, set_config, read_entire_config, get_sections, get_options
+import sane_yt_subfeed.gui.views.config_view.checkbox as checkbox
 
 
 class ConfigView(QWidget):
@@ -41,11 +42,11 @@ class ConfigView(QWidget):
         launch_gui_opt = QLabel('Launch GUI?')
         launch_gui_val = QCheckBox("(Default: {})".format(str(read_config('Gui', 'launch_gui'))), self)
         launch_gui_val.setCheckState(2 if read_config('Gui', 'launch_gui') else 0)
-        launch_gui_val.stateChanged.connect(self.check_box_gui_launch_gui)
+        launch_gui_val.stateChanged.connect(checkbox.check_box_gui_launch_gui)
         hide_downloaded_vids_opt = QLabel('Hide downloaded videos from feed')
         hide_downloaded_vids_val = QCheckBox("(Default: {})".format(str(read_config('Gui', 'hide_downloaded'))), self)
         hide_downloaded_vids_val.setCheckState(2 if read_config('Gui', 'hide_downloaded') else 0)
-        hide_downloaded_vids_val.stateChanged.connect(self.check_box_gui_hide_downloaded)
+        hide_downloaded_vids_val.stateChanged.connect(checkbox.check_box_gui_hide_downloaded)
         gridview_x_opt = QLabel('Grid view X')
         gridview_x_val = QLabel(str(read_config('Gui', 'grid_view_x')))
         gridview_y_opt = QLabel('Grid view Y')
@@ -56,36 +57,37 @@ class ConfigView(QWidget):
         debug_opt = QLabel('Debug')
         debug_val = QCheckBox("(Default: {})".format(str(read_config('Debug', 'debug'))), self)
         debug_val.setCheckState(2 if read_config('Debug', 'debug') else 0)
-        debug_val.stateChanged.connect(self.check_box_debug_toggle)
+        debug_val.stateChanged.connect(checkbox.check_box_debug_toggle)
         cache_subs_opt = QLabel('Cache subscriptions')
         cache_subs_val = QCheckBox("(Default: {})".format(str(read_config('Debug', 'cached_subs'))), self)
         cache_subs_val.setCheckState(2 if read_config('Debug', 'cached_subs') else 0)
-        cache_subs_val.stateChanged.connect(self.check_box_debug_cached_subs)
+        cache_subs_val.stateChanged.connect(checkbox.check_box_debug_cached_subs)
         start_with_cached_vids_opt = QLabel('Start with cached videos')
-        start_with_cached_vids_val = QCheckBox("(Default: {})".format(str(read_config('Debug', 'start_with_stored_videos'))), self)
+        start_with_cached_vids_val = QCheckBox(
+            "(Default: {})".format(str(read_config('Debug', 'start_with_stored_videos'))), self)
         start_with_cached_vids_val.setCheckState(2 if read_config('Debug', 'start_with_stored_videos') else 0)
-        start_with_cached_vids_val.stateChanged.connect(self.check_box_debug_start_with_stored_videos)
+        start_with_cached_vids_val.stateChanged.connect(checkbox.check_box_debug_start_with_stored_videos)
         channel_limit_opt = QLabel('Channel limit')
         channel_limit_val = QLabel(str(read_config('Debug', 'channels_limit')))
         use_playlist_items_opt = QLabel('Use playlistItems')
         use_playlist_items_val = QCheckBox("(Default: {})".format(str(read_config('Debug', 'use_playlistItems'))), self)
         use_playlist_items_val.setCheckState(2 if read_config('Debug', 'use_playlistItems') else 0)
-        use_playlist_items_val.stateChanged.connect(self.check_box_debug_use_playlistitems)
+        use_playlist_items_val.stateChanged.connect(checkbox.check_box_debug_use_playlistitems)
         disable_tooltips_opt = QLabel('Disable tooltips')
         disable_tooltips_val = QCheckBox("(Default: {})".format(str(read_config('Debug', 'disable_tooltips'))), self)
         disable_tooltips_val.setCheckState(2 if read_config('Debug', 'disable_tooltips') else 0)
-        disable_tooltips_val.stateChanged.connect(self.check_box_debug_disable_tooltips)
+        disable_tooltips_val.stateChanged.connect(checkbox.check_box_debug_disable_tooltips)
         disable_tqdm_opt = QLabel('Disable tqdm (cli)')
         disable_tqdm_val = QCheckBox("(Default: {})".format(str(read_config('Debug', 'disable_tqdm'))), self)
         disable_tqdm_val.setCheckState(2 if read_config('Debug', 'disable_tqdm') else 0)
-        disable_tqdm_val.stateChanged.connect(self.check_box_debug_disable_tqdm)
+        disable_tqdm_val.stateChanged.connect(checkbox.check_box_debug_disable_tqdm)
 
         # Section [Requests]
         requests_section = QLabel('{}Requests{}'.format(deco_l, deco_r))
         use_tests_opt = QLabel('Use tests')
         use_tests_val = QCheckBox("(Default: {})".format(str(read_config('Requests', 'use_tests'))), self)
         use_tests_val.setCheckState(2 if read_config('Requests', 'use_tests') else 0)
-        use_tests_val.stateChanged.connect(self.check_box_requests_use_tests)
+        use_tests_val.stateChanged.connect(checkbox.check_box_requests_use_tests)
         missed_vid_limit_opt = QLabel('Missed video limit')
         missed_vid_limit_val = QLabel(str(read_config('Requests', 'miss_limit')))
         test_pages_opt = QLabel('Test pages')
@@ -94,9 +96,10 @@ class ConfigView(QWidget):
         # Section [Thumbnails]
         thumbnails_section = QLabel('{}Thumbnails{}'.format(deco_l, deco_r))
         force_dl_best_thumb_opt = QLabel('Force download best quality, based on prioritised list')
-        force_dl_best_thumb_val = QCheckBox("(Default: {})".format(str(read_config('Thumbnails', 'force_download_best'))), self)
+        force_dl_best_thumb_val = QCheckBox(
+            "(Default: {})".format(str(read_config('Thumbnails', 'force_download_best'))), self)
         force_dl_best_thumb_val.setCheckState(2 if read_config('Thumbnails', 'force_download_best') else 0)
-        force_dl_best_thumb_val.stateChanged.connect(self.check_box_thumbnails_force_download_best)
+        force_dl_best_thumb_val.stateChanged.connect(checkbox.check_box_thumbnails_force_download_best)
         force_dl_best_thumb_prio_1_opt = QLabel('1. Priority')
         force_dl_best_thumb_prio_1_val = QLabel(str(read_config('Thumbnails', '0')))
         force_dl_best_thumb_prio_2_opt = QLabel('2. Priority')
@@ -172,124 +175,3 @@ class ConfigView(QWidget):
         section_offset += 1
         layout.addWidget(img_thread_limit_opt, (section_offset + 20), 0)
         layout.addWidget(img_thread_limit_val, (section_offset + 20), 1)
-
-    @staticmethod
-    def check_box_gui_launch_gui(state):
-        """
-        Toggles the given setting between True and False
-        :param state: 0=unchecked, 1=tristate?, 2=checked
-        :return:
-        """
-        if state == Qt.Checked:
-            set_config('Gui', 'launch_gui', 'True')
-        else:
-            set_config('Gui', 'launch_gui', 'False')
-
-    @staticmethod
-    def check_box_gui_hide_downloaded(state):
-        """
-        Toggles the given setting between True and False
-        :param state: 0=unchecked, 1=tristate?, 2=checked
-        :return:
-        """
-        if state == Qt.Checked:
-            set_config('Gui', 'hide_downloaded', 'True')
-        else:
-            set_config('Gui', 'hide_downloaded', 'False')
-
-    @staticmethod
-    def check_box_debug_toggle(state):
-        """
-        Toggles the given setting between True and False
-        :param state: 0=unchecked, 1=tristate?, 2=checked
-        :return:
-        """
-        if state == Qt.Checked:
-            set_config('Debug', 'debug', 'True')
-        else:
-            set_config('Debug', 'debug', 'False')
-
-    @staticmethod
-    def check_box_debug_cached_subs(state):
-        """
-        Toggles the given setting between True and False
-        :param state: 0=unchecked, 1=tristate?, 2=checked
-        :return:
-        """
-        if state == Qt.Checked:
-            set_config('Debug', 'cached_subs', 'True')
-        else:
-            set_config('Debug', 'cached_subs', 'False')
-
-    @staticmethod
-    def check_box_debug_start_with_stored_videos(state):
-        """
-        Toggles the given setting between True and False
-        :param state: 0=unchecked, 1=tristate?, 2=checked
-        :return:
-        """
-        if state == Qt.Checked:
-            set_config('Debug', 'start_with_stored_videos', 'True')
-        else:
-            set_config('Debug', 'start_with_stored_videos', 'False')
-
-    @staticmethod
-    def check_box_debug_use_playlistitems(state):
-        """
-        Toggles the given setting between True and False
-        :param state: 0=unchecked, 1=tristate?, 2=checked
-        :return:
-        """
-        if state == Qt.Checked:
-            set_config('Debug', 'use_playlistitems', 'True')
-        else:
-            set_config('Debug', 'use_playlistitems', 'False')
-
-    @staticmethod
-    def check_box_debug_disable_tooltips(state):
-        """
-        Toggles the given setting between True and False
-        :param state: 0=unchecked, 1=tristate?, 2=checked
-        :return:
-        """
-        if state == Qt.Checked:
-            set_config('Debug', 'disable_tooltips', 'True')
-        else:
-            set_config('Debug', 'disable_tooltips', 'False')
-
-    @staticmethod
-    def check_box_debug_disable_tqdm(state):
-        """
-        Toggles the given setting between True and False
-        :param state: 0=unchecked, 1=tristate?, 2=checked
-        :return:
-        """
-        if state == Qt.Checked:
-            set_config('Debug', 'disable_tqdm', 'True')
-        else:
-            set_config('Debug', 'disable_tqdm', 'False')
-
-    @staticmethod
-    def check_box_requests_use_tests(state):
-        """
-        Toggles the given setting between True and False
-        :param state: 0=unchecked, 1=tristate?, 2=checked
-        :return:
-        """
-        if state == Qt.Checked:
-            set_config('Requests', 'use_tests', 'True')
-        else:
-            set_config('Requests', 'use_tests', 'False')
-
-    @staticmethod
-    def check_box_thumbnails_force_download_best(state):
-        """
-        Toggles the given setting between True and False
-        :param state: 0=unchecked, 1=tristate?, 2=checked
-        :return:
-        """
-        if state == Qt.Checked:
-            set_config('Thumbnails', 'force_download_best', 'True')
-        else:
-            set_config('Thumbnails', 'force_download_best', 'False')
-
