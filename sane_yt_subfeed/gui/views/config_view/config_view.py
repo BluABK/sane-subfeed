@@ -118,7 +118,6 @@ class ConfigView(QWidget):
             else:
                 value_offset = 1
             current_value = (read_config(cfg_section, cfg_option) - value_offset)
-            print(current_value)
 
         else:
             current_value = items.index(read_config(cfg_section, cfg_option))
