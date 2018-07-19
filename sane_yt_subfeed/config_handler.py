@@ -21,12 +21,12 @@ defaults = {
         'cached_subs': 'True',
         'start_with_stored_videos': 'False',
         'channels_limit': '-1',
-        'use_playlistItems': 'True',
+        'use_playlistitems': 'True',
         'disable_tqdm': 'True',
         'disable_tooltips': 'False'
     },
     'Gui': {
-        'launch': 'Gui',
+        'launch_gui': 'True',
         'hide_downloaded': 'True',
         'grid_view_x': '5',
         'grid_view_y': '4',
@@ -44,7 +44,7 @@ defaults = {
         '4': 'default'
     },
     'Threading': {
-        'img_threads': '100',
+        'img_threads': '200',
     }
 }
 
