@@ -1,3 +1,8 @@
+v0.2.0-dev2
+- Renamed VERSION.txt --> VERSION
+- A grand rewrite of ConfigView making it humanly usable
+- ConfigView now has comboboxes and covers *all* settings
+
 v0.2.0-dev
 - Added this changelog \o/
 - Added feature: Versioning
