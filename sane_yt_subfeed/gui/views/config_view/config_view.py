@@ -57,17 +57,18 @@ class ConfigView(QWidget):
         self.layout.addWidget(QLabel(name), self.offset, 0)
         self.offset += 1
 
-    def add_option_checkbox(self, option_name, current_value, value_listener):
+    def add_option_checkbox(self, description, cfg_section, cfg_option, value_listener):
         """
         Add an option w/ value to the ConfigView layout and increment the grid offset.
-        :param current_value:
+        :param cfg_option:
+        :param cfg_section:
         :param value_listener:
-        :param option_name:
+        :param description:
         :return:
         """
-        option = QLabel(option_name)
-        value = QCheckBox("(Default: {})".format(str(current_value)), self)  # FIXME: use default dict
-        value.setCheckState(2 if current_value else 0)
+        option = QLabel(description)
+        value = QCheckBox("(Default: {})".format(str(defaults[cfg_section][cfg_option])), self)
+        value.setCheckState(2 if read_config(cfg_section, cfg_option) else 0)
         value.stateChanged.connect(value_listener)
         self.layout.addWidget(option, self.offset, 0)
         self.layout.addWidget(value, self.offset, 1)
@@ -75,15 +76,16 @@ class ConfigView(QWidget):
 
         return value  # Needed for connected listeners etc
 
-    def add_option_inactive(self, option_name, current_value):
+    def add_option_inactive(self, description, cfg_section, cfg_option):
         """
         Add an option w/ UNEDITABLE value to the ConfigView layout and increment the grid offset.
-        :param current_value:
-        :param option_name:
+        :param cfg_option:
+        :param cfg_section:
+        :param description:
         :return:
         """
-        option = QLabel(option_name)
-        value = QLabel(str(current_value))
+        option = QLabel(description)
+        value = QLabel(str(defaults[cfg_section][cfg_option]))
         self.layout.addWidget(option, self.offset, 0)
         self.layout.addWidget(value, self.offset, 1)
         self.offset += 1
@@ -97,49 +99,45 @@ class ConfigView(QWidget):
         """
         # Section [Gui]
         self.add_section('{}GUI{}'.format(self.deco_l, self.deco_r))
-        self.launch_gui = self.add_option_checkbox('Launch GUI?', read_config('Gui', 'launch_gui'),
-                                                   checkbox.gui_launch_gui)
-        self.hide_downloaded_vids = self.add_option_checkbox('Hide downloaded videos from feed',
-                                                             read_config('Gui', 'hide_downloaded'),
-                                                             checkbox.gui_hide_downloaded)
-        self.add_option_inactive('Grid view X', read_config('Gui', 'grid_view_x'))
-        self.add_option_inactive('Grid view Y', read_config('Gui', 'grid_view_y'))
+        self.launch_gui = self.add_option_checkbox('Launch GUI?', 'Gui', 'launch_gui', checkbox.gui_launch_gui)
+        self.hide_downloaded_vids = self.add_option_checkbox('Hide downloaded videos from feed', 'Gui',
+                                                             'hide_downloaded', checkbox.gui_hide_downloaded)
+        self.add_option_inactive('Grid view X', 'Gui', 'grid_view_x')
+        self.add_option_inactive('Grid view Y', 'Gui', 'grid_view_y')
 
         # Section [Debug]
         self.add_section('{}Debug{}'.format(self.deco_l, self.deco_r))
-        self.debug_toggle = self.add_option_checkbox('Debug', read_config('Debug', 'debug'), checkbox.debug_toggle)
-        self.cache_subs = self.add_option_checkbox('Cache subscriptions', read_config('Debug', 'cached_subs'),
+        self.debug_toggle = self.add_option_checkbox('Debug', 'Debug', 'debug', checkbox.debug_toggle)
+        self.cache_subs = self.add_option_checkbox('Cache subscriptions', 'Debug', 'cached_subs',
                                                    checkbox.debug_cached_subs)
-        self.start_with_cached_vids = self.add_option_checkbox('Start with cached videos',
-                                                               read_config('Debug', 'start_with_stored_videos'),
+        self.start_with_cached_vids = self.add_option_checkbox('Start with cached videos', 'Debug',
+                                                               'start_with_stored_videos',
                                                                checkbox.debug_start_with_stored_videos)
-        self.add_option_inactive('Channel limit', read_config('Debug', 'channels_limit'))
-        self.use_playlist_items = self.add_option_checkbox('Use playlistItems',
-                                                           read_config('Debug', 'use_playlistItems'),
+        self.add_option_inactive('Channel limit', 'Debug', 'channels_limit')
+        self.use_playlist_items = self.add_option_checkbox('Use playlistItems', 'Debug', 'use_playlistitems',
                                                            checkbox.debug_use_playlistitems)
-        self.disable_tooltips = self.add_option_checkbox('Disable tooltips', read_config('Debug', 'disable_tooltips'),
+        self.disable_tooltips = self.add_option_checkbox('Disable tooltips', 'Debug', 'disable_tooltips',
                                                          checkbox.debug_disable_tooltips)
-        self.disable_tqdm = self.add_option_checkbox('Disable tqdm (cli)', read_config('Debug', 'disable_tqdm'),
+        self.disable_tqdm = self.add_option_checkbox('Disable tqdm (cli)', 'Debug', 'disable_tqdm',
                                                      checkbox.debug_disable_tqdm)
 
         # Section [Requests]
         self.add_section('{}Requests{}'.format(self.deco_l, self.deco_r))
-        self.use_tests = self.add_option_checkbox('Use tests', read_config('Requests', 'use_tests'),
-                                                  checkbox.requests_use_tests)
-        self.add_option_inactive('Missed video limit', read_config('Requests', 'miss_limit'))
-        self.add_option_inactive('Test pages', read_config('Requests', 'test_pages'))
+        self.use_tests = self.add_option_checkbox('Use tests', 'Requests', 'use_tests', checkbox.requests_use_tests)
+        self.add_option_inactive('Missed video limit', 'Requests', 'miss_limit')
+        self.add_option_inactive('Test pages', 'Requests', 'test_pages')
 
         # Section [Thumbnails]
         self.add_section('{}Thumbnails{}'.format(self.deco_l, self.deco_r))
         self.force_dl_best_thumb = self.add_option_checkbox('Force download best quality, based on prioritised list',
-                                                            read_config('Thumbnails', 'force_download_best'),
+                                                            'Thumbnails', 'force_download_best',
                                                             checkbox.thumbnails_force_download_best)
-        self.add_option_inactive('1. Priority', read_config('Thumbnails', '0'))
-        self.add_option_inactive('2. Priority', read_config('Thumbnails', '1'))
-        self.add_option_inactive('3. Priority', read_config('Thumbnails', '2'))
-        self.add_option_inactive('4. Priority', read_config('Thumbnails', '3'))
-        self.add_option_inactive('5. Priority', read_config('Thumbnails', '4'))
+        self.add_option_inactive('1. Priority', 'Thumbnails', '0')
+        self.add_option_inactive('2. Priority', 'Thumbnails', '1')
+        self.add_option_inactive('3. Priority', 'Thumbnails', '2')
+        self.add_option_inactive('4. Priority', 'Thumbnails', '3')
+        self.add_option_inactive('5. Priority', 'Thumbnails', '4')
 
         # Section [Threading]
         self.add_section('{}Threading{}'.format(self.deco_l, self.deco_r))
-        self.add_option_inactive('Image/thumbnail download thread limit', read_config('Threading', 'img_threads'))
+        self.add_option_inactive('Image/thumbnail download thread limit', 'Threading', 'img_threads')
