@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox
 from sane_yt_subfeed.config_handler import read_config, set_config, read_entire_config, get_sections, get_options
 
 
-def check_box_gui_launch_gui(state):
+def gui_launch_gui(state):
     """
     Toggles the given setting between True and False
     :param state: 0=unchecked, 1=tristate?, 2=checked
@@ -16,7 +16,7 @@ def check_box_gui_launch_gui(state):
         set_config('Gui', 'launch_gui', 'False')
 
 
-def check_box_gui_hide_downloaded(state):
+def gui_hide_downloaded(state):
     """
     Toggles the given setting between True and False
     :param state: 0=unchecked, 1=tristate?, 2=checked
@@ -28,7 +28,7 @@ def check_box_gui_hide_downloaded(state):
         set_config('Gui', 'hide_downloaded', 'False')
 
 
-def check_box_debug_toggle(state):
+def debug_toggle(state):
     """
     Toggles the given setting between True and False
     :param state: 0=unchecked, 1=tristate?, 2=checked
@@ -40,7 +40,7 @@ def check_box_debug_toggle(state):
         set_config('Debug', 'debug', 'False')
 
 
-def check_box_debug_cached_subs(state):
+def debug_cached_subs(state):
     """
     Toggles the given setting between True and False
     :param state: 0=unchecked, 1=tristate?, 2=checked
@@ -52,7 +52,7 @@ def check_box_debug_cached_subs(state):
         set_config('Debug', 'cached_subs', 'False')
 
 
-def check_box_debug_start_with_stored_videos(state):
+def debug_start_with_stored_videos(state):
     """
     Toggles the given setting between True and False
     :param state: 0=unchecked, 1=tristate?, 2=checked
@@ -64,7 +64,7 @@ def check_box_debug_start_with_stored_videos(state):
         set_config('Debug', 'start_with_stored_videos', 'False')
 
 
-def check_box_debug_use_playlistitems(state):
+def debug_use_playlistitems(state):
     """
     Toggles the given setting between True and False
     :param state: 0=unchecked, 1=tristate?, 2=checked
@@ -76,7 +76,7 @@ def check_box_debug_use_playlistitems(state):
         set_config('Debug', 'use_playlistitems', 'False')
 
 
-def check_box_debug_disable_tooltips(state):
+def debug_disable_tooltips(state):
     """
     Toggles the given setting between True and False
     :param state: 0=unchecked, 1=tristate?, 2=checked
@@ -88,7 +88,7 @@ def check_box_debug_disable_tooltips(state):
         set_config('Debug', 'disable_tooltips', 'False')
 
 
-def check_box_debug_disable_tqdm(state):
+def debug_disable_tqdm(state):
     """
     Toggles the given setting between True and False
     :param state: 0=unchecked, 1=tristate?, 2=checked
@@ -100,7 +100,7 @@ def check_box_debug_disable_tqdm(state):
         set_config('Debug', 'disable_tqdm', 'False')
 
 
-def check_box_requests_use_tests(state):
+def requests_use_tests(state):
     """
     Toggles the given setting between True and False
     :param state: 0=unchecked, 1=tristate?, 2=checked
@@ -112,7 +112,7 @@ def check_box_requests_use_tests(state):
         set_config('Requests', 'use_tests', 'False')
 
 
-def check_box_thumbnails_force_download_best(state):
+def thumbnails_force_download_best(state):
     """
     Toggles the given setting between True and False
     :param state: 0=unchecked, 1=tristate?, 2=checked
