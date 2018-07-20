@@ -43,6 +43,7 @@ def run_print():
     print("\nRun time: {}".format(time_elsapsed))
 
 
+# FIXME: move this method to the youtube package
 def run_channels_test():
     logger.info('Running Channels test')
     subscriptions = get_subscriptions(cached_subs)
