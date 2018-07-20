@@ -7,7 +7,7 @@ import os
 # PyQt5 libs
 from subprocess import check_output
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QVBoxLayout, QStackedWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QVBoxLayout, QStackedWidget, QProgressBar
 from PyQt5.QtGui import QIcon
 
 # Project internal libs
@@ -128,6 +128,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(app_title)
         self.setWindowIcon(QIcon(os.path.join(ICO_PATH, 'yubbtubbz-padding.ico')))
         self.statusBar().showMessage('Ready.')
+        self.statusBar().addPermanentWidget(self.progress_bar)
 
         # # Set a default view and layout
         # window_layout = QVBoxLayout()
