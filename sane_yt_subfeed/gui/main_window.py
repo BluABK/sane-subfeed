@@ -92,6 +92,8 @@ class MainWindow(QMainWindow):
         refresh_subs = self.add_submenu('&Function', 'Reload Subscriptions &List', self.refresh_subs, shortcut='Ctrl+L',
                                         tooltip='Fetch a new subscriptions list', icon='refresh_subs.png')
 
+        self.add_submenu('&Function', 'Test Channels', self.test_channels,
+                         tooltip='Tests the test_pages and miss_limit of channels', icon='refresh.png')
         # View menu
         self.add_menu(menubar, '&View')
         view_grid_view = self.add_submenu('&View', 'Grid', self.view_grid, shortcut='Ctrl+1',
@@ -228,33 +230,6 @@ class MainWindow(QMainWindow):
         """
         widget.setHidden(True)
 
-    def switch_view_kindly(self, new_view):  # TODO: Deferred usage (Garbage collection issue)
-        """
-        Switch to a new view: Kind & Gentle edition.
-        Hide currently shown view and show new_view instead
-        :param new_view:
-        :return:
-        """
-        self.hide_widget(self.current_view)
-        if new_view.isHidden():
-            new_view.setHidden(False)
-        self.current_view = new_view
-        self.setCentralWidget(new_view)
-        self.update()
-
-    def switch_view_destructively(self, new_view_spawn):
-        """
-        Switch to a new view: Destructive edition.
-        Sets the current view and CentralWidget to a spawned new view, The old view then gets brutally murdered by
-        PyQT5's ruthless garbage collection.
-        :param new_view_spawn:
-        :return:
-        """
-        self.current_view = new_view_spawn
-        self.setCentralWidget(new_view_spawn)
-        self.update()
-        return new_view_spawn
-
     def view_grid(self):
         """
         Set View variable and CentralWidget to GridView
@@ -319,6 +294,13 @@ class MainWindow(QMainWindow):
         :return:
         """
         self.main_model.main_window_listener.refreshVideos.emit()
+
+    def test_channels(self):
+        """
+        Sends a testChannels signal
+        :return:
+        """
+        self.main_model.main_window_listener.testChannels.emit()
 
     def refresh_subs(self):
         """

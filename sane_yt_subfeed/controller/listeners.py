@@ -4,6 +4,7 @@ import time
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
+from sane_yt_subfeed import main
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.video import Video
@@ -42,6 +43,7 @@ class GridViewListener(QObject):
 
 
 class MainWindowListener(QObject):
+    testChannels = pyqtSignal()
     refreshVideos = pyqtSignal()
     refreshSubs = pyqtSignal()
 
@@ -50,6 +52,7 @@ class MainWindowListener(QObject):
         self.model = model
         self.refreshVideos.connect(self.refresh_videos)
         self.refreshSubs.connect(self.refresh_subs)
+        self.testChannels.connect(self.test_channels)
 
     def run(self):
         while True:
@@ -81,6 +84,14 @@ class MainWindowListener(QObject):
         """
         logger.info("Reloading subscriptions list")
         get_remote_subscriptions_cached_oauth()
+
+    @pyqtSlot()
+    def test_channels(self):
+        """
+        Runs the test channels test
+        :return:
+        """
+        main.run_channels_test()
 
 
 class DatabaseListener(QObject):
