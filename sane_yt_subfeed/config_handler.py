@@ -14,7 +14,8 @@ defaults = {
     'Requests': {
         'miss_limit': '10',
         'test_pages': '2',
-        'use_tests': 'True'
+        'use_tests': 'True',
+        'extra_list_pages': '0'
     },
     'Debug': {
         'debug': 'False',

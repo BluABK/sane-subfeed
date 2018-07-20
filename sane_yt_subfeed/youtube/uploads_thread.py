@@ -42,21 +42,20 @@ class GetUploadsThread(threading.Thread):
             channel = db_session.query(Channel).get(self.channel_id)
             miss = read_config('Requests', 'miss_limit')
             pages = read_config('Requests', 'test_pages')
+            extra_pages = read_config('Requests', 'extra_list_pages')
             used_list = False
-            counter = 0
+            list_pages = 0
             for test in channel.tests:
+                if test.test_pages > list_pages:
+                    list_pages = test.test_pages
                 if test.test_miss < miss or test.test_pages > pages:
                     used_list = True
                     db_session.remove()
-                    counter += 1
                     list_uploaded_videos_search(self.youtube, self.channel_id, self.videos, self.req_limit)
                     break
             if not used_list:
-                counter += 1
+                list_uploaded_videos(self.youtube, self.videos, self.playlist_id, list_pages+extra_pages)
                 db_session.remove()
-                list_uploaded_videos(self.youtube, self.videos, self.playlist_id, self.req_limit)
-            if counter > 1:
-                raise ResourceWarning
         else:
             use_playlist_items = read_config('Debug', 'use_playlistItems')
             if use_playlist_items:
