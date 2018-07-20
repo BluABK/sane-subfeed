@@ -2,7 +2,7 @@ from PyQt5.QtCore import QThread
 
 # FIXME: imp*
 from sane_yt_subfeed.controller.listeners import *
-from sane_yt_subfeed.database.read_operations import get_newest_stored_videos
+from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, refresh_and_get_newest_videos
 
 
 class MainModel:
