@@ -129,7 +129,9 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QIcon(os.path.join(ICO_PATH, 'yubbtubbz-padding.ico')))
         self.statusBar().showMessage('Ready.')
 
-        self.statusBar().addPermanentWidget(self.main_model.new_status_bar_progress(self))
+        progress_bar = self.main_model.new_status_bar_progress(self)
+        progress_bar.setFixedHeight(20)
+        self.statusBar().addPermanentWidget(progress_bar)
 
         # # Set a default view and layout
         # window_layout = QVBoxLayout()
