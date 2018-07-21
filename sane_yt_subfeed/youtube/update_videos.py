@@ -18,7 +18,7 @@ YOUTUBE_PARM_PLIST = "playlist?list ="
 YT_VIDEO_URL = YOUTUBE_URL + YOUTUBE_PARM_VIDEO
 
 
-def refresh_uploads(progress_bar_listener: ProgressBar=None):
+def refresh_uploads(progress_bar_listener: ProgressBar=None, add_to_max=0):
     thread_increment = 0
     thread_list = []
     videos = []
@@ -26,8 +26,7 @@ def refresh_uploads(progress_bar_listener: ProgressBar=None):
     subscriptions = get_subscriptions(cached_subs)
     youtube_keys = load_keys(subscriptions)
     if progress_bar_listener:
-        progress_bar_listener.resetBar.emit()
-        progress_bar_listener.setMaximum.emit(2*len(subscriptions))
+        progress_bar_listener.setMaximum.emit(2*len(subscriptions)+add_to_max)
 
     channels_limit = read_config('Debug', 'channels_limit')
     for channel, youtube in tqdm(zip(subscriptions, youtube_keys), desc="Creating video update threads",

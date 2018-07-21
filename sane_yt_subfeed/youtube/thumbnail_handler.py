@@ -23,12 +23,13 @@ THUMBNAILS_PATH = os.path.join(OS_PATH, '..', 'resources', 'thumbnails')
 
 class DownloadThumbnail(threading.Thread):
 
-    def __init__(self, thread_list, video, force_dl_best, thumbnail_dict):
+    def __init__(self, thread_list, video, force_dl_best, thumbnail_dict, progress_listener=None):
         threading.Thread.__init__(self)
         self.thread_list = thread_list
         self.video = video
         self.force_dl_best = force_dl_best
         self.thumbnail_dict = thumbnail_dict
+        self.progress_listener = progress_listener
 
     def run(self):
         vid_path = os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(self.video.video_id))
@@ -43,21 +44,29 @@ class DownloadThumbnail(threading.Thread):
                     crop = True
                 download_file(self.thumbnail_dict['url'], vid_path, crop=crop, quality=quality['quality'])
         self.thread_list.remove(self)
+        if self.progress_listener:
+            self.progress_listener.updateProgress.emit()
 
 
 def get_thumbnail_path(vid):
     return os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(vid.video_id))
 
 
-def download_thumbnails_threaded(vid_list):
+def download_thumbnails_threaded(vid_list, progress_listener=None):
     thread_list = []
     thread_limit = int(read_config('Threading', 'img_threads'))
     force_dl_best = read_config('Thumbnails', 'force_download_best')
+
+    if progress_listener:
+        progress_listener.setText.emit('Downloading thumbnails')
+
     for vid in tqdm(vid_list, desc="Starting thumbnail threads", disable=read_config('Debug', 'disable_tqdm')):
         thumbnail_dict = get_best_thumbnail(vid)
-        t = DownloadThumbnail(thread_list, vid, force_dl_best, thumbnail_dict)
+        t = DownloadThumbnail(thread_list, vid, force_dl_best, thumbnail_dict, progress_listener=progress_listener)
         thread_list.append(t)
         t.start()
+        if progress_listener:
+            progress_listener.updateProgress.emit()
         while len(thread_list) >= thread_limit:
             time.sleep(0.0001)
     time.sleep(0.01)
