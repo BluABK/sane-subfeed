@@ -111,17 +111,19 @@ class DatabaseListener(QObject):
     def refresh_videos(self):
         print('refresh')
 
+
 class ProgressBar(QObject):
     setMaximum = pyqtSignal(int)
     setProgress = pyqtSignal(int)
     updateProgress = pyqtSignal()
     setText = pyqtSignal(str)
     resetBar = pyqtSignal()
+    progress_bar = None
 
-    def __init__(self, parent, model):
+    def __init__(self, model, progress_bar):
         super().__init__()
-        self.parent = parent
-        self.progress_bar = QProgressBar(parent=parent)
+        self.model = model
+        self.progress_bar = progress_bar
         self.setMaximum.connect(self.set_maximum)
         self.setProgress.connect(self.set_progress)
         self.updateProgress.connect(self.update_progress)

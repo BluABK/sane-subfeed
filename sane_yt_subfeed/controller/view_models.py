@@ -7,6 +7,10 @@ from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, r
 
 class MainModel:
 
+    status_bar_progress = None
+    status_bar_thread = None
+    status_bar_listener = None
+
     def __init__(self, videos, filtered_videos, videos_limit):
         super().__init__()
         self.videos_limit = videos_limit
@@ -53,3 +57,12 @@ class MainModel:
             self.grid_view_listener.hiddenVideosChanged.emit()
         else:
             self.videos = refresh_and_get_newest_videos((self.videos_limit, filtered))
+
+    def new_status_bar_progress(self, parent):
+        self.status_bar_progress = QProgressBar(parent=parent)
+        self.status_bar_listener = ProgressBar(self, self.status_bar_progress)
+        self.status_bar_thread = QThread()
+        self.status_bar_thread.setObjectName('status_bar_thread')
+        self.status_bar_listener.moveToThread(self.status_bar_thread)
+        self.status_bar_thread.start()
+        return self.status_bar_progress
