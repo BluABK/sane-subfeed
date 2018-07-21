@@ -50,12 +50,14 @@ def compare_db_filtered(videos, limit, discarded=False, downloaded=False):
 
 
 def refresh_and_get_newest_videos(limit, filter_downloaded=False, progress_listener=None):
-    videos = refresh_uploads(progress_bar_listener=progress_listener)
+    if progress_listener:
+        progress_listener.resetBar.emit()
+    videos = refresh_uploads(progress_bar_listener=progress_listener, add_to_max=2*limit)
     UpdateVideosThread(videos).start()
     if filter_downloaded:
         return_list = compare_db_filtered(videos, limit, True, True)
     else:
         return_list = videos[:limit]
-    download_thumbnails_threaded(return_list)
+    download_thumbnails_threaded(return_list, progress_listener=progress_listener)
     UpdateVideosThread(return_list, update_existing=True).start()
     return return_list
