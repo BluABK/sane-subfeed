@@ -124,6 +124,9 @@ class ProgressBar(QObject):
         super().__init__()
         self.model = model
         self.progress_bar = progress_bar
+        self.progress_bar.setTextVisible(True)
+        self.progress_bar.setAlignment(Qt.AlignCenter)
+
         self.setMaximum.connect(self.set_maximum)
         self.setProgress.connect(self.set_progress)
         self.updateProgress.connect(self.update_progress)
@@ -147,7 +150,8 @@ class ProgressBar(QObject):
         self.progress_bar.update()
 
     def set_text(self, text):
-        self.progress_bar.text = text
+        self.progress_bar.setFormat(text)
+        # self.progress_bar.text = text
         self.progress_bar.update()
 
     def reset_bar(self):

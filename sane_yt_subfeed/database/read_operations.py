@@ -49,8 +49,8 @@ def compare_db_filtered(videos, limit, discarded=False, downloaded=False):
     return return_list
 
 
-def refresh_and_get_newest_videos(limit, filter_downloaded=False):
-    videos = refresh_uploads()
+def refresh_and_get_newest_videos(limit, filter_downloaded=False, progress_listener=None):
+    videos = refresh_uploads(progress_bar_listener=progress_listener)
     UpdateVideosThread(videos).start()
     if filter_downloaded:
         return_list = compare_db_filtered(videos, limit, True, True)

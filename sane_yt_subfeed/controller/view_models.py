@@ -53,10 +53,10 @@ class MainModel:
     def remote_update_videos(self, filtered=True):
         # FIXME: only does filtered videos
         if filtered:
-            self.filtered_videos = refresh_and_get_newest_videos(self.videos_limit, filtered)
+            self.filtered_videos = refresh_and_get_newest_videos(self.videos_limit, filtered, self.status_bar_listener)
             self.grid_view_listener.hiddenVideosChanged.emit()
         else:
-            self.videos = refresh_and_get_newest_videos((self.videos_limit, filtered))
+            self.videos = refresh_and_get_newest_videos((self.videos_limit, filtered, self.status_bar_listener))
 
     def new_status_bar_progress(self, parent):
         self.status_bar_progress = QProgressBar(parent=parent)
