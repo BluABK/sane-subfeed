@@ -17,6 +17,8 @@ use_playlistItems = True
 disable_tooltips = False
 disable_tqdm = True
 show_grab_method = False
+log_search = False
+log_list = False
 
 [Requests]
 use_tests = False
