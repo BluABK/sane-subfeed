@@ -5,6 +5,7 @@ from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_search, get_channel_uploads, \
     list_uploaded_videos
+from sane_yt_subfeed.log_handler import logger
 
 
 class GetUploadsThread(threading.Thread):

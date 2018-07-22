@@ -9,6 +9,7 @@ from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session, engine
 from sane_yt_subfeed.database.write_operations import engine_execute_first, engine_execute
 from sane_yt_subfeed.database.engine_statements import update_channel_from_remote, get_channel_by_id_stmt
+from sane_yt_subfeed.log_handler import logger
 from sane_yt_subfeed.pickle_handler import load_sub_list, load_youtube, dump_youtube, dump_sub_list
 from sane_yt_subfeed.print_functions import remove_empty_kwargs
 import datetime
@@ -74,6 +75,10 @@ def list_uploaded_videos(youtube_key, videos, uploads_playlist_id, req_limit):
 
         # Grab information about each video.
         for search_result in playlistitems_list_response['items']:
+            if read_config('Debug', 'log_list'):
+                logger.debug("list():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
+                                                             search_result['snippet']['publishedAt'],
+                                                             search_result['snippet']['title']))
             videos.append(VideoD.playlist_item_new_video_d(search_result))
         if searched_pages >= req_limit:
             break
@@ -123,6 +128,12 @@ def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit, live
             if (not live_videos) and (not live_broadcast):
                 break
             if search_result['id']['kind'] == 'youtube#video':
+                if read_config('Debug', 'log_search'):
+                    title = search_result['snippet']['title']
+                    if search_result['snippet']['liveBroadcastContent'] != "none":
+                        title += " [LIVESTREAM]"
+                    logger.debug("search():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
+                                                                   search_result['snippet']['publishedAt'], title))
                 videos.append(VideoD(search_result))
         if search_pages >= req_limit:
             break

@@ -25,7 +25,9 @@ defaults = {
         'use_playlistitems': 'True',
         'disable_tqdm': 'True',
         'disable_tooltips': 'False',
-        'show_grab_method': 'False'
+        'show_grab_method': 'False',
+        'log_search': 'False',
+        'log_list': 'False'
     },
     'Gui': {
         'launch_gui': 'True',
