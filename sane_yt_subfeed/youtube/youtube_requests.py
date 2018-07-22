@@ -75,7 +75,13 @@ def list_uploaded_videos(youtube_key, videos, uploads_playlist_id, req_limit):
 
         # Grab information about each video.
         for search_result in playlistitems_list_response['items']:
-            if read_config('Debug', 'log_list'):
+            if read_config('Debug', 'log_list') and read_config('Debug', 'log_needle') != 'unset':
+                if search_result['snippet']['channelTitle'] == str(read_config('Debug', 'log_needle')):
+                    logger.debug("list():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
+                                                                 search_result['snippet']['publishedAt'],
+                                                                 search_result['snippet']['title']))
+
+            if read_config('Debug', 'log_list') and read_config('Debug', 'log_needle') == 'unset':
                 logger.debug("list():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
                                                              search_result['snippet']['publishedAt'],
                                                              search_result['snippet']['title']))
@@ -128,7 +134,15 @@ def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit, live
             if (not live_videos) and (not live_broadcast):
                 break
             if search_result['id']['kind'] == 'youtube#video':
-                if read_config('Debug', 'log_search'):
+                if read_config('Debug', 'log_search') and read_config('Debug', 'log_needle') != 'unset':
+                    if search_result['snippet']['channelTitle'] == str(read_config('Debug', 'log_needle')):
+                        title = search_result['snippet']['title']
+                        if search_result['snippet']['liveBroadcastContent'] != "none":
+                            title += " [LIVESTREAM]"
+                        logger.debug("search():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
+                                                                       search_result['snippet']['publishedAt'], title))
+
+                if read_config('Debug', 'log_search') and read_config('Debug', 'log_needle') == 'unset':
                     title = search_result['snippet']['title']
                     if search_result['snippet']['liveBroadcastContent'] != "none":
                         title += " [LIVESTREAM]"
