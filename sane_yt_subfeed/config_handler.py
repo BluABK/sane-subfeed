@@ -24,7 +24,8 @@ defaults = {
         'channels_limit': '-1',
         'use_playlistitems': 'True',
         'disable_tqdm': 'True',
-        'disable_tooltips': 'False'
+        'disable_tooltips': 'False',
+        'show_grab_method': 'False'
     },
     'Gui': {
         'launch_gui': 'True',
