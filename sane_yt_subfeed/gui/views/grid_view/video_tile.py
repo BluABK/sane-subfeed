@@ -10,6 +10,10 @@ from sane_yt_subfeed.gui.views.grid_view.title_tile import TitleTile
 from sane_yt_subfeed.gui.views.grid_view.channel_tile import ChannelTile
 from sane_yt_subfeed.gui.views.grid_view.date_tile import DateTile
 from sane_yt_subfeed.log_handler import logger
+from sane_yt_subfeed.database.orm import db_session
+from sane_yt_subfeed.database.models import Channel
+from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_search, get_channel_uploads, \
+    list_uploaded_videos
 
 
 class VideoTile(QWidget):
@@ -33,7 +37,6 @@ class VideoTile(QWidget):
 
         self.title_widget = TitleTile(video.title, self)
         self.layout.addWidget(self.title_widget)
-
         self.channel_widget = ChannelTile(video.channel_title, self)
         self.layout.addWidget(self.channel_widget)
 
@@ -56,7 +59,13 @@ class VideoTile(QWidget):
         self.video = video
         self.set_tool_tip()
         self.title_widget.update_font()
-        self.channel_widget.setText(self.video.channel_title)
+
+        show_grab_method = read_config('Debug', 'show_grab_method')
+        if show_grab_method:
+            grab_method = self.debug_grab_method(video)
+            self.channel_widget.setText("{} | {}".format(video.channel_title, grab_method))
+        else:
+            self.channel_widget.setText(self.video.channel_title)
 
         vid_age = datetime.datetime.now() - self.video.date_published
         self.date_widget.setText(format(vid_age))
@@ -154,3 +163,32 @@ class VideoTile(QWidget):
         logger.info(text)
 
         self.b.insertPlainText(text + '\n')
+
+    def debug_grab_method(self, video):
+        """
+        Shows if a channel was crawled using list() or search()
+        :param video:
+        :return:
+        """
+        grab_method = "N/A"
+        use_tests = read_config('Requests', 'use_tests')
+        if use_tests:
+            channel = db_session.query(Channel).get(video.channel_id)
+            miss = read_config('Requests', 'miss_limit')
+            pages = read_config('Requests', 'test_pages')
+            extra_pages = read_config('Requests', 'extra_list_pages')
+            used_list = False
+            list_pages = 0
+            for test in channel.tests:
+                if test.test_pages > list_pages:
+                    list_pages = test.test_pages
+                if test.test_miss < miss or test.test_pages > pages:
+                    used_list = True
+                    db_session.remove()
+                    grab_method = "search()"
+                    break
+            if not used_list:
+                grab_method = "list()"
+                db_session.remove()
+
+        return grab_method

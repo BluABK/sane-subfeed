@@ -16,6 +16,7 @@ channels_limit = -1
 use_playlistItems = True
 disable_tooltips = False
 disable_tqdm = True
+show_grab_method = False
 
 [Requests]
 use_tests = False
