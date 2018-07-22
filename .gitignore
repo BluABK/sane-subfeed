@@ -13,6 +13,7 @@ keys_private.json
 config.ini
 *.db
 *.db-journal
+*.db.*
 
 # python
 __pycache__

@@ -27,7 +27,8 @@ defaults = {
         'disable_tooltips': 'False',
         'show_grab_method': 'False',
         'log_search': 'False',
-        'log_list': 'False'
+        'log_list': 'False',
+        'log_needle': 'unset'
     },
     'Gui': {
         'launch_gui': 'True',
