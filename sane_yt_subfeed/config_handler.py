@@ -39,7 +39,7 @@ defaults = {
         'enable_grid_resize': 'True',
         'tile_pref_height': '150',
         'tile_pref_width': '180',
-        'tooltip_pictures': 'True',
+        'tooltip_pictures': 'False',
         'tooltip_picture_width': '512',
         'tooltip_picture_height': '256',
         'tooltip_picture_size': 'h1'
