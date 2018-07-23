@@ -1,6 +1,6 @@
 import datetime
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QEvent
 from PyQt5.QtGui import QPalette, QPixmap
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QApplication, QMenu, qApp, QSizePolicy
 
@@ -12,11 +12,13 @@ from sane_yt_subfeed.gui.views.grid_view.date_tile import DateTile
 from sane_yt_subfeed.log_handler import logger
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.models import Channel
+from sane_yt_subfeed.youtube.thumbnail_handler import resize_thumbnail
 from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_search, get_channel_uploads, \
     list_uploaded_videos
 
 
 class VideoTile(QWidget):
+    hotkey_ctrl_down = False
 
     def __init__(self, parent, video, id, clipboard, status_bar):
         QWidget.__init__(self, parent=parent)
@@ -25,6 +27,9 @@ class VideoTile(QWidget):
         self.video = video
         self.id = id
         self.parent = parent
+        self.root = parent.root  # MainWindow
+        # parent.parent.parent.bind('<KeyPress-ctrl>', self.key_press_ctrl)
+        # parent.parent.parent.bind('<KeyRelease-ctrl>', self.key_release_ctrl)
 
         self.pref_height = read_config('Gui', 'tile_pref_height')
         self.pref_width = read_config('Gui', 'tile_pref_width')
@@ -87,7 +92,20 @@ class VideoTile(QWidget):
 
     def set_tool_tip(self):
         if not read_config('Debug', 'disable_tooltips'):
-            self.setToolTip("{}: {}".format(self.video.channel_title, self.video.title))
+            if read_config('Gui', 'tooltip_pictures'):
+                text_element = read_config('Gui', 'tooltip_picture_size')
+                thumb_width = read_config('Gui', 'tooltip_picture_width')
+                thumb_height = read_config('Gui', 'tooltip_picture_height')
+                resized_thumb = resize_thumbnail(self.video.thumbnail_path, thumb_width, thumb_height)
+
+                print(self.root.hotkey_ctrl_down)
+                self.setToolTip("<{} style='text-align:center;'><img src={} style='float:below'>{}: {}</{}>".format(
+                    text_element, resized_thumb, self.video.channel_title, self.video.title, text_element))
+                if self.root.hotkey_ctrl_down:
+                    print(self.root.hotkey_ctrl_down)
+                    # self.showTooltip()
+            else:
+                self.setToolTip("{}: {}".format(self.video.channel_title, self.video.title))
 
     def mousePressEvent(self, QMouseEvent):
         """
@@ -101,6 +119,18 @@ class VideoTile(QWidget):
             print("Not Implemented: Select video")
         elif QMouseEvent.button() == Qt.LeftButton:
             self.mark_downloaded()
+
+    # def keyPressEvent(self, QKeyEvent):
+    #     print(QKeyEvent.key())
+    #     if QKeyEvent.key() == Qt.Key_Control:
+    #         print("ctrl pressed")
+    #         self.hotkey_ctrl_down = True
+    #
+    # def keyReleaseEvent(self, QKeyEvent):
+    #     print(QKeyEvent)
+    #     if QKeyEvent.key() == Qt.Key_Control:
+    #         print("ctrl released")
+    #         self.hotkey_ctrl_down = False
 
     def contextMenuEvent(self, event):
         """
