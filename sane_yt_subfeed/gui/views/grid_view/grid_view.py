@@ -19,6 +19,7 @@ class GridView(QWidget):
         super(GridView, self).__init__(parent)
         self.setMinimumSize(0,0)
         self.parent = parent
+        self.root = parent  # MainWindow
         self.buffer = 10
         self.bar_correction = 0
         self.clipboard = clipboard

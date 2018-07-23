@@ -7,6 +7,7 @@ import os
 # PyQt5 libs
 from subprocess import check_output
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QVBoxLayout, QStackedWidget, QProgressBar
 from PyQt5.QtGui import QIcon
 
@@ -38,6 +39,7 @@ class MainWindow(QMainWindow):
     list_tiled_view = None
     about_view = None
     menus = None
+    hotkey_ctrl_down = False
 
     # noinspection PyArgumentList
     def __init__(self, main_model: MainModel, dimensions=None, position=None):
@@ -150,6 +152,17 @@ class MainWindow(QMainWindow):
 
         # if self.dimensions:
         #     self.resize(self.dimensions[0], self.dimensions[1])
+
+    # Qt Overrides
+    def keyPressEvent(self, QKeyEvent):
+        if QKeyEvent.key() == Qt.Key_Control:
+            print("ctrl pressed")
+            self.hotkey_ctrl_down = True
+
+    def keyReleaseEvent(self, QKeyEvent):
+        if QKeyEvent.key() == Qt.Key_Control:
+            print("ctrl released")
+            self.hotkey_ctrl_down = False
 
     # Internal
     def determine_version(self):

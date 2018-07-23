@@ -198,9 +198,12 @@ def quality_404_check(img):
     return ImageChops.difference(img_cmp, img_404).getbbox() is None
 
 
-def resize_thumbnail(img_path, maxwidth, maxheight):
+def resize_thumbnail(img_path, maxwidth, maxheight, out=True):
     """
     Resizes and antialises thumbnail up to the given maximum size, thus maintaining AR
+
+    https://pillow.readthedocs.io/en/3.0.x/releasenotes/2.7.0.html#default-filter-for-thumbnails
+    :param out:
     :param maxheight: int
     :param maxwidth: int
     :param img_path: string/path
@@ -210,8 +213,13 @@ def resize_thumbnail(img_path, maxwidth, maxheight):
     resize_ratio = min(maxwidth / im.width, maxheight / im.height)
     new_size = tuple(int(resize_ratio * x) for x in im.size)
     try:
-        im.thumbnail(new_size, Image.ANTIALIAS)
-        return im
+        im.thumbnail(new_size, Image.BICUBIC)
+        if out:
+            outfile_path = os.path.join(THUMBNAILS_PATH, 'resized', img_path[-15:])
+            im.save(outfile_path)
+            return outfile_path
+        elif out is False:
+            return im
     except IOError as eio:
         logger.error("Cannot create thumbnail for {}: IOError".format(img_path))
         logger.exception(eio)
