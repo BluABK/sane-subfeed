@@ -14,6 +14,7 @@ import urllib3
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread
+from sane_yt_subfeed.log_handler import logger
 from sane_yt_subfeed.pickle_handler import load_pickle, PICKLE_PATH
 from sane_yt_subfeed.database.video import Video
 
@@ -195,3 +196,23 @@ def quality_404_check(img):
     img_404 = Image.open(os.path.join(OS_PATH, '..', 'resources', 'quality404.jpg'))
     img_cmp = Image.open(img)
     return ImageChops.difference(img_cmp, img_404).getbbox() is None
+
+
+def resize_thumbnail(img_path, maxwidth, maxheight):
+    """
+    Resizes and antialises thumbnail up to the given maximum size, thus maintaining AR
+    :param maxheight: int
+    :param maxwidth: int
+    :param img_path: string/path
+    :return: resized image or 404 image if operation failed
+    """
+    im = Image.open(img_path)
+    resize_ratio = min(maxwidth / im.width, maxheight / im.height)
+    new_size = tuple(int(resize_ratio * x) for x in im.size)
+    try:
+        im.thumbnail(new_size, Image.ANTIALIAS)
+        return im
+    except IOError as eio:
+        logger.error("Cannot create thumbnail for {}: IOError".format(img_path))
+        logger.exception(eio)
+        return Image.open(os.path.join(OS_PATH, '..', 'resources', 'quality404.jpg'))
