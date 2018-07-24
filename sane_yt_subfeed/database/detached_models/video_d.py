@@ -32,7 +32,7 @@ class VideoD:
         self.search_item = search_item
         # self.determine_thumbnails(playlist_item.snippet.thumbnails)
 
-        self.new = True
+        self.new = False
         self.missed = False
 
     def determine_thumbnails(self, thumbnails_item):
