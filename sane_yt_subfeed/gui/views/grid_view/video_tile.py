@@ -52,14 +52,6 @@ class VideoTile(QWidget):
 
         self.set_video(video)
 
-    def resizeEvent(self, event):
-        pass
-        # self.title_widget.update_font()
-        #
-        # self.channel_widget.update_font()
-        #
-        # self.date_widget.update_font()
-
     def set_video(self, video):
         self.video = video
         self.set_tool_tip()

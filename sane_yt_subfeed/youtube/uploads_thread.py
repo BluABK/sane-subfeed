@@ -44,19 +44,19 @@ class GetUploadsThread(threading.Thread):
             miss = read_config('Requests', 'miss_limit')
             pages = read_config('Requests', 'test_pages')
             extra_pages = read_config('Requests', 'extra_list_pages')
-            used_list = False
             list_pages = 0
             for test in channel.tests:
                 if test.test_pages > list_pages:
                     list_pages = test.test_pages
                 if test.test_miss < miss or test.test_pages > pages:
-                    used_list = True
                     db_session.remove()
                     list_uploaded_videos_search(self.youtube, self.channel_id, self.videos, self.req_limit)
                     break
-            if not used_list:
-                list_uploaded_videos(self.youtube, self.videos, self.playlist_id, list_pages+extra_pages)
-                db_session.remove()
+            db_session.remove()
+            list_uploaded_videos(self.youtube, self.videos, self.playlist_id,
+                                 min(pages + extra_pages, list_pages + extra_pages))
+            self.merge_same_videos_in_list(self.videos)
+
         else:
             use_playlist_items = read_config('Debug', 'use_playlistItems')
             if use_playlist_items:
@@ -66,19 +66,21 @@ class GetUploadsThread(threading.Thread):
 
         self.job_done = True
 
+    @staticmethod
+    def merge_same_videos_in_list(videos):
+        for commpare_vid in videos:
+            for vid in videos:
+                # FIXME: wasteful compare
+                if commpare_vid != vid and commpare_vid.video_id == vid.video_id:
+                    commpare_vid.grab_methods.extend(vid.grab_methods)
+                    videos.remove(vid)
+
     def get_videos(self):
         """
         Return a list of Video objects
         :return:
         """
         return self.videos
-
-    def get_statistics(self):
-        """
-        Return a dict of statistics/timings
-        :return:
-        """
-        return self.statistics
 
     def get_id(self):
         """
