@@ -24,6 +24,7 @@ show_grab_method = False
 log_search = False
 log_list = False
 log_needle = unset
+show_unimplemented_gui = False
 
 [Requests]
 use_tests = False

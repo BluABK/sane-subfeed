@@ -28,7 +28,8 @@ defaults = {
         'show_grab_method': 'False',
         'log_search': 'False',
         'log_list': 'False',
-        'log_needle': 'unset'
+        'log_needle': 'unset',
+        'show_unimplemented_gui': 'False'
     },
     'Gui': {
         'launch_gui': 'True',
