@@ -15,7 +15,8 @@ defaults = {
         'miss_limit': '10',
         'test_pages': '2',
         'use_tests': 'True',
-        'extra_list_pages': '0'
+        'extra_list_pages': '0',
+        'deep_search_quota_k': '20'
     },
     'Debug': {
         'debug': 'False',

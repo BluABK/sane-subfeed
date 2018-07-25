@@ -11,7 +11,7 @@ from sane_yt_subfeed.log_handler import logger
 
 class GetUploadsThread(threading.Thread):
 
-    def __init__(self, thread_id, youtube, channel_id, playlist_id, videos, req_limit):
+    def __init__(self, thread_id, youtube, channel_id, playlist_id, videos, list_pages, search_pages):
         """
         Init GetUploadsThread
         :param thread_id:
@@ -24,7 +24,8 @@ class GetUploadsThread(threading.Thread):
         self.thread_id = thread_id
         self.job_done = False
         self.youtube = youtube
-        self.req_limit = req_limit
+        self.search_pages = search_pages
+        self.list_pages = list_pages
         self.channel_id = channel_id
         self.playlist_id = playlist_id
 
@@ -52,7 +53,7 @@ class GetUploadsThread(threading.Thread):
                     list_pages = test.test_pages
                 if test.test_miss < miss or test.test_pages > pages:
                     db_session.remove()
-                    list_uploaded_videos_search(self.youtube, self.channel_id, temp_videos, self.req_limit)
+                    list_uploaded_videos_search(self.youtube, self.channel_id, temp_videos, self.search_pages)
                     break
             db_session.remove()
             list_uploaded_videos(self.youtube, temp_videos , self.playlist_id,
@@ -63,9 +64,9 @@ class GetUploadsThread(threading.Thread):
         else:
             use_playlist_items = read_config('Debug', 'use_playlistItems')
             if use_playlist_items:
-                list_uploaded_videos(self.youtube, self.videos, self.playlist_id, self.req_limit)
+                list_uploaded_videos(self.youtube, self.videos, self.playlist_id, self.list_pages)
             else:
-                list_uploaded_videos_search(self.youtube, self.channel_id, self.videos, self.req_limit)
+                list_uploaded_videos_search(self.youtube, self.channel_id, self.videos, self.search_pages)
 
         self.job_done = True
 

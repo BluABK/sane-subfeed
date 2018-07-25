@@ -71,13 +71,12 @@ class MainWindowListener(QObject):
         """
         logger.info("Reloading subfeed")
         hide_downloaded = read_config('Gui', 'hide_downloaded')
-        if refresh_type == LISTENER_SIGNAL_NORMAL_REFRESH:
-            if hide_downloaded:
-                self.model.remote_update_videos()
-                self.model.grid_view_listener.hiddenVideosChanged.emit()
-            else:
-                self.model.remote_update_videos()
-                logger.debug('MainWindowListener: not implemented disabled hide_downloaded')
+        if hide_downloaded:
+            self.model.remote_update_videos(refresh_type=refresh_type)
+            self.model.grid_view_listener.hiddenVideosChanged.emit()
+        else:
+            self.model.remote_update_videos(refresh_type=refresh_type)
+            logger.debug('MainWindowListener: not implemented disabled hide_downloaded')
 
     @pyqtSlot()
     def refresh_subs(self):
