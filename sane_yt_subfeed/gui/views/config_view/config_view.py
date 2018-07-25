@@ -141,6 +141,8 @@ class ConfigView(QWidget):
         combox_w_disabled = list(range(-1, 1000))
         combox_w_disabled[0] = 'Disabled'
         thumb_qualities = ['maxres', 'standard', 'high', 'medium', 'default']
+        tt_font_sizes = ['h1', 'h2', 'h3', 'h4', 'h5', 'p']
+
         # Section [Gui]
         self.add_section('{}GUI{}'.format(self.deco_l, self.deco_r))
         self.launch_gui = self.add_option_checkbox('Launch GUI', 'Gui', 'launch_gui', checkbox.gui_launch_gui)
@@ -152,14 +154,21 @@ class ConfigView(QWidget):
                                  checkbox.gui_grey_old_videos)
         self.add_option_checkbox('Enable grid resizing', 'Gui', 'enable_grid_resize', checkbox.gui_enable_grid_resize)
 
-        self.add_option_combobox('Grid tile height (px)', 'Gui', 'tile_pref_height',
+        self.add_option_combobox('\tGrid tile height (px)', 'Gui', 'tile_pref_height',
                                  combobox.gui_tile_pref_height, list(range(1, 1000)))
-        self.add_option_combobox('Grid tile width (px)', 'Gui', 'tile_pref_width',
+        self.add_option_combobox('\tGrid tile width (px)', 'Gui', 'tile_pref_width',
                                  combobox.gui_tile_pref_width, list(range(1, 1000)))
+        self.add_option_checkbox('Embed thumbnails in tooltips', 'Gui', 'tooltip_pictures',
+                                 checkbox.gui_tooltip_pictures)
+        self.add_option_combobox('\tTooltip picture width', 'Gui', 'tooltip_picture_width', combobox.gui_tooltip_picture_width, list(range(1, 1000)))
+        self.add_option_combobox('\tTooltip picture height', 'Gui', 'tooltip_picture_height', combobox.gui_tooltip_picture_height, list(range(1, 1000)))
+        self.add_option_combobox('\tTooltip picture font size', 'Gui', 'tooltip_picture_size', combobox.gui_tooltip_picture_size, tt_font_sizes, numeric=False)
+        self.add_option_checkbox('Keep Aspect Ratop on resized thumbnails', 'Gui', 'keep_thumb_ar',
+                                 checkbox.gui_keep_thumb_ar)
 
         # Section [Debug]
         self.add_section('{}Debug{}'.format(self.deco_l, self.deco_r))
-        self.debug_toggle = self.add_option_checkbox('Debug', 'Debug', 'debug', checkbox.debug_toggle)
+        self.debug_toggle = self.add_option_checkbox('Debug prints', 'Debug', 'debug', checkbox.debug_toggle)
         self.cache_subs = self.add_option_checkbox('Cache subscriptions', 'Debug', 'cached_subs',
                                                    checkbox.debug_cached_subs)
         self.start_with_cached_vids = self.add_option_checkbox('Start with cached videos', 'Debug',

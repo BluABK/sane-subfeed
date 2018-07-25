@@ -93,7 +93,7 @@ class UpdateVideo(threading.Thread):
                 pass
         else:
             engine.execute(Video.__table__.insert(), insert_item(self.video_d))
-        print('Updated: {}'.format(self.video_d.title))
+        # print('Updated: {}'.format(self.video_d.title))
         lock.release()
 
 

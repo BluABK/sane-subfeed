@@ -52,6 +52,30 @@ def gui_enable_grid_resize(state):
         set_config('Gui', 'enable_grid_resize', 'False')
 
 
+def gui_tooltip_pictures(state):
+    """
+    Toggles the given setting between True and False
+    :param state: 0=unchecked, 1=tristate?, 2=checked
+    :return:
+    """
+    if state == Qt.Checked:
+        set_config('Gui', 'tooltip_pictures', 'True')
+    else:
+        set_config('Gui', 'tooltip_pictures', 'False')
+
+
+def gui_keep_thumb_ar(state):
+    """
+    Toggles the given setting between True and False
+    :param state: 0=unchecked, 1=tristate?, 2=checked
+    :return:
+    """
+    if state == Qt.Checked:
+        set_config('Gui', 'keep_thumb_ar', 'True')
+    else:
+        set_config('Gui', 'keep_thumb_ar', 'False')
+
+
 def debug_toggle(state):
     """
     Toggles the given setting between True and False
