@@ -3,6 +3,9 @@ import datetime
 import sane_yt_subfeed.database.video as video_file
 from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 
+GRAB_METHOD_LIST = 'list()'
+GRAB_METHOD_SEARCH = 'search()'
+
 
 class VideoD:
     thumbnail_path = None
@@ -10,12 +13,17 @@ class VideoD:
     url_playlist_video = None
     discarded = False
     downloaded = False
+    new = False
+    missed = False
+    grab_methods = []
 
-    def __init__(self, search_item):
+    def __init__(self, search_item, grab_methods=None):
         """
         Creates a Video object from a YouTube playlist_item
         :param search_item:
         """
+        if grab_methods is None:
+            grab_methods = []
         self.video_id = search_item['id']['videoId']
         self.channel_title = search_item['snippet']['channelTitle']
         self.title = search_item['snippet']['title']
@@ -32,8 +40,10 @@ class VideoD:
         self.search_item = search_item
         # self.determine_thumbnails(playlist_item.snippet.thumbnails)
 
-        self.new = False
-        self.missed = False
+        # TODO: add to Video
+        if grab_methods:
+            self.grab_methods = grab_methods
+
 
     def determine_thumbnails(self, thumbnails_item):
         """
@@ -69,6 +79,6 @@ class VideoD:
         return video
 
     @staticmethod
-    def playlist_item_new_video_d(playlist_item):
+    def playlist_item_new_video_d(playlist_item, grab_methods=None):
         playlist_item['id'] = playlist_item['snippet']['resourceId']
-        return VideoD(playlist_item)
+        return VideoD(playlist_item, grab_methods=grab_methods)

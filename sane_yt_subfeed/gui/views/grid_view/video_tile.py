@@ -67,7 +67,12 @@ class VideoTile(QWidget):
 
         show_grab_method = read_config('Debug', 'show_grab_method')
         if show_grab_method:
-            grab_method = self.debug_grab_method(video)
+            grab_method = ''
+            grab_methods = video.grab_methods
+            if len(grab_methods) > 0:
+                grab_method = grab_methods[0]
+                for grab in grab_methods[1:]:
+                    grab_method = '{}, {}'.format(grab_method, grab)
             self.channel_widget.setText("{} | {}".format(video.channel_title, grab_method))
         else:
             self.channel_widget.setText(self.video.channel_title)
@@ -194,31 +199,3 @@ class VideoTile(QWidget):
 
         self.b.insertPlainText(text + '\n')
 
-    def debug_grab_method(self, video):
-        """
-        Shows if a channel was crawled using list() or search()
-        :param video:
-        :return:
-        """
-        grab_method = "N/A"
-        use_tests = read_config('Requests', 'use_tests')
-        if use_tests:
-            channel = db_session.query(Channel).get(video.channel_id)
-            miss = read_config('Requests', 'miss_limit')
-            pages = read_config('Requests', 'test_pages')
-            extra_pages = read_config('Requests', 'extra_list_pages')
-            used_list = False
-            list_pages = 0
-            for test in channel.tests:
-                if test.test_pages > list_pages:
-                    list_pages = test.test_pages
-                if test.test_miss < miss or test.test_pages > pages:
-                    used_list = True
-                    db_session.remove()
-                    grab_method = "search()"
-                    break
-            if not used_list:
-                grab_method = "list()"
-                db_session.remove()
-
-        return grab_method
