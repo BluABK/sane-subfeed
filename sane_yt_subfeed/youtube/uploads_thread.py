@@ -1,4 +1,5 @@
 import threading
+import timeit
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.models import Channel
@@ -45,17 +46,19 @@ class GetUploadsThread(threading.Thread):
             pages = read_config('Requests', 'test_pages')
             extra_pages = read_config('Requests', 'extra_list_pages')
             list_pages = 0
+            temp_videos = []
             for test in channel.tests:
                 if test.test_pages > list_pages:
                     list_pages = test.test_pages
                 if test.test_miss < miss or test.test_pages > pages:
                     db_session.remove()
-                    list_uploaded_videos_search(self.youtube, self.channel_id, self.videos, self.req_limit)
+                    list_uploaded_videos_search(self.youtube, self.channel_id, temp_videos, self.req_limit)
                     break
             db_session.remove()
-            list_uploaded_videos(self.youtube, self.videos, self.playlist_id,
+            list_uploaded_videos(self.youtube, temp_videos , self.playlist_id,
                                  min(pages + extra_pages, list_pages + extra_pages))
-            self.merge_same_videos_in_list(self.videos)
+            self.merge_same_videos_in_list(temp_videos)
+            self.videos.extend(temp_videos)
 
         else:
             use_playlist_items = read_config('Debug', 'use_playlistItems')
@@ -68,6 +71,8 @@ class GetUploadsThread(threading.Thread):
 
     @staticmethod
     def merge_same_videos_in_list(videos):
+
+        # start_time = timeit.default_timer()
         for commpare_vid in videos:
             for vid in videos:
                 # FIXME: wasteful compare
@@ -75,6 +80,7 @@ class GetUploadsThread(threading.Thread):
                     # FIXME: check if grab method is in list?
                     commpare_vid.grab_methods.extend(vid.grab_methods)
                     videos.remove(vid)
+        # print(timeit.default_timer() - start_time)
 
     def get_videos(self):
         """
