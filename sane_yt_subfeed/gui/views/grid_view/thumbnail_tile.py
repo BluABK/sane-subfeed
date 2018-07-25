@@ -1,4 +1,6 @@
 import os
+
+from PyQt5.QtCore import Qt, QSize, QPoint
 from PyQt5.QtGui import QPainter, QImage, QPixmap
 from PyQt5.QtWidgets import QLabel, QSizePolicy
 
@@ -26,11 +28,18 @@ class ThumbnailTile(QLabel):
             painter.drawPixmap(self.rect(), self.p)
             if self.parent.video.missed:
                 overlay = QPixmap(OVERLAY_MISSED_PATH)
-                painter.drawPixmap(self.width()*0.7, 0, self.width()*0.3, self.height()*0.3, overlay)
+                resize_ratio = min(self.width() * 0.7 / self.width(), self.height() * 0.3 / self.height())
+                new_size = QSize(self.width() * resize_ratio, self.height() * resize_ratio)
+                overlay = overlay.scaled(new_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                point = QPoint(self.width() - overlay.width(), 0)
+                painter.drawPixmap(point, overlay)
             elif self.parent.video.new:
                 overlay = QPixmap(OVERLAY_NEW_PATH)
-                painter.drawPixmap(self.width()*0.7, 0, self.width()*0.3, self.height()*0.3, overlay)
-            #painter.end()
+                resize_ratio = min(self.width()*0.7 / self.width(), self.height()*0.3 / self.height())
+                new_size = QSize(self.width() * resize_ratio, self.height() * resize_ratio)
+                overlay = overlay.scaled(new_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                point = QPoint(self.width()-overlay.width(), 0)
+                painter.drawPixmap(point, overlay)
 
     # def resizeEvent(self, *args, **kwargs):
     #     margins = self.parent.layout.getContentsMargins()
