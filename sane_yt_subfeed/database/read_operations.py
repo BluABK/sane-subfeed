@@ -3,7 +3,7 @@ import timeit
 import datetime
 from sqlalchemy import desc
 
-from sane_yt_subfeed.controller.listeners import LISTENER_SIGNAL_NORMAL_REFRESH
+from sane_yt_subfeed.controller.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.database.engine_statements import get_video_by_id_stmt
 from sane_yt_subfeed.database.orm import db_session, engine
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread
@@ -52,7 +52,7 @@ def compare_db_filtered(videos, limit, discarded=False, downloaded=False):
     return return_list
 
 
-def check_for_new(videos):
+def check_for_new(videos, deep_refresh=False):
     # FIXME: add to progress bar
     # start_time = timeit.default_timer()
     for vid in videos:
@@ -61,14 +61,18 @@ def check_for_new(videos):
         if not db_video:
             # FIXME: uses wrong timezones
             vid_age = datetime.datetime.now() - vid.date_published
-            if vid_age > datetime.timedelta(hours=12):
-                vid.missed = True
+            if deep_refresh:
+                if vid_age > datetime.timedelta(hours=1):
+                    vid.missed = True
+                else:
+                    vid.new = True
             else:
-                vid.new = True
-        elif True:
-            pass
+                if vid_age > datetime.timedelta(hours=12):
+                    vid.missed = True
+                else:
+                    vid.new = True
         else:
-            vid.new = True
+            pass
     # print(timeit.default_timer() - start_time)
     return videos
 
@@ -84,7 +88,10 @@ def refresh_and_get_newest_videos(limit, filter_downloaded=False, progress_liste
     else:
         return_list = videos[:limit]
 
-    return_list = check_for_new(return_list)
+    if refresh_type == LISTENER_SIGNAL_DEEP_REFRESH:
+        return_list = check_for_new(return_list, deep_refresh=True)
+    else:
+        return_list = check_for_new(return_list)
 
     UpdateVideosThread(videos).start()
     download_thumbnails_threaded(return_list, progress_listener=progress_listener)
