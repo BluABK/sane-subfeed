@@ -6,7 +6,6 @@ from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, r
 
 
 class MainModel:
-
     status_bar_progress = None
     status_bar_thread = None
     status_bar_listener = None
@@ -50,13 +49,15 @@ class MainModel:
         else:
             self.videos = get_newest_stored_videos(self.videos_limit, filtered)
 
-    def remote_update_videos(self, filtered=True):
+    def remote_update_videos(self, filtered=True, refresh_type=LISTENER_SIGNAL_NORMAL_REFRESH):
         # FIXME: only does filtered videos
         if filtered:
-            self.filtered_videos = refresh_and_get_newest_videos(self.videos_limit, filtered, self.status_bar_listener)
+            self.filtered_videos = refresh_and_get_newest_videos(self.videos_limit, filtered, self.status_bar_listener,
+                                                                 refresh_type=refresh_type)
             self.grid_view_listener.hiddenVideosChanged.emit()
         else:
-            self.videos = refresh_and_get_newest_videos((self.videos_limit, filtered, self.status_bar_listener))
+            self.videos = refresh_and_get_newest_videos(self.videos_limit, filtered, self.status_bar_listener,
+                                                        refresh_type=refresh_type)
 
     def new_status_bar_progress(self, parent):
         self.status_bar_progress = QProgressBar(parent=parent)

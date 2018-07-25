@@ -30,6 +30,7 @@ use_tests = False
 miss_limit = 10
 test_pages = 2
 extra_list_pages = 0
+deep_search_quota_k = 20
 
 [Thumbnails]
 force_download_best = True
