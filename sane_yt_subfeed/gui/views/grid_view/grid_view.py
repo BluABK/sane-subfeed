@@ -1,6 +1,7 @@
 import time
 
 from PyQt5 import sip
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QGridLayout
 
 from sane_yt_subfeed.config_handler import read_config
@@ -44,7 +45,8 @@ class GridView(QWidget):
         self.items_x = read_config('Gui', 'grid_view_x')
         self.items_y = read_config('Gui', 'grid_view_y')
 
-
+        self.setAutoFillBackground(True)
+        self.set_bgcolor()
         self.update_grid()
         # subscription_feed = self.main_model.filtered_videos
         #
@@ -103,3 +105,11 @@ class GridView(QWidget):
                 sip.delete(widget)
         self.resizeEvent('')
                 # widget.deleteLater()
+
+    def set_bgcolor(self, color="default", darkmode=False):
+        palette = self.palette()
+        if darkmode:
+            palette.setColor(self.backgroundRole(), Qt.black)
+        else:
+            palette.setColor(self.backgroundRole(), Qt.white)
+        self.setPalette(palette)
