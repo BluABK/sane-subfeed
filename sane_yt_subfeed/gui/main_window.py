@@ -13,6 +13,7 @@ from PyQt5.QtGui import QIcon
 
 # Project internal libs
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.controller.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_videos
 from sane_yt_subfeed.gui.views.about_view import AboutView
@@ -91,9 +92,14 @@ class MainWindow(QMainWindow):
         refresh_feed = self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
                                         tooltip='Refresh the subscription feed', icon='refresh.png')
 
-        refresh_subs = self.add_submenu('&Function', 'Reload Subscriptions &List', self.refresh_subs, shortcut='Ctrl+L',
+        self.add_submenu('&Function', 'Reload Subscriptions &List', self.refresh_subs, shortcut='Ctrl+L',
                                         tooltip='Fetch a new subscriptions list', icon='refresh_subs.png')
 
+        # FIXME: icon, shortcut(alt/shift as extra modifier to the normal refresh shortcut?)
+        self.add_submenu('&Function', 'Deep refresh of feed', self.refresh_list_deep, shortcut='Ctrl+T',
+                                        tooltip='Deed refresh the subscription feed', icon='refresh.png')
+
+        # FIXME: icon
         self.add_submenu('&Function', 'Test Channels', self.test_channels,
                          tooltip='Tests the test_pages and miss_limit of channels', icon='refresh.png')
         # View menu
@@ -311,7 +317,14 @@ class MainWindow(QMainWindow):
         Refresh the subscription feed
         :return:
         """
-        self.main_model.main_window_listener.refreshVideos.emit()
+        self.main_model.main_window_listener.refreshVideos.emit(LISTENER_SIGNAL_NORMAL_REFRESH)
+
+    def refresh_list_deep(self):
+        """
+        Refresh the subscription feed
+        :return:
+        """
+        self.main_model.main_window_listener.refreshVideos.emit(LISTENER_SIGNAL_DEEP_REFRESH)
 
     def test_channels(self):
         """
