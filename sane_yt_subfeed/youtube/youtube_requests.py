@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 from sane_yt_subfeed.authentication import youtube_auth_oauth
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.database.detached_models.video_d import VideoD
+from sane_yt_subfeed.database.detached_models.video_d import VideoD, GRAB_METHOD_SEARCH, GRAB_METHOD_LIST
 from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session, engine
 from sane_yt_subfeed.database.write_operations import engine_execute_first, engine_execute
@@ -85,7 +85,8 @@ def list_uploaded_videos(youtube_key, videos, uploads_playlist_id, req_limit):
                 logger.debug("list():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
                                                              search_result['snippet']['publishedAt'],
                                                              search_result['snippet']['title']))
-            videos.append(VideoD.playlist_item_new_video_d(search_result))
+
+            videos.append(VideoD.playlist_item_new_video_d(search_result, grab_methods=[GRAB_METHOD_LIST]))
         if searched_pages >= req_limit:
             break
 
@@ -148,7 +149,8 @@ def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit, live
                         title += " [LIVESTREAM]"
                     logger.debug("search():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
                                                                    search_result['snippet']['publishedAt'], title))
-                videos.append(VideoD(search_result))
+
+                videos.append(VideoD(search_result, grab_methods=[GRAB_METHOD_SEARCH]))
         if search_pages >= req_limit:
             break
 
