@@ -103,24 +103,29 @@ class MainWindow(QMainWindow):
         view_list_detailed_view = self.add_submenu('&View', 'Detailed List', self.view_list_detailed, shortcut='Ctrl+2',
                                                    tooltip='View subscription feed as a detailed list',
                                                    icon='table.png')
-        view_list_tiled_view = self.add_submenu('&View', 'Tiled List', self.view_list_tiled, shortcut='Ctrl+3',
-                                                tooltip='View subscription feed as a tiled list', icon='tiled_list.png')
+        if read_config('Debug', 'show_unimplemented_gui'):
+            view_list_tiled_view = self.add_submenu('&View', 'Tiled List', self.view_list_tiled, shortcut='Ctrl+3',
+                                                    tooltip='View subscription feed as a tiled list',
+                                                    icon='tiled_list.png')
         view_subs_view = self.add_submenu('&View', 'Subscriptions', self.view_subs, shortcut='Ctrl+4',
                                           tooltip='View Subscriptions', icon='subs.png')
 
         # Help menu
-        self.add_menu(menubar, '&Help')
-        view_about_view = self.add_submenu('&Help', 'About', self.view_about, shortcut='F1', tooltip='About me',
-                                           icon='about.png')
+        if read_config('Debug', 'show_unimplemented_gui'):
+            self.add_menu(menubar, '&Help')
+            view_about_view = self.add_submenu('&Help', 'About', self.view_about, shortcut='F1', tooltip='About me',
+                                               icon='about.png')
 
         # Toolbar of different views
         toolbar = self.addToolBar('View')
         toolbar.addAction(view_grid_view)
         toolbar.addAction(view_list_detailed_view)
-        toolbar.addAction(view_list_tiled_view)
+        if read_config('Debug', 'show_unimplemented_gui'):
+            toolbar.addAction(view_list_tiled_view)
         toolbar.addAction(view_subs_view)
         toolbar.addAction(refresh_feed)
-        toolbar.addAction(view_about_view)
+        if read_config('Debug', 'show_unimplemented_gui'):
+            toolbar.addAction(view_about_view)
 
         # Set MainWindow properties
         app_title = 'Sane Subscription Feed'
@@ -144,10 +149,12 @@ class MainWindow(QMainWindow):
         # Display the window
         self.central_widget.addWidget(self.grid_view)
         self.central_widget.addWidget(self.list_detailed_view)
-        self.central_widget.addWidget(self.list_tiled_view)
+        if read_config('Debug', 'show_unimplemented_gui'):
+            self.central_widget.addWidget(self.list_tiled_view)
         self.central_widget.addWidget(self.subs_view)
         self.central_widget.addWidget(self.config_view)
-        self.central_widget.addWidget(self.about_view)
+        if read_config('Debug', 'show_unimplemented_gui'):
+            self.central_widget.addWidget(self.about_view)
         self.central_widget.setCurrentWidget(self.grid_view)
 
         # if self.dimensions:
