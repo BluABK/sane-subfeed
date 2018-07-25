@@ -12,6 +12,8 @@ from sane_yt_subfeed.database.write_operations import UpdateVideo
 from sane_yt_subfeed.log_handler import logger
 from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_cached_oauth
 
+LISTENER_SIGNAL_NORMAL_REFRESH = 0
+LISTENER_SIGNAL_DEEP_REFRESH = 1
 
 class GridViewListener(QObject):
     tileDownloaded = pyqtSignal(VideoD, int)
@@ -44,7 +46,7 @@ class GridViewListener(QObject):
 
 class MainWindowListener(QObject):
     testChannels = pyqtSignal()
-    refreshVideos = pyqtSignal()
+    refreshVideos = pyqtSignal(int)
     refreshSubs = pyqtSignal()
 
     def __init__(self, model):
@@ -61,20 +63,21 @@ class MainWindowListener(QObject):
         # noinspection PyUnreachableCode
         logger.error('MainWindowListener finished')
 
-    @pyqtSlot()
-    def refresh_videos(self):
+    @pyqtSlot(int)
+    def refresh_videos(self, refresh_type):
         """
         Fetches new videos and reloads the subscription feed
         :return:
         """
         logger.info("Reloading subfeed")
         hide_downloaded = read_config('Gui', 'hide_downloaded')
-        if hide_downloaded:
-            self.model.remote_update_videos()
-            self.model.grid_view_listener.hiddenVideosChanged.emit()
-        else:
-            self.model.remote_update_videos()
-            logger.debug('MainWindowListener: not implemented disabled hide_downloaded')
+        if refresh_type == LISTENER_SIGNAL_NORMAL_REFRESH:
+            if hide_downloaded:
+                self.model.remote_update_videos()
+                self.model.grid_view_listener.hiddenVideosChanged.emit()
+            else:
+                self.model.remote_update_videos()
+                logger.debug('MainWindowListener: not implemented disabled hide_downloaded')
 
     @pyqtSlot()
     def refresh_subs(self):

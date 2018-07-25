@@ -72,6 +72,7 @@ class GetUploadsThread(threading.Thread):
             for vid in videos:
                 # FIXME: wasteful compare
                 if commpare_vid != vid and commpare_vid.video_id == vid.video_id:
+                    # FIXME: check if grab method is in list?
                     commpare_vid.grab_methods.extend(vid.grab_methods)
                     videos.remove(vid)
 
