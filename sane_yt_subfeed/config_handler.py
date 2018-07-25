@@ -43,7 +43,8 @@ defaults = {
         'tooltip_pictures': 'False',
         'tooltip_picture_width': '512',
         'tooltip_picture_height': '256',
-        'tooltip_picture_size': 'h1'
+        'tooltip_picture_size': 'h1',
+        'keep_thumb_ar': 'True'
     },
     'Thumbnails': {
         'force_download_best': 'True',
