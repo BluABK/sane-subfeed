@@ -69,7 +69,7 @@ class VideoTile(QWidget):
         else:
             self.channel_widget.setText(self.video.channel_title)
 
-        vid_age = datetime.datetime.now() - self.video.date_published
+        vid_age = datetime.datetime.utcnow() - self.video.date_published
         self.date_widget.setText(format(vid_age))
         if read_config('Gui', 'grey_old_videos'):
             if vid_age > datetime.timedelta(days=1):

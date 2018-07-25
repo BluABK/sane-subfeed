@@ -124,6 +124,6 @@ class RunTestsThreaded(threading.Thread):
             next_page = list_uploaded_videos_page(self.youtube_key, playlist_videos, self.subscription.playlist_id,
                                                   playlistitems_list_request=next_page)
 
-        result = [datetime.datetime.now(), test_pages, test_miss, self.subscription]
+        result = [datetime.datetime.utcnow(), test_pages, test_miss, self.subscription]
         self.results.append(result)
 

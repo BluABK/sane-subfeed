@@ -60,7 +60,7 @@ def check_for_new(videos, deep_refresh=False):
         db_video = engine.execute(stmt).first()
         if not db_video:
             # FIXME: uses wrong timezones
-            vid_age = datetime.datetime.now() - vid.date_published
+            vid_age = datetime.datetime.utcnow() - vid.date_published
             if deep_refresh:
                 if vid_age > datetime.timedelta(hours=1):
                     vid.missed = True
