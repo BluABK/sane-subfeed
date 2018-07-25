@@ -1,3 +1,14 @@
+v0.2.0
+- Application now uses test to determine how many pages to use for missed videos
+- Tests can now be initiated from GUI
+- Progressbar on reloading of subfeed
+- Optional embedded thumbnails in tooltip
+- Optional keeping of Aspect Ratio when resizing thumbnails
+- Thumbnail overlays for missed and new videos
+- Default background colour is now white
+- Application now uses db to check for old videos
+- Option to hide/show wip/unimplemented GUI elements
+
 v0.2.0-dev2
 - Renamed VERSION.txt --> VERSION
 - A grand rewrite of ConfigView making it humanly usable
