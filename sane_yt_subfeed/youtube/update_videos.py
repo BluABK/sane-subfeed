@@ -24,10 +24,12 @@ def refresh_uploads(progress_bar_listener: ProgressBar = None, add_to_max=0,
     youtube_keys = load_keys(subscriptions)
 
     search_pages = [1, 1]
+    deep_search = False
 
     if refresh_type == LISTENER_SIGNAL_DEEP_REFRESH:
         quota_k = read_config('Requests', 'deep_search_quota_k')
         search_pages = deep_search_calc(quota_k, subscriptions)
+        deep_search = True
 
     if progress_bar_listener:
         progress_bar_listener.setMaximum.emit(2 * len(subscriptions) + add_to_max)
@@ -36,7 +38,7 @@ def refresh_uploads(progress_bar_listener: ProgressBar = None, add_to_max=0,
     for channel, youtube in tqdm(zip(subscriptions, youtube_keys), desc="Creating video update threads",
                                  disable=read_config('Debug', 'disable_tqdm')):
         thread = GetUploadsThread(thread_increment, youtube, channel.id, channel.playlist_id, videos, search_pages[0],
-                                  search_pages[1])
+                                  search_pages[1], deep_search=deep_search)
         thread_list.append(thread)
         thread_increment += 1
 
