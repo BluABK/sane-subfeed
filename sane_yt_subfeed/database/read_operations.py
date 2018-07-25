@@ -1,5 +1,6 @@
 import timeit
 
+import datetime
 from sqlalchemy import desc
 
 from sane_yt_subfeed.database.engine_statements import get_video_by_id_stmt
@@ -56,7 +57,16 @@ def check_for_new(videos):
     for vid in videos:
         stmt = get_video_by_id_stmt(vid)
         db_video = engine.execute(stmt).first()
-        if db_video:
+        if not db_video:
+            # FIXME: uses wrong timezones
+            vid_age = datetime.datetime.now() - vid.date_published
+            if vid_age > datetime.timedelta(hours=12):
+                # TODO properly test if this if works
+                print('missed vid!!')
+                vid.missed = True
+            else:
+                vid.new = True
+        elif True:
             pass
         else:
             vid.new = True

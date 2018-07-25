@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QLabel, QSizePolicy
 
 OS_PATH = os.path.dirname(__file__)
 OVERLAY_NEW_PATH = os.path.join(OS_PATH, '..', '..', 'icons', 'new_vid.png')
+OVERLAY_MISSED_PATH = os.path.join(OS_PATH, '..', '..', 'icons', 'missed_vid.png')
 
 class ThumbnailTile(QLabel):
 
@@ -23,9 +24,12 @@ class ThumbnailTile(QLabel):
         if self.p:
             painter = QPainter(self)
             painter.drawPixmap(self.rect(), self.p)
-            if self.parent.video.new or self.parent.video.missed:
+            if self.parent.video.missed:
+                overlay = QPixmap(OVERLAY_MISSED_PATH)
+                painter.drawPixmap(self.width()*0.7, 0, self.width()*0.3, self.height()*0.3, overlay)
+            elif self.parent.video.new:
                 overlay = QPixmap(OVERLAY_NEW_PATH)
-                painter.drawPixmap(self.rect(), overlay)
+                painter.drawPixmap(self.width()*0.7, 0, self.width()*0.3, self.height()*0.3, overlay)
             #painter.end()
 
     # def resizeEvent(self, *args, **kwargs):
