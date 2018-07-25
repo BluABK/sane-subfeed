@@ -11,7 +11,8 @@ from sane_yt_subfeed.log_handler import logger
 
 class GetUploadsThread(threading.Thread):
 
-    def __init__(self, thread_id, youtube, channel_id, playlist_id, videos, list_pages, search_pages):
+    def __init__(self, thread_id, youtube, channel_id, playlist_id, videos, list_pages, search_pages,
+                 deep_search=False):
         """
         Init GetUploadsThread
         :param thread_id:
@@ -28,6 +29,7 @@ class GetUploadsThread(threading.Thread):
         self.list_pages = list_pages
         self.channel_id = channel_id
         self.playlist_id = playlist_id
+        self.deep_search = deep_search
 
     # TODO: Handle failed requests
     def run(self):
@@ -39,9 +41,16 @@ class GetUploadsThread(threading.Thread):
         # youtube = youtube_auth_keys()
 
         # self.videos = get_channel_uploads(self.youtube, channel_id)
-
         use_tests = read_config('Requests', 'use_tests')
-        if use_tests:
+
+        if self.deep_search:
+            temp_videos = []
+            list_uploaded_videos_search(self.youtube, self.channel_id, temp_videos, self.search_pages)
+            list_uploaded_videos(self.youtube, temp_videos, self.playlist_id, self.list_pages)
+            self.merge_same_videos_in_list(temp_videos)
+            self.videos.extend(temp_videos)
+
+        elif use_tests:
             channel = db_session.query(Channel).get(self.channel_id)
             miss = read_config('Requests', 'miss_limit')
             pages = read_config('Requests', 'test_pages')
@@ -56,7 +65,7 @@ class GetUploadsThread(threading.Thread):
                     list_uploaded_videos_search(self.youtube, self.channel_id, temp_videos, self.search_pages)
                     break
             db_session.remove()
-            list_uploaded_videos(self.youtube, temp_videos , self.playlist_id,
+            list_uploaded_videos(self.youtube, temp_videos, self.playlist_id,
                                  min(pages + extra_pages, list_pages + extra_pages))
             self.merge_same_videos_in_list(temp_videos)
             self.videos.extend(temp_videos)
