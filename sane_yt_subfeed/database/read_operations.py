@@ -61,8 +61,6 @@ def check_for_new(videos):
             # FIXME: uses wrong timezones
             vid_age = datetime.datetime.now() - vid.date_published
             if vid_age > datetime.timedelta(hours=12):
-                # TODO properly test if this if works
-                print('missed vid!!')
                 vid.missed = True
             else:
                 vid.new = True
