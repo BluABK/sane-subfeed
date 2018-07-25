@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox
 from sane_yt_subfeed.config_handler import read_config, set_config, read_entire_config, get_sections, get_options
 
 thumb_qualities = ['maxres', 'standard', 'high', 'medium', 'default']   # FIXME: Get QComboBox to set strings not ints
+tt_font_sizes = ['h1', 'h2', 'h3', 'h4', 'h5', 'p']
 
 
 def gui_grid_view_x(number):
@@ -36,6 +37,30 @@ def gui_tile_pref_width(number):
     :return:
     """
     set_config('Gui', 'tile_pref_width', str(number + 1))
+
+
+def gui_tooltip_picture_width(number):
+    """
+    Sets the integer value of the current setting
+    :return:
+    """
+    set_config('Gui', 'tooltip_picture_width', str(number + 1))
+
+
+def gui_tooltip_picture_height(number):
+    """
+    Sets the integer value of the current setting
+    :return:
+    """
+    set_config('Gui', 'tooltip_picture_height', str(number + 1))
+
+
+def gui_tooltip_picture_size(font_size):
+    """
+    Sets the integer value of the current setting
+    :return:
+    """
+    set_config('Gui', 'tooltip_picture_size', str(tt_font_sizes[font_size]))
 
 
 def debug_channels_limit(value):

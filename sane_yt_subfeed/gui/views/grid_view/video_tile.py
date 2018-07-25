@@ -98,11 +98,10 @@ class VideoTile(QWidget):
                 thumb_height = read_config('Gui', 'tooltip_picture_height')
                 resized_thumb = resize_thumbnail(self.video.thumbnail_path, thumb_width, thumb_height)
 
-                print(self.root.hotkey_ctrl_down)
                 self.setToolTip("<{} style='text-align:center;'><img src={} style='float:below'>{}: {}</{}>".format(
                     text_element, resized_thumb, self.video.channel_title, self.video.title, text_element))
-                if self.root.hotkey_ctrl_down:
-                    print(self.root.hotkey_ctrl_down)
+                # if self.root.hotkey_ctrl_down:
+                    # print(self.root.hotkey_ctrl_down)
                     # self.showTooltip()
             else:
                 self.setToolTip("{}: {}".format(self.video.channel_title, self.video.title))
@@ -116,7 +115,7 @@ class VideoTile(QWidget):
         if QMouseEvent.button() == Qt.MidButton:
             self.mark_discarded()
         elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
-            print("Not Implemented: Select video")
+            logger.error("Not Implemented: Select video")
         elif QMouseEvent.button() == Qt.LeftButton:
             self.mark_downloaded()
 

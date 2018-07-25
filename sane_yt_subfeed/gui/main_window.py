@@ -163,12 +163,12 @@ class MainWindow(QMainWindow):
     # Qt Overrides
     def keyPressEvent(self, QKeyEvent):
         if QKeyEvent.key() == Qt.Key_Control:
-            print("ctrl pressed")
+            logger.debug("ctrl pressed")
             self.hotkey_ctrl_down = True
 
     def keyReleaseEvent(self, QKeyEvent):
         if QKeyEvent.key() == Qt.Key_Control:
-            print("ctrl released")
+            logger.debug("ctrl released")
             self.hotkey_ctrl_down = False
 
     # Internal
@@ -309,7 +309,7 @@ class MainWindow(QMainWindow):
         for q_label in self.grid_view.q_labels:
             urls += "{}\n".format(q_label.video.url_video)
 
-        print("Copied URLs to clipboard: \n{}".format(urls))
+        logger.info("Copied URLs to clipboard: \n{}".format(urls))
         self.clipboard.setText(urls)
         self.statusBar().showMessage('Copied {} URLs to clipboard'.format(len(urls.splitlines())))
 

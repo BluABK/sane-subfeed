@@ -157,7 +157,7 @@ def force_download_best(video):
             temp_url = url + '{url_quality}.jpg'.format_map(defaultdict(url_quality='default'))
             if download_file(temp_url, vid_path, crop=True, quality=quality):
                 # Got 404 image, try lower quality... Oh wait there is none! uh-oh....
-                print("ERROR: force_download_best() tried to go lower than 'default' quality!")
+                logger.error("ERROR: force_download_best() tried to go lower than 'default' quality!")
                 break
 
 
