@@ -32,7 +32,7 @@ def load_pickle(path):
             return pickle_object
         except MemoryError as mem_exc:
             logger.error("Loading attempt #{} of pickle failed, retrying {} more time(s)...".format(tries, 6-tries))
-            logger.exception(exc_info=mem_exc)
+            logger.exception("load_pickle exception: ", exc_info=mem_exc)
             logger.debug("pickle path: {}".format(path))
             if tries <= 6:
                 tries += 1
