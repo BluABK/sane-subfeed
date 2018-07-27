@@ -23,12 +23,18 @@ def cli(no_gui, test_channels):
         sys._excepthook = sys.excepthook
 
         def my_exception_hook(exctype, value, traceback):
-            # Print the error and traceback
-            print('QT override:\n', exctype, value, traceback)
-            logger.exception(value, exctype, traceback)
+            # Ignore KeyboardInterrupt so a console python program can exit with Ctrl + C.
+            if issubclass(exctype, KeyboardInterrupt):
+                sys.__excepthook__(exctype, value, traceback)
+                return
+
+            # Log the exception with the logger
+            logger.critical("Uncaught Exception (likely Qt)", exc_info=(exctype, value, traceback))
+
             # Call the normal Exception hook after
             sys._excepthook(exctype, value, traceback)
-            # sys.exit(1)
+
+            # sys.exit(1)       # Alternatively, exit
 
         # Set the exception hook to our wrapping function
         sys.excepthook = my_exception_hook
