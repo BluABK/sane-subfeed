@@ -33,13 +33,23 @@ def load_pickle(path):
         except MemoryError as mem_exc:
             logger.error("Loading attempt #{} of pickle failed, retrying {} more time(s)...".format(tries, 5-tries))
             logger.exception(mem_exc)
-            if tries >= 6:
+            if tries <= 6:
                 tries += 1
                 time.sleep(1)
                 continue
             else:
                 logger.fatal("Loading of pickle has utterly failed, terminating application!")
                 raise mem_exc
+        # except RuntimeError as rt_exc:
+        #     logger.error("Loading attempt #{} of pickle failed, retrying {} more time(s)...".format(tries, 5-tries))
+        #     logger.exception(rt_exc)
+        #     if tries >= 6:
+        #         tries += 1
+        #         time.sleep(1)
+        #         continue
+        #     else:
+        #         logger.fatal("Loading of pickle has utterly failed, terminating application!")
+        #         raise rt_exc
 
 
 def load_youtube():
