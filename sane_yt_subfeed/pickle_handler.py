@@ -1,5 +1,6 @@
 import os
 import pickle
+import time
 
 from sane_yt_subfeed.log_handler import logger
 
@@ -23,9 +24,22 @@ def dump_pickle(pickle_object, path):
 
 def load_pickle(path):
     logger.info("Loading pickle from {}".format(path))
-    with open(path, 'rb') as pickle_input:
-        pickle_object = pickle.load(pickle_input)
-    return pickle_object
+    tries = 1
+    while tries <= 6:
+        try:
+            with open(path, 'rb') as pickle_input:
+                pickle_object = pickle.load(pickle_input)
+            return pickle_object
+        except MemoryError as mem_exc:
+            logger.error("Loading attempt #{} of pickle failed, retrying {} more time(s)...".format(tries, 5-tries))
+            logger.exception(mem_exc)
+            if tries >= 6:
+                tries += 1
+                time.sleep(1)
+                continue
+            else:
+                logger.fatal("Loading of pickle has utterly failed, terminating application!")
+                raise mem_exc
 
 
 def load_youtube():

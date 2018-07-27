@@ -29,7 +29,7 @@ def cli(no_gui, test_channels):
                 return
 
             # Log the exception with the logger
-            logger.critical("Uncaught Exception (likely Qt)", exc_info=(exctype, value, traceback))
+            logger.critical("Intercepted Exception", exc_info=(exctype, value, traceback))
 
             # Call the normal Exception hook after
             sys._excepthook(exctype, value, traceback)
