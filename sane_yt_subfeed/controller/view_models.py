@@ -36,10 +36,13 @@ class MainModel:
 
     def hide_video_item(self, index):
         del self.filtered_videos[index]
-        # if len(self.filtered_videos) > self.videos_limit/2:
-        #     self.db_update_videos()
-        #     # FIXME: only does filtered videos
-        #     logger.info('Reduced view models filtered_videos to /2, requesting new videos from db')
+        regrab_percentage = read_config('Model', 'regrab_percentage')
+        loaded_videos = read_config('Model', 'loaded_videos')
+        self.videos_limit = loaded_videos
+        if len(self.filtered_videos) <= int(regrab_percentage*loaded_videos):
+            self.db_update_videos()
+            # FIXME: only does filtered videos
+            logger.info('Reduced view models filtered_videos to /2, requesting new videos from db')
 
     def db_update_videos(self, filtered=True):
         # FIXME: only does filtered videos
