@@ -11,6 +11,10 @@ parser = ConfigParser()
 parser.read(CONFIG_PATH)
 
 defaults = {
+    'Model': {
+        'loaded_videos': '200',
+        'regrab_percentage': '0.3'
+    },
     'Requests': {
         'miss_limit': '10',
         'test_pages': '2',
