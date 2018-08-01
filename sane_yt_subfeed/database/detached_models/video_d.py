@@ -22,6 +22,19 @@ class VideoD:
         Creates a Video object from a YouTube playlist_item
         :param search_item:
         """
+        if not search_item:
+            self.video_id = ""
+            self.channel_title = ""
+            self.title = ""
+            self.date_published = datetime.datetime.utcnow()
+            self.description = ""
+            self.channel_id = ""
+
+            self.url_video = ""
+            self.thumbnails = ""
+            self.search_item = ""
+            return 
+
         if grab_methods is None:
             grab_methods = []
         self.video_id = search_item['id']['videoId']
