@@ -33,7 +33,7 @@ class VideoD:
             self.url_video = ""
             self.thumbnails = ""
             self.search_item = ""
-            return 
+            return
 
         if grab_methods is None:
             grab_methods = []

@@ -10,11 +10,12 @@ class MainModel:
     status_bar_thread = None
     status_bar_listener = None
 
-    def __init__(self, videos, filtered_videos, videos_limit):
+    def __init__(self, videos, filtered_videos, downloaded_videos, videos_limit):
         super().__init__()
         self.videos_limit = videos_limit
         self.videos = videos
         self.filtered_videos = filtered_videos
+        self.downloaded_videos = downloaded_videos
 
         self.grid_view_listener = GridViewListener(self)
         self.grid_thread = QThread()

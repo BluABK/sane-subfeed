@@ -13,7 +13,8 @@ from sane_yt_subfeed.controller.listeners import *
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.gui.main_window import MainWindow
-from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_videos, get_newest_stored_videos
+from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_videos, get_newest_stored_videos, \
+    get_best_downloaded_videos
 
 
 class Controller:
@@ -44,7 +45,9 @@ class Controller:
         else:
             subscription_feed = refresh_and_get_newest_videos(vid_limit, filter_downloaded=filter_dl)
 
-        model = MainModel([], subscription_feed, vid_limit)
+        downloaded_videos = get_best_downloaded_videos(vid_limit)
+
+        model = MainModel([], subscription_feed, downloaded_videos, vid_limit)
 
         grid_view_x = read_config('Gui', 'grid_view_x')
         grid_view_y = read_config('Gui', 'grid_view_y')
