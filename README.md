@@ -10,6 +10,17 @@
 
 * https://developers.google.com/youtube/v3/getting-started
 
+## Migrate Database
+*   Add application to path:
+    ```
+    pip install -e .
+*   Genererate migration script:
+    ```
+    alembic revision --autogenerate -m "migration msg"
+*   Migrate database:
+    ```
+    alembic upgrade head
+
 ## FAQ (assumed)
 
 Q: What are missed videos (and tests)? <br/>
