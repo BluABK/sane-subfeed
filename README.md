@@ -14,12 +14,17 @@
 *   Add application to path:
     ```
     pip install -e .
-*   Genererate migration script:
+    ```
+    
+*   Generate migration script:
     ```
     alembic revision --autogenerate -m "migration msg"
+    ```
+    
 *   Migrate database:
     ```
     alembic upgrade head
+    ```
 
 ## FAQ (assumed)
 
