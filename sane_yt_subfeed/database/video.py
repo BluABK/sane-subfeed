@@ -22,6 +22,7 @@ class Video(PermanentBase):
     downloaded = Column(Boolean)
     discarded = Column(Boolean)
     search_item = Column(TextPickleType())
+    vid_path = Column(String)
 
     def __init__(self, search_item):
         """
