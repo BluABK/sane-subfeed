@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QWidget, QGridLayout
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.view_models import MainModel
+from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
 from sane_yt_subfeed.log_handler import logger
 
@@ -82,7 +83,7 @@ class GridView(QWidget):
                 self.update_grid()
 
     def update_grid(self):
-        subscription_feed = self.main_model.filtered_videos
+        feed = self.get_feed()
         counter = 0
         positions = [(i, j) for i in range(self.items_y) for j in range(self.items_x)]
         for position in positions:
@@ -90,7 +91,11 @@ class GridView(QWidget):
             if counter < len(self.q_labels):
                 self.grid.addWidget(self.q_labels[counter], *position)
             else:
-                lbl = VideoTile(self, subscription_feed[counter], counter, self.clipboard, self.status_bar)
+                if counter >= len(feed):
+                    vid_item = VideoD(None)
+                    lbl = VideoTile(self, vid_item, counter, self.clipboard, self.status_bar)
+                else:
+                    lbl = VideoTile(self, feed[counter], counter, self.clipboard, self.status_bar)
                 self.grid.addWidget(lbl, *position)
                 self.q_labels.append(lbl)
             counter += 1
@@ -102,7 +107,10 @@ class GridView(QWidget):
                 sip.delete(widget)
         self.resizeEvent('')
                 # widget.deleteLater()
-    
+
+    def get_feed(self):
+        subscription_feed = self.main_model.filtered_videos
+        return subscription_feed
 
     def set_bgcolor(self, color="default", darkmode=False):
         palette = self.palette()
