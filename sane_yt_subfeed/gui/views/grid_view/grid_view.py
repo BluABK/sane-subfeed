@@ -11,10 +11,6 @@ from sane_yt_subfeed.log_handler import logger
 
 
 class GridView(QWidget):
-    q_labels = []
-    items_x = None
-    items_y = None
-    main_model = None
 
     def __init__(self, parent, main_model: MainModel, clipboard, status_bar):
         super(GridView, self).__init__(parent)
@@ -29,8 +25,11 @@ class GridView(QWidget):
         self.pref_tile_height = read_config('Gui', 'tile_pref_height')
         self.pref_tile_width = read_config('Gui', 'tile_pref_width')
         self.resize_enabled = read_config('Gui', 'enable_grid_resize')
-
+        self.q_labels = []
         self.grid = QGridLayout()
+        self.items_x = read_config('Gui', 'grid_view_x')
+        self.items_y = read_config('Gui', 'grid_view_y')
+
         self.init_ui()
 
     def init_ui(self):
@@ -42,8 +41,6 @@ class GridView(QWidget):
         self.grid.setSpacing(0)
         self.setLayout(self.grid)
 
-        self.items_x = read_config('Gui', 'grid_view_x')
-        self.items_y = read_config('Gui', 'grid_view_y')
 
         self.setAutoFillBackground(True)
         self.set_bgcolor()
@@ -105,6 +102,7 @@ class GridView(QWidget):
                 sip.delete(widget)
         self.resizeEvent('')
                 # widget.deleteLater()
+    
 
     def set_bgcolor(self, color="default", darkmode=False):
         palette = self.palette()
