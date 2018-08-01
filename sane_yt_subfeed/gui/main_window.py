@@ -18,6 +18,7 @@ from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_videos
 from sane_yt_subfeed.gui.views.about_view import AboutView
 from sane_yt_subfeed.gui.views.config_view.config_view import ConfigView
+from sane_yt_subfeed.gui.views.play_view.play_view import PlayView
 from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
 from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
 # from sane_yt_subfeed.uploads import Uploads
@@ -60,6 +61,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         self.grid_view = GridView(self, main_model, self.clipboard, self.statusBar())
+        self.play_view = PlayView(self, main_model, self.clipboard, self.statusBar())
         self.list_detailed_view = ListDetailedView(self, self.clipboard, self.statusBar())
         self.list_tiled_view = ListTiledView(self, self.clipboard, self.statusBar())
         self.subs_view = SubscriptionsView(self, self.clipboard, self.statusBar())
@@ -105,6 +107,8 @@ class MainWindow(QMainWindow):
         # View menu
         self.add_menu(menubar, '&View')
         view_grid_view = self.add_submenu('&View', 'Grid', self.view_grid, shortcut='Ctrl+1',
+                                          tooltip='View subscription feed as a grid', icon='grid.png')
+        view_play_view = self.add_submenu('&View', 'play', self.view_play, shortcut='Ctrl+9',
                                           tooltip='View subscription feed as a grid', icon='grid.png')
         view_list_detailed_view = self.add_submenu('&View', 'Detailed List', self.view_list_detailed, shortcut='Ctrl+2',
                                                    tooltip='View subscription feed as a detailed list',
@@ -154,6 +158,7 @@ class MainWindow(QMainWindow):
 
         # Display the window
         self.central_widget.addWidget(self.grid_view)
+        self.central_widget.addWidget(self.play_view)
         self.central_widget.addWidget(self.list_detailed_view)
         if read_config('Debug', 'show_unimplemented_gui'):
             self.central_widget.addWidget(self.list_tiled_view)
@@ -268,6 +273,14 @@ class MainWindow(QMainWindow):
         """
         # FIXME: hotfix for actions using self.grid_view(refresh and copy urls)
         self.central_widget.setCurrentWidget(self.grid_view)
+
+    def view_play(self):
+        """
+        Set View variable and CentralWidget to GridView
+        :return:
+        """
+        # FIXME: hotfix for actions using self.grid_view(refresh and copy urls)
+        self.central_widget.setCurrentWidget(self.play_view)
 
     def view_subs(self):
         """
