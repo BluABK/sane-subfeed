@@ -15,13 +15,21 @@ class VideoD:
     downloaded = False
     new = False
     missed = False
-    grab_methods = []
 
     def __init__(self, search_item, grab_methods=None):
         """
         Creates a Video object from a YouTube playlist_item
         :param search_item:
         """
+        self.grab_methods = []
+        self.vid_path = ""
+        if grab_methods is None:
+            grab_methods = []
+
+        # TODO: add to Video
+        if grab_methods:
+            self.grab_methods = grab_methods
+
         if not search_item:
             self.video_id = ""
             self.channel_title = ""
@@ -35,27 +43,18 @@ class VideoD:
             self.search_item = ""
             return
 
-        if grab_methods is None:
-            grab_methods = []
         self.video_id = search_item['id']['videoId']
         self.channel_title = search_item['snippet']['channelTitle']
         self.title = search_item['snippet']['title']
         str_date = search_item['snippet']['publishedAt']
         self.date_published = datetime.datetime.strptime(str_date, '%Y-%m-%dT%H:%M:%S.000Z')
         self.description = search_item['snippet']['description']
-        # self.playlist_id = search_item['snippet']['playlistId']   # Which playlist it's added from
-        # self.playlist_pos = search_item['snippet']['position']    # Which position it's got in the playlist
         self.channel_id = search_item['snippet']['channelId']
 
         self.url_video = YOUTUBE_URL_BASE + YOUTUBE_URL_PART_VIDEO + self.video_id
-        # self.url_playlist_video = self.url_video + "&list=" + self.playlist_id
         self.thumbnails = search_item['snippet']['thumbnails']
         self.search_item = search_item
-        # self.determine_thumbnails(playlist_item.snippet.thumbnails)
 
-        # TODO: add to Video
-        if grab_methods:
-            self.grab_methods = grab_methods
 
 
     def determine_thumbnails(self, thumbnails_item):
