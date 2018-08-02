@@ -112,16 +112,17 @@ class MainWindow(QMainWindow):
         self.add_menu(menubar, '&View')
         view_grid_view = self.add_submenu('&View', 'Grid', self.view_grid, shortcut='Ctrl+1',
                                           tooltip='View subscription feed as a grid', icon='grid.png')
-        view_play_view = self.add_submenu('&View', 'play', self.view_play, shortcut='Ctrl+9',
+        # FIXME: icon
+        view_play_view = self.add_submenu('&View', 'play', self.view_play, shortcut='Ctrl+2',
                                           tooltip='View subscription feed as a grid', icon='grid.png')
-        view_list_detailed_view = self.add_submenu('&View', 'Detailed List', self.view_list_detailed, shortcut='Ctrl+2',
+        view_list_detailed_view = self.add_submenu('&View', 'Detailed List', self.view_list_detailed, shortcut='Ctrl+3',
                                                    tooltip='View subscription feed as a detailed list',
                                                    icon='table.png')
         if read_config('Debug', 'show_unimplemented_gui'):
-            view_list_tiled_view = self.add_submenu('&View', 'Tiled List', self.view_list_tiled, shortcut='Ctrl+3',
+            view_list_tiled_view = self.add_submenu('&View', 'Tiled List', self.view_list_tiled, shortcut='Ctrl+4',
                                                     tooltip='View subscription feed as a tiled list',
                                                     icon='tiled_list.png')
-        view_subs_view = self.add_submenu('&View', 'Subscriptions', self.view_subs, shortcut='Ctrl+4',
+        view_subs_view = self.add_submenu('&View', 'Subscriptions', self.view_subs, shortcut='Ctrl+5',
                                           tooltip='View Subscriptions', icon='subs.png')
 
         # Help menu
@@ -133,6 +134,7 @@ class MainWindow(QMainWindow):
         # Toolbar of different views
         toolbar = self.addToolBar('View')
         toolbar.addAction(view_grid_view)
+        toolbar.addAction(view_play_view)
         toolbar.addAction(view_list_detailed_view)
         if read_config('Debug', 'show_unimplemented_gui'):
             toolbar.addAction(view_list_tiled_view)
