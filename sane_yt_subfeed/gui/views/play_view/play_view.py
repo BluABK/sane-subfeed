@@ -18,7 +18,7 @@ class PlayView(GridView):
     def init_ui(self):
         logger.info("Initializing PlayView UI")
 
-        self.main_model.yt_dir_listener.downloadedVideosChanged.connect(self.downloaded_videos_changed)
+        self.main_model.grid_view_listener.downloadedVideosChanged.connect(self.downloaded_videos_changed)
 
         self.update_grid()
 

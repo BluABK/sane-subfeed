@@ -25,7 +25,9 @@ class PlayTile(VideoTile):
             logger.error("Not Implemented: Select video")
         elif QMouseEvent.button() == Qt.LeftButton:
             self.play_vid(self.video.vid_path)
+            self.mark_watched()
 
 
     def play_vid(self, file_path, player="mpc-hc64"):
         subprocess.Popen([player, file_path])
+

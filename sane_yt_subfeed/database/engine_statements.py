@@ -18,7 +18,8 @@ def update_video_statement_full(db_video):
         thumbnails=db_video.thumbnails,
         downloaded=db_video.downloaded,
         search_item=db_video.search_item,
-        discarded=db_video.discarded)
+        discarded=db_video.discarded,
+        watched=db_video.watched)
 
 
 def update_channel_from_remote(channel):

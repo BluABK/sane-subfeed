@@ -41,6 +41,7 @@ class VideoD:
             self.url_video = ""
             self.thumbnails = ""
             self.search_item = ""
+            self.watched = False
             return
 
         self.video_id = search_item['id']['videoId']
@@ -54,6 +55,7 @@ class VideoD:
         self.url_video = YOUTUBE_URL_BASE + YOUTUBE_URL_PART_VIDEO + self.video_id
         self.thumbnails = search_item['snippet']['thumbnails']
         self.search_item = search_item
+        self.watched = False
 
 
 
@@ -89,6 +91,7 @@ class VideoD:
         video.thumbnail_path = self.thumbnail_path
         video.discarded = self.discarded
         video.vid_path = self.vid_path
+        video.watched = self.watched
         return video
 
     @staticmethod
