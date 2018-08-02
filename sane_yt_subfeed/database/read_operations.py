@@ -3,14 +3,13 @@ import time
 
 from sqlalchemy import desc
 
-from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.controller.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
+from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NORMAL_REFRESH, \
+    LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
-from sane_yt_subfeed.database.engine_statements import get_video_by_id_stmt
+from sane_yt_subfeed.database.engine_statements import get_video_by_vidd_stmt, get_video_by_id_stmt
 from sane_yt_subfeed.database.orm import db_session, engine
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread
 from sane_yt_subfeed.database.video import Video
-from sane_yt_subfeed.controller.dir_handler import get_yt_file
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
 from sane_yt_subfeed.youtube.update_videos import refresh_uploads
 from sqlalchemy.sql.expression import false, true, or_
@@ -43,14 +42,14 @@ def get_best_downloaded_videos(limit, filter_watched=True):
     """
     if filter_watched:
         db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(
-                Video.vid_path != "", or_(Video.watched.is_(None), Video.watched == false())).limit(limit).all()
+            Video.vid_path != "", or_(Video.watched.is_(None), Video.watched == false())).limit(limit).all()
     else:
         db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(
-                Video.vid_path != "").limit(limit).all()
+            Video.vid_path != "").limit(limit).all()
     videos = Video.to_video_ds(db_videos)
     db_session.remove()
     if len(videos) < limit:
-        for _ in range(limit-len(videos)):
+        for _ in range(limit - len(videos)):
             videos.append(VideoD(None))
     return videos
 
@@ -81,7 +80,7 @@ def check_for_new(videos, deep_refresh=False):
     # FIXME: add to progress bar
     # start_time = timeit.default_timer()
     for vid in videos:
-        stmt = get_video_by_id_stmt(vid)
+        stmt = get_video_by_vidd_stmt(vid)
         db_video = engine.execute(stmt).first()
         if not db_video:
             # FIXME: uses wrong timezones
@@ -125,3 +124,9 @@ def refresh_and_get_newest_videos(limit, filter_downloaded=False, progress_liste
         progress_listener.progress_bar.setVisible(False)
         progress_listener.resetBar.emit()
     return return_list
+
+
+def get_vid_by_id(video_id):
+    stmt = get_video_by_id_stmt(video_id)
+    db_video = engine.execute(stmt).first()
+    return db_video

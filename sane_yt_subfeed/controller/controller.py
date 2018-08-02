@@ -1,6 +1,9 @@
 import sys
 # FIXME: imp*
-from sane_yt_subfeed.controller.listeners import *
+# from sane_yt_subfeed.controller.listeners import *
+from PyQt5.QtWidgets import QApplication
+
+from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.gui.main_window import MainWindow
 from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_videos, get_newest_stored_videos, \
