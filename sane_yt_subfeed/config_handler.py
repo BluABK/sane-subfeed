@@ -61,6 +61,9 @@ defaults = {
     },
     'Threading': {
         'img_threads': '200',
+    },
+    'Youtube-dl': {
+        'use_youtube_dl': 'True'
     }
 }
 

@@ -13,6 +13,7 @@ from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideo, UpdateVideosThread
 from sane_yt_subfeed.log_handler import logger
+from sane_yt_subfeed.youtube.youtube_dl_handler import YoutubeDownload
 from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_cached_oauth
 
 LISTENER_SIGNAL_NORMAL_REFRESH = 0
@@ -37,6 +38,11 @@ class GridViewListener(QObject):
     def tile_downloaded(self, video: Video, index):
         self.model.hide_video_item(index)
         self.hiddenVideosChanged.emit()
+
+        use_youtube_dl = read_config('Youtube-dl', 'use_youtube_dl')
+        if use_youtube_dl:
+            YoutubeDownload([video]).start()
+
         UpdateVideo(video, update_existing=True).start()
 
     @pyqtSlot(VideoD, int)
