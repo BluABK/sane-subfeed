@@ -41,7 +41,7 @@ class GridViewListener(QObject):
 
         use_youtube_dl = read_config('Youtube-dl', 'use_youtube_dl')
         if use_youtube_dl:
-            YoutubeDownload([video]).start()
+            YoutubeDownload(video).start()
 
         UpdateVideo(video, update_existing=True).start()
 
@@ -190,11 +190,13 @@ class YtDirListener(QObject):
         self.newFile.connect(self.new_file)
         self.manualCheck.connect(self.manual_check)
 
-        path = read_config('Play', 'yt_file_path')
-        event_handler = VidEventHandler(self)
-        self.observer = Observer()
-        self.observer.schedule(event_handler, path)
-        self.observer.start()
+        disable_dir_observer = read_config('Play', 'disable_dir_listener')
+        if not disable_dir_observer:
+            path = read_config('Play', 'yt_file_path')
+            event_handler = VidEventHandler(self)
+            self.observer = Observer()
+            self.observer.schedule(event_handler, path)
+            self.observer.start()
 
     def run(self):
         while True:

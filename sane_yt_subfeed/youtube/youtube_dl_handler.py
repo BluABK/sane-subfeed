@@ -1,8 +1,12 @@
 from __future__ import unicode_literals
 
+import os
 import threading
+import time
 
 from youtube_dl import YoutubeDL
+
+from sane_yt_subfeed.config_handler import read_config
 
 
 class MyLogger(object):
@@ -20,22 +24,26 @@ def my_hook(d):
     if d['status'] == 'finished':
         print('Done downloading, now converting ...')
 
-
-ydl_opts = {
-    'logger': MyLogger(),
-    'progress_hooks': [my_hook],
-}
-
-
+# FIXME: because of formating string, for channel, it can't do batch dl
 class YoutubeDownload(threading.Thread):
-    def __init__(self, videos):
+    def __init__(self, video):
         threading.Thread.__init__(self)
-        self.videos = videos
+        self.video = video
+
+        file_name = "{channel_title} - {date} - %(title)s (%(fps)s_%(vcodec)s_%(acodec)s).%(ext)s".format(
+            channel_title=self.video.channel_title, date=self.video.date_published.strftime("%Y-%m-%d"))
+        # file_name = 'testwsefefewf.fwef'
+        youtube_folder = read_config('Play', 'yt_file_path')
+        file_path = os.path.join(youtube_folder, file_name)
+        self.ydl_opts = {
+            'logger': MyLogger(),
+            'progress_hooks': [my_hook],
+            'outtmpl': file_path
+        }
 
     def run(self):
-        url_list = []
-        for video in self.videos:
-            url_list.append(video.url_video)
-
-        with YoutubeDL(ydl_opts) as ydl:
-            ydl.download(url_list)
+        # url_list = []
+        # for video in self.videos:
+        #     url_list.append(video.url_video)
+        with YoutubeDL(self.ydl_opts) as ydl:
+            ydl.download([self.video.url_video])
