@@ -31,3 +31,4 @@ tqdm==4.23.4
 uritemplate==3.0.0
 urllib3==1.23
 watchdog==0.8.3
+youtube-dl==2018.7.29
