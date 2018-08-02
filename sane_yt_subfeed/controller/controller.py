@@ -8,7 +8,9 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication
 
 # FIXME: imp*
+from watchdog.observers import Observer
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.controller.dir_handler import VidEventHandler
 from sane_yt_subfeed.controller.listeners import *
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
@@ -49,6 +51,12 @@ class Controller:
 
         model = MainModel([], subscription_feed, downloaded_videos, vid_limit)
 
+        path = read_config('Play', 'yt_file_path')
+        event_handler = VidEventHandler()
+        observer = Observer()
+        observer.schedule(event_handler, path)
+        observer.start()
+
         grid_view_x = read_config('Gui', 'grid_view_x')
         grid_view_y = read_config('Gui', 'grid_view_y')
         tile_pref_height = read_config('Gui', 'tile_pref_height')
@@ -60,3 +68,4 @@ class Controller:
         window = MainWindow(model, dimensions=dimensions)
         window.show()
         app.exec_()
+        observer.join()
