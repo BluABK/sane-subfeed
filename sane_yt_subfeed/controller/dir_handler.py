@@ -19,7 +19,9 @@ def get_yt_file(search_path, id):
 class VidEventHandler(PatternMatchingEventHandler):
     patterns = ["*.mp4"]
 
-
+    def __init__(self, listener):
+        super().__init__()
+        self.listener = listener
     # def on_any_event(self, event):
     #     print("change")
     #     if event.event_type == 'created':
@@ -37,13 +39,9 @@ class VidEventHandler(PatternMatchingEventHandler):
             file = ffmpeg.probe(event.src_path)
             yt_comment = file['format']['tags']['comment']
             vid_id = yt_comment.split('v=')[-1]
-            vid = db_session.query(Video).get(vid_id)
+            self.listener.newFile.emit(vid_id, event.src_path)
 
-            vid.vid_path = event.src_path
-
-            db_session.commit()
-            db_session.remove()
         except Exception as e:
             print("Trying to probe file again")
-            time.sleep(0.5)
+            time.sleep(0.3)
             self.on_created(event)

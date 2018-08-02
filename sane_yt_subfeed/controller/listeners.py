@@ -5,8 +5,12 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from sane_yt_subfeed import main
+
+from watchdog.observers import Observer
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.controller.dir_handler import VidEventHandler
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
+from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideo
 from sane_yt_subfeed.log_handler import logger
@@ -159,3 +163,34 @@ class ProgressBar(QObject):
     def reset_bar(self):
         self.progress_bar.reset()
         self.progress_bar.update()
+
+
+class YtDirListener(QObject):
+    newFile = pyqtSignal(str, str)
+    newFileDB = pyqtSignal()
+
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
+
+        self.newFile.connect(self.new_file)
+
+        path = read_config('Play', 'yt_file_path')
+        event_handler = VidEventHandler(self)
+        self.observer = Observer()
+        self.observer.schedule(event_handler, path)
+        self.observer.start()
+
+    def run(self):
+        while True:
+            time.sleep(2)
+
+    def new_file(self, id, path):
+        vid = db_session.query(Video).get(id)
+
+        vid.vid_path = path
+
+        db_session.commit()
+        db_session.remove()
+
+        self.newFileDB.emit()
