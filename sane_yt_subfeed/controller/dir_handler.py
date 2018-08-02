@@ -35,6 +35,10 @@ class VidEventHandler(PatternMatchingEventHandler):
     #     # self.process(event)
 
     def on_created(self, event):
+        time.sleep(0.01)
+        if not event.src_path:
+            return
+
         try:
             file = ffmpeg.probe(event.src_path)
             yt_comment = file['format']['tags']['comment']

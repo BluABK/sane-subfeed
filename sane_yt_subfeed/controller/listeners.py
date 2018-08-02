@@ -167,7 +167,7 @@ class ProgressBar(QObject):
 
 class YtDirListener(QObject):
     newFile = pyqtSignal(str, str)
-    newFileDB = pyqtSignal()
+    downloadedVideosChanged = pyqtSignal()
 
     def __init__(self, model):
         super().__init__()
@@ -185,12 +185,15 @@ class YtDirListener(QObject):
         while True:
             time.sleep(2)
 
-    def new_file(self, id, path):
-        vid = db_session.query(Video).get(id)
+    @pyqtSlot(str, str)
+    def new_file(self, vid_id, vid_path):
 
-        vid.vid_path = path
+        vid = db_session.query(Video).get(vid_id)
+        if vid:
+            vid.vid_path = vid_path
 
-        db_session.commit()
-        db_session.remove()
+            db_session.commit()
+            db_session.remove()
 
-        self.newFileDB.emit()
+            self.model.db_update_downloaded_videos()
+

@@ -2,7 +2,8 @@ from PyQt5.QtCore import QThread
 
 # FIXME: imp*
 from sane_yt_subfeed.controller.listeners import *
-from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, refresh_and_get_newest_videos
+from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, refresh_and_get_newest_videos, \
+    get_best_downloaded_videos
 
 
 class MainModel:
@@ -77,3 +78,7 @@ class MainModel:
         self.status_bar_listener.moveToThread(self.status_bar_thread)
         self.status_bar_thread.start()
         return self.status_bar_progress
+
+    def db_update_downloaded_videos(self):
+        self.downloaded_videos = get_best_downloaded_videos(self.videos_limit)
+        self.yt_dir_listener.downloadedVideosChanged.emit()
