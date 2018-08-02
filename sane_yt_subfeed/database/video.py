@@ -78,6 +78,7 @@ class Video(PermanentBase):
         video_d.downloaded = video.downloaded
         video_d.thumbnail_path = video.thumbnail_path
         video_d.discarded = video.discarded
+        video_d.vid_path = video.vid_path
         return video_d
 
     @staticmethod
@@ -91,3 +92,4 @@ class Video(PermanentBase):
         self.thumbnail_path = video_d.thumbnail_path
         self.downloaded = video_d.downloaded
         self.discarded = video_d.discarded
+        self.vid_path = video_d.vid_path

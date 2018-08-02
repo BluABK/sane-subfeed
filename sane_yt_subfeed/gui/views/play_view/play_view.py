@@ -2,8 +2,12 @@ import os
 import subprocess
 import timeit
 
+from PyQt5 import sip
+
 from sane_yt_subfeed.controller.view_models import MainModel, logger
+from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.gui.views.grid_view.grid_view import GridView
+from sane_yt_subfeed.gui.views.play_view.play_tile import PlayTile
 
 
 class PlayView(GridView):
@@ -27,7 +31,29 @@ class PlayView(GridView):
         for q_label, video in zip(self.q_labels, self.main_model.downloaded_videos):
             q_label.set_video(video)
 
-    def play(self, file_path, player="mpc-hc64"):
-        subprocess.Popen([player, file_path])
 
+    def update_grid(self):
+        feed = self.get_feed()
+        counter = 0
+        positions = [(i, j) for i in range(self.items_y) for j in range(self.items_x)]
+        for position in positions:
+
+            if counter < len(self.q_labels):
+                self.grid.addWidget(self.q_labels[counter], *position)
+            else:
+                if counter >= len(feed):
+                    vid_item = VideoD(None)
+                    lbl = PlayTile(self, vid_item, counter, self.clipboard, self.status_bar)
+                else:
+                    lbl = PlayTile(self, feed[counter], counter, self.clipboard, self.status_bar)
+                self.grid.addWidget(lbl, *position)
+                self.q_labels.append(lbl)
+            counter += 1
+        if len(positions) < len(self.q_labels):
+            widgets_to_delete = self.q_labels[len(positions):]
+            self.q_labels = self.q_labels[:len(positions)]
+            for widget in widgets_to_delete:
+                self.grid.removeWidget(widget)
+                sip.delete(widget)
+        self.resizeEvent('')
 

@@ -20,12 +20,12 @@ from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_search
 class VideoTile(QWidget):
     hotkey_ctrl_down = False
 
-    def __init__(self, parent, video, id, clipboard, status_bar):
+    def __init__(self, parent, video, vid_id, clipboard, status_bar):
         QWidget.__init__(self, parent=parent)
         self.clipboard = clipboard
         self.status_bar = status_bar
         self.video = video
-        self.id = id
+        self.id = vid_id
         self.parent = parent
         self.root = parent.root  # MainWindow
         # parent.parent.parent.bind('<KeyPress-ctrl>', self.key_press_ctrl)
