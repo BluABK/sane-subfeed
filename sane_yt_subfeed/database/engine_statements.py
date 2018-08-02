@@ -19,6 +19,7 @@ def update_video_statement_full(db_video):
         downloaded=db_video.downloaded,
         search_item=db_video.search_item,
         discarded=db_video.discarded,
+        vid_path=db_video.vid_path,
         watched=db_video.watched)
 
 
@@ -31,8 +32,12 @@ def get_channel_by_id_stmt(channel):
     return Channel.__table__.select().where(text("id = '{}'".format(channel.id)))
 
 
-def get_video_by_id_stmt(video_d):
+def get_video_by_vidd_stmt(video_d):
     return Video.__table__.select().where(text("video_id = '{}'".format(video_d.video_id)))
+
+
+def get_video_by_id_stmt(video_id):
+    return Video.__table__.select().where(text("video_id = '{}'".format(video_id)))
 
 
 def insert_item(video):

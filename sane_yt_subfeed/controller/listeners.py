@@ -2,17 +2,16 @@
 import time
 
 from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
 
 from sane_yt_subfeed import main
 
 from watchdog.observers import Observer
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.controller.dir_handler import VidEventHandler
+from sane_yt_subfeed.controller.dir_handler import VidEventHandler, manual_youtube_folder_check
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
-from sane_yt_subfeed.database.write_operations import UpdateVideo
+from sane_yt_subfeed.database.write_operations import UpdateVideo, UpdateVideosThread
 from sane_yt_subfeed.log_handler import logger
 from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_cached_oauth
 
@@ -176,12 +175,14 @@ class ProgressBar(QObject):
 
 class YtDirListener(QObject):
     newFile = pyqtSignal(str, str)
+    manualCheck = pyqtSignal()
 
     def __init__(self, model):
         super().__init__()
         self.model = model
 
         self.newFile.connect(self.new_file)
+        self.manualCheck.connect(self.manual_check)
 
         path = read_config('Play', 'yt_file_path')
         event_handler = VidEventHandler(self)
@@ -205,3 +206,7 @@ class YtDirListener(QObject):
 
             self.model.db_update_downloaded_videos()
 
+    def manual_check(self):
+        youtube_folder = read_config("Play", "yt_file_path")
+        update_videos = manual_youtube_folder_check(youtube_folder)
+        UpdateVideosThread(update_videos, update_existing=True).start()

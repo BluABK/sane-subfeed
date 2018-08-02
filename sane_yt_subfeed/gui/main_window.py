@@ -104,6 +104,10 @@ class MainWindow(QMainWindow):
         # FIXME: icon
         self.add_submenu('&Function', 'Test Channels', self.test_channels,
                          tooltip='Tests the test_pages and miss_limit of channels', icon='refresh.png')
+
+        # FIXME: icon
+        self.add_submenu('&Function', 'Manual dir search', self.dir_search,
+                         tooltip='Starts a manual search for new videos in youtube directory', icon='refresh.png')
         # View menu
         self.add_menu(menubar, '&View')
         view_grid_view = self.add_submenu('&View', 'Grid', self.view_grid, shortcut='Ctrl+1',
@@ -352,6 +356,14 @@ class MainWindow(QMainWindow):
         :return:
         """
         self.main_model.main_window_listener.testChannels.emit()
+
+    def dir_search(self):
+        """
+        Sends a testChannels signal
+        :return:
+        """
+        self.main_model.yt_dir_listener.manualCheck.emit()
+        # do_walk(os.path.join("d:/", "youtube"))
 
     def refresh_subs(self):
         """

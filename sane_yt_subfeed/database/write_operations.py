@@ -1,7 +1,7 @@
 import threading
 
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
-from sane_yt_subfeed.database.engine_statements import update_video_statement_full, get_video_by_id_stmt, insert_item
+from sane_yt_subfeed.database.engine_statements import update_video_statement_full, get_video_by_vidd_stmt, insert_item
 from sane_yt_subfeed.database.orm import engine
 from sane_yt_subfeed.database.video import Video
 
@@ -44,7 +44,7 @@ class UpdateVideosThread(threading.Thread):
         items_to_add = []
         items_to_update = []
         for video_d in self.video_list:
-            stmt = get_video_by_id_stmt(VideoD.to_video(video_d))
+            stmt = get_video_by_vidd_stmt(VideoD.to_video(video_d))
             db_video = engine.execute(stmt).first()
             if db_video:
                 if self.update_existing:
@@ -84,7 +84,7 @@ class UpdateVideo(threading.Thread):
         """
         # start = default_timer()
         lock.acquire()
-        stmt = get_video_by_id_stmt(VideoD.to_video(self.video_d))
+        stmt = get_video_by_vidd_stmt(VideoD.to_video(self.video_d))
         db_video = engine.execute(stmt).first()
         if db_video:
             if self.update_existing:
