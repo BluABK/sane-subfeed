@@ -67,12 +67,13 @@ class UpdateVideosThread(threading.Thread):
 
 class UpdateVideo(threading.Thread):
 
-    def __init__(self, video_d, update_existing=False):
+    def __init__(self, video_d, update_existing=False, finished_listener=None):
         """
         Init GetUploadsThread
         :param video_d:
         """
         threading.Thread.__init__(self)
+        self.finished_listener = finished_listener
         self.video_d = video_d
         self.update_existing = update_existing
 
@@ -95,6 +96,9 @@ class UpdateVideo(threading.Thread):
             engine.execute(Video.__table__.insert(), insert_item(self.video_d))
         # print('Updated: {}'.format(self.video_d.title))
         lock.release()
+
+        if self.finished_listener:
+            self.finished_listener.emit()
 
 
 def check_for_unique(vid_list):
