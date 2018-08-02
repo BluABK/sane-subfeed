@@ -9,11 +9,12 @@ from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideo
-from sane_yt_subfeed.log_handler import logger
+from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_cached_oauth
 
 LISTENER_SIGNAL_NORMAL_REFRESH = 0
 LISTENER_SIGNAL_DEEP_REFRESH = 1
+
 
 class GridViewListener(QObject):
     tileDownloaded = pyqtSignal(VideoD, int)
@@ -26,15 +27,18 @@ class GridViewListener(QObject):
 
         self.tileDownloaded.connect(self.tile_downloaded)
         self.tileDiscarded.connect(self.tile_discarded)
+        self.logger = create_logger('GridViewListener')
 
     @pyqtSlot(VideoD, int)
     def tile_downloaded(self, video: Video, index):
+        self.logger.info("Downloaded: {} - {} [{}]".format(video.channel_title, video.title, video.url_video))
         self.model.hide_video_item(index)
         self.hiddenVideosChanged.emit()
         UpdateVideo(video, update_existing=True).start()
 
     @pyqtSlot(VideoD, int)
     def tile_discarded(self, video: Video, index):
+        self.logger.info("Discarded: {} - {} [{}]".format(video.channel_title, video.title, video.url_video))
         self.model.hide_video_item(index)
         self.hiddenVideosChanged.emit()
         UpdateVideo(video, update_existing=True).start()
@@ -55,13 +59,14 @@ class MainWindowListener(QObject):
         self.refreshVideos.connect(self.refresh_videos)
         self.refreshSubs.connect(self.refresh_subs)
         self.testChannels.connect(self.test_channels)
+        self.logger = create_logger('MainWindowListener')
 
     def run(self):
         while True:
             time.sleep(2)
-            logger.debug('MainWindowListener: is alive')
+            self.logger.debug('I\'m alive!')
         # noinspection PyUnreachableCode
-        logger.error('MainWindowListener finished')
+        self.logger.error('Finished when not supposed to')
 
     @pyqtSlot(int)
     def refresh_videos(self, refresh_type):
@@ -69,14 +74,14 @@ class MainWindowListener(QObject):
         Fetches new videos and reloads the subscription feed
         :return:
         """
-        logger.info("Reloading subfeed")
+        self.logger.info("Reloading subfeed")
         hide_downloaded = read_config('Gui', 'hide_downloaded')
         if hide_downloaded:
             self.model.remote_update_videos(refresh_type=refresh_type)
             self.model.grid_view_listener.hiddenVideosChanged.emit()
         else:
             self.model.remote_update_videos(refresh_type=refresh_type)
-            logger.debug('MainWindowListener: not implemented disabled hide_downloaded')
+            self.logger.error('NOT IMPLEMENTED: disabled hide_downloaded')
 
     @pyqtSlot()
     def refresh_subs(self):
@@ -84,7 +89,7 @@ class MainWindowListener(QObject):
         Fetches a new list of subscriptions from YouTube API via OAuth
         :return:
         """
-        logger.info("Reloading subscriptions list")
+        self.logger.info("Reloading subscriptions list")
         get_remote_subscriptions_cached_oauth()
 
     @pyqtSlot()
@@ -93,6 +98,7 @@ class MainWindowListener(QObject):
         Runs the test channels test
         :return:
         """
+        self.logger.info("Running test: channels test")
         main.run_channels_test()
 
 
@@ -104,6 +110,7 @@ class DatabaseListener(QObject):
         super().__init__()
         self.model = model
         self.refreshVideos.connect(self.refresh_videos)
+        self.logger = create_logger('DatabaseListener')
 
     def run(self):
         while True:
@@ -111,7 +118,7 @@ class DatabaseListener(QObject):
 
     @pyqtSlot()
     def refresh_videos(self):
-        print('refresh')
+        self.logger.info('Reloading videos')
 
 
 class ProgressBar(QObject):
@@ -134,6 +141,7 @@ class ProgressBar(QObject):
         self.updateProgress.connect(self.update_progress)
         self.setText.connect(self.set_text)
         self.resetBar.connect(self.reset_bar)
+        self.logger = create_logger('ProgressBar')
 
     def run(self):
         while True:
