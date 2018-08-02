@@ -88,6 +88,7 @@ class VideoD:
         video.downloaded = self.downloaded
         video.thumbnail_path = self.thumbnail_path
         video.discarded = self.discarded
+        video.vid_path = self.vid_path
         return video
 
     @staticmethod
