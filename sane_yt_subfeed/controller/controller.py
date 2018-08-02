@@ -1,19 +1,7 @@
 import sys
-import threading
-import time
-
 # FIXME: imp*
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtWidgets import QApplication
-
-# FIXME: imp*
-from watchdog.observers import Observer
-from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.controller.dir_handler import VidEventHandler
 from sane_yt_subfeed.controller.listeners import *
 from sane_yt_subfeed.controller.view_models import MainModel
-from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.gui.main_window import MainWindow
 from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_videos, get_newest_stored_videos, \
     get_best_downloaded_videos
@@ -30,7 +18,6 @@ class Controller:
 
     def run(self):
         vid_limit = read_config('Model', 'loaded_videos')
-
 
         filter_dl = read_config('Gui', 'hide_downloaded')
         start_with_stored_videos = read_config('Debug', 'start_with_stored_videos')
@@ -51,21 +38,14 @@ class Controller:
 
         model = MainModel([], subscription_feed, downloaded_videos, vid_limit)
 
-        path = read_config('Play', 'yt_file_path')
-        event_handler = VidEventHandler()
-        observer = Observer()
-        observer.schedule(event_handler, path)
-        observer.start()
-
         grid_view_x = read_config('Gui', 'grid_view_x')
         grid_view_y = read_config('Gui', 'grid_view_y')
         tile_pref_height = read_config('Gui', 'tile_pref_height')
         tile_pref_width = read_config('Gui', 'tile_pref_width')
         # FIXME: static buffer
-        dimensions = [grid_view_x*tile_pref_width+10, grid_view_y*tile_pref_height+10]
+        dimensions = [grid_view_x * tile_pref_width + 10, grid_view_y * tile_pref_height + 10]
 
         app = QApplication(sys.argv)
         window = MainWindow(model, dimensions=dimensions)
         window.show()
         app.exec_()
-        observer.join()
