@@ -25,6 +25,10 @@ class GridViewListener(QObject):
     tileWatched = pyqtSignal(VideoD, int)
     hiddenVideosChanged = pyqtSignal()
     downloadedVideosChanged = pyqtSignal()
+    # FIXME: move youtube-dl listener to its own listener?
+    downloadFinished = pyqtSignal(VideoD)
+    # FIXME: move to db listener
+    downloadedVideosChangedinDB = pyqtSignal()
 
     def __init__(self, model):
         super().__init__()
@@ -33,17 +37,26 @@ class GridViewListener(QObject):
         self.tileDownloaded.connect(self.tile_downloaded)
         self.tileWatched.connect(self.tile_watched)
         self.tileDiscarded.connect(self.tile_discarded)
+        self.downloadFinished.connect(self.download_finished)
+        self.downloadedVideosChangedinDB.connect(self.download_finished_in_db)
 
     @pyqtSlot(VideoD, int)
-    def tile_downloaded(self, video: Video, index):
+    def tile_downloaded(self, video: VideoD, index):
         self.model.hide_video_item(index)
         self.hiddenVideosChanged.emit()
 
         use_youtube_dl = read_config('Youtube-dl', 'use_youtube_dl')
         if use_youtube_dl:
-            YoutubeDownload(video).start()
+            YoutubeDownload(video, finished_listener=self.downloadFinished).start()
+        else:
+            UpdateVideo(video, update_existing=True).start()
 
-        UpdateVideo(video, update_existing=True).start()
+    @pyqtSlot(VideoD)
+    def download_finished(self, video: VideoD):
+        UpdateVideo(video, update_existing=True, finished_listener=self.downloadedVideosChangedinDB).start()
+
+    def download_finished_in_db(self):
+        self.model.db_update_downloaded_videos()
 
     @pyqtSlot(VideoD, int)
     def tile_watched(self, video: Video, index):

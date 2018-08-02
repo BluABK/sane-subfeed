@@ -21,24 +21,33 @@ class MyLogger(object):
 
 
 def my_hook(d):
+    time.sleep(0.01)
     if d['status'] == 'finished':
         print('Done downloading, now converting ...')
 
+
 # FIXME: because of formating string, for channel, it can't do batch dl
 class YoutubeDownload(threading.Thread):
-    def __init__(self, video):
+    def __init__(self, video, finished_listener=None):
         threading.Thread.__init__(self)
         self.video = video
-
-        file_name = "{channel_title} - {date} - %(title)s (%(fps)s_%(vcodec)s_%(acodec)s).%(ext)s".format(
-            channel_title=self.video.channel_title, date=self.video.date_published.strftime("%Y-%m-%d"))
+        self.listener = finished_listener
+        # FIXME: faux filename, as the application is currently not able to get final filname from youtube-dl
+        # file_name = "{channel_title} - {date} - %(title)s (%(fps)s_%(vcodec)s_%(acodec)s).%(ext)s".format(
+        #     channel_title=self.video.channel_title, date=self.video.date_published.strftime("%Y-%m-%d"))
+        file_name = "{channel_title} - {date} - {title}.mp4".format(title=self.video.title,
+                                                                    channel_title=self.video.channel_title,
+                                                                    date=self.video.date_published.strftime("%Y-%m-%d"))
         # file_name = 'testwsefefewf.fwef'
         youtube_folder = read_config('Play', 'yt_file_path')
         file_path = os.path.join(youtube_folder, file_name)
+        self.video.vid_path = file_path
+
         self.ydl_opts = {
             'logger': MyLogger(),
             'progress_hooks': [my_hook],
-            'outtmpl': file_path
+            'outtmpl': file_path,
+            'forcefilename': 'True'
         }
 
     def run(self):
@@ -47,3 +56,5 @@ class YoutubeDownload(threading.Thread):
         #     url_list.append(video.url_video)
         with YoutubeDL(self.ydl_opts) as ydl:
             ydl.download([self.video.url_video])
+        if self.listener:
+            self.listener.emit(self.video)
