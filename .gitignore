@@ -32,4 +32,4 @@ logs/
 Sane_Subscription_Feed.egg-info/
 
 # alembic
-alembic/versions/
+alembic/versions/*.py
