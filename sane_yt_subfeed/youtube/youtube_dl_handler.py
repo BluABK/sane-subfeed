@@ -35,13 +35,13 @@ class YoutubeDownload(threading.Thread):
         # FIXME: faux filename, as the application is currently not able to get final filname from youtube-dl
         # file_name = "{channel_title} - {date} - %(title)s (%(fps)s_%(vcodec)s_%(acodec)s).%(ext)s".format(
         #     channel_title=self.video.channel_title, date=self.video.date_published.strftime("%Y-%m-%d"))
-        file_name = "{channel_title} - {date} - {title}.mp4".format(title=self.video.title,
-                                                                    channel_title=self.video.channel_title,
-                                                                    date=self.video.date_published.strftime("%Y-%m-%d"))
+        file_name = "{channel_title} - {date} - {title} - {id}".format(title=self.video.title,
+                                                                       channel_title=self.video.channel_title,
+                                                                       date=self.video.date_published.strftime(
+                                                                           "%Y-%m-%d"), id=self.video.video_id)
         # file_name = 'testwsefefewf.fwef'
-        youtube_folder = read_config('Play', 'yt_file_path')
-        file_path = os.path.join(youtube_folder, file_name)
-        self.video.vid_path = file_path
+        self.youtube_folder = read_config('Play', 'yt_file_path')
+        file_path = os.path.join(self.youtube_folder, file_name)
 
         self.ydl_opts = {
             'logger': MyLogger(),
@@ -56,5 +56,10 @@ class YoutubeDownload(threading.Thread):
         #     url_list.append(video.url_video)
         with YoutubeDL(self.ydl_opts) as ydl:
             ydl.download([self.video.url_video])
+
+        for name in os.listdir(self.youtube_folder):
+            if self.video.video_id in name:
+                self.video.vid_path = os.path.join(self.youtube_folder, name)
+
         if self.listener:
             self.listener.emit(self.video)
