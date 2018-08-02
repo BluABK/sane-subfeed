@@ -17,7 +17,7 @@ def get_yt_file(search_path, id):
 
 
 class VidEventHandler(PatternMatchingEventHandler):
-    patterns = ["*.mp4"]
+    patterns = ["*.mp4", "*.webm"]
 
     def __init__(self, listener):
         super().__init__()
@@ -36,15 +36,17 @@ class VidEventHandler(PatternMatchingEventHandler):
     #     # self.process(event)
 
     def on_created(self, event):
-        time.sleep(0.01)
         if not event.src_path:
             return
 
         try:
             file = ffmpeg.probe(event.src_path)
-            yt_comment = file['format']['tags']['comment']
-            vid_id = yt_comment.split('v=')[-1]
-            self.listener.newFile.emit(vid_id, event.src_path)
+            try:
+                yt_comment = file['format']['tags']['comment']
+                vid_id = yt_comment.split('v=')[-1]
+                self.listener.newFile.emit(vid_id, event.src_path)
+            except Exception as e:
+                raise e
 
         except Exception as e:
             print("Trying to probe file again")

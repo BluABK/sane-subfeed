@@ -62,6 +62,10 @@ defaults = {
     'Threading': {
         'img_threads': '200',
     },
+    'Play': {
+        'yt_file_path': "",
+        'disable_dir_listener': 'True',
+    },
     'Youtube-dl': {
         'use_youtube_dl': 'True'
     }
