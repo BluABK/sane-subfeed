@@ -52,6 +52,15 @@ class MainModel:
             # FIXME: only does filtered videos
             logger.info('Reduced view models filtered_videos to /2, requesting new videos from db')
 
+    def hide_downloaded_video_item(self, index):
+        del self.downloaded_videos[index]
+        regrab_percentage = read_config('Model', 'regrab_percentage')
+        loaded_videos = read_config('Model', 'loaded_videos')
+        self.videos_limit = loaded_videos
+        if len(self.downloaded_videos) <= int(regrab_percentage*loaded_videos):
+            self.db_update_downloaded_videos()
+            logger.info('Reduced view models downloaded_videos to /2, requesting new videos from db')
+
     def db_update_videos(self, filtered=True):
         # FIXME: only does filtered videos
         if filtered:
@@ -81,4 +90,4 @@ class MainModel:
 
     def db_update_downloaded_videos(self):
         self.downloaded_videos = get_best_downloaded_videos(self.videos_limit)
-        self.yt_dir_listener.downloadedVideosChanged.emit()
+        self.grid_view_listener.downloadedVideosChanged.emit()

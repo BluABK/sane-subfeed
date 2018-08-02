@@ -23,6 +23,7 @@ class Video(PermanentBase):
     discarded = Column(Boolean)
     search_item = Column(TextPickleType())
     vid_path = Column(String)
+    watched = Column(Boolean)
 
     def __init__(self, search_item):
         """
@@ -35,16 +36,13 @@ class Video(PermanentBase):
         str_date = search_item['snippet']['publishedAt']
         self.date_published = datetime.datetime.strptime(str_date, '%Y-%m-%dT%H:%M:%S.000Z')
         self.description = search_item['snippet']['description']
-        # self.playlist_id = search_item['snippet']['playlistId']   # Which playlist it's added from
-        # self.playlist_pos = search_item['snippet']['position']    # Which position it's got in the playlist
         self.channel_id = search_item['snippet']['channelId']
 
         self.url_video = YOUTUBE_URL_BASE + YOUTUBE_URL_PART_VIDEO + self.video_id
-        # self.url_playlist_video = self.url_video + "&list=" + self.playlist_id
         self.downloaded = False
         self.thumbnails = search_item['snippet']['thumbnails']
         self.search_item = search_item
-        # self.determine_thumbnails(playlist_item.snippet.thumbnails)
+        self.watched = False
 
     def determine_thumbnails(self, thumbnails_item):
         """
@@ -79,6 +77,7 @@ class Video(PermanentBase):
         video_d.thumbnail_path = video.thumbnail_path
         video_d.discarded = video.discarded
         video_d.vid_path = video.vid_path
+        video_d.watched = video.watched
         return video_d
 
     @staticmethod
@@ -93,3 +92,4 @@ class Video(PermanentBase):
         self.downloaded = video_d.downloaded
         self.discarded = video_d.discarded
         self.vid_path = video_d.vid_path
+        self.watched = video_d.watched

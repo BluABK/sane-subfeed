@@ -22,19 +22,28 @@ LISTENER_SIGNAL_DEEP_REFRESH = 1
 class GridViewListener(QObject):
     tileDownloaded = pyqtSignal(VideoD, int)
     tileDiscarded = pyqtSignal(VideoD, int)
+    tileWatched = pyqtSignal(VideoD, int)
     hiddenVideosChanged = pyqtSignal()
+    downloadedVideosChanged = pyqtSignal()
 
     def __init__(self, model):
         super().__init__()
         self.model = model
 
         self.tileDownloaded.connect(self.tile_downloaded)
+        self.tileWatched.connect(self.tile_watched)
         self.tileDiscarded.connect(self.tile_discarded)
 
     @pyqtSlot(VideoD, int)
     def tile_downloaded(self, video: Video, index):
         self.model.hide_video_item(index)
         self.hiddenVideosChanged.emit()
+        UpdateVideo(video, update_existing=True).start()
+
+    @pyqtSlot(VideoD, int)
+    def tile_watched(self, video: Video, index):
+        self.model.hide_downloaded_video_item(index)
+        self.downloadedVideosChanged.emit()
         UpdateVideo(video, update_existing=True).start()
 
     @pyqtSlot(VideoD, int)
@@ -167,7 +176,6 @@ class ProgressBar(QObject):
 
 class YtDirListener(QObject):
     newFile = pyqtSignal(str, str)
-    downloadedVideosChanged = pyqtSignal()
 
     def __init__(self, model):
         super().__init__()

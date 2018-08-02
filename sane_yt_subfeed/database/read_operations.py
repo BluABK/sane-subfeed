@@ -1,8 +1,11 @@
 import datetime
+import time
+
 from sqlalchemy import desc
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
+from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.engine_statements import get_video_by_id_stmt
 from sane_yt_subfeed.database.orm import db_session, engine
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread
@@ -10,6 +13,7 @@ from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.controller.dir_handler import get_yt_file
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
 from sane_yt_subfeed.youtube.update_videos import refresh_uploads
+from sqlalchemy.sql.expression import false, true, or_
 
 
 def get_newest_stored_videos(limit, filter_downloaded=False):
@@ -30,24 +34,24 @@ def get_newest_stored_videos(limit, filter_downloaded=False):
     return videos
 
 
-def get_best_downloaded_videos(limit):
+def get_best_downloaded_videos(limit, filter_watched=True):
     """
 
+    :param filter_watched:
     :param limit:
-    :param filter_downloaded:
     :return: list(VideoD)
     """
-    db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(
-            Video.vid_path != "").limit(limit).all()
+    if filter_watched:
+        db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(
+                Video.vid_path != "", or_(Video.watched.is_(None), Video.watched == false())).limit(limit).all()
+    else:
+        db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(
+                Video.vid_path != "").limit(limit).all()
     videos = Video.to_video_ds(db_videos)
     db_session.remove()
-    # return_videos = []
-    # path = read_config('Play', 'yt_file_path')
-    # for vid in videos:
-    #     yt_file = get_yt_file(path, vid.video_id)
-    #     if yt_file:
-    #         return_videos.append(vid)
-    # db_session.remove()
+    if len(videos) < limit:
+        for _ in range(limit-len(videos)):
+            videos.append(VideoD(None))
     return videos
 
 

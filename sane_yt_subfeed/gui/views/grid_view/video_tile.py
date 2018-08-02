@@ -183,6 +183,16 @@ class VideoTile(QWidget):
                                                                      self.video.channel_title,
                                                                      self.video.title))
 
+    def mark_watched(self):
+        """
+        Mark the video as downloaded
+        :return:
+        """
+        logger.info('Mark watched: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
+                                                                self.video.title))
+        self.video.watched = True
+        self.parent.main_model.grid_view_listener.tileWatched.emit(self.video, self.id)
+
     # Get the system clipboard contents
     def clipboard_changed(self):
         text = self.clipboard().text()
