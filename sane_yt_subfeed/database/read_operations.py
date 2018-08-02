@@ -1,5 +1,3 @@
-import timeit
-
 import datetime
 from sqlalchemy import desc
 
@@ -9,8 +7,8 @@ from sane_yt_subfeed.database.engine_statements import get_video_by_id_stmt
 from sane_yt_subfeed.database.orm import db_session, engine
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread
 from sane_yt_subfeed.database.video import Video
-from sane_yt_subfeed.dir_handler import get_yt_file
-from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths, download_thumbnails_threaded
+from sane_yt_subfeed.controller.dir_handler import get_yt_file
+from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
 from sane_yt_subfeed.youtube.update_videos import refresh_uploads
 
 
@@ -40,17 +38,17 @@ def get_best_downloaded_videos(limit):
     :return: list(VideoD)
     """
     db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(
-            Video.downloaded == '1').limit(limit).all()
+            Video.vid_path != "").limit(limit).all()
     videos = Video.to_video_ds(db_videos)
     db_session.remove()
-    return_videos = []
-    path = read_config('Play', 'yt_file_path')
-    for vid in videos:
-        yt_file = get_yt_file(path, vid.video_id)
-        if yt_file:
-            return_videos.append(vid)
-    db_session.remove()
-    return return_videos
+    # return_videos = []
+    # path = read_config('Play', 'yt_file_path')
+    # for vid in videos:
+    #     yt_file = get_yt_file(path, vid.video_id)
+    #     if yt_file:
+    #         return_videos.append(vid)
+    # db_session.remove()
+    return videos
 
 
 def compare_db_filtered(videos, limit, discarded=False, downloaded=False):
