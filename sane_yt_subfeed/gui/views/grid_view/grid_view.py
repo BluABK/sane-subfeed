@@ -30,6 +30,13 @@ class GridView(QWidget):
         self.grid = QGridLayout()
         self.items_x = read_config('Gui', 'grid_view_x')
         self.items_y = read_config('Gui', 'grid_view_y')
+        self.grid.setContentsMargins(5, 5, 0, 0)
+        self.grid.setSpacing(0)
+        self.setLayout(self.grid)
+
+
+        self.setAutoFillBackground(True)
+        self.set_bgcolor()
 
         self.init_ui()
 
@@ -38,13 +45,6 @@ class GridView(QWidget):
 
         self.main_model.grid_view_listener.hiddenVideosChanged.connect(self.videos_changed)
 
-        self.grid.setContentsMargins(5, 5, 0, 0)
-        self.grid.setSpacing(0)
-        self.setLayout(self.grid)
-
-
-        self.setAutoFillBackground(True)
-        self.set_bgcolor()
         self.update_grid()
         # subscription_feed = self.main_model.filtered_videos
         #
