@@ -43,5 +43,6 @@ def create_logger(facility, logfile='debug.log'):
 
     return log_instance
 
+
 # Default logger facility
 logger = create_logger('sane-subfeed')

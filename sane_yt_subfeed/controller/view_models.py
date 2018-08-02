@@ -3,6 +3,7 @@ from PyQt5.QtCore import QThread
 # FIXME: imp*
 from sane_yt_subfeed.controller.listeners import *
 from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, refresh_and_get_newest_videos
+from sane_yt_subfeed.log_handler import create_logger
 
 
 class MainModel:
@@ -12,10 +13,12 @@ class MainModel:
 
     def __init__(self, videos, filtered_videos, videos_limit):
         super().__init__()
+        self.logger = create_logger('MainModel')
         self.videos_limit = videos_limit
         self.videos = videos
         self.filtered_videos = filtered_videos
 
+        self.logger.info("Creating listeners and threads")
         self.grid_view_listener = GridViewListener(self)
         self.grid_thread = QThread()
         self.grid_thread.setObjectName('grid_thread')
@@ -35,6 +38,7 @@ class MainModel:
         self.main_w_thread.start()
 
     def hide_video_item(self, index):
+        self.logger.debug("Hiding video item: {}".format(index))
         del self.filtered_videos[index]
         regrab_percentage = read_config('Model', 'regrab_percentage')
         loaded_videos = read_config('Model', 'loaded_videos')
@@ -42,9 +46,10 @@ class MainModel:
         if len(self.filtered_videos) <= int(regrab_percentage*loaded_videos):
             self.db_update_videos()
             # FIXME: only does filtered videos
-            logger.info('Reduced view models filtered_videos to /2, requesting new videos from db')
+            self.logger.warning('Reduced view models filtered_videos to /2, requesting new videos from db')
 
     def db_update_videos(self, filtered=True):
+        self.logger.info("Getting newest stored videos from DB")
         # FIXME: only does filtered videos
         if filtered:
             self.filtered_videos = get_newest_stored_videos(self.videos_limit, filtered)
@@ -53,6 +58,7 @@ class MainModel:
             self.videos = get_newest_stored_videos(self.videos_limit, filtered)
 
     def remote_update_videos(self, filtered=True, refresh_type=LISTENER_SIGNAL_NORMAL_REFRESH):
+        self.logger.info("Reloading and getting newest videos from YouTube")
         # FIXME: only does filtered videos
         if filtered:
             self.filtered_videos = refresh_and_get_newest_videos(self.videos_limit, filtered, self.status_bar_listener,
