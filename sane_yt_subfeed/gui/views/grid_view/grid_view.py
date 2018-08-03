@@ -46,18 +46,6 @@ class GridView(QWidget):
         self.main_model.grid_view_listener.hiddenVideosChanged.connect(self.videos_changed)
 
         self.update_grid()
-        # subscription_feed = self.main_model.filtered_videos
-        #
-        # counter = 0
-        # positions = [(i, j) for i in range(self.items_y) for j in range(self.items_x)]
-        # for position in positions:
-        #     if counter >= len(positions):
-        #         break
-        #     lbl = VideoTile(self, subscription_feed[counter], counter, self.clipboard, self.status_bar)
-        #
-        #     self.q_labels.append(lbl)
-        #     self.grid.addWidget(lbl, *position)
-        #     counter += 1
 
     def videos_changed(self):
         logger.info('GridView: Updating tiles')
@@ -67,8 +55,6 @@ class GridView(QWidget):
     def resizeEvent(self, QResizeEvent):
         if self.resize_enabled:
             margins = self.grid.getContentsMargins()
-            height = self.height()
-            other = (self.items_y+1)*self.pref_tile_height+margins[1]+margins[3]+self.buffer
             if self.width() > ((self.items_x+1)*self.pref_tile_width+margins[0]+margins[2]+self.buffer):
                 self.items_x += 1
                 self.update_grid()

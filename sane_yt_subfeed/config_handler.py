@@ -49,7 +49,8 @@ defaults = {
         'tooltip_picture_width': '512',
         'tooltip_picture_height': '256',
         'tooltip_picture_size': 'h1',
-        'keep_thumb_ar': 'False'
+        'keep_thumb_ar': 'False',
+        'enable_auto_copy_to_clipboard': 'False'
     },
     'Thumbnails': {
         'force_download_best': 'True',
@@ -68,6 +69,12 @@ defaults = {
     },
     'Youtube-dl': {
         'use_youtube_dl': 'True'
+    },
+    'Player': {
+        'default_player': "",
+        'alternative_player1': "",
+        'alternative_player2': "",
+        'alternative_player3': ""
     }
 }
 
