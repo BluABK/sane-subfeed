@@ -48,7 +48,7 @@ class GridViewListener(QObject):
         use_youtube_dl = read_config('Youtube-dl', 'use_youtube_dl')
         UpdateVideo(video, update_existing=True).start()
         if use_youtube_dl:
-            UpdateVideo(video, update_existing=True).start()
+            YoutubeDownload(video, finished_listener=self.downloadFinished).start()
 
     @pyqtSlot(VideoD)
     def download_finished(self, video: VideoD):
