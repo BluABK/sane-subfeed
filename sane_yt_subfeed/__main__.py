@@ -1,6 +1,8 @@
+from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.cli import cli
-from sane_yt_subfeed.log_handler import logger
+
+logger = create_logger("__main__")
 
 if __name__ == "__main__":
-    logger.info("Initializing __main__")
+    logger.info("Launching cli...")
     cli()

@@ -2,13 +2,15 @@ import os
 import pickle
 import time
 
-from sane_yt_subfeed.log_handler import logger
+from sane_yt_subfeed.log_handler import create_logger
 
 OS_PATH = os.path.dirname(__file__)
 
 PICKLE_PATH = os.path.join(OS_PATH, 'resources', 'pickles')
 
 YOUTUBE_PICKLE = os.path.join(PICKLE_PATH, 'youtube_oauth.pkl')
+
+logger = create_logger("pickle_handler")
 
 
 def dump_youtube(youtube):
