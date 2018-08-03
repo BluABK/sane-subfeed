@@ -40,7 +40,7 @@ class YoutubeDownload(threading.Thread):
                                                                        date=self.video.date_published.strftime(
                                                                            "%Y-%m-%d"), id=self.video.video_id)
         # file_name = 'testwsefefewf.fwef'
-        self.youtube_folder = read_config('Play', 'yt_file_path')
+        self.youtube_folder = read_config('Play', 'yt_file_path', literal_eval=False)
         file_path = os.path.join(self.youtube_folder, file_name)
 
         self.ydl_opts = {
