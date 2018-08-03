@@ -98,8 +98,8 @@ class VideoTile(QWidget):
                 self.setToolTip("<{} style='text-align:center;'><img src={} style='float:below'>{}: {}</{}>".format(
                     text_element, resized_thumb, self.video.channel_title, self.video.title, text_element))
                 # if self.root.hotkey_ctrl_down:
-                    # print(self.root.hotkey_ctrl_down)
-                    # self.showTooltip()
+                # print(self.root.hotkey_ctrl_down)
+                # self.showTooltip()
             else:
                 self.setToolTip("{}: {}".format(self.video.channel_title, self.video.title))
 
@@ -168,7 +168,12 @@ class VideoTile(QWidget):
                                                                 self.video.title))
         self.video.downloaded = True
         self.parent.main_model.grid_view_listener.tileDownloaded.emit(self.video, self.id)
-        self.copy_url()
+        if read_config('Gui', 'enable_auto_copy_to_clipboard'):
+            self.copy_url()
+        if read_config('Youtube-dl', 'use_youtube_dl'):
+            self.status_bar.showMessage('Downloading video with youtube-dl: {} ({} - {})'.format(self.video.url_video,
+                                                                                             self.video.channel_title,
+                                                                                             self.video.title))
 
     def mark_discarded(self):
         """
@@ -189,7 +194,7 @@ class VideoTile(QWidget):
         :return:
         """
         logger.info('Mark watched: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
-                                                                self.video.title))
+                                                             self.video.title))
         self.video.watched = True
         self.parent.main_model.grid_view_listener.tileWatched.emit(self.video, self.id)
 
@@ -199,4 +204,3 @@ class VideoTile(QWidget):
         logger.info(text)
 
         self.b.insertPlainText(text + '\n')
-
