@@ -7,11 +7,14 @@ from sane_yt_subfeed.controller.listeners import LISTENER_SIGNAL_NORMAL_REFRESH,
 from tqdm import tqdm
 
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
+from sane_yt_subfeed.log_handler import create_logger
 
 YOUTUBE_URL = "https://www.youtube.com/"
 YOUTUBE_PARM_VIDEO = "watch?v="
 YOUTUBE_PARM_PLIST = "playlist?list ="
 YT_VIDEO_URL = YOUTUBE_URL + YOUTUBE_PARM_VIDEO
+
+logger = create_logger("update_videos")
 
 
 def refresh_uploads(progress_bar_listener: ProgressBar = None, add_to_max=0,
@@ -71,12 +74,14 @@ def load_keys(subs):
     try:
         youtube_keys = load_batch_build_key()
     except FileNotFoundError:
+        logger.info("load_batch_build_key() gave 404 error. Generating new youtube key builds.")
         print("\nGenerating youtube key builds:")
         youtube_keys.extend(generate_keys(len(subs)))
         dump_batch_build_key(youtube_keys)
 
     diff = len(subs) - len(youtube_keys)
     if diff > 0:
+        logger.info("Generating diff youtube key builds.")
         print("\nGenerating diff youtube key builds:")
         youtube_keys.extend(generate_keys(diff))
         dump_batch_build_key(youtube_keys)
@@ -87,12 +92,14 @@ def generate_keys(key_number):
     keys = []
     threads = []
 
+    logger.info("Starting key generation threads.")
     for _ in tqdm(range(key_number), desc="Starting key generation threads",
                   disable=read_config('Debug', 'disable_tqdm')):
         t = GenerateKeys(keys)
         t.start()
         threads.append(t)
 
+    logger.info("Waiting for key generation threads.")
     for t in tqdm(threads, desc="Waiting for key generation threads", disable=read_config('Debug', 'disable_tqdm')):
         t.join()
     return keys
