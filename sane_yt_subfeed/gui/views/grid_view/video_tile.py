@@ -71,6 +71,13 @@ class VideoTile(QWidget):
 
         vid_age = datetime.datetime.utcnow() - self.video.date_published
         self.date_widget.setText(format(vid_age))
+        self.old_videos(vid_age)
+
+        self.thumbnail_widget.setPixmap(QPixmap(video.thumbnail_path))
+
+        self.update()
+
+    def old_videos(self, vid_age):
         if read_config('Gui', 'grey_old_videos'):
             if vid_age > datetime.timedelta(days=1):
                 pal = self.palette()
@@ -82,10 +89,6 @@ class VideoTile(QWidget):
                 pal.setColor(QPalette.Background, Qt.white)
                 self.setAutoFillBackground(True)
                 self.setPalette(pal)
-
-        self.thumbnail_widget.setPixmap(QPixmap(video.thumbnail_path))
-
-        self.update()
 
     def set_tool_tip(self):
         if not read_config('Debug', 'disable_tooltips'):
