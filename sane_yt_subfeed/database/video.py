@@ -13,6 +13,7 @@ class Video(PermanentBase):
     channel_title = Column(String)
     title = Column(String)
     date_published = Column(DateTime)
+    date_downloaded = Column(DateTime)
     description = Column(String)
     thumbnail_path = Column(String)
     playlist_pos = Column(String)
@@ -78,6 +79,7 @@ class Video(PermanentBase):
         video_d.discarded = video.discarded
         video_d.vid_path = video.vid_path
         video_d.watched = video.watched
+        video_d.date_downloaded = video.date_downloaded
         return video_d
 
     @staticmethod
@@ -93,3 +95,4 @@ class Video(PermanentBase):
         self.discarded = video_d.discarded
         self.vid_path = video_d.vid_path
         self.watched = video_d.watched
+        self.date_downloaded = video_d.date_downloaded

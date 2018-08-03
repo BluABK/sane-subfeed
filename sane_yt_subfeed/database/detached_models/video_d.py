@@ -35,6 +35,7 @@ class VideoD:
             self.channel_title = ""
             self.title = ""
             self.date_published = datetime.datetime.utcnow()
+            self.date_downloaded = None
             self.description = ""
             self.channel_id = ""
 
@@ -56,6 +57,7 @@ class VideoD:
         self.thumbnails = search_item['snippet']['thumbnails']
         self.search_item = search_item
         self.watched = False
+        self.date_downloaded = None
 
 
 
@@ -92,6 +94,7 @@ class VideoD:
         video.discarded = self.discarded
         video.vid_path = self.vid_path
         video.watched = self.watched
+        video.date_downloaded = self.date_downloaded
         return video
 
     @staticmethod
