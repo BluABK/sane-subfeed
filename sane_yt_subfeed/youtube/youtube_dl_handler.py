@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import datetime
 import os
 import threading
 import time
@@ -62,4 +63,5 @@ class YoutubeDownload(threading.Thread):
                 self.video.vid_path = os.path.join(self.youtube_folder, name)
 
         if self.listener:
+            self.video.date_downloaded = datetime.datetime.utcnow()
             self.listener.emit(self.video)

@@ -5,6 +5,7 @@ from sqlalchemy import desc
 
 from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NORMAL_REFRESH, \
     LISTENER_SIGNAL_DEEP_REFRESH
+from sane_yt_subfeed.database.database_static_vars import ORDER_METHOD_DATE_DOWNLOADED_UPLOAD_DATE
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.engine_statements import get_video_by_vidd_stmt, get_video_by_id_stmt
 from sane_yt_subfeed.database.orm import db_session, engine
@@ -33,19 +34,23 @@ def get_newest_stored_videos(limit, filter_downloaded=False):
     return videos
 
 
-def get_best_downloaded_videos(limit, filter_watched=True):
+def get_best_downloaded_videos(limit, filter_watched=True, sort_method=ORDER_METHOD_DATE_DOWNLOADED_UPLOAD_DATE):
     """
 
+    :param sort_method:
     :param filter_watched:
     :param limit:
     :return: list(VideoD)
     """
-    if filter_watched:
-        db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(
-            Video.vid_path != "", or_(Video.watched.is_(None), Video.watched == false())).limit(limit).all()
-    else:
-        db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(
-            Video.vid_path != "").limit(limit).all()
+    if sort_method == ORDER_METHOD_DATE_DOWNLOADED_UPLOAD_DATE:
+        if filter_watched:
+            db_videos = db_session.query(Video).order_by(desc(Video.date_downloaded),
+                                                         desc(Video.date_published)).filter(
+                Video.vid_path != "", or_(Video.watched.is_(None), Video.watched == false())).limit(limit).all()
+        else:
+            db_videos = db_session.query(Video).order_by(desc(Video.date_downloaded),
+                                                         desc(Video.date_published)).filter(
+                Video.vid_path != "").limit(limit).all()
     videos = Video.to_video_ds(db_videos)
     db_session.remove()
     if len(videos) < limit:
