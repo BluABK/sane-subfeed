@@ -44,7 +44,6 @@ class VideoD:
         if grab_methods:
             self.grab_methods = grab_methods
 
-
     def determine_thumbnails(self, thumbnails_item):
         """
         Takes a youtube#playListItem thumbnails section and determines which qualities are available.

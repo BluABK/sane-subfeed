@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QListWidget, QLi
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
+from sane_yt_subfeed.log_handler import create_logger
 
 
 class SubscriptionsView(QWidget):
@@ -20,6 +21,7 @@ class SubscriptionsView(QWidget):
         :param headers:
         """
         super(SubscriptionsView, self).__init__(parent)
+        self.logger = create_logger("SubscriptionsView")
         self.clipboard = clipboard
         self.status_bar = status_bar
 
@@ -34,6 +36,7 @@ class SubscriptionsView(QWidget):
         Initialize the UI
         :return:
         """
+        self.logger.info("Initialized UI")
         layout = QVBoxLayout()
         self.setLayout(layout)
         self.get_subs()
@@ -46,6 +49,7 @@ class SubscriptionsView(QWidget):
         NB: get_videos() *has* to run before this function is called.
         :return:
         """
+        self.logger.info("Creating subscriptions table")
         self.subs_table = QTableWidget()
         self.subs_table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.subs_table.setRowCount(len(self.subs))
@@ -103,4 +107,5 @@ class SubscriptionsView(QWidget):
         Retrieve Channels table from DB
         :return:
         """
+        self.logger.info("Getting subscriptions")
         self.subs = get_subscriptions(read_config('Debug', 'cached_subs'))

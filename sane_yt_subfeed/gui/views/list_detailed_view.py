@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 # Project internal libs
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.read_operations import get_newest_stored_videos
+from sane_yt_subfeed.log_handler import create_logger
 
 
 class ListDetailedView(QWidget):
@@ -21,6 +22,7 @@ class ListDetailedView(QWidget):
         :param vid_limit:
         """
         super(ListDetailedView, self).__init__(parent)
+        self.logger = create_logger("ListDetailedView")
         self.config_file = None
         self.clipboard = clipboard
         self.status_bar = status_bar
@@ -37,6 +39,7 @@ class ListDetailedView(QWidget):
         Initialize the UI
         :return:
         """
+        self.logger.info("Initialized UI")
         layout = QVBoxLayout()
         self.setLayout(layout)
         self.get_videos()
@@ -49,6 +52,7 @@ class ListDetailedView(QWidget):
         NB: get_videos() *has* to run before this function is called.
         :return:
         """
+        self.logger.info("Creating subfeed table")
         self.subfeed_table = QTableWidget()
         self.subfeed_table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.subfeed_table.setRowCount(len(self.videos))
@@ -110,4 +114,5 @@ class ListDetailedView(QWidget):
         Retrieve a list of VideoD objects
         :return:
         """
+        self.logger.info("Getting videos")
         self.videos = get_newest_stored_videos(self.vid_limit)

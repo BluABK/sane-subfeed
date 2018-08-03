@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout
 from PyQt5.QtGui import QPixmap, QPainter
 
 # Project internal libs
-
+from sane_yt_subfeed.log_handler import create_logger
 
 # Constants
 OS_PATH = os.path.dirname(__file__)
@@ -45,9 +45,11 @@ class AboutView(QWidget):
     # noinspection PyArgumentList
     def __init__(self, parent):
         super(AboutView, self).__init__(parent)
+        self.logger = create_logger("AboutView")
         self.init_ui()
 
     def init_ui(self):
+        self.logger.info("Initialized UI")
         # textbox = QTextEdit()
         layout = QVBoxLayout()
         self.setLayout(layout)

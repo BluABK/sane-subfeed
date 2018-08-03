@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox
 from sane_yt_subfeed.config_handler import read_config, defaults, get_size
 # import sane_yt_subfeed.gui.views.config_view.checkbox as checkbox
 from sane_yt_subfeed.gui.views.config_view import checkbox, combobox
-from sane_yt_subfeed.log_handler import logger
+from sane_yt_subfeed.log_handler import create_logger
 
 
 class ConfigView(QWidget):
@@ -37,6 +37,7 @@ class ConfigView(QWidget):
         :param status_bar:
         """
         super(ConfigView, self).__init__(parent)
+        self.logger = create_logger("ConfigView")
         self.clipboard = clipboard
         self.status_bar = status_bar
         self.init_ui()
@@ -46,12 +47,13 @@ class ConfigView(QWidget):
         Initialize UI
         :return:
         """
+        self.logger.info("Initializing UI")
         self.layout = QGridLayout()
         self.setLayout(self.layout)
         self.populate_options()
         mismatch = get_size() - self.offset
         if mismatch != 0:
-            logger.warning("ConfigView is missing {} entries!".format(mismatch))
+            self.logger.warning("ConfigView is missing {} entries!".format(mismatch))
 
     def add_section(self, name):
         """
