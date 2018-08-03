@@ -28,11 +28,11 @@ class PlayTile(VideoTile):
             self.play_vid(self.video.vid_path, self.get_default_player())
 
     def get_default_player(self):
-        config_default_player = read_config('Player', 'default_player')
-        if config_default_player == "":
-            return None
-        else:
+        config_default_player = read_config('Player', 'default_player', literal_eval=False)
+        if config_default_player:
             return config_default_player
+        else:
+            return None
 
     def play_vid(self, file_path, player, mark_watched=True):
         # player = player.strip()
@@ -67,7 +67,6 @@ class PlayTile(VideoTile):
         if alternative_player3:
             alternative_player3_action = menu.addAction("Play with alternative player 3")
 
-
         action = menu.exec_(self.mapToGlobal(event.pos()))
         if action == copy_url_action:
             self.copy_url()
@@ -79,5 +78,3 @@ class PlayTile(VideoTile):
             self.play_vid(self.video.vid_path, alternative_player2)
         elif action == alternative_player3_action:
             self.play_vid(self.video.vid_path, alternative_player3)
-
-
