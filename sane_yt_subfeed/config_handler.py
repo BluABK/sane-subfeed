@@ -79,20 +79,36 @@ defaults = {
 }
 
 
-def read_config(section, option):
-    if not os.path.exists(CONFIG_PATH):
-        copyfile(SAMPLE_PATH, CONFIG_PATH)
-    try:
-        value = parser.get(section, option)
-    except (NoSectionError, NoOptionError):
-        value = defaults[section][option]
-    if value:
+def read_config(section, option, literal_eval=True):
+    if literal_eval:
+        if not os.path.exists(CONFIG_PATH):
+            copyfile(SAMPLE_PATH, CONFIG_PATH)
         try:
-            return ast.literal_eval(value)
-        except ValueError:
-            return value
+            value = parser.get(section, option)
+        except (NoSectionError, NoOptionError):
+            value = defaults[section][option]
+        if value:
+            try:
+                return ast.literal_eval(value)
+            except ValueError:
+                return value
+        else:
+            return ast.literal_eval(defaults[section][option])
     else:
-        return ast.literal_eval(defaults[section][option])
+        if not os.path.exists(CONFIG_PATH):
+            copyfile(SAMPLE_PATH, CONFIG_PATH)
+        try:
+            value = parser.get(section, option)
+        except (NoSectionError, NoOptionError):
+            value = defaults[section][option]
+        if value:
+            try:
+                return value
+            except ValueError:
+                return value
+        else:
+            return defaults[section][option]
+
 
 
 def read_entire_config():

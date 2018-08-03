@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 from PyQt5.QtCore import Qt, QEvent
@@ -12,7 +13,6 @@ class PlayTile(VideoTile):
 
     def __init__(self, parent, video, vid_id, clipboard, status_bar):
         super().__init__(parent, video, vid_id, clipboard, status_bar)
-
 
     def mousePressEvent(self, QMouseEvent):
         """
@@ -34,15 +34,14 @@ class PlayTile(VideoTile):
         else:
             return config_default_player
 
-
-    def play_vid(self, file_path, player):
-        self.mark_watched()
+    def play_vid(self, file_path, player, mark_watched=True):
+        # player = player.strip()
+        if mark_watched:
+            self.mark_watched()
         if player:
-            subprocess.Popen([player, file_path])
+            subprocess.Popen([player, file_path], shell=True)
         else:
-            subprocess.Popen([file_path])
-
-
+            subprocess.Popen([file_path], shell=True)
 
     def contextMenuEvent(self, event):
         """
@@ -52,9 +51,33 @@ class PlayTile(VideoTile):
         """
         menu = QMenu(self)
         copy_url_action = menu.addAction("Copy link")
-        discard_item_action = menu.addAction("Discard video")
+        discard_item_action = menu.addAction("Discard video(doesn't affect play_view)")
+
+        alternative_player1 = read_config('Player', 'alternative_player1', literal_eval=False)
+        alternative_player2 = read_config('Player', 'alternative_player2', literal_eval=False)
+        alternative_player3 = read_config('Player', 'alternative_player3', literal_eval=False)
+        alternative_player1_action = None
+        alternative_player2_action = None
+        alternative_player3_action = None
+
+        if alternative_player1:
+            alternative_player1_action = menu.addAction("Play with alternative player 1")
+        if alternative_player2:
+            alternative_player2_action = menu.addAction("Play with alternative player 2")
+        if alternative_player3:
+            alternative_player3_action = menu.addAction("Play with alternative player 3")
+
+
         action = menu.exec_(self.mapToGlobal(event.pos()))
         if action == copy_url_action:
             self.copy_url()
         elif action == discard_item_action:
             self.mark_discarded()
+        elif action == alternative_player1_action:
+            self.play_vid(self.video.vid_path, alternative_player1)
+        elif action == alternative_player2_action:
+            self.play_vid(self.video.vid_path, alternative_player2)
+        elif action == alternative_player3_action:
+            self.play_vid(self.video.vid_path, alternative_player3)
+
+

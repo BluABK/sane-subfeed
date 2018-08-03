@@ -204,7 +204,7 @@ class YtDirListener(QObject):
 
         disable_dir_observer = read_config('Play', 'disable_dir_listener')
         if not disable_dir_observer:
-            path = read_config('Play', 'yt_file_path')
+            path = read_config('Play', 'yt_file_path', literal_eval=False)
             event_handler = VidEventHandler(self)
             self.observer = Observer()
             self.observer.schedule(event_handler, path)
@@ -227,6 +227,6 @@ class YtDirListener(QObject):
             self.model.db_update_downloaded_videos()
 
     def manual_check(self):
-        youtube_folder = read_config("Play", "yt_file_path")
+        youtube_folder = read_config("Play", "yt_file_path", literal_eval=False)
         update_videos = manual_youtube_folder_check(youtube_folder)
         UpdateVideosThread(update_videos, update_existing=True).start()
