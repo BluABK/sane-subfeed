@@ -46,7 +46,6 @@ def run_migrations_offline():
 
 
 def run_migrations_online():
-
     with engine.connect() as connection:
         context.configure(
                     connection=connection,

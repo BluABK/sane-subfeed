@@ -20,7 +20,8 @@ def update_video_statement_full(db_video):
         search_item=db_video.search_item,
         discarded=db_video.discarded,
         vid_path=db_video.vid_path,
-        watched=db_video.watched)
+        watched=db_video.watched,
+        date_downloaded=db_video.date_downloaded)
 
 
 def update_channel_from_remote(channel):
@@ -40,6 +41,7 @@ def get_video_by_id_stmt(video_id):
     return Video.__table__.select().where(text("video_id = '{}'".format(video_id)))
 
 
+# FIXME: probably outdated for variables and values
 def insert_item(video):
     return {"video_id": video.video_id, "channel_title": video.channel_title,
             'title': video.title, "date_published": video.date_published,
