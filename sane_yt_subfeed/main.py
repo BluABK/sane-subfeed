@@ -16,7 +16,9 @@ from sane_yt_subfeed.gui.main_window import MainWindow
 from sane_yt_subfeed.youtube.update_videos import refresh_uploads, load_keys
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions, list_uploaded_videos, \
     list_uploaded_videos_search, list_uploaded_videos_page
-from sane_yt_subfeed.log_handler import logger
+from sane_yt_subfeed.log_handler import create_logger
+
+logger = create_logger("main")
 
 cached_subs = True
 global_debug = False
@@ -37,6 +39,7 @@ def run_with_gui():
 
 
 def run_print():
+    logger.info('Running with print/console')
     start = default_timer()
     refresh_uploads()
     time_elsapsed = default_timer() - start
@@ -45,17 +48,20 @@ def run_print():
 
 # FIXME: move this method to the youtube package
 def run_channels_test():
-    logger.info('Running Channels test')
+    logger.info('Running Channels Test')
     subscriptions = get_subscriptions(cached_subs)
     youtube_keys = load_keys(subscriptions)
     test_threads = []
     results = []
+    logger.info("Channels Test: Starting miss and pages tests")
     for subscription, youtube_key in tqdm(zip(subscriptions, youtube_keys),
                                           desc="Starting miss and pages tests",
                                           total=len(subscriptions)):
         test = RunTestsThreaded(subscription, youtube_key, results)
         test.start()
         test_threads.append(test)
+
+    logger.info("Channels Test: Waiting for test threads")
     for thread in tqdm(test_threads, desc="Waiting for test threads"):
         thread.join()
 
