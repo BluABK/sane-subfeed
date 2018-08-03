@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QWidget, QGridLayout
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
-from sane_yt_subfeed.log_handler import logger
+from sane_yt_subfeed.log_handler import create_logger
 
 
 class GridView(QWidget):
@@ -18,6 +18,7 @@ class GridView(QWidget):
 
     def __init__(self, parent, main_model: MainModel, clipboard, status_bar):
         super(GridView, self).__init__(parent)
+        self.logger = create_logger("GridView")
         self.setMinimumSize(0,0)
         self.parent = parent
         self.root = parent  # MainWindow
@@ -34,7 +35,7 @@ class GridView(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        logger.info("Initializing GridView UI")
+        self.logger.info("Initializing UI")
 
         self.main_model.grid_view_listener.hiddenVideosChanged.connect(self.videos_changed)
 
@@ -62,7 +63,7 @@ class GridView(QWidget):
         #     counter += 1
 
     def videos_changed(self):
-        logger.info('GridView: Updating tiles')
+        self.logger.info('Updating tiles')
         for q_label, video in zip(self.q_labels, self.main_model.filtered_videos):
             q_label.set_video(video)
 

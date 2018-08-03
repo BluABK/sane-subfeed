@@ -24,7 +24,7 @@ from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
 from sane_yt_subfeed.gui.views.grid_view.grid_view import GridView
 from sane_yt_subfeed.gui.views.list_detailed_view import ListDetailedView
 from sane_yt_subfeed.gui.views.list_tiled_view import ListTiledView
-from sane_yt_subfeed.log_handler import logger
+from sane_yt_subfeed.log_handler import create_logger
 
 # Constants
 OS_PATH = os.path.dirname(__file__)
@@ -45,6 +45,7 @@ class MainWindow(QMainWindow):
     # noinspection PyArgumentList
     def __init__(self, main_model: MainModel, dimensions=None, position=None):
         super().__init__()
+        self.logger = create_logger("MainWindow")
         self.main_model = main_model
 
         for fakech in range(100):
@@ -69,6 +70,7 @@ class MainWindow(QMainWindow):
         self.init_ui()
 
     def init_ui(self):
+        self.logger.info("Initialized UI")
         # Define a menu and status bar
         menubar = self.menuBar()
         self.statusBar()
@@ -93,11 +95,11 @@ class MainWindow(QMainWindow):
                                         tooltip='Refresh the subscription feed', icon='refresh.png')
 
         self.add_submenu('&Function', 'Reload Subscriptions &List', self.refresh_subs, shortcut='Ctrl+L',
-                                        tooltip='Fetch a new subscriptions list', icon='refresh_subs.png')
+                         tooltip='Fetch a new subscriptions list', icon='refresh_subs.png')
 
         # FIXME: icon, shortcut(alt/shift as extra modifier to the normal refresh shortcut?)
         self.add_submenu('&Function', 'Deep refresh of feed', self.refresh_list_deep, shortcut='Ctrl+T',
-                                        tooltip='Deed refresh the subscription feed', icon='refresh.png')
+                         tooltip='Deed refresh the subscription feed', icon='refresh.png')
 
         # FIXME: icon
         self.add_submenu('&Function', 'Test Channels', self.test_channels,
@@ -169,12 +171,12 @@ class MainWindow(QMainWindow):
     # Qt Overrides
     def keyPressEvent(self, QKeyEvent):
         if QKeyEvent.key() == Qt.Key_Control:
-            logger.debug("ctrl pressed")
+            # self.logger.debug("ctrl pressed")
             self.hotkey_ctrl_down = True
 
     def keyReleaseEvent(self, QKeyEvent):
         if QKeyEvent.key() == Qt.Key_Control:
-            logger.debug("ctrl released")
+            # self.logger.debug("ctrl released")
             self.hotkey_ctrl_down = False
 
     # Internal
@@ -315,7 +317,7 @@ class MainWindow(QMainWindow):
         for q_label in self.grid_view.q_labels:
             urls += "{}\n".format(q_label.video.url_video)
 
-        logger.info("Copied URLs to clipboard: \n{}".format(urls))
+        self.logger.info("Copied URLs to clipboard: \n{}".format(urls))
         self.clipboard.setText(urls)
         self.statusBar().showMessage('Copied {} URLs to clipboard'.format(len(urls.splitlines())))
 
