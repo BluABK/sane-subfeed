@@ -42,15 +42,16 @@ def get_best_downloaded_videos(limit, filter_watched=True, sort_method=ORDER_MET
     :param limit:
     :return: list(VideoD)
     """
+    db_query = db_session.query(Video)
+
     if sort_method == ORDER_METHOD_DATE_DOWNLOADED_UPLOAD_DATE:
-        if filter_watched:
-            db_videos = db_session.query(Video).order_by(desc(Video.date_downloaded),
-                                                         desc(Video.date_published)).filter(
-                Video.vid_path != "", or_(Video.watched.is_(None), Video.watched == false())).limit(limit).all()
-        else:
-            db_videos = db_session.query(Video).order_by(desc(Video.date_downloaded),
-                                                         desc(Video.date_published)).filter(
-                Video.vid_path != "").limit(limit).all()
+        db_query = db_query.order_by(desc(Video.date_downloaded), desc(Video.date_published))
+
+    if filter_watched:
+        db_query = db_query.filter(Video.vid_path != "", or_(Video.watched.is_(None), Video.watched == false()))
+    else:
+        db_query = db_query.filter(Video.vid_path != "").limit(limit).all()
+    db_videos = db_query.limit(limit).all()
     videos = Video.to_video_ds(db_videos)
     db_session.remove()
     if len(videos) < limit:
