@@ -62,6 +62,6 @@ class Controller:
         window = MainWindow(model, dimensions=dimensions)
         self.logger.info("Created MainWindow({}, dimensions={})".format(model, dimensions))
         window.show()
-        self.logger.info("Executing application")
+        self.logger.info("Executing Qt Application")
         app.exec_()
         self.logger.info("*** APPLICATION EXIT ***\n")
