@@ -46,9 +46,8 @@ class GridViewListener(QObject):
         self.hiddenVideosChanged.emit()
 
         use_youtube_dl = read_config('Youtube-dl', 'use_youtube_dl')
+        UpdateVideo(video, update_existing=True).start()
         if use_youtube_dl:
-            YoutubeDownload(video, finished_listener=self.downloadFinished).start()
-        else:
             UpdateVideo(video, update_existing=True).start()
 
     @pyqtSlot(VideoD)
