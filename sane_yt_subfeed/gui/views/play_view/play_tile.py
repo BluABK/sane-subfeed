@@ -78,3 +78,7 @@ class PlayTile(VideoTile):
             self.play_vid(self.video.vid_path, alternative_player2)
         elif action == alternative_player3_action:
             self.play_vid(self.video.vid_path, alternative_player3)
+
+
+    def old_videos(self, vid_age):
+        pass
