@@ -112,6 +112,7 @@ def list_uploaded_videos_page(youtube_key, videos, uploads_playlist_id, playlist
     return youtube_key.playlistItems().list_next(
         playlistitems_list_request, playlistitems_list_response)
 
+
 def list_uploaded_videos_videos(youtube_key, video_ids, req_limit, part='snippet'):
     """
     Get a list of videos through the API videos()
@@ -141,6 +142,7 @@ def list_uploaded_videos_videos(youtube_key, video_ids, req_limit, part='snippet
         playlistitems_list_request = youtube_key.playlistItems().list_next(playlistitems_list_request,
                                                                            playlistitems_list_response)
     return videos
+
 
 def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit, live_videos=True):
     """
@@ -261,5 +263,3 @@ def get_remote_subscriptions_cached_oauth():
         dump_youtube(youtube_oauth)
         temp_subscriptions = get_remote_subscriptions(youtube_oauth)
     return temp_subscriptions
-
-

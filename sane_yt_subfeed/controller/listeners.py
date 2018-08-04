@@ -15,8 +15,10 @@ from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideo, UpdateVideosThread
 from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
+from sane_yt_subfeed.youtube.update_videos import load_keys
 from sane_yt_subfeed.youtube.youtube_dl_handler import YoutubeDownload
-from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_cached_oauth
+from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_cached_oauth, list_uploaded_videos_videos
 
 LISTENER_SIGNAL_NORMAL_REFRESH = 0
 LISTENER_SIGNAL_DEEP_REFRESH = 1
@@ -70,7 +72,7 @@ class GridViewListener(QObject):
 
     @pyqtSlot(VideoD)
     def download_finished(self, video: VideoD):
-        UpdateVideo(video, update_existing=True, finished_listener=self.downloadedVideosChangedinDB).start()
+        UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
 
     def download_finished_in_db(self):
         self.model.db_update_downloaded_videos()
@@ -84,7 +86,8 @@ class GridViewListener(QObject):
     @pyqtSlot(VideoD, int)
     def tile_discarded(self, video: Video, index):
         self.model.hide_video_item(index)
-        self.logger.info("Video hidden from grid view(Discarded): {} - {} [{}]".format(video.channel_title, video.title, video.url_video))
+        self.logger.info("Video hidden from grid view(Discarded): {} - {} [{}]".format(video.channel_title, video.title,
+                                                                                       video.url_video))
         self.hiddenVideosChanged.emit()
         UpdateVideo(video, update_existing=True).start()
 
@@ -217,6 +220,7 @@ class YtDirListener(QObject):
 
     def __init__(self, model):
         super().__init__()
+        self.logger = create_logger('YtDirListener')
         self.model = model
 
         self.newFile.connect(self.new_file)
@@ -236,18 +240,32 @@ class YtDirListener(QObject):
 
     @pyqtSlot(str, str)
     def new_file(self, vid_id, vid_path):
-
+        self.logger.info("Adding new file to db")
         vid = db_session.query(Video).get(vid_id)
         if vid:
             vid.vid_path = vid_path
             vid.date_downloaded = datetime.datetime.utcnow()
             vid.downloaded = True
-
             db_session.commit()
-            db_session.remove()
 
             self.model.db_update_videos()
             self.model.db_update_downloaded_videos()
+        else:
+            db_session.remove()
+            youtube_keys = load_keys(1)
+            self.logger.info("Grabbing new video information from youtube")
+            response_videos = list_uploaded_videos_videos(youtube_keys[0], [vid_id], 1)
+            if len(response_videos) > 0:
+                video = response_videos[0]
+                video.vid_path = vid_path
+                video.downloaded = True
+                video.date_downloaded = datetime.datetime.utcnow()
+                self.logger.info("Downloading thumbnail")
+                download_thumbnails_threaded([video])
+                UpdateVideo(video,
+                            finished_listeners=[self.model.grid_view_listener.downloadedVideosChangedinDB]).start()
+            else:
+                self.logger.warning("Video with id {}, not found on youtube servers".format(vid_id))
 
     @pyqtSlot()
     def manual_check(self):

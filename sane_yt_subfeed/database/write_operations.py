@@ -74,14 +74,14 @@ class UpdateVideosThread(threading.Thread):
 
 class UpdateVideo(threading.Thread):
 
-    def __init__(self, video_d, update_existing=False, finished_listener=None):
+    def __init__(self, video_d, update_existing=False, finished_listeners=None):
         """
         Init GetUploadsThread
         :param video_d:
         """
         threading.Thread.__init__(self)
         self.logger = create_logger("UpdateVideo")
-        self.finished_listener = finished_listener
+        self.finished_listeners = finished_listeners
         self.video_d = video_d
         self.update_existing = update_existing
 
@@ -94,6 +94,7 @@ class UpdateVideo(threading.Thread):
         # self.logger.debug("Run")
         # start = default_timer()
         lock.acquire()
+        self.logger.debug("Acquired lock")
         stmt = get_video_by_vidd_stmt(VideoD.to_video(self.video_d))
         db_video = engine.execute(stmt).first()
         if db_video:
@@ -105,9 +106,11 @@ class UpdateVideo(threading.Thread):
             engine.execute(Video.__table__.insert(), insert_item(self.video_d))
         # print('Updated: {}'.format(self.video_d.title))
         lock.release()
+        self.logger.debug("Released lock")
 
-        if self.finished_listener:
-            self.finished_listener.emit()
+        if self.finished_listeners:
+            for listener in self.finished_listeners:
+                listener.emit()
 
 
 def check_for_unique(vid_list):
