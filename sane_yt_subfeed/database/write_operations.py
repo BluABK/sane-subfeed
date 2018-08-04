@@ -11,13 +11,14 @@ lock = threading.Lock()
 def engine_execute_first(stmt):
     return engine.execute(stmt).first()
 
+
 def engine_execute(stmt):
     engine.execute(stmt)
 
 
 class UpdateVideosThread(threading.Thread):
 
-    def __init__(self, video_list, update_existing=False, uniques_check=True):
+    def __init__(self, video_list, update_existing=False, uniques_check=True, finished_listener=None):
         """
         Init GetUploadsThread
         :param thread_id:
@@ -29,6 +30,7 @@ class UpdateVideosThread(threading.Thread):
         self.video_list = video_list
         self.update_existing = update_existing
         self.uniques_check = uniques_check
+        self.finished_listener = finished_listener
 
     # TODO: Handle failed requests
     def run(self):
@@ -63,6 +65,8 @@ class UpdateVideosThread(threading.Thread):
         # if len(items_to_update) > 0:
         #     engine.execute(items_to_update)
         lock.release()
+        if self.finished_listener:
+            self.finished_listener.emit()
 
 
 class UpdateVideo(threading.Thread):
@@ -109,5 +113,3 @@ def check_for_unique(vid_list):
         else:
             compare_set.add(vid.video_id)
     return vid_list
-
-

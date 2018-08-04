@@ -7,7 +7,8 @@ from sane_yt_subfeed import main
 
 from watchdog.observers import Observer
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.controller.dir_handler import VidEventHandler, manual_youtube_folder_check
+from sane_yt_subfeed.controller.dir_handler import VidEventHandler, manual_youtube_folder_check, \
+    CheckYoutubeFolderForNew
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
@@ -18,6 +19,7 @@ from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_ca
 
 LISTENER_SIGNAL_NORMAL_REFRESH = 0
 LISTENER_SIGNAL_DEEP_REFRESH = 1
+
 
 class GridViewListener(QObject):
     tileDownloaded = pyqtSignal(VideoD, int)
@@ -226,7 +228,8 @@ class YtDirListener(QObject):
 
             self.model.db_update_downloaded_videos()
 
+    @pyqtSlot()
     def manual_check(self):
         youtube_folder = read_config("Play", "yt_file_path", literal_eval=False)
-        update_videos = manual_youtube_folder_check(youtube_folder)
-        UpdateVideosThread(update_videos, update_existing=True).start()
+        CheckYoutubeFolderForNew(youtube_folder,
+                                 db_listener=self.model.grid_view_listener.downloadedVideosChangedinDB).start()
