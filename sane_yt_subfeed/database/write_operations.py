@@ -94,7 +94,6 @@ class UpdateVideo(threading.Thread):
         # self.logger.debug("Run")
         # start = default_timer()
         lock.acquire()
-        self.logger.debug("Acquired lock")
         stmt = get_video_by_vidd_stmt(VideoD.to_video(self.video_d))
         db_video = engine.execute(stmt).first()
         if db_video:
@@ -106,7 +105,6 @@ class UpdateVideo(threading.Thread):
             engine.execute(Video.__table__.insert(), insert_item(self.video_d))
         # print('Updated: {}'.format(self.video_d.title))
         lock.release()
-        self.logger.debug("Released lock")
 
         if self.finished_listeners:
             for listener in self.finished_listeners:
