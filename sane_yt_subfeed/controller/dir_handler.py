@@ -7,7 +7,7 @@ import ffmpeg
 from watchdog.events import PatternMatchingEventHandler
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.database.read_operations import get_videos_by_ids
+from sane_yt_subfeed.database.read_operations import get_videos_by_ids, get_vid_by_id
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread
 
 
@@ -19,7 +19,7 @@ def get_yt_file(search_path, id):
 
 
 class VidEventHandler(PatternMatchingEventHandler):
-    patterns = ["*.mp4", "*.webm"]
+    patterns = ["*.mp4", "*.webm", "*.mkv"]
 
     def __init__(self, listener):
         super().__init__()
@@ -40,20 +40,15 @@ class VidEventHandler(PatternMatchingEventHandler):
     def on_created(self, event):
         if not event.src_path:
             return
-
-        try:
-            file = ffmpeg.probe(event.src_path)
-            try:
-                yt_comment = file['format']['tags']['comment']
-                vid_id = yt_comment.split('v=')[-1]
-                self.listener.newFile.emit(vid_id, event.src_path)
-            except Exception as e:
-                raise e
-
-        except Exception as e:
-            print("Trying to probe file again")
-            time.sleep(0.3)
-            self.on_created(event)
+        split_string = "_v-id-"
+        if split_string in event.src_path:
+            name = os.path.basename(event.src_path)
+            filename = name.split(".")
+            for s in filename:
+                if split_string in s:
+                    filename = str(s)
+            id = str(filename.split(split_string)[-1])
+            self.listener.newFile.emit(id, event.src_path)
 
 
 def manual_youtube_folder_check(input_path):
@@ -93,7 +88,3 @@ class CheckYoutubeFolderForNew(threading.Thread):
             video.downloaded = True
             video.date_downloaded = datetime.datetime.utcnow()
         UpdateVideosThread(videos, update_existing=True, finished_listener=self.db_listener).start()
-
-if __name__ == '__main__':
-    path = read_config('Play', 'yt_file_path', literal_eval=False)
-    manual_youtube_folder_check(path)

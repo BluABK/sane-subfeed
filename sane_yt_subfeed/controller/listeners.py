@@ -1,4 +1,5 @@
 # FIXME: imp*
+import datetime
 import time
 
 from PyQt5.QtCore import *
@@ -222,10 +223,13 @@ class YtDirListener(QObject):
         vid = db_session.query(Video).get(vid_id)
         if vid:
             vid.vid_path = vid_path
+            vid.date_downloaded = datetime.datetime.utcnow()
+            vid.downloaded = True
 
             db_session.commit()
             db_session.remove()
 
+            self.model.db_update_videos()
             self.model.db_update_downloaded_videos()
 
     @pyqtSlot()

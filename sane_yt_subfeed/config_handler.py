@@ -65,7 +65,7 @@ defaults = {
     },
     'Play': {
         'yt_file_path': "",
-        'disable_dir_listener': 'True',
+        'disable_dir_listener': 'False',
     },
     'Youtube-dl': {
         'use_youtube_dl': 'True'
