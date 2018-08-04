@@ -73,9 +73,9 @@ def download_thumbnails_threaded(vid_list, progress_listener=None):
             progress_listener.updateProgress.emit()
         while len(thread_list) >= thread_limit:
             time.sleep(0.0001)
-    time.sleep(0.01)
     for t in tqdm(thread_list, desc="Waiting on thumbnail threads", disable=read_config('Debug', 'disable_tqdm')):
         t.join()
+    time.sleep(0.01)
 
     # UpdateVideosThread(vid_list).start()
     # return vid_list
