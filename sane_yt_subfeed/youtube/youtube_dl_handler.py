@@ -4,6 +4,7 @@ import datetime
 import os
 import threading
 import time
+import re
 
 from youtube_dl import YoutubeDL
 
@@ -36,10 +37,11 @@ class YoutubeDownload(threading.Thread):
         # FIXME: faux filename, as the application is currently not able to get final filname from youtube-dl
         # file_name = "{channel_title} - {date} - %(title)s (%(fps)s_%(vcodec)s_%(acodec)s).%(ext)s".format(
         #     channel_title=self.video.channel_title, date=self.video.date_published.strftime("%Y-%m-%d"))
-        file_name = "{channel_title} - {date} - {title} - {id}".format(title=self.video.title,
-                                                                       channel_title=self.video.channel_title,
-                                                                       date=self.video.date_published.strftime(
-                                                                           "%Y-%m-%d"), id=self.video.video_id)
+        channel_title = re.sub(r'[\\/*?:"<>|]', "", self.video.channel_title)
+        file_name = "%(uploader)s - {date} - %(title)s - {id}".format(title=self.video.title,
+                                                                         channel_title=channel_title,
+                                                                         date=self.video.date_published.strftime(
+                                                                             "%Y-%m-%d"), id=self.video.video_id)
         # file_name = 'testwsefefewf.fwef'
         self.youtube_folder = read_config('Play', 'yt_file_path', literal_eval=False)
         file_path = os.path.join(self.youtube_folder, file_name)
