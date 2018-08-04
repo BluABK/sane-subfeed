@@ -75,6 +75,9 @@ defaults = {
         'alternative_player1': "",
         'alternative_player2': "",
         'alternative_player3': ""
+    },
+    'Logging': {
+        'use_socket_log': 'False'
     }
 }
 
