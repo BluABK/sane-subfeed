@@ -6,6 +6,10 @@ import threading
 import time
 import re
 
+from sane_yt_subfeed import create_logger
+
+logger = create_logger("youtube_dl_handler")
+
 from youtube_dl import YoutubeDL
 
 from sane_yt_subfeed.config_handler import read_config
@@ -25,13 +29,14 @@ class MyLogger(object):
 def my_hook(d):
     time.sleep(0.01)
     if d['status'] == 'finished':
-        print('Done downloading, now converting ...')
+        logger.info("DL status == 'finished")
 
 
 # FIXME: because of formating string, for channel, it can't do batch dl
 class YoutubeDownload(threading.Thread):
     def __init__(self, video, finished_listener=None):
         threading.Thread.__init__(self)
+        logger.debug("Created thread")
         self.video = video
         self.listener = finished_listener
         # FIXME: faux filename, as the application is currently not able to get final filname from youtube-dl
@@ -51,11 +56,17 @@ class YoutubeDownload(threading.Thread):
         }
 
     def run(self):
+        logger.debug("Started download thread")
         # url_list = []
         # for video in self.videos:
         #     url_list.append(video.url_video)
         with YoutubeDL(self.ydl_opts) as ydl:
+            logger.info("Starting download for: {} - {} [{}]".format(self.video.channel_title, self.video.title,
+                                                                           self.video.url_video))
             ydl.download([self.video.url_video])
+
+        logger.info("Finished downloading: {} - {} [{}]".format(self.video.channel_title, self.video.title,
+                                                                 self.video.url_video))
 
         for name in os.listdir(self.youtube_folder):
             if self.video.video_id in name:
