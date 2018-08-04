@@ -23,7 +23,7 @@ def refresh_uploads(progress_bar_listener=None, add_to_max=0,
     videos = []
     cached_subs = read_config('Debug', 'cached_subs')
     subscriptions = get_subscriptions(cached_subs)
-    youtube_keys = load_keys(subscriptions)
+    youtube_keys = load_keys(len(subscriptions))
 
     search_pages = [1, 1]
     deep_search = False
@@ -68,17 +68,17 @@ def refresh_uploads(progress_bar_listener=None, add_to_max=0,
     return sorted(videos, key=lambda video: video.date_published, reverse=True)
 
 
-def load_keys(subs):
+def load_keys(number_of_keys):
     youtube_keys = []
     try:
         youtube_keys = load_batch_build_key()
     except FileNotFoundError:
         logger.info("load_batch_build_key() gave 404 error. Generating new youtube key builds.")
         print("\nGenerating youtube key builds:")
-        youtube_keys.extend(generate_keys(len(subs)))
+        youtube_keys.extend(generate_keys(number_of_keys))
         dump_batch_build_key(youtube_keys)
 
-    diff = len(subs) - len(youtube_keys)
+    diff = number_of_keys - len(youtube_keys)
     if diff > 0:
         logger.info("Generating diff youtube key builds.")
         print("\nGenerating diff youtube key builds:")
