@@ -77,14 +77,14 @@ def manual_youtube_folder_check(input_path):
 
 class CheckYoutubeFolderForNew(threading.Thread):
 
-    def __init__(self, input_path, db_listener=None):
+    def __init__(self, input_path, db_listeners=None):
         threading.Thread.__init__(self)
         self.input_path = input_path
-        self.db_listener = db_listener
+        self.db_listeners = db_listeners
 
     def run(self):
         videos = manual_youtube_folder_check(self.input_path)
         for video in videos:
             video.downloaded = True
             video.date_downloaded = datetime.datetime.utcnow()
-        UpdateVideosThread(videos, update_existing=True, finished_listener=self.db_listener).start()
+        UpdateVideosThread(videos, update_existing=True, finished_listeners=self.db_listeners).start()

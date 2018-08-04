@@ -28,6 +28,7 @@ class GridViewListener(QObject):
     tileWatched = pyqtSignal(VideoD, int)
     hiddenVideosChanged = pyqtSignal()
     downloadedVideosChanged = pyqtSignal()
+    updateGridViewFromDb = pyqtSignal()
     # FIXME: move youtube-dl listener to its own listener?
     downloadFinished = pyqtSignal(VideoD)
     # FIXME: move to db listener
@@ -42,6 +43,10 @@ class GridViewListener(QObject):
         self.tileDiscarded.connect(self.tile_discarded)
         self.downloadFinished.connect(self.download_finished)
         self.downloadedVideosChangedinDB.connect(self.download_finished_in_db)
+        self.updateGridViewFromDb.connect(self.update_grid_view_from_db)
+
+    def update_grid_view_from_db(self):
+        self.model.db_update_videos()
 
     @pyqtSlot(VideoD, int)
     def tile_downloaded(self, video: VideoD, index):
@@ -236,4 +241,5 @@ class YtDirListener(QObject):
     def manual_check(self):
         youtube_folder = read_config("Play", "yt_file_path", literal_eval=False)
         CheckYoutubeFolderForNew(youtube_folder,
-                                 db_listener=self.model.grid_view_listener.downloadedVideosChangedinDB).start()
+                                 db_listeners=[self.model.grid_view_listener.downloadedVideosChangedinDB,
+                                               self.model.grid_view_listener.updateGridViewFromDb]).start()
