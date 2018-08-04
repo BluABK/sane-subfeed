@@ -1,3 +1,14 @@
+v0.3.0-pre
+- Added a Play View which shows your downloaded videos (gui).
+- Play View can recognise and add downloaded videos from a specified directory (config).
+- Added function to manually refresh download directory.
+- Added feature that watches the specified download directory for changes (inotify).
+- Videos can now be downloaded with youtube-dl (lib).
+- Videos can now be played with a video player of your choosing (config).
+- Database now stores download date.
+- Added function to manually update from database (gui).
+- More logging.
+
 v0.2.1
 - Added Deep refresh feature that more thoroughly scrapes YouTube.
 - Fixed bad timezone handling on datestamps which affect "new video" calculation.
