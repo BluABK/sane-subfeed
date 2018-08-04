@@ -136,3 +136,8 @@ def get_vid_by_id(video_id):
     stmt = get_video_by_id_stmt(video_id)
     db_video = engine.execute(stmt).first()
     return db_video
+
+def get_videos_by_ids(video_ids):
+    db_videos = engine.execute(Video.__table__.select(Video.video_id.in_(video_ids)))
+    return_videos = Video.to_video_ds(db_videos)
+    return return_videos
