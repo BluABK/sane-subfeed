@@ -4,6 +4,10 @@ import json
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
+from sane_yt_subfeed.log_handler import create_logger
+
+logger = create_logger("authentication")
+
 OS_PATH = os.path.dirname(__file__)
 
 CLIENT_SECRETS_FILE = os.path.join(OS_PATH, 'resources', 'client_secret.json')
@@ -25,10 +29,13 @@ def youtube_auth_oauth():
     Authorize the request and store authorization credentials.
     :return:
     """
+    logger.info("OAuth: Authorising API...")
     flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
     credentials = flow.run_console()
+    logger.info("OAuth: Instantiated flow (console)")
     return build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
 
 def youtube_auth_keys():
+    logger.info("Keys: Authorising API...")
     return build(API_SERVICE_NAME, API_VERSION, developerKey=get_api_key())

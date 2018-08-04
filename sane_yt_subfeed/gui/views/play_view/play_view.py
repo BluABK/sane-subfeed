@@ -4,10 +4,11 @@ import timeit
 
 from PyQt5 import sip
 
-from sane_yt_subfeed.controller.view_models import MainModel, logger
+from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.gui.views.grid_view.grid_view import GridView
 from sane_yt_subfeed.gui.views.play_view.play_tile import PlayTile
+from sane_yt_subfeed.log_handler import create_logger
 
 
 class PlayView(GridView):
@@ -16,7 +17,8 @@ class PlayView(GridView):
         super().__init__(parent, main_model, clipboard, status_bar)
 
     def init_ui(self):
-        logger.info("Initializing PlayView UI")
+        self.logger = create_logger("PlayView")
+        self.logger.info("Initializing UI")
 
         self.main_model.grid_view_listener.downloadedVideosChanged.connect(self.downloaded_videos_changed)
 
@@ -27,7 +29,7 @@ class PlayView(GridView):
         return subscription_feed
 
     def downloaded_videos_changed(self):
-        logger.info('PlayView: Updating tiles')
+        self.logger.info('PlayView: Updating tiles')
         for q_label, video in zip(self.q_labels, self.main_model.downloaded_videos):
             q_label.set_video(video)
 

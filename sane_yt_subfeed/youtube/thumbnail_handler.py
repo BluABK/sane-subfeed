@@ -14,18 +14,21 @@ import urllib3
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread
-from sane_yt_subfeed.log_handler import logger
+from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.pickle_handler import load_pickle, PICKLE_PATH
 from sane_yt_subfeed.database.video import Video
 
 OS_PATH = os.path.dirname(__file__)
 THUMBNAILS_PATH = os.path.join(OS_PATH, '..', 'resources', 'thumbnails')
 
+logger = create_logger("thumbnail_handler")
+
 
 class DownloadThumbnail(threading.Thread):
 
     def __init__(self, thread_list, video, force_dl_best, thumbnail_dict, progress_listener=None):
         threading.Thread.__init__(self)
+        self.logger = create_logger("DownloadThumbnail")
         self.thread_list = thread_list
         self.video = video
         self.force_dl_best = force_dl_best
@@ -101,10 +104,6 @@ def thumbnails_dl_and_paths(vid_list):
     for vid in vid_list:
         path_list.append(get_thumbnail_path(vid))
     return path_list
-
-
-def jesse_pickle():
-    return load_pickle(os.path.join(PICKLE_PATH, 'jesse_vid_dump.pkl'))
 
 
 def download_file(url, path, crop=False, quality=None):

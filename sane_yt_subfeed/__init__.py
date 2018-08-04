@@ -3,6 +3,10 @@ import os
 from PyQt5 import QtCore
 
 from sane_yt_subfeed.database.orm import init_db
+from sane_yt_subfeed.log_handler import create_logger
+
+logger = create_logger("__init__")
+logger.info("Initializing...")
 
 OS_PATH = os.path.dirname(__file__)
 
