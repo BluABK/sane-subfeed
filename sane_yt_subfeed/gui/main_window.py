@@ -108,6 +108,10 @@ class MainWindow(QMainWindow):
         # FIXME: icon
         self.add_submenu('&Function', 'Manual dir search', self.dir_search,
                          tooltip='Starts a manual search for new videos in youtube directory', icon='refresh.png')
+
+        # FIXME: icon
+        self.add_submenu('&Function', 'Manual db grab', self.db_reload,
+                         tooltip='Starts a manual grab of data for the model', icon='refresh.png')
         # View menu
         self.add_menu(menubar, '&View')
         view_grid_view = self.add_submenu('&View', 'Grid', self.view_grid, shortcut='Ctrl+1',
@@ -366,6 +370,13 @@ class MainWindow(QMainWindow):
         """
         self.main_model.yt_dir_listener.manualCheck.emit()
         # do_walk(os.path.join("d:/", "youtube"))
+
+    def db_reload(self):
+        """
+        Sends a testChannels signal
+        :return:
+        """
+        self.main_model.grid_view_listener.updateFromDb.emit()
 
     def refresh_subs(self):
         """

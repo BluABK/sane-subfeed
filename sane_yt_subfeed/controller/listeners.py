@@ -29,6 +29,7 @@ class GridViewListener(QObject):
     hiddenVideosChanged = pyqtSignal()
     downloadedVideosChanged = pyqtSignal()
     updateGridViewFromDb = pyqtSignal()
+    updateFromDb = pyqtSignal()
     # FIXME: move youtube-dl listener to its own listener?
     downloadFinished = pyqtSignal(VideoD)
     # FIXME: move to db listener
@@ -44,6 +45,11 @@ class GridViewListener(QObject):
         self.downloadFinished.connect(self.download_finished)
         self.downloadedVideosChangedinDB.connect(self.download_finished_in_db)
         self.updateGridViewFromDb.connect(self.update_grid_view_from_db)
+        self.updateFromDb.connect(self.update_from_db)
+
+    def update_from_db(self):
+        self.model.db_update_videos()
+        self.model.db_update_downloaded_videos()
 
     def update_grid_view_from_db(self):
         self.model.db_update_videos()
