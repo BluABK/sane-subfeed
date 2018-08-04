@@ -240,16 +240,20 @@ class YtDirListener(QObject):
 
     @pyqtSlot(str, str)
     def new_file(self, vid_id, vid_path):
-        self.logger.info("Adding new file to db")
         vid = db_session.query(Video).get(vid_id)
         if vid:
-            vid.vid_path = vid_path
-            vid.date_downloaded = datetime.datetime.utcnow()
-            vid.downloaded = True
-            db_session.commit()
+            if not vid.downloaded:
+                vid.vid_path = vid_path
+                vid.date_downloaded = datetime.datetime.utcnow()
+                vid.downloaded = True
+                self.logger.info("Adding new file to db")
+                db_session.commit()
+                self.model.db_update_videos()
+                self.model.db_update_downloaded_videos()
+            else:
+                self.logger.info("File already downloaded by this system")
+            db_session.remove()
 
-            self.model.db_update_videos()
-            self.model.db_update_downloaded_videos()
         else:
             db_session.remove()
             youtube_keys = load_keys(1)
@@ -262,6 +266,7 @@ class YtDirListener(QObject):
                 video.date_downloaded = datetime.datetime.utcnow()
                 self.logger.info("Downloading thumbnail")
                 download_thumbnails_threaded([video])
+                self.logger.info("Adding new file to db")
                 UpdateVideo(video,
                             finished_listeners=[self.model.grid_view_listener.downloadedVideosChangedinDB]).start()
             else:
