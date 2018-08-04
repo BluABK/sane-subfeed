@@ -37,7 +37,7 @@ class YoutubeDownload(threading.Thread):
         # FIXME: faux filename, as the application is currently not able to get final filname from youtube-dl
         # file_name = "{channel_title} - {date} - %(title)s (%(fps)s_%(vcodec)s_%(acodec)s).%(ext)s".format(
         #     channel_title=self.video.channel_title, date=self.video.date_published.strftime("%Y-%m-%d"))
-        file_name = "%(uploader)s - {date} - %(title)s - {id}".format(date=self.video.date_published.strftime(
+        file_name = "%(uploader)s - {date} - %(title)s - _v-id-{id}.%(ext)s".format(date=self.video.date_published.strftime(
                                                                              "%Y-%m-%d"), id=self.video.video_id)
         # file_name = 'testwsefefewf.fwef'
         self.youtube_folder = read_config('Play', 'yt_file_path', literal_eval=False)

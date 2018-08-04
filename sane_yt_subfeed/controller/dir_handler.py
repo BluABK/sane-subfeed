@@ -3,8 +3,10 @@ import time
 import timeit
 import ffmpeg
 from watchdog.events import PatternMatchingEventHandler
+
+from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database import read_operations
-from sane_yt_subfeed.database.orm import db_session
+from sane_yt_subfeed.database.orm import db_session, engine
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread
 
@@ -57,22 +59,25 @@ class VidEventHandler(PatternMatchingEventHandler):
 def manual_youtube_folder_check(input_path):
     # input_path = os.path.join(OS_PATH, input_folder)
 
-    update_videos = []
+    video_ids = []
+    vid_paths = {}
     # start_time = timeit.default_timer()
     for name in os.listdir(input_path):
-        try:
-            file_path = os.path.join(input_path, name)
-            file = ffmpeg.probe(file_path)
-            yt_comment = file['format']['tags']['comment']
-            vid_id = yt_comment.split('v=')[-1]
-            vid = db_session.query(Video).get(vid_id)
-            if vid:
-                if not vid.vid_path:
-                    vid.vid_path = file_path
-                    update_videos.append(vid)
-        except:
-            pass
-    return update_videos
+        if "_v-id-" in name:
+            filename = str(name.split(".")[-2])
+            id = str(filename.split("_v-id-")[-1])
+            video_ids.append(id)
+            vid_paths[id] = os.path.join(input_path, name)
+    db_videos = engine.execute(Video.__table__.select(Video.video_id.in_(video_ids)))
+    return_videos = Video.to_video_ds(db_videos)
+    for video in return_videos:
+        video.vid_path = vid_paths[video.video_id]
+
+    return return_videos
     # print(timeit.default_timer() - start_time)
 
+# class
 
+if __name__ == '__main__':
+    path = read_config('Play', 'yt_file_path', literal_eval=False)
+    manual_youtube_folder_check(path)
