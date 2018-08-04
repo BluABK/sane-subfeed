@@ -4,6 +4,7 @@ from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.engine_statements import update_video_statement_full, get_video_by_vidd_stmt, insert_item
 from sane_yt_subfeed.database.orm import engine
 from sane_yt_subfeed.database.video import Video
+from sane_yt_subfeed.log_handler import create_logger
 
 lock = threading.Lock()
 
@@ -27,6 +28,7 @@ class UpdateVideosThread(threading.Thread):
         :param debug:
         """
         threading.Thread.__init__(self)
+        self.logger = create_logger("UpdateVideosThread")
         self.video_list = video_list
         self.update_existing = update_existing
         self.uniques_check = uniques_check
@@ -78,6 +80,7 @@ class UpdateVideo(threading.Thread):
         :param video_d:
         """
         threading.Thread.__init__(self)
+        self.logger = create_logger("UpdateVideo")
         self.finished_listener = finished_listener
         self.video_d = video_d
         self.update_existing = update_existing
@@ -88,6 +91,7 @@ class UpdateVideo(threading.Thread):
         Override threading.Thread.run() with its own code
         :return:
         """
+        # self.logger.debug("Run")
         # start = default_timer()
         lock.acquire()
         stmt = get_video_by_vidd_stmt(VideoD.to_video(self.video_d))

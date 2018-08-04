@@ -9,7 +9,7 @@ from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session, engine
 from sane_yt_subfeed.database.write_operations import engine_execute_first, engine_execute
 from sane_yt_subfeed.database.engine_statements import update_channel_from_remote, get_channel_by_id_stmt
-from sane_yt_subfeed.log_handler import logger
+from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.pickle_handler import load_sub_list, load_youtube, dump_youtube, dump_sub_list
 from sane_yt_subfeed.print_functions import remove_empty_kwargs
 import datetime
@@ -18,6 +18,9 @@ YOUTUBE_URL = "https://www.youtube.com/"
 YOUTUBE_PARM_VIDEO = "watch?v="
 YOUTUBE_PARM_PLIST = "playlist?list ="
 YT_VIDEO_URL = YOUTUBE_URL + YOUTUBE_PARM_VIDEO
+
+logger = create_logger("youtube_requests")
+logger_list_search = create_logger("youtube_requests: list()/search()", logfile="debug_list_search.log")
 
 
 def get_channel_uploads(youtube_key, channel_id, videos, req_limit):
@@ -77,14 +80,14 @@ def list_uploaded_videos(youtube_key, videos, uploads_playlist_id, req_limit):
         for search_result in playlistitems_list_response['items']:
             if read_config('Debug', 'log_list') and read_config('Debug', 'log_needle') != 'unset':
                 if search_result['snippet']['channelTitle'] == str(read_config('Debug', 'log_needle')):
-                    logger.debug("list():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
-                                                                 search_result['snippet']['publishedAt'],
-                                                                 search_result['snippet']['title']))
+                    logger_list_search.debug("list():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
+                                                                             search_result['snippet']['publishedAt'],
+                                                                             search_result['snippet']['title']))
 
             if read_config('Debug', 'log_list') and read_config('Debug', 'log_needle') == 'unset':
-                logger.debug("list():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
-                                                             search_result['snippet']['publishedAt'],
-                                                             search_result['snippet']['title']))
+                logger_list_search.debug("list():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
+                                                                         search_result['snippet']['publishedAt'],
+                                                                         search_result['snippet']['title']))
 
             videos.append(VideoD.playlist_item_new_video_d(search_result, grab_methods=[GRAB_METHOD_LIST]))
         if searched_pages >= req_limit:
@@ -140,15 +143,17 @@ def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit, live
                         title = search_result['snippet']['title']
                         if search_result['snippet']['liveBroadcastContent'] != "none":
                             title += " [LIVESTREAM]"
-                        logger.debug("search():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
-                                                                       search_result['snippet']['publishedAt'], title))
+                            logger_list_search.debug(
+                                "search():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
+                                                                  search_result['snippet']['publishedAt'], title))
 
                 if read_config('Debug', 'log_search') and read_config('Debug', 'log_needle') == 'unset':
                     title = search_result['snippet']['title']
                     if search_result['snippet']['liveBroadcastContent'] != "none":
                         title += " [LIVESTREAM]"
-                    logger.debug("search():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
-                                                                   search_result['snippet']['publishedAt'], title))
+                        logger_list_search.debug(
+                            "search():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
+                                                              search_result['snippet']['publishedAt'], title))
 
                 videos.append(VideoD(search_result, grab_methods=[GRAB_METHOD_SEARCH]))
         if search_pages >= req_limit:
@@ -208,6 +213,7 @@ def get_subscriptions(cached_subs):
 
 
 def get_stored_subscriptions():
+    logger.info("Getting subscriptions from DB.")
     channels = db_session.query(Channel).all()
     if len(channels) < 1:
         return get_remote_subscriptions_cached_oauth()
@@ -215,10 +221,12 @@ def get_stored_subscriptions():
 
 
 def get_remote_subscriptions_cached_oauth():
+    logger.info("Getting subscriptions from remote (cached OAuth).")
     try:
         youtube_oauth = load_youtube()
         temp_subscriptions = get_remote_subscriptions(youtube_oauth)
     except FileNotFoundError:
+        logger.warning("Loading of cached OAuth: File not found. Requesting new OAuth from user.")
         youtube_oauth = youtube_auth_oauth()
         dump_youtube(youtube_oauth)
         temp_subscriptions = get_remote_subscriptions(youtube_oauth)

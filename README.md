@@ -1,3 +1,4 @@
+<img src="https://img.bluabk.net/python_2018-07-28_19-10-08.png" alt="drawing" width="800px"/>
 ## Prerequisites
 
 *   Python 3

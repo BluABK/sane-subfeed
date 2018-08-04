@@ -11,6 +11,7 @@ from PyQt5.QtGui import *
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.write_operations import UpdateVideo
+from sane_yt_subfeed.log_handler import create_logger
 
 # Constants
 OS_PATH = os.path.dirname(__file__)
@@ -106,6 +107,7 @@ class ListTiledView(QWidget):
 
     def __init__(self, parent, clipboard, status_bar, vid_limit=40):
         super(ListTiledView, self).__init__(parent)
+        self.logger = create_logger("ListTiledView")
         self.eqlabels = []
         self.vid_limit = vid_limit
         self.clipboard = clipboard
@@ -125,7 +127,6 @@ class ListTiledView(QWidget):
         description_layout = QVBoxLayout()
         image_layout = QVBoxLayout()
 
-
         body_layout.addLayout(image_layout)
         body_layout.addLayout(description_layout)
 
@@ -133,11 +134,9 @@ class ListTiledView(QWidget):
         more_layout = QHBoxLayout()
         published_layout = QHBoxLayout()
 
-
         description_layout.addLayout(video_title_layout)
         description_layout.addLayout(more_layout)
         description_layout.addLayout(published_layout)
-
 
         video_title = QLabel('video title')
         view_count = QLabel('View count')
@@ -157,4 +156,3 @@ class ListTiledView(QWidget):
         more_layout.addWidget(date)
         more_layout.addWidget(published)
         description_layout.addWidget(view_description)
-

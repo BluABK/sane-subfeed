@@ -13,7 +13,10 @@ from sane_yt_subfeed.database.write_operations import UpdateVideosThread
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
 from sane_yt_subfeed.youtube.update_videos import refresh_uploads
+from sane_yt_subfeed.log_handler import create_logger
 from sqlalchemy.sql.expression import false, true, or_
+
+logger = create_logger("Database (READ)")
 
 
 def get_newest_stored_videos(limit, filter_downloaded=False):
@@ -24,10 +27,12 @@ def get_newest_stored_videos(limit, filter_downloaded=False):
     :return: list(VideoD)
     """
     if filter_downloaded:
+        logger.info("Getting newest stored videos (filter: downloaded)")
         db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(
             Video.downloaded != '1', Video.discarded != '1').limit(
             limit).all()
     else:
+        logger.info("Getting newest stored videos")
         db_videos = db_session.query(Video).order_by(desc(Video.date_published)).limit(limit).all()
     videos = Video.to_video_ds(db_videos)
     db_session.remove()
@@ -61,6 +66,7 @@ def get_best_downloaded_videos(limit, filter_watched=True, sort_method=ORDER_MET
 
 
 def compare_db_filtered(videos, limit, discarded=False, downloaded=False):
+    logger.info("Comparing filtered videos with DB")
     return_list = []
     counter = 0
     for video in videos:
@@ -83,24 +89,28 @@ def compare_db_filtered(videos, limit, discarded=False, downloaded=False):
 
 
 def check_for_new(videos, deep_refresh=False):
+    logger.info("Checking for new videos{}".format((" (deep refresh)" if deep_refresh else "")))
     # FIXME: add to progress bar
     # start_time = timeit.default_timer()
     for vid in videos:
         stmt = get_video_by_vidd_stmt(vid)
         db_video = engine.execute(stmt).first()
         if not db_video:
-            # FIXME: uses wrong timezones
             vid_age = datetime.datetime.utcnow() - vid.date_published
             if deep_refresh:
                 if vid_age > datetime.timedelta(hours=1):
                     vid.missed = True
+                    logger.info("Missed video: {} - {} [{}]".format(vid.channel_title, vid.title, vid.url_video))
                 else:
                     vid.new = True
+                    logger.info("New video: {} - {} [{}]".format(vid.channel_title, vid.title, vid.url_video))
             else:
                 if vid_age > datetime.timedelta(hours=12):
                     vid.missed = True
+                    logger.info("Missed video: {} - {} [{}]".format(vid.channel_title, vid.title, vid.url_video))
                 else:
                     vid.new = True
+                    logger.info("New video: {} - {} [{}]".format(vid.channel_title, vid.title, vid.url_video))
         else:
             pass
     # print(timeit.default_timer() - start_time)
@@ -109,6 +119,7 @@ def check_for_new(videos, deep_refresh=False):
 
 def refresh_and_get_newest_videos(limit, filter_downloaded=False, progress_listener=None,
                                   refresh_type=LISTENER_SIGNAL_NORMAL_REFRESH):
+    logger.info("Refreshing and getting newest videos")
     if progress_listener:
         progress_listener.progress_bar.setVisible(True)
         progress_listener.resetBar.emit()

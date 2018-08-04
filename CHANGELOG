@@ -1,31 +1,40 @@
+v0.2.1
+- Added Deep refresh feature that more thoroughly scrapes YouTube.
+- Fixed bad timezone handling on datestamps which affect "new video" calculation.
+- Videos found by Deep refresh that are > 1h old are marked as "missed".
+- Fixed broken implementation of syshook intercept that would cause Exceptions in logging
+- Implemented regrab feature that will automatically refresh feed if the cache gets too small.
+- Log handler now uses multiple facilities which allows for a better overview.
+- Logging is now implemented project-wide.
+
 v0.2.0
-- Application now uses test to determine how many pages to use for missed videos
-- Tests can now be initiated from GUI
-- Progressbar on reloading of subfeed
-- Optional embedded thumbnails in tooltip
-- Optional keeping of Aspect Ratio when resizing thumbnails
-- Thumbnail overlays for missed and new videos
-- Default background colour is now white
-- Application now uses db to check for old videos
-- Option to hide/show wip/unimplemented GUI elements
+- Application now uses test to determine how many pages to use for missed videos.
+- Tests can now be initiated from GUI.
+- Progressbar on reloading of subfeed.
+- Optional embedded thumbnails in tooltip.
+- Optional keeping of Aspect Ratio when resizing thumbnails.
+- Thumbnail overlays for missed and new videos.
+- Default background colour is now white.
+- Application now uses db to check for old videos.
+- Option to hide/show wip/unimplemented GUI elements.
 
 v0.2.0-dev2
-- Renamed VERSION.txt --> VERSION
-- A grand rewrite of ConfigView making it humanly usable
-- ConfigView now has comboboxes and covers *all* settings
+- Renamed VERSION.txt --> VERSION.
+- A grand rewrite of ConfigView making it humanly usable.
+- ConfigView now has comboboxes and covers *all* settings.
 
 v0.2.0-dev
-- Added this changelog \o/
-- Added feature: Versioning
-- Added feature: Colouring of *new* videos in GridView
-- Added feature: Reload subscriptions list on demand from GUI
-- Added feature: Text (title, channel, date) on video tiles in GridView
-- SubscriptionsView is now a table that practically mimics the DBs 'Channel' tbl
-- Video tiles in GridView now have a fixed size and spawn new if space allows
-- Fixed a lot of icons and related gfx
-- Misc file/folder restructuring
-- HOTFIX: Only one resizeEvent on a big change
-- BUG: Grid resize has issues if started > 2x2
+- Added this changelog. \o/
+- Added feature: Versioning.
+- Added feature: Colouring of *new* videos in GridView.
+- Added feature: Reload subscriptions list on demand from GUI.
+- Added feature: Text (title, channel, date) on video tiles in GridView.
+- SubscriptionsView is now a table that practically mimics the DBs 'Channel' tbl.
+- Video tiles in GridView now have a fixed size and spawn new if space allows.
+- Fixed a lot of icons and related gfx.
+- Misc file/folder restructuring.
+- HOTFIX: Only one resizeEvent on a big change.
+- BUG: Grid resize has issues if started > 2x2.
 
 v0.1.0-dev
-Initial release/tag
+Initial release/tag.

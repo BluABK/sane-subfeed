@@ -60,7 +60,6 @@ class VideoD:
         self.date_downloaded = None
 
 
-
     def determine_thumbnails(self, thumbnails_item):
         """
         Takes a youtube#playListItem thumbnails section and determines which qualities are available.

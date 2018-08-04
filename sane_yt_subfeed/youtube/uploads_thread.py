@@ -6,7 +6,7 @@ from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_search, get_channel_uploads, \
     list_uploaded_videos
-from sane_yt_subfeed.log_handler import logger
+from sane_yt_subfeed.log_handler import create_logger
 
 
 class GetUploadsThread(threading.Thread):
@@ -21,6 +21,7 @@ class GetUploadsThread(threading.Thread):
         :param debug:
         """
         threading.Thread.__init__(self)
+        self.logger = create_logger("GetUploadsThread")
         self.videos = videos
         self.thread_id = thread_id
         self.job_done = False
