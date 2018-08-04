@@ -48,4 +48,5 @@ def insert_item(video):
             "description": video.description, "thumbnail_path": video.thumbnail_path,
             "playlist_pos": video.playlist_pos, "url_video": video.url_video,
             "url_playlist_video": video.url_playlist_video, "thumbnails": video.thumbnails,
-            "downloaded": video.downloaded, "search_item": video.search_item, "discarded": video.discarded}
+            "downloaded": video.downloaded, "search_item": video.search_item, "discarded": video.discarded,
+            "vid_path": video.vid_path, "watched": video.watched, "date_downloaded": video.date_downloaded}

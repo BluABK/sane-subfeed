@@ -5,6 +5,7 @@ from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 
 GRAB_METHOD_LIST = 'list()'
 GRAB_METHOD_SEARCH = 'search()'
+GRAB_METHOD_VIDEOS = 'videos()'
 
 
 class VideoD:
@@ -100,3 +101,8 @@ class VideoD:
     def playlist_item_new_video_d(playlist_item, grab_methods=None):
         playlist_item['id'] = playlist_item['snippet']['resourceId']
         return VideoD(playlist_item, grab_methods=grab_methods)
+
+    @staticmethod
+    def videos_item_new_video_d(videos_item, grab_methods=None):
+        videos_item['id'] = {'videoId': videos_item['id']}
+        return VideoD(videos_item, grab_methods=grab_methods)
