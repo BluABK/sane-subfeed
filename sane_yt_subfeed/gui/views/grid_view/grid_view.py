@@ -1,3 +1,5 @@
+import math
+
 from PyQt5 import sip
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QGridLayout, QSizePolicy
@@ -33,6 +35,7 @@ class GridView(QWidget):
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.grid.setContentsMargins(5, 5, 0, 0)
         self.grid.setSpacing(2)
+        self.grid.setAlignment(Qt.AlignTop)
         self.setLayout(self.grid)
 
         self.setAutoFillBackground(True)
@@ -49,6 +52,7 @@ class GridView(QWidget):
 
     def videos_changed(self):
         self.logger.info('Updating tiles')
+        self.update_grid()
         for q_label, video in zip(self.q_labels, self.main_model.filtered_videos):
             q_label.set_video(video)
 
@@ -67,24 +71,26 @@ class GridView(QWidget):
     def update_grid(self):
         feed = self.get_feed()
         counter = 0
+        video_counter = 0
         positions = [(i, j) for i in
-                     range(max(int(len(feed) / max(self.items_x, 1)), 1))
+                     range(max(math.ceil(len(feed) / max(self.items_x, 1)), 1))
                      for j in
                      range(self.items_x)]
         for position in positions:
-            if counter < len(self.q_labels):
+            if counter >= len(feed):
+                pass
+            elif counter < len(self.q_labels):
                 self.grid.addWidget(self.q_labels[counter], *position)
+                video_counter += 1
             else:
-                if counter >= len(feed):
-                    pass
-                else:
-                    lbl = self.new_tile(counter, feed[counter])
-                    self.grid.addWidget(lbl, *position)
-                    self.q_labels.append(lbl)
+                lbl = self.new_tile(counter, feed[counter])
+                self.grid.addWidget(lbl, *position)
+                video_counter += 1
+                self.q_labels.append(lbl)
             counter += 1
-        if len(positions) < len(self.q_labels):
-            widgets_to_delete = self.q_labels[len(positions):]
-            self.q_labels = self.q_labels[:len(positions)]
+        if video_counter < len(self.q_labels):
+            widgets_to_delete = self.q_labels[video_counter:]
+            self.q_labels = self.q_labels[:video_counter]
             for widget in widgets_to_delete:
                 self.grid.removeWidget(widget)
                 sip.delete(widget)
