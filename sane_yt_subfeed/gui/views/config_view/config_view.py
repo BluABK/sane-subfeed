@@ -29,7 +29,7 @@ class ConfigView(QWidget):
     use_tests = None
     force_dl_best_thumb = None
 
-    def __init__(self, parent, clipboard, status_bar):
+    def __init__(self, parent):
         """
         A GUI Widget that reads and sets config.ini settings
         :param parent:
@@ -38,8 +38,9 @@ class ConfigView(QWidget):
         """
         super(ConfigView, self).__init__(parent)
         self.logger = create_logger("ConfigView")
-        self.clipboard = clipboard
-        self.status_bar = status_bar
+        self.root = parent  # MainWindow
+        self.clipboard = self.root.clipboard
+        self.status_bar = self.root.status_bar
         self.init_ui()
 
     def init_ui(self):

@@ -14,7 +14,7 @@ class ListDetailedView(QWidget):
     videos = None
     headers = None
 
-    def __init__(self, parent, clipboard, status_bar, vid_limit=40, headers=None):
+    def __init__(self, parent, vid_limit=40, headers=None):
         """
         ListDetailedView, a table representation of relevant parts of the Subscription Feed
         :param clipboard:
@@ -24,8 +24,9 @@ class ListDetailedView(QWidget):
         super(ListDetailedView, self).__init__(parent)
         self.logger = create_logger("ListDetailedView")
         self.config_file = None
-        self.clipboard = clipboard
-        self.status_bar = status_bar
+        self.root = parent  # MainWindow
+        self.clipboard = self.root.clipboard
+        self.status_bar = self.root.status_bar
         self.vid_limit = vid_limit
         if headers:
             self.headers = headers

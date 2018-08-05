@@ -46,6 +46,9 @@ class AboutView(QWidget):
     def __init__(self, parent):
         super(AboutView, self).__init__(parent)
         self.logger = create_logger("AboutView")
+        self.root = parent  # MainWindow
+        self.clipboard = self.root.clipboard
+        self.status_bar = self.root.status_bar
         self.init_ui()
 
     def init_ui(self):

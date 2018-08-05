@@ -52,6 +52,7 @@ class MainWindow(QMainWindow):
         for fakech in range(100):
             self.subs.append("Fake channel #{:3d}".format(fakech))
         self.clipboard = QApplication.clipboard()
+        self.status_bar = self.statusBar()
         self.menus = {}
         if dimensions:
             self.dimensions = dimensions
@@ -61,12 +62,12 @@ class MainWindow(QMainWindow):
         self.central_widget = QStackedWidget()
         self.setCentralWidget(self.central_widget)
 
-        self.grid_view = GridView(self, main_model, self.clipboard, self.statusBar())
-        self.play_view = PlayView(self, main_model, self.clipboard, self.statusBar())
-        self.list_detailed_view = ListDetailedView(self, self.clipboard, self.statusBar())
-        self.list_tiled_view = ListTiledView(self, self.clipboard, self.statusBar())
-        self.subs_view = SubscriptionsView(self, self.clipboard, self.statusBar())
-        self.config_view = ConfigView(self, self.clipboard, self.statusBar())
+        self.grid_view = GridView(self, main_model)
+        self.play_view = PlayView(self, main_model)
+        self.list_detailed_view = ListDetailedView(self)
+        self.list_tiled_view = ListTiledView(self)
+        self.subs_view = SubscriptionsView(self)
+        self.config_view = ConfigView(self)
         self.about_view = AboutView(self)
 
         self.init_ui()

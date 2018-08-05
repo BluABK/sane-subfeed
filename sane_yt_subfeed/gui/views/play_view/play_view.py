@@ -13,8 +13,11 @@ from sane_yt_subfeed.log_handler import create_logger
 
 class PlayView(GridView):
 
-    def __init__(self, parent, main_model: MainModel, clipboard, status_bar):
-        super().__init__(parent, main_model, clipboard, status_bar)
+    def __init__(self, parent, main_model: MainModel):
+        super().__init__(parent, main_model)
+        self.root = parent  # MainWindow
+        self.clipboard = self.root.clipboard
+        self.status_bar = self.root.status_bar
 
     def init_ui(self):
         self.logger = create_logger("PlayView")

@@ -208,6 +208,13 @@ def resize_thumbnail(img_path, maxwidth, maxheight, out=True):
     :param img_path: string/path
     :return: resized image or 404 image if operation failed
     """
+    if img_path is None:
+        return None
+        # if out:
+        #     return Image.open(os.path.join(OS_PATH, '..', 'resources', 'quality404.jpg'))
+        # else:
+        #     return os.path.join(OS_PATH, '..', 'resources', 'quality404.jpg')
+
     im = Image.open(img_path)
     resize_ratio = min(maxwidth / im.width, maxheight / im.height)
     new_size = tuple(int(resize_ratio * x) for x in im.size)

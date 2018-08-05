@@ -105,13 +105,14 @@ class ListTiledView(QWidget):
     """
     eqlabels = None
 
-    def __init__(self, parent, clipboard, status_bar, vid_limit=40):
+    def __init__(self, parent, vid_limit=40):
         super(ListTiledView, self).__init__(parent)
         self.logger = create_logger("ListTiledView")
+        self.root = parent  # MainWindow
         self.eqlabels = []
         self.vid_limit = vid_limit
-        self.clipboard = clipboard
-        self.status_bar = status_bar
+        self.clipboard = self.root.clipboard
+        self.status_bar = self.root.status_bar
 
         # The layouts
         main_layout = QVBoxLayout()

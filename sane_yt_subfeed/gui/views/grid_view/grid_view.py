@@ -13,16 +13,16 @@ from sane_yt_subfeed.log_handler import create_logger
 
 class GridView(QWidget):
 
-    def __init__(self, parent, main_model: MainModel, clipboard, status_bar):
+    def __init__(self, parent, main_model: MainModel):
         super(GridView, self).__init__(parent)
         self.logger = create_logger("GridView")
         self.setMinimumSize(0,0)
         self.parent = parent
         self.root = parent  # MainWindow
+        self.clipboard = self.root.clipboard
+        self.status_bar = self.root.status_bar
         self.buffer = 10
         self.bar_correction = 0
-        self.clipboard = clipboard
-        self.status_bar = status_bar
         self.main_model = main_model
         self.pref_tile_height = read_config('Gui', 'tile_pref_height')
         self.pref_tile_width = read_config('Gui', 'tile_pref_width')
