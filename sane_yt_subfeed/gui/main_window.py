@@ -89,7 +89,7 @@ class MainWindow(QMainWindow):
 
         # Set function menu triggers
         self.add_submenu('&Function', 'Copy all URLs', self.clipboard_copy_urls, shortcut='Ctrl+D',
-                         tooltip='Copy URLs of all currently visible videos to clipboard')
+                         tooltip='Copy URLs of all currently visible videos to clipboard', icon='copy.png')
 
         # refresh_list
         # self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
@@ -104,24 +104,23 @@ class MainWindow(QMainWindow):
         self.add_submenu('&Function', 'Deep refresh of feed', self.refresh_list_deep, shortcut='Ctrl+T',
                          tooltip='Deed refresh the subscription feed', icon='refresh.png')
 
-        # FIXME: icon
         self.add_submenu('&Function', 'Test Channels', self.test_channels,
-                         tooltip='Tests the test_pages and miss_limit of channels', icon='refresh.png')
+                         tooltip='Tests the test_pages and miss_limit of channels', icon='rerun_test.png')
 
-        # FIXME: icon
         self.add_submenu('&Function', 'Manual dir search', self.dir_search,
-                         tooltip='Starts a manual search for new videos in youtube directory', icon='refresh.png')
+                         tooltip='Starts a manual search for new videos in youtube directory',
+                         icon='folder_refresh.png')
 
-        # FIXME: icon
-        self.add_submenu('&Function', 'Manual db grab', self.db_reload,
-                         tooltip='Starts a manual grab of data for the model', icon='refresh.png')
+        # FIXME: icon, look more related to action
+        self.add_submenu('&Function', 'Manual DB grab', self.db_reload,
+                         tooltip='Starts a manual grab of data for the model', icon='database.png')
         # View menu
         self.add_menu(menubar, '&View')
-        view_grid_view = self.add_submenu('&View', 'Grid', self.view_grid, shortcut='Ctrl+1',
+        view_grid_view = self.add_submenu('&View', 'Subscription feed', self.view_grid, shortcut='Ctrl+1',
                                           tooltip='View subscription feed as a grid', icon='grid.png')
-        # FIXME: icon
-        view_play_view = self.add_submenu('&View', 'play', self.view_play, shortcut='Ctrl+2',
-                                          tooltip='View subscription feed as a grid', icon='grid.png')
+        view_play_view = self.add_submenu('&View', 'Playable videos feed', self.view_play, shortcut='Ctrl+2',
+                                          tooltip='View downloaded videos as a grid',
+                                          icon='play_view_basic.png')
         view_list_detailed_view = self.add_submenu('&View', 'Detailed List', self.view_list_detailed, shortcut='Ctrl+3',
                                                    tooltip='View subscription feed as a detailed list',
                                                    icon='table.png')
