@@ -57,13 +57,16 @@ class GridView(QWidget):
     def resize_event(self):
         if self.items_x >= 1:
             margins = self.grid.getContentsMargins()
-            if self.parent.width() > (
+            update_grid = False
+            while self.parent.width() > (
                     (self.items_x + 1) * self.pref_tile_width + margins[0] + margins[2] + self.buffer):
                 self.items_x += 1
-                self.update_grid()
-            elif self.parent.width() <= self.items_x * self.pref_tile_width + margins[0] + margins[
+                update_grid = True
+            while self.parent.width() <= self.items_x * self.pref_tile_width + margins[0] + margins[
                 2] and self.items_x > 1:
                 self.items_x -= 1
+                update_grid = True
+            if update_grid:
                 self.update_grid()
 
     def update_grid(self):

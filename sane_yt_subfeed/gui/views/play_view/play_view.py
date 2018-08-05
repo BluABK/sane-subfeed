@@ -30,6 +30,7 @@ class PlayView(GridView):
 
     def downloaded_videos_changed(self):
         self.logger.info('PlayView: Updating tiles')
+        self.update_grid()
         for q_label, video in zip(self.q_labels, self.main_model.downloaded_videos):
             q_label.set_video(video)
 
