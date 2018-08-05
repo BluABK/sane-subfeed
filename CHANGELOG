@@ -1,3 +1,5 @@
+v0.3.0
+- Cleaned version of v0.3.0-pre
 v0.3.0-pre
 - Added a Play View which shows your downloaded videos (gui).
 - Play View can recognise and add downloaded videos from a specified directory (config).
