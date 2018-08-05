@@ -26,6 +26,7 @@ if read_config('Logging', 'use_socket_log'):
     socket_handler = SocketHandler('127.0.0.1', 19996)  # default listening address
     log.addHandler(socket_handler)
 
+
 def create_logger(facility, logfile='debug.log'):
     # create logger
     if read_config('Logging', 'use_socket_log'):
