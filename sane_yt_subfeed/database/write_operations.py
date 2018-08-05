@@ -18,6 +18,8 @@ def engine_execute(stmt):
 
 
 class UpdateVideosThread(threading.Thread):
+    logger = create_logger("d").getChild("w").getChild("UpdateVideosThread")
+
 
     def __init__(self, video_list, update_existing=False, uniques_check=True, finished_listeners=None):
         """
@@ -28,7 +30,6 @@ class UpdateVideosThread(threading.Thread):
         :param debug:
         """
         threading.Thread.__init__(self)
-        self.logger = create_logger("UpdateVideosThread")
         self.video_list = video_list
         self.update_existing = update_existing
         self.uniques_check = uniques_check
@@ -44,7 +45,6 @@ class UpdateVideosThread(threading.Thread):
             self.video_list = check_for_unique(self.video_list)
 
         lock.acquire()
-
         items_to_add = []
         items_to_update = []
         for video_d in self.video_list:
@@ -73,6 +73,7 @@ class UpdateVideosThread(threading.Thread):
 
 
 class UpdateVideo(threading.Thread):
+    logger = create_logger("d").getChild("w").getChild("UpdateVideo")
 
     def __init__(self, video_d, update_existing=False, finished_listeners=None):
         """
@@ -80,7 +81,6 @@ class UpdateVideo(threading.Thread):
         :param video_d:
         """
         threading.Thread.__init__(self)
-        self.logger = create_logger("UpdateVideo")
         self.finished_listeners = finished_listeners
         self.video_d = video_d
         self.update_existing = update_existing
