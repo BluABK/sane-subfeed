@@ -68,7 +68,7 @@ class GridView(QWidget):
         feed = self.get_feed()
         counter = 0
         positions = [(i, j) for i in
-                     range(int(len(feed) / self.items_x))
+                     range(max(int(len(feed) / max(self.items_x, 1)), 1))
                      for j in
                      range(self.items_x)]
         for position in positions:
@@ -76,12 +76,11 @@ class GridView(QWidget):
                 self.grid.addWidget(self.q_labels[counter], *position)
             else:
                 if counter >= len(feed):
-                    vid_item = VideoD(None)
-                    lbl = self.new_tile(counter, vid_item)
+                    pass
                 else:
                     lbl = self.new_tile(counter, feed[counter])
-                self.grid.addWidget(lbl, *position)
-                self.q_labels.append(lbl)
+                    self.grid.addWidget(lbl, *position)
+                    self.q_labels.append(lbl)
             counter += 1
         if len(positions) < len(self.q_labels):
             widgets_to_delete = self.q_labels[len(positions):]
