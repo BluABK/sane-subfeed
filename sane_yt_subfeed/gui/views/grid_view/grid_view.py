@@ -14,7 +14,7 @@ from sane_yt_subfeed.log_handler import create_logger
 class GridView(QWidget):
     def __init__(self, parent, root, main_model: MainModel):
         super(GridView, self).__init__(parent=parent)
-        self.logger = create_logger('g').getChild('g').getChild("GridView")
+        self.logger = create_logger('g').getChild('v').getChild('g').getChild("GridView")
         self.setMinimumSize(0, 0)
         self.parent = parent
         self.root = root  # MainWindow
