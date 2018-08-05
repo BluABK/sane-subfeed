@@ -12,7 +12,7 @@ from sane_yt_subfeed.log_handler import create_logger
 class SubscriptionsView(QWidget):
     subs = None
 
-    def __init__(self, parent, clipboard, status_bar, headers=None):
+    def __init__(self, parent, headers=None):
         """
         SubscriptionsView, a table representation of relevant parts of the Subscriptions list
         :param parent:
@@ -22,8 +22,9 @@ class SubscriptionsView(QWidget):
         """
         super(SubscriptionsView, self).__init__(parent)
         self.logger = create_logger("SubscriptionsView")
-        self.clipboard = clipboard
-        self.status_bar = status_bar
+        self.root = parent  # MainWindow
+        self.clipboard = self.root.clipboard
+        self.status_bar = self.root.status_bar
 
         if headers:
             self.headers = headers
