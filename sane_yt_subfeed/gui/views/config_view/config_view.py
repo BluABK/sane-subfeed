@@ -1,5 +1,5 @@
 # PyQt5
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox, QScrollArea
 
 # Internal
 from sane_yt_subfeed.config_handler import read_config, defaults, get_size
@@ -8,7 +8,7 @@ from sane_yt_subfeed.gui.views.config_view import checkbox, combobox
 from sane_yt_subfeed.log_handler import create_logger
 
 
-class ConfigView(QWidget):
+class ConfigView(QScrollArea):
     """
     Configuration widget
     """
@@ -154,7 +154,7 @@ class ConfigView(QWidget):
         self.add_option_combobox('Grid view Y', 'Gui', 'grid_view_y', combobox.gui_grid_view_y, list(range(1, 100)))
         self.add_option_checkbox('Grey background on old (1d+) videos', 'Gui', 'grey_old_videos',
                                  checkbox.gui_grey_old_videos)
-        self.add_option_checkbox('Enable grid resizing', 'Gui', 'enable_grid_resize', checkbox.gui_enable_grid_resize)
+        # self.add_option_checkbox('Enable grid resizing', 'Gui', 'enable_grid_resize', checkbox.gui_enable_grid_resize)
 
         self.add_option_combobox('\tGrid tile height (px)', 'Gui', 'tile_pref_height',
                                  combobox.gui_tile_pref_height, list(range(1, 1000)))
