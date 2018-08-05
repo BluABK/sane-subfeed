@@ -11,12 +11,10 @@ from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
 from sane_yt_subfeed.log_handler import create_logger
 
 
-
-
 class GridView(QWidget):
     def __init__(self, parent, root, main_model: MainModel, clipboard, status_bar):
         super(GridView, self).__init__(parent=parent)
-        self.logger = create_logger("GridView")
+        self.logger = create_logger('g').getChild('g').getChild("GridView")
         self.setMinimumSize(0, 0)
         self.parent = parent
         self.root = root  # MainWindow
@@ -64,7 +62,7 @@ class GridView(QWidget):
                 self.items_x += 1
                 self.update_grid()
             elif self.parent.width() <= self.items_x * self.pref_tile_width + margins[0] + margins[
-                                                                                        2] and self.items_x > 1:
+                2] and self.items_x > 1:
                 self.items_x -= 1
                 self.update_grid()
 
@@ -94,6 +92,8 @@ class GridView(QWidget):
             for widget in widgets_to_delete:
                 self.grid.removeWidget(widget)
                 sip.delete(widget)
+        self.logger.debug(
+            "Updated view: currently {} widgets and {} items_x".format(video_counter, self.items_x))
         self.resize_event()
 
     def new_tile(self, counter, video):

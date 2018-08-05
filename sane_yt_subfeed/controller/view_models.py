@@ -20,6 +20,7 @@ class MainModel:
         super().__init__()
         self.logger = create_logger('MainModel')
         self.videos_limit = videos_limit
+        self.downloaded_videos_limit = videos_limit
         self.videos = videos
         self.filtered_videos = filtered_videos
         self.downloaded_videos = downloaded_videos
@@ -53,9 +54,7 @@ class MainModel:
         self.logger.debug("Hiding video item: {}".format(index))
         del self.filtered_videos[index]
         regrab_percentage = read_config('Model', 'regrab_percentage')
-        loaded_videos = read_config('Model', 'loaded_videos')
-        self.videos_limit = loaded_videos
-        if len(self.filtered_videos) <= int(regrab_percentage*loaded_videos):
+        if len(self.filtered_videos) <= int(regrab_percentage*self.videos_limit):
             self.db_update_videos()
             # FIXME: only does filtered videos
             self.logger.warning('Reduced view models filtered_videos to /2, requesting new videos from db')
@@ -63,9 +62,7 @@ class MainModel:
     def hide_downloaded_video_item(self, index):
         del self.downloaded_videos[index]
         regrab_percentage = read_config('Model', 'regrab_percentage')
-        loaded_videos = read_config('Model', 'loaded_videos')
-        self.videos_limit = loaded_videos
-        if len(self.downloaded_videos) <= int(regrab_percentage*loaded_videos):
+        if len(self.downloaded_videos) <= int(regrab_percentage*self.downloaded_videos_limit):
             self.db_update_downloaded_videos()
             self.logger.info('Reduced view models downloaded_videos to /2, requesting new videos from db')
 
@@ -99,5 +96,5 @@ class MainModel:
         return self.status_bar_progress
 
     def db_update_downloaded_videos(self):
-        self.downloaded_videos = get_best_downloaded_videos(self.videos_limit)
+        self.downloaded_videos = get_best_downloaded_videos(self.downloaded_videos_limit)
         self.grid_view_listener.downloadedVideosChanged.emit()
