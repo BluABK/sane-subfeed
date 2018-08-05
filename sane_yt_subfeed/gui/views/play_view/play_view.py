@@ -13,14 +13,11 @@ from sane_yt_subfeed.log_handler import create_logger
 
 class PlayView(GridView):
 
-    def __init__(self, parent, main_model: MainModel):
-        super().__init__(parent, main_model)
-        self.root = parent  # MainWindow
-        self.clipboard = self.root.clipboard
-        self.status_bar = self.root.status_bar
+    def __init__(self, parent, root, main_model: MainModel):
+        super().__init__(parent, root, main_model)
 
     def init_ui(self):
-        self.logger = create_logger("PlayView")
+        self.logger = create_logger('g').getChild('g').getChild("PlayView")
         self.logger.info("Initializing UI")
 
         self.main_model.grid_view_listener.downloadedVideosChanged.connect(self.downloaded_videos_changed)
@@ -33,32 +30,9 @@ class PlayView(GridView):
 
     def downloaded_videos_changed(self):
         self.logger.info('PlayView: Updating tiles')
+        self.update_grid()
         for q_label, video in zip(self.q_labels, self.main_model.downloaded_videos):
             q_label.set_video(video)
 
-
-    def update_grid(self):
-        feed = self.get_feed()
-        counter = 0
-        positions = [(i, j) for i in range(self.items_y) for j in range(self.items_x)]
-        for position in positions:
-
-            if counter < len(self.q_labels):
-                self.grid.addWidget(self.q_labels[counter], *position)
-            else:
-                if counter >= len(feed):
-                    vid_item = VideoD(None)
-                    lbl = PlayTile(self, vid_item, counter, self.clipboard, self.status_bar)
-                else:
-                    lbl = PlayTile(self, feed[counter], counter, self.clipboard, self.status_bar)
-                self.grid.addWidget(lbl, *position)
-                self.q_labels.append(lbl)
-            counter += 1
-        if len(positions) < len(self.q_labels):
-            widgets_to_delete = self.q_labels[len(positions):]
-            self.q_labels = self.q_labels[:len(positions)]
-            for widget in widgets_to_delete:
-                self.grid.removeWidget(widget)
-                sip.delete(widget)
-        self.resizeEvent('')
-
+    def new_tile(self, counter, video):
+        return PlayTile(self, video, counter, self.clipboard, self.status_bar)

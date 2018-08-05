@@ -32,6 +32,9 @@ class GridViewListener(QObject):
     downloadedVideosChanged = pyqtSignal()
     updateGridViewFromDb = pyqtSignal()
     updateFromDb = pyqtSignal()
+    scrollReachedEndGrid = pyqtSignal()
+    scrollReachedEndPlay = pyqtSignal()
+
     # FIXME: move youtube-dl listener to its own listener?
     downloadFinished = pyqtSignal(VideoD)
     # FIXME: move to db listener
@@ -40,7 +43,7 @@ class GridViewListener(QObject):
     def __init__(self, model):
         super().__init__()
         self.model = model
-        self.logger = create_logger('GridViewListener')
+        self.logger = create_logger('c').getChild('li').getChild('GridViewListener')
 
         self.tileDownloaded.connect(self.tile_downloaded)
         self.tileWatched.connect(self.tile_watched)
@@ -49,6 +52,22 @@ class GridViewListener(QObject):
         self.downloadedVideosChangedinDB.connect(self.download_finished_in_db)
         self.updateGridViewFromDb.connect(self.update_grid_view_from_db)
         self.updateFromDb.connect(self.update_from_db)
+        self.scrollReachedEndGrid.connect(self.scroll_reached_end_grid)
+        self.scrollReachedEndPlay.connect(self.db_update_downloaded_videos)
+
+    def scroll_reached_end_grid(self):
+        add_value = read_config("Model", "loaded_videos")
+        self.model.videos_limit = self.model.videos_limit + add_value
+        self.logger.info(
+            "Scroll for Grid View reached 80%, updating videos limit to {}".format(self.model.videos_limit))
+        self.model.db_update_videos()
+
+    def db_update_downloaded_videos(self):
+        add_value = read_config("Model", "loaded_videos")
+        self.model.downloaded_videos_limit = self.model.downloaded_videos_limit + add_value
+        self.logger.info(
+            "Scroll for Play View reached 80%, updating videos limit to {}".format(self.model.downloaded_videos_limit))
+        self.model.db_update_downloaded_videos()
 
     def update_from_db(self):
         self.model.db_update_videos()
@@ -107,7 +126,7 @@ class MainWindowListener(QObject):
         self.refreshVideos.connect(self.refresh_videos)
         self.refreshSubs.connect(self.refresh_subs)
         self.testChannels.connect(self.test_channels)
-        self.logger = create_logger('MainWindowListener')
+        self.logger = create_logger('c').getChild('li').getChild('MainWindowListener')
 
     def run(self):
         while True:
@@ -155,7 +174,7 @@ class DatabaseListener(QObject):
         super().__init__()
         self.model = model
         self.refreshVideos.connect(self.refresh_videos)
-        self.logger = create_logger('DatabaseListener')
+        self.logger = create_logger('c').getChild('li').getChild('DatabaseListener')
 
     def run(self):
         while True:
@@ -186,7 +205,7 @@ class ProgressBar(QObject):
         self.updateProgress.connect(self.update_progress)
         self.setText.connect(self.set_text)
         self.resetBar.connect(self.reset_bar)
-        self.logger = create_logger('ProgressBar')
+        self.logger = create_logger('c').getChild('li').getChild('ProgressBar')
 
     def run(self):
         while True:
@@ -220,7 +239,7 @@ class YtDirListener(QObject):
 
     def __init__(self, model):
         super().__init__()
-        self.logger = create_logger('YtDirListener')
+        self.logger = create_logger('c').getChild('li').getChild('YtDirListener')
         self.model = model
 
         self.newFile.connect(self.new_file)

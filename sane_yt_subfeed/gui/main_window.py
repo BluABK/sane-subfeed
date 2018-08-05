@@ -14,10 +14,12 @@ from PyQt5.QtGui import QIcon
 # Project internal libs
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
+from sane_yt_subfeed.controller.static_controller_vars import GRID_VIEW_ID, PLAY_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_videos
 from sane_yt_subfeed.gui.views.about_view import AboutView
 from sane_yt_subfeed.gui.views.config_view.config_view import ConfigView
+from sane_yt_subfeed.gui.views.grid_view.grid_scroll_area import GridScrollArea
 from sane_yt_subfeed.gui.views.play_view.play_view import PlayView
 from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
 from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
@@ -62,8 +64,11 @@ class MainWindow(QMainWindow):
         self.central_widget = QStackedWidget()
         self.setCentralWidget(self.central_widget)
 
-        self.grid_view = GridView(self, main_model)
-        self.play_view = PlayView(self, main_model)
+        self.grid_view = GridScrollArea(self, main_model)
+        self.play_view = GridScrollArea(self, main_model)
+        self.grid_view.set_view(GridView(self.grid_view, self, main_model), GRID_VIEW_ID)
+        self.play_view.set_view(PlayView(self.play_view, self, main_model), PLAY_VIEW_ID)
+
         self.list_detailed_view = ListDetailedView(self)
         self.list_tiled_view = ListTiledView(self)
         self.subs_view = SubscriptionsView(self)

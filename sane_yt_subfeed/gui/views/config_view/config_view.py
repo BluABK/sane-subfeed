@@ -1,5 +1,6 @@
 # PyQt5
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox, QScrollArea
 
 # Internal
 from sane_yt_subfeed.config_handler import read_config, defaults, get_size
@@ -8,7 +9,20 @@ from sane_yt_subfeed.gui.views.config_view import checkbox, combobox
 from sane_yt_subfeed.log_handler import create_logger
 
 
-class ConfigView(QWidget):
+class ConfigView(QScrollArea):
+
+    def __init__(self, parent):
+        super(ConfigView, self).__init__(parent)
+
+        self.parent = parent
+        self.widget = ConfigViewWidget(self, parent)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+
+        # self.resize(100, 100)
+
+
+class ConfigViewWidget(QWidget):
     """
     Configuration widget
     """
@@ -29,16 +43,17 @@ class ConfigView(QWidget):
     use_tests = None
     force_dl_best_thumb = None
 
-    def __init__(self, parent):
+    def __init__(self, parent, root):
         """
         A GUI Widget that reads and sets config.ini settings
         :param parent:
         :param clipboard:
         :param status_bar:
         """
-        super(ConfigView, self).__init__(parent)
+        super(ConfigViewWidget, self).__init__(parent)
+        self.parent = parent
+        self.root = root  # MainWindow
         self.logger = create_logger("ConfigView")
-        self.root = parent  # MainWindow
         self.clipboard = self.root.clipboard
         self.status_bar = self.root.status_bar
         self.init_ui()
@@ -155,7 +170,7 @@ class ConfigView(QWidget):
         self.add_option_combobox('Grid view Y', 'Gui', 'grid_view_y', combobox.gui_grid_view_y, list(range(1, 100)))
         self.add_option_checkbox('Grey background on old (1d+) videos', 'Gui', 'grey_old_videos',
                                  checkbox.gui_grey_old_videos)
-        self.add_option_checkbox('Enable grid resizing', 'Gui', 'enable_grid_resize', checkbox.gui_enable_grid_resize)
+        # self.add_option_checkbox('Enable grid resizing', 'Gui', 'enable_grid_resize', checkbox.gui_enable_grid_resize)
 
         self.add_option_combobox('\tGrid tile height (px)', 'Gui', 'tile_pref_height',
                                  combobox.gui_tile_pref_height, list(range(1, 1000)))
