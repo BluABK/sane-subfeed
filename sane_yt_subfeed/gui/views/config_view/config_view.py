@@ -1,4 +1,5 @@
 # PyQt5
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox, QScrollArea
 
 # Internal
@@ -9,6 +10,19 @@ from sane_yt_subfeed.log_handler import create_logger
 
 
 class ConfigView(QScrollArea):
+
+    def __init__(self, parent,  clipboard, status_bar):
+        super(ConfigView, self).__init__(parent)
+
+        self.parent = parent
+        self.widget = ConfigViewWidget(self, parent, clipboard, status_bar)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+
+        # self.resize(100, 100)
+
+
+class ConfigViewWidget(QWidget):
     """
     Configuration widget
     """
@@ -29,14 +43,16 @@ class ConfigView(QScrollArea):
     use_tests = None
     force_dl_best_thumb = None
 
-    def __init__(self, parent, clipboard, status_bar):
+    def __init__(self, parent, root, clipboard, status_bar):
         """
         A GUI Widget that reads and sets config.ini settings
         :param parent:
         :param clipboard:
         :param status_bar:
         """
-        super(ConfigView, self).__init__(parent)
+        super(ConfigViewWidget, self).__init__(parent)
+        self.parent = parent
+        self.root = root
         self.logger = create_logger("ConfigView")
         self.clipboard = clipboard
         self.status_bar = status_bar
