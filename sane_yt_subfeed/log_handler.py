@@ -21,7 +21,7 @@ NOTSET 	    0
 OS_PATH = os.path.dirname(__file__)
 LOGDIR = os.path.join(OS_PATH, 'logs')
 if read_config('Logging', 'use_socket_log'):
-    log = logging.getLogger('Root logger')
+    log = logging.getLogger('r')
     log.setLevel(1)  # to send all records to cutelog
     socket_handler = SocketHandler('127.0.0.1', 19996)  # default listening address
     log.addHandler(socket_handler)
