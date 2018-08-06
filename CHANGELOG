@@ -1,7 +1,8 @@
-Current
+v0.3.2
 - Optimized grid views by changing q_labels to dict, and reusing them.
 - Made GridView generic, and move specialized functions to sub_feed
 - Removed regrab_percentage and related functionality
+- Gave manual db grab shortcut(Ctrl+E)
 v0.3.1
 - Added scrollbar to GridView and PlayView
 v0.3.0

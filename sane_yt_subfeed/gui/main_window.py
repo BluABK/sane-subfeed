@@ -117,7 +117,7 @@ class MainWindow(QMainWindow):
 
         # FIXME: icon, look more related to action
         self.add_submenu('&Function', 'Manual DB grab', self.db_reload,
-                         tooltip='Starts a manual grab of data for the model', icon='database.png')
+                         tooltip='Starts a manual grab of data for the model', icon='database.png', shortcut='Ctrl+E')
         # View menu
         self.add_menu(menubar, '&View')
         view_grid_view = self.add_submenu('&View', 'Subscription feed', self.view_grid, shortcut='Ctrl+1',
