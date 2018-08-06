@@ -30,7 +30,8 @@ class MyLogger(object):
 def my_hook(d):
     time.sleep(0.01)
     if d['status'] == 'finished':
-        logger.info("DL status == 'finished")
+        pass
+        # logger.info("DL status == 'finished")
 
 
 # FIXME: because of formating string, for channel, it can't do batch dl
