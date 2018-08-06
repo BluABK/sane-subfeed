@@ -20,11 +20,5 @@ class PlayView(GridView):
         subscription_feed = self.main_model.downloaded_videos
         return subscription_feed
 
-    def downloaded_videos_changed(self):
-        self.logger.info('Updating tiles')
-        self.update_grid()
-        for q_label, video in zip(self.q_labels, self.main_model.downloaded_videos):
-            q_label.set_video(video)
-
     def new_tile(self, counter, video):
         return PlayTile(self, video, counter, self.clipboard, self.status_bar)
