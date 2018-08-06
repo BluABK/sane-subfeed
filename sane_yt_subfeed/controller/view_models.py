@@ -11,6 +11,12 @@ from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, r
 from sane_yt_subfeed.log_handler import create_logger
 
 
+def remove_video(test_list, video):
+    for vid in test_list:
+        if vid.video_id == video.video_id:
+            test_list.remove(vid)
+
+
 class MainModel:
     status_bar_progress = None
     status_bar_thread = None
@@ -50,21 +56,12 @@ class MainModel:
         self.yt_dir_listener.moveToThread(self.yt_dir_thread)
         self.yt_dir_thread.start()
 
-    def hide_video_item(self, index):
-        self.logger.debug("Hiding video item: {}".format(index))
-        del self.filtered_videos[index]
-        regrab_percentage = read_config('Model', 'regrab_percentage')
-        if len(self.filtered_videos) <= int(regrab_percentage*self.videos_limit):
-            self.db_update_videos()
-            # FIXME: only does filtered videos
-            self.logger.warning('Reduced view models filtered_videos to /2, requesting new videos from db')
+    def hide_video_item(self, video):
+        self.logger.debug("Hiding video item: {}".format(video))
+        remove_video(self.filtered_videos, video)
 
-    def hide_downloaded_video_item(self, index):
-        del self.downloaded_videos[index]
-        regrab_percentage = read_config('Model', 'regrab_percentage')
-        if len(self.downloaded_videos) <= int(regrab_percentage*self.downloaded_videos_limit):
-            self.db_update_downloaded_videos()
-            self.logger.info('Reduced view models downloaded_videos to /2, requesting new videos from db')
+    def hide_downloaded_video_item(self, video):
+        remove_video(self.downloaded_videos, video)
 
     def db_update_videos(self, filtered=True):
         self.logger.info("Getting newest stored videos from DB")
