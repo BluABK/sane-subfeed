@@ -1,3 +1,5 @@
+Current
+- Optimized grid views by changing q_labels to dict, and reusing them.
 v0.3.1
 - Added scrollbar to GridView and PlayView
 v0.3.0
