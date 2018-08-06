@@ -6,7 +6,8 @@ from googleapiclient.discovery import build
 
 from sane_yt_subfeed.log_handler import create_logger
 
-logger = create_logger("authentication")
+# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+logger = create_logger(__name__)
 
 OS_PATH = os.path.dirname(__file__)
 

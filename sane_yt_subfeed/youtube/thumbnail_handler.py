@@ -21,14 +21,15 @@ from sane_yt_subfeed.database.video import Video
 OS_PATH = os.path.dirname(__file__)
 THUMBNAILS_PATH = os.path.join(OS_PATH, '..', 'resources', 'thumbnails')
 
-logger = create_logger("thumbnail_handler")
+# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+logger = create_logger(__name__)
 
 
 class DownloadThumbnail(threading.Thread):
 
     def __init__(self, thread_list, video, force_dl_best, thumbnail_dict, progress_listener=None):
         threading.Thread.__init__(self)
-        self.logger = create_logger("DownloadThumbnail")
+        self.logger = create_logger(__name__ + ".DownloadThumbnail")
         self.thread_list = thread_list
         self.video = video
         self.force_dl_best = force_dl_best

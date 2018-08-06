@@ -17,7 +17,7 @@ class PlayView(GridView):
         super().__init__(parent, root, main_model)
 
     def init_ui(self):
-        self.logger = create_logger('g').getChild('v').getChild('g').getChild("PlayView")
+        self.logger = create_logger(__name__ + ".PlayView")
         self.logger.info("Initializing UI")
 
         self.main_model.grid_view_listener.downloadedVideosChanged.connect(self.downloaded_videos_changed)

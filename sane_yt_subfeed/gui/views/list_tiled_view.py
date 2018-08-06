@@ -107,7 +107,7 @@ class ListTiledView(QWidget):
 
     def __init__(self, parent, vid_limit=40):
         super(ListTiledView, self).__init__(parent)
-        self.logger = create_logger("ListTiledView")
+        self.logger = create_logger(__name__)
         self.root = parent  # MainWindow
         self.eqlabels = []
         self.vid_limit = vid_limit

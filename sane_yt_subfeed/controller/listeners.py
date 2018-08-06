@@ -43,7 +43,7 @@ class GridViewListener(QObject):
     def __init__(self, model):
         super().__init__()
         self.model = model
-        self.logger = create_logger('c').getChild('li').getChild('GridViewListener')
+        self.logger = create_logger(__name__ + '.GridViewListener')
 
         self.tileDownloaded.connect(self.tile_downloaded)
         self.tileWatched.connect(self.tile_watched)
@@ -126,7 +126,7 @@ class MainWindowListener(QObject):
         self.refreshVideos.connect(self.refresh_videos)
         self.refreshSubs.connect(self.refresh_subs)
         self.testChannels.connect(self.test_channels)
-        self.logger = create_logger('c').getChild('li').getChild('MainWindowListener')
+        self.logger = create_logger(__name__ + '.MainWindowListener')
 
     def run(self):
         while True:
@@ -174,7 +174,7 @@ class DatabaseListener(QObject):
         super().__init__()
         self.model = model
         self.refreshVideos.connect(self.refresh_videos)
-        self.logger = create_logger('c').getChild('li').getChild('DatabaseListener')
+        self.logger = create_logger(__name__ + '.DatabaseListener')
 
     def run(self):
         while True:
@@ -205,7 +205,7 @@ class ProgressBar(QObject):
         self.updateProgress.connect(self.update_progress)
         self.setText.connect(self.set_text)
         self.resetBar.connect(self.reset_bar)
-        self.logger = create_logger('c').getChild('li').getChild('ProgressBar')
+        self.logger = create_logger(__name__ + '.ProgressBar')
 
     def run(self):
         while True:
@@ -239,7 +239,7 @@ class YtDirListener(QObject):
 
     def __init__(self, model):
         super().__init__()
-        self.logger = create_logger('c').getChild('li').getChild('YtDirListener')
+        self.logger = create_logger(__name__ + '.YtDirListener')
         self.model = model
 
         self.newFile.connect(self.new_file)

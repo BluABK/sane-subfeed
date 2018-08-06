@@ -14,7 +14,7 @@ class Controller:
 
     def __init__(self):
         super().__init__()
-        self.logger = create_logger('Controller')
+        self.logger = create_logger(__name__)
         # self.grid_view_listener = GridViewListener(self)
         # self.thread = QThread()
         # self.thread.start()

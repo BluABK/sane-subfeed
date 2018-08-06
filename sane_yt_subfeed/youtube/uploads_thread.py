@@ -21,7 +21,7 @@ class GetUploadsThread(threading.Thread):
         :param debug:
         """
         threading.Thread.__init__(self)
-        self.logger = create_logger("GetUploadsThread")
+        self.logger = create_logger(__name__)
         self.videos = videos
         self.thread_id = thread_id
         self.job_done = False

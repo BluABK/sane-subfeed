@@ -15,7 +15,8 @@ from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_thread
 from sane_yt_subfeed.youtube.update_videos import load_keys
 from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_videos
 
-logger = create_logger("dir_handler")
+# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+logger = create_logger(__name__)
 
 
 def get_yt_file(search_path, id):

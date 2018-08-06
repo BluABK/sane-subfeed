@@ -18,7 +18,7 @@ def engine_execute(stmt):
 
 
 class UpdateVideosThread(threading.Thread):
-    logger = create_logger("d").getChild("w").getChild("UpdateVideosThread")
+    logger = create_logger(__name__ + ".UpdateVideosThread")
 
 
     def __init__(self, video_list, update_existing=False, uniques_check=True, finished_listeners=None):
@@ -73,7 +73,7 @@ class UpdateVideosThread(threading.Thread):
 
 
 class UpdateVideo(threading.Thread):
-    logger = create_logger("d").getChild("w").getChild("UpdateVideo")
+    logger = create_logger(__name__ + ".UpdateVideo")
 
     def __init__(self, video_d, update_existing=False, finished_listeners=None):
         """

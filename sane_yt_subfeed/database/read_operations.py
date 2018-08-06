@@ -16,7 +16,8 @@ from sane_yt_subfeed.youtube.update_videos import refresh_uploads
 from sane_yt_subfeed.log_handler import create_logger
 from sqlalchemy.sql.expression import false, true, or_
 
-logger = create_logger("Database (READ)")
+# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+logger = create_logger(__name__)
 
 
 def get_newest_stored_videos(limit, filter_downloaded=False):

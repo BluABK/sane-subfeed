@@ -10,7 +10,8 @@ PICKLE_PATH = os.path.join(OS_PATH, 'resources', 'pickles')
 
 YOUTUBE_PICKLE = os.path.join(PICKLE_PATH, 'youtube_oauth.pkl')
 
-logger = create_logger("pickle_handler")
+# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+logger = create_logger(__name__)
 
 
 def dump_youtube(youtube):

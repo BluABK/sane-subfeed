@@ -45,7 +45,7 @@ class AboutView(QWidget):
     # noinspection PyArgumentList
     def __init__(self, parent):
         super(AboutView, self).__init__(parent)
-        self.logger = create_logger("AboutView")
+        self.logger = create_logger(__name__)
         self.root = parent  # MainWindow
         self.clipboard = self.root.clipboard
         self.status_bar = self.root.status_bar

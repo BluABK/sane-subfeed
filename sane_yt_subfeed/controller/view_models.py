@@ -18,7 +18,7 @@ class MainModel:
 
     def __init__(self, videos, filtered_videos, downloaded_videos, videos_limit):
         super().__init__()
-        self.logger = create_logger('MainModel')
+        self.logger = create_logger(__name__)
         self.videos_limit = videos_limit
         self.downloaded_videos_limit = videos_limit
         self.videos = videos

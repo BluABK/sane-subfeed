@@ -20,7 +20,10 @@ YOUTUBE_PARM_VIDEO = "watch?v="
 YOUTUBE_PARM_PLIST = "playlist?list ="
 YT_VIDEO_URL = YOUTUBE_URL + YOUTUBE_PARM_VIDEO
 
-logger = create_logger("youtube_requests")
+# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+logger = create_logger(__name__)
+
+# FIXME: integrate with socket system
 logger_list_search = create_logger("youtube_requests: list()/search()", logfile="debug_list_search.log")
 
 

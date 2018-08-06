@@ -22,7 +22,7 @@ class ListDetailedView(QWidget):
         :param vid_limit:
         """
         super(ListDetailedView, self).__init__(parent)
-        self.logger = create_logger("ListDetailedView")
+        self.logger = create_logger(__name__)
         self.config_file = None
         self.root = parent  # MainWindow
         self.clipboard = self.root.clipboard
