@@ -8,7 +8,7 @@ import os
 from subprocess import check_output
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QVBoxLayout, QStackedWidget, QProgressBar
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget
 from PyQt5.QtGui import QIcon
 
 # Project internal libs
@@ -16,13 +16,12 @@ from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import GRID_VIEW_ID, PLAY_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
-from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_videos
 from sane_yt_subfeed.gui.views.about_view import AboutView
 from sane_yt_subfeed.gui.views.config_view.config_view import ConfigView
 from sane_yt_subfeed.gui.views.grid_view.grid_scroll_area import GridScrollArea
-from sane_yt_subfeed.gui.views.play_view.play_view import PlayView
+from sane_yt_subfeed.gui.views.grid_view.play_view.play_view import PlayView
+from sane_yt_subfeed.gui.views.grid_view.sub_feed.sub_feed_view import SubFeedView
 from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
-from sane_yt_subfeed.youtube.thumbnail_handler import thumbnails_dl_and_paths
 # from sane_yt_subfeed.uploads import Uploads
 from sane_yt_subfeed.gui.views.grid_view.grid_view import GridView
 from sane_yt_subfeed.gui.views.list_detailed_view import ListDetailedView
@@ -66,7 +65,7 @@ class MainWindow(QMainWindow):
 
         self.grid_view = GridScrollArea(self, main_model)
         self.play_view = GridScrollArea(self, main_model)
-        self.grid_view.set_view(GridView(self.grid_view, self, main_model), GRID_VIEW_ID)
+        self.grid_view.set_view(SubFeedView(self.grid_view, self, main_model), GRID_VIEW_ID)
         self.play_view.set_view(PlayView(self.play_view, self, main_model), PLAY_VIEW_ID)
 
         self.list_detailed_view = ListDetailedView(self)
