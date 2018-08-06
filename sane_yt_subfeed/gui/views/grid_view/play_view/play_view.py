@@ -7,9 +7,8 @@ from sane_yt_subfeed.log_handler import create_logger
 class PlayView(GridView):
 
     def __init__(self, parent, root, main_model: MainModel):
-        self.logger = create_logger(__name__ + ".PlayView")
-        self.logger.debug("Calling super")
         super().__init__(parent, root, main_model)
+        self.logger = create_logger(__name__ + ".PlayView")
 
         self.main_model.grid_view_listener.downloadedVideosChanged.connect(self.videos_changed)
 
