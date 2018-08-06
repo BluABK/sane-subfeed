@@ -25,9 +25,9 @@ LISTENER_SIGNAL_DEEP_REFRESH = 1
 
 
 class GridViewListener(QObject):
-    tileDownloaded = pyqtSignal(VideoD, int)
-    tileDiscarded = pyqtSignal(VideoD, int)
-    tileWatched = pyqtSignal(VideoD, int)
+    tileDownloaded = pyqtSignal(VideoD)
+    tileDiscarded = pyqtSignal(VideoD)
+    tileWatched = pyqtSignal(VideoD)
     hiddenVideosChanged = pyqtSignal()
     downloadedVideosChanged = pyqtSignal()
     updateGridViewFromDb = pyqtSignal()
@@ -76,9 +76,9 @@ class GridViewListener(QObject):
     def update_grid_view_from_db(self):
         self.model.db_update_videos()
 
-    @pyqtSlot(VideoD, int)
-    def tile_downloaded(self, video: VideoD, index):
-        self.model.hide_video_item(index)
+    @pyqtSlot(VideoD)
+    def tile_downloaded(self, video: VideoD):
+        self.model.hide_video_item(video)
         self.logger.info(
             "Video hidden from grid view(downloaded): {} - {} [{}]".format(video.channel_title, video.title,
                                                                            video.url_video))
@@ -96,15 +96,15 @@ class GridViewListener(QObject):
     def download_finished_in_db(self):
         self.model.db_update_downloaded_videos()
 
-    @pyqtSlot(VideoD, int)
-    def tile_watched(self, video: Video, index):
-        self.model.hide_downloaded_video_item(index)
+    @pyqtSlot(VideoD)
+    def tile_watched(self, video: Video):
+        self.model.hide_downloaded_video_item(video)
         self.downloadedVideosChanged.emit()
         UpdateVideo(video, update_existing=True).start()
 
-    @pyqtSlot(VideoD, int)
-    def tile_discarded(self, video: Video, index):
-        self.model.hide_video_item(index)
+    @pyqtSlot(VideoD)
+    def tile_discarded(self, video: Video):
+        self.model.hide_video_item(video)
         self.logger.info("Video hidden from grid view(Discarded): {} - {} [{}]".format(video.channel_title, video.title,
                                                                                        video.url_video))
         self.hiddenVideosChanged.emit()

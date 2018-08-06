@@ -29,7 +29,6 @@ show_unimplemented_gui = False
 
 [Model]
 loaded_videos = 200
-regrab_percentage = 0.3
 
 [Requests]
 use_tests = False
