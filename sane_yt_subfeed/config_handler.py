@@ -69,6 +69,13 @@ defaults = {
     'Youtube-dl': {
         'use_youtube_dl': 'True'
     },
+    'Youtube-dl_proxies': {
+        'proxy1': "",
+        'proxy2': "",
+        'proxy3': "",
+        'proxy4': "",
+        'proxy5': ""
+    },
     'Player': {
         'default_player': "",
         'alternative_player1': "",
