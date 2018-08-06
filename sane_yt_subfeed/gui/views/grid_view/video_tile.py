@@ -106,51 +106,6 @@ class VideoTile(QWidget):
             else:
                 self.setToolTip("{}: {}".format(self.video.channel_title, self.video.title))
 
-    def mousePressEvent(self, QMouseEvent):
-        """
-        Override mousePressEvent to support mouse button actions
-        :param QMouseEvent:
-        :return:
-        """
-        if QMouseEvent.button() == Qt.MidButton:
-            self.mark_discarded()
-        elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
-            logger.error("Not Implemented: Select video")
-        elif QMouseEvent.button() == Qt.LeftButton:
-            self.mark_downloaded()
-
-    # def keyPressEvent(self, QKeyEvent):
-    #     print(QKeyEvent.key())
-    #     if QKeyEvent.key() == Qt.Key_Control:
-    #         print("ctrl pressed")
-    #         self.hotkey_ctrl_down = True
-    #
-    # def keyReleaseEvent(self, QKeyEvent):
-    #     print(QKeyEvent)
-    #     if QKeyEvent.key() == Qt.Key_Control:
-    #         print("ctrl released")
-    #         self.hotkey_ctrl_down = False
-
-    def contextMenuEvent(self, event):
-        """
-        Override context menu event to set own custom menu
-        :param event:
-        :return:
-        """
-        menu = QMenu(self)
-        copy_url_action = menu.addAction("Copy link")
-        downloaded_item_action = menu.addAction("Copy link and mark as downloaded")
-        discard_item_action = menu.addAction("Discard video")
-        quit_action = menu.addAction("Quit")
-        action = menu.exec_(self.mapToGlobal(event.pos()))
-        if action == copy_url_action:
-            self.copy_url()
-        elif action == downloaded_item_action:
-            self.mark_downloaded()
-        elif action == discard_item_action:
-            self.mark_discarded()
-        elif action == quit_action:
-            qApp.quit()
 
     def copy_url(self):
         """
@@ -175,8 +130,8 @@ class VideoTile(QWidget):
             self.copy_url()
         if read_config('Youtube-dl', 'use_youtube_dl'):
             self.status_bar.showMessage('Downloading video with youtube-dl: {} ({} - {})'.format(self.video.url_video,
-                                                                                             self.video.channel_title,
-                                                                                             self.video.title))
+                                                                                                 self.video.channel_title,
+                                                                                                 self.video.title))
 
     def mark_discarded(self):
         """

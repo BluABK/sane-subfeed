@@ -39,15 +39,6 @@ class GridView(QWidget):
         self.setAutoFillBackground(True)
         self.set_bgcolor()
 
-        self.init_ui()
-
-    def init_ui(self):
-        self.logger.info("Initializing GridView UI")
-
-        self.main_model.grid_view_listener.hiddenVideosChanged.connect(self.videos_changed)
-
-        self.update_grid()
-
     def videos_changed(self):
         self.logger.info('Updating tiles')
         self.update_grid()
@@ -93,9 +84,6 @@ class GridView(QWidget):
                 video_counter += 1
             counter += 1
 
-        # if video_counter < len(self.q_labels):
-        #     widgets_to_delete = self.q_labels[video_counter:]
-        #     self.q_labels = self.q_labels[:video_counter]
         for key in q_labels_keys_to_delete:
             widget = self.q_labels[key]
             self.grid.removeWidget(widget)
@@ -104,13 +92,6 @@ class GridView(QWidget):
         self.logger.debug(
             "Updated view: currently {} widgets and {} items_x".format(video_counter, self.items_x))
         self.resize_event()
-
-    def new_tile(self, counter, video):
-        return VideoTile(self, video, counter, self.clipboard, self.status_bar)
-
-    def get_feed(self):
-        subscription_feed = self.main_model.filtered_videos
-        return subscription_feed
 
     def set_bgcolor(self, color="default", darkmode=False):
         palette = self.palette()

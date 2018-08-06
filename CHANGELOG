@@ -1,5 +1,6 @@
 Current
 - Optimized grid views by changing q_labels to dict, and reusing them.
+- Made GridView generic, and move specialized functions to sub_feed
 v0.3.1
 - Added scrollbar to GridView and PlayView
 v0.3.0
