@@ -60,9 +60,6 @@ def get_best_downloaded_videos(limit, filter_watched=True, sort_method=ORDER_MET
     db_videos = db_query.limit(limit).all()
     videos = Video.to_video_ds(db_videos)
     db_session.remove()
-    if len(videos) < limit:
-        for _ in range(limit - len(videos)):
-            videos.append(VideoD(None))
     return videos
 
 
