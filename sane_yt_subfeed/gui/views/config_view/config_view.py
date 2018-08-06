@@ -53,7 +53,7 @@ class ConfigViewWidget(QWidget):
         super(ConfigViewWidget, self).__init__(parent)
         self.parent = parent
         self.root = root  # MainWindow
-        self.logger = create_logger("ConfigView")
+        self.logger = create_logger(__name__)
         self.clipboard = self.root.clipboard
         self.status_bar = self.root.status_bar
         self.init_ui()

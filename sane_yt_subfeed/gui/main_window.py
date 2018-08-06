@@ -48,7 +48,7 @@ class MainWindow(QMainWindow):
     # noinspection PyArgumentList
     def __init__(self, main_model: MainModel, dimensions=None, position=None):
         super().__init__()
-        self.logger = create_logger("MainWindow")
+        self.logger = create_logger(__name__)
         self.main_model = main_model
 
         for fakech in range(100):

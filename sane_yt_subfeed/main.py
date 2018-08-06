@@ -18,7 +18,8 @@ from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions, list_upl
     list_uploaded_videos_search, list_uploaded_videos_page
 from sane_yt_subfeed.log_handler import create_logger
 
-logger = create_logger("main")
+# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+logger = create_logger(__name__)
 
 cached_subs = True
 global_debug = False

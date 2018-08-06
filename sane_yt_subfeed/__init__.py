@@ -5,7 +5,8 @@ from PyQt5 import QtCore
 from sane_yt_subfeed.database.orm import init_db
 from sane_yt_subfeed.log_handler import create_logger
 
-logger = create_logger("__init__")
+# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+logger = create_logger(__name__)
 logger.info("Initializing...")
 
 OS_PATH = os.path.dirname(__file__)

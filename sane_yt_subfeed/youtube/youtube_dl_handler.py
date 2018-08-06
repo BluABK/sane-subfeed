@@ -8,7 +8,8 @@ import re
 
 from sane_yt_subfeed import create_logger
 
-logger = create_logger("youtube_dl_handler")
+# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+logger = create_logger(__name__)
 
 from youtube_dl import YoutubeDL
 

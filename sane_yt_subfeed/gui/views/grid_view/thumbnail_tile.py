@@ -17,7 +17,7 @@ class ThumbnailTile(QLabel):
     def __init__(self, parent):
         QLabel.__init__(self, parent)
         self.parent = parent
-        self.logger = create_logger("ThumbnailTile")
+        self.logger = create_logger(__name__ + ".ThumbnailTitle")
 
         margins = self.parent.layout.getContentsMargins()
         self.setFixedSize(self.parent.width() - margins[0] - margins[2], (self.parent.height() - 4 * margins[3]) * 0.6)
