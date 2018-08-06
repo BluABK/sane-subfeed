@@ -25,7 +25,7 @@ class GridView(QWidget):
         self.main_model = main_model
         self.pref_tile_height = read_config('Gui', 'tile_pref_height')
         self.pref_tile_width = read_config('Gui', 'tile_pref_width')
-        self.q_labels = []
+        self.q_labels = {}
         self.grid = QGridLayout()
         self.items_x = read_config('Gui', 'grid_view_x')
         self.items_y = read_config('Gui', 'grid_view_y')
@@ -51,8 +51,6 @@ class GridView(QWidget):
     def videos_changed(self):
         self.logger.info('Updating tiles')
         self.update_grid()
-        for q_label, video in zip(self.q_labels, self.main_model.filtered_videos):
-            q_label.set_video(video)
 
     def resize_event(self):
         if self.items_x >= 1:
@@ -73,6 +71,8 @@ class GridView(QWidget):
         feed = self.get_feed()
         counter = 0
         video_counter = 0
+        q_labels_keys_to_delete = set(self.q_labels)
+
         positions = [(i, j) for i in
                      range(max(math.ceil(len(feed) / max(self.items_x, 1)), 1))
                      for j in
@@ -80,21 +80,27 @@ class GridView(QWidget):
         for position in positions:
             if counter >= len(feed):
                 pass
-            elif counter < len(self.q_labels):
-                self.grid.addWidget(self.q_labels[counter], *position)
+            elif feed[counter].video_id in self.q_labels:
+                self.grid.addWidget(self.q_labels[feed[counter].video_id], *position)
+                q_labels_keys_to_delete.discard(feed[counter].video_id)
+                # q_labels_keys_to_delete.remove(feed[counter].video_id)
                 video_counter += 1
             else:
-                lbl = self.new_tile(counter, feed[counter])
+                video = feed[counter]
+                lbl = self.new_tile(counter, video)
                 self.grid.addWidget(lbl, *position)
+                self.q_labels[video.video_id] = lbl
                 video_counter += 1
-                self.q_labels.append(lbl)
             counter += 1
-        if video_counter < len(self.q_labels):
-            widgets_to_delete = self.q_labels[video_counter:]
-            self.q_labels = self.q_labels[:video_counter]
-            for widget in widgets_to_delete:
-                self.grid.removeWidget(widget)
-                sip.delete(widget)
+
+        # if video_counter < len(self.q_labels):
+        #     widgets_to_delete = self.q_labels[video_counter:]
+        #     self.q_labels = self.q_labels[:video_counter]
+        for key in q_labels_keys_to_delete:
+            widget = self.q_labels[key]
+            self.grid.removeWidget(widget)
+            sip.delete(widget)
+            self.q_labels.pop(key)
         self.logger.debug(
             "Updated view: currently {} widgets and {} items_x".format(video_counter, self.items_x))
         self.resize_event()

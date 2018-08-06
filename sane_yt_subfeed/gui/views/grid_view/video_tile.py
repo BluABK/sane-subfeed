@@ -170,7 +170,7 @@ class VideoTile(QWidget):
         logger.info('Mark downloaded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
                                                                 self.video.title))
         self.video.downloaded = True
-        self.parent.main_model.grid_view_listener.tileDownloaded.emit(self.video, self.id)
+        self.parent.main_model.grid_view_listener.tileDownloaded.emit(self.video)
         if read_config('Gui', 'enable_auto_copy_to_clipboard'):
             self.copy_url()
         if read_config('Youtube-dl', 'use_youtube_dl'):
@@ -186,7 +186,7 @@ class VideoTile(QWidget):
         logger.info('Mark discarded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
                                                                self.video.title))
         self.video.discarded = True
-        self.parent.main_model.grid_view_listener.tileDiscarded.emit(self.video, self.id)
+        self.parent.main_model.grid_view_listener.tileDiscarded.emit(self.video)
         self.status_bar.showMessage('Dismissed: {} ({} - {})'.format(self.video.url_video,
                                                                      self.video.channel_title,
                                                                      self.video.title))
@@ -199,7 +199,7 @@ class VideoTile(QWidget):
         logger.info('Mark watched: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
                                                              self.video.title))
         self.video.watched = True
-        self.parent.main_model.grid_view_listener.tileWatched.emit(self.video, self.id)
+        self.parent.main_model.grid_view_listener.tileWatched.emit(self.video)
 
     # Get the system clipboard contents
     def clipboard_changed(self):
