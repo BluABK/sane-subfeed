@@ -82,7 +82,8 @@ defaults = {
         'alternative_player3': ""
     },
     'Logging': {
-        'use_socket_log': 'False'
+        'use_socket_log': 'False',
+        'log_level': '1'
     }
 }
 
