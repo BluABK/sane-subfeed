@@ -3,10 +3,12 @@
 
 # virtualenv
 env/
+env.old/
 
 # sane-yt-subfeed
 client_secret.json
 client_secret_private.json
+client_secret_private - Copy.json
 keys.json
 keys_private.json
 *.pkl
