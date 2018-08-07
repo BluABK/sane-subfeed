@@ -32,7 +32,7 @@ class GridScrollArea(QScrollArea):
         if self.current_v_max != self.verticalScrollBar().maximum():
             self.current_v_max = self.verticalScrollBar().maximum()
             self.slider_lock = False
-        if (not self.slider_lock) and value / self.verticalScrollBar().maximum() > 0.9:
+        if (not self.slider_lock) and value / self.verticalScrollBar().maximum() >= 1.0:
             if self.widget_id == GRID_VIEW_ID:
                 self.model.grid_view_listener.scrollReachedEndGrid.emit()
             elif self.widget_id == PLAY_VIEW_ID:
