@@ -20,6 +20,7 @@ from sane_yt_subfeed.database.video import Video
 
 OS_PATH = os.path.dirname(__file__)
 THUMBNAILS_PATH = os.path.join(OS_PATH, '..', 'resources', 'thumbnails')
+THUMBNAIL_NA_PATH = os.path.join(OS_PATH, '..', 'resources', 'thumbnail_na.png')
 
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 logger = create_logger(__name__)
@@ -230,4 +231,5 @@ def resize_thumbnail(img_path, maxwidth, maxheight, out=True):
     except IOError as eio:
         logger.error("Cannot create thumbnail for {}: IOError".format(img_path))
         logger.exception(eio)
-        return Image.open(os.path.join(OS_PATH, '..', 'resources', 'thumbnail_na.png'))
+        logger.info("Returning default 'Thumbnail N/A' image")
+        return Image.open(THUMBNAIL_NA_PATH)
