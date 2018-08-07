@@ -4,7 +4,6 @@ import threading
 from watchdog.events import PatternMatchingEventHandler
 
 from sane_yt_subfeed import create_logger
-from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.read_operations import get_videos_by_ids, get_vid_by_id
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread
@@ -12,8 +11,6 @@ from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_thread
 from sane_yt_subfeed.youtube.update_videos import load_keys
 from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_videos
 
-# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
-logger = create_logger(__name__)
 
 
 def get_yt_file(search_path, id):
@@ -29,6 +26,7 @@ class VidEventHandler(PatternMatchingEventHandler):
     def __init__(self, listener):
         super().__init__()
         self.listener = listener
+        self.logger = create_logger(__name__ + "VidEventHandler")
 
     # def on_any_event(self, event):
     #     print("change")
@@ -47,8 +45,8 @@ class VidEventHandler(PatternMatchingEventHandler):
             return
         split_string = "_v-id-"
         if split_string in event.src_path:
-            logger.info("Discovered new file")
             name = os.path.basename(event.src_path)
+            self.logger.info("Discovered new file: {}".format(name))
             filename = name.split(".")
             for s in filename:
                 if split_string in s:
@@ -59,12 +57,14 @@ class VidEventHandler(PatternMatchingEventHandler):
 
 def manual_youtube_folder_check(input_path):
     # input_path = os.path.join(OS_PATH, input_folder)
-
+    logger = create_logger(__name__ + ".manual")
+    logger.info("Searching directory: {}".format(input_path))
     vid_paths = {}
     # start_time = timeit.default_timer()
     split_string = "_v-id-"
     for name in os.listdir(input_path):
         if split_string in name:
+            logger.spam("Found: {}".format(name))
             filename = name.split(".")
             for s in filename:
                 if split_string in s:
@@ -83,6 +83,7 @@ def get_new_and_updated_videos(vid_paths):
     :param vid_paths: dict(video_id, vid_path)
     :return:
     """
+    logger = create_logger(__name__ + ".new_and_updated")
     db_videos = get_videos_by_ids(vid_paths.keys())
 
     return_videos = []
@@ -92,6 +93,7 @@ def get_new_and_updated_videos(vid_paths):
             video_d.vid_path = vid_paths[video.video_id]
             video_d.downloaded = True
             video_d.date_downloaded = datetime.datetime.utcnow()
+            logger.info("Found video needing update: {} - {}".format(video.video_id, video.title))
 
             return_videos.append(video_d)
         vid_paths.pop(video.video_id, None)
@@ -104,8 +106,9 @@ def get_new_and_updated_videos(vid_paths):
             video.vid_path = vid_paths[video.video_id]
             video.downloaded = True
             video.date_downloaded = datetime.datetime.utcnow()
+            logger.info("Found new video: {} - {}".format(video.video_id, video.title))
             new_videos.append(video)
-        logger.info("Grabbing new video(s) information from youtube")
+        logger.info("Grabbing new video(s) information from youtube for {} videos".format(len(new_videos)))
         download_thumbnails_threaded(new_videos)
 
     return_videos.extend(new_videos)
@@ -116,10 +119,11 @@ class CheckYoutubeFolderForNew(threading.Thread):
 
     def __init__(self, input_path, db_listeners=None):
         threading.Thread.__init__(self)
+        self.logger = create_logger(__name__ + ".CheckYoutubeFolderForNew")
         self.input_path = input_path
         self.db_listeners = db_listeners
 
     def run(self):
-        logger.debug("Starting CheckYoutubeFolderForNew thread")
+        self.logger.debug("Starting CheckYoutubeFolderForNew thread")
         videos = manual_youtube_folder_check(self.input_path)
         UpdateVideosThread(videos, update_existing=True, finished_listeners=self.db_listeners).start()
