@@ -1,3 +1,5 @@
+v0.3.3
+- Added support for proxies to bypass geo blocks.
 v0.3.2
 - Optimized grid views by changing q_labels to dict, and reusing them.
 - Made GridView generic, and move specialized functions to sub_feed
