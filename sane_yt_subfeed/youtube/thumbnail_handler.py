@@ -230,4 +230,4 @@ def resize_thumbnail(img_path, maxwidth, maxheight, out=True):
     except IOError as eio:
         logger.error("Cannot create thumbnail for {}: IOError".format(img_path))
         logger.exception(eio)
-        return Image.open(os.path.join(OS_PATH, '..', 'resources', 'quality404.jpg'))
+        return Image.open(os.path.join(OS_PATH, '..', 'resources', 'thumbnail_na.png'))
