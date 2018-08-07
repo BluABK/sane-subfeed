@@ -39,6 +39,9 @@ class PlayTile(VideoTile):
         # player = player.strip()
         if mark_watched:
             self.mark_watched()
+        self.logger.info('Playing {}, with player: {}'.format(file_path, player))
+        if not os.path.isfile(file_path):
+            self.logger.warning('os.path.isfile returns False for File: {}'.format(file_path))
         if player:
             subprocess.Popen([player, file_path], shell=True)
         else:
