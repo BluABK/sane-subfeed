@@ -1,11 +1,17 @@
-from setuptools import setup, find_packages
-setup(
-    name="Sane Subscription Feed",
-    version="0.1.0-dev",
-    packages=find_packages(),
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-    # FIXME: Currently rather specific versions due to lack of knowledge as to which versions may be incompatible
-    install_requires=[
+"""The setup script."""
+
+from setuptools import setup, find_packages
+
+with open('README.rst') as readme_file:
+    readme = readme_file.read()
+
+with open('HISTORY.rst') as history_file:
+    history = history_file.read()
+
+requirements = [
         'cachetools>=2.1.0',
         'certifi>=2018.4.16',
         'chardet>=3.0.4',
@@ -30,20 +36,46 @@ setup(
         'SQLAlchemy>=1.2.9',
         'tqdm>=4.23.4',     # FIXME: Should be optional/extras
         'uritemplate>=3.0.0',
-        'urllib3>=1.23'
+        'urllib3>=1.23',
+		'youtube-dl>=2018.7.29'
+
+]
+
+setup_requirements = [ ]
+
+test_requirements = [ ]
+
+setup(
+    author="Acca",
+    author_email='nikert.ludvik@gmail.com',
+    classifiers=[
+        'Development Status :: 2 - Pre-Alpha',
+        'Intended Audience :: Developers',
+        'Natural Language :: English',
+        "Programming Language :: Python :: 2",
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
-
-    author="BluABK",
-    author_email="abk@blucoders.net",
-    description="An independent 3rd party alternative to the algorithm plagued YouTube subscription feed",
-    license="FIXME",    # FIXME: Figure out a license
-    keywords="youtube google subscription feed independent blu abk",
-    url="https://git.vpn/BluABK/sane-yt-subfeed",  # project home page, if any
-    project_urls={
-        "Bug Tracker": "https://git.vpn/BluABK/sane-yt-subfeed/issues",
-        # "Documentation": "https://docs.example.com/HelloWorld/",   # FIXME: Add docs
-        "Source Code": "https://git.vpn/BluABK/sane-yt-subfeed",
-    }
-
-    # TODO: could also include long_description, download_url, classifiers, etc.
+    description="Returning the concept of sanity to the YouTube subscription feed.",
+    entry_points={
+        'console_scripts': [
+            'sane_yt_subfeed=sane_yt_subfeed.cli:cli',
+        ],
+    },
+    install_requires=requirements,
+    long_description=readme + '\n\n' + history,
+    include_package_data=True,
+    keywords='sane_yt_subfeed',
+    name='sane_yt_subfeed',
+    packages=find_packages(include=['sane_yt_subfeed']),
+    setup_requires=setup_requirements,
+    test_suite='tests',
+    tests_require=test_requirements,
+    url='https://github.com/Acccentor/sane_yt_subfeed',
+    version='0.3.3',
+    zip_safe=False,
 )

@@ -1,0 +1,37 @@
+# pycharm
+.idea/
+
+# virtualenv
+env/
+env.old/
+
+# sane-yt-subfeed
+client_secret.json
+client_secret_private.json
+client_secret_private - Copy.json
+keys.json
+keys_private.json
+*.pkl
+config.ini
+*.db
+*.db-journal
+*.db.*
+
+# python
+__pycache__
+*.pyc
+
+# gui mess
+*.jpg
+
+# 404 Thumbnail
+!quality404.jpg
+
+# logs
+logs/
+
+# pip
+Sane_Subscription_Feed.egg-info/
+
+# alembic
+alembic/versions/*.py
