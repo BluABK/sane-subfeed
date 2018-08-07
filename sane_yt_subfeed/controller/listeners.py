@@ -1,5 +1,6 @@
 # FIXME: imp*
 import datetime
+import os
 import time
 
 from PyQt5.QtCore import *
@@ -15,7 +16,7 @@ from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideo, UpdateVideosThread
 from sane_yt_subfeed.log_handler import create_logger
-from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
+from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded, THUMBNAILS_PATH
 from sane_yt_subfeed.youtube.update_videos import load_keys
 from sane_yt_subfeed.youtube.youtube_dl_handler import YoutubeDownload
 from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_cached_oauth, list_uploaded_videos_videos
@@ -265,7 +266,12 @@ class YtDirListener(QObject):
                 vid.vid_path = vid_path
                 vid.date_downloaded = datetime.datetime.utcnow()
                 vid.downloaded = True
-                self.logger.info("Adding new file to db")
+                thumb_path = os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(vid.video_id))
+                if os.path.isfile(thumb_path) and (not vid.thumbnail_path):
+                    vid.thumbnail_path = thumb_path
+                    self.logger.warning(
+                        "Thumbnail downloaded, but path didn't exist in db, for video: {}".format(dir(vid)))
+                self.logger.info("Updating existing record in db")
                 db_session.commit()
                 self.model.db_update_videos()
                 self.model.db_update_downloaded_videos()
