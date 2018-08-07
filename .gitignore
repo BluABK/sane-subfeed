@@ -21,11 +21,14 @@ config.ini
 __pycache__
 *.pyc
 
-# gui mess
+# Blacklist images
 *.jpg
+*.png
 
-# 404 Thumbnail
+# Whitelist Project images
+!sane_yt_subfeed/gui/icons
 !quality404.jpg
+!thumbnail_na.png
 
 # logs
 logs/
