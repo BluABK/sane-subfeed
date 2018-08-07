@@ -211,7 +211,7 @@ def resize_thumbnail(img_path, maxwidth, maxheight, out=True):
     :return: resized image or 404 image if operation failed
     """
     if img_path is None:
-        return None
+        img_path = THUMBNAIL_NA_PATH
         # if out:
         #     return Image.open(os.path.join(OS_PATH, '..', 'resources', 'quality404.jpg'))
         # else:
