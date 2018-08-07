@@ -1,9 +1,6 @@
 import datetime
 import os
 import threading
-import time
-import timeit
-import ffmpeg
 from watchdog.events import PatternMatchingEventHandler
 
 from sane_yt_subfeed import create_logger
