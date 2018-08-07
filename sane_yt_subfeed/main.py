@@ -51,7 +51,7 @@ def run_print():
 def run_channels_test():
     logger.info('Running Channels Test')
     subscriptions = get_subscriptions(cached_subs)
-    youtube_keys = load_keys(subscriptions)
+    youtube_keys = load_keys(len(subscriptions))
     test_threads = []
     results = []
     logger.info("Channels Test: Starting miss and pages tests")
