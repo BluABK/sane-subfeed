@@ -10,6 +10,7 @@ from sane_yt_subfeed.log_handler import create_logger
 OS_PATH = os.path.dirname(__file__)
 OVERLAY_NEW_PATH = os.path.join(OS_PATH, '..', '..', 'icons', 'new_vid.png')
 OVERLAY_MISSED_PATH = os.path.join(OS_PATH, '..', '..', 'icons', 'missed_vid.png')
+THUMBNAIL_NA_PATH = os.path.join(OS_PATH, '..', '..', '..', 'resources', 'thumbnail_na.png')
 
 
 class ThumbnailTile(QLabel):
@@ -25,10 +26,19 @@ class ThumbnailTile(QLabel):
         # self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
     def setPixmap(self, p):
+        """
+        Override setPixmap
+        :param p:  <class 'PyQt5.QtGui.QPixmap'>: <PyQt5.QtGui.QPixmap object>
+        :return:
+        """
+        # self.logger.debug("{}: {}".format(type(p), p))
         self.p = p
 
     def paintEvent(self, event):
         if self.p:
+            if self.p.isNull():
+                self.logger.warning("QPixmap self.p was NULL, replacing with 'Thumbnail N/A' image!")
+                self.p = QPixmap(THUMBNAIL_NA_PATH)
             painter = QPainter(self)
             # painter.drawPixmap(self.rect(), self.p)
             if read_config('Gui', 'keep_thumb_ar'):
