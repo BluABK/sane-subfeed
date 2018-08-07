@@ -8,7 +8,7 @@ class SubFeedView(GridView):
 
     def __init__(self, parent, root, main_model: MainModel):
         super().__init__(parent, root, main_model)
-        self.logger = create_logger(__name__ + ".PlayView")
+        self.logger = create_logger(__name__ + ".SubFeedView")
 
         self.main_model.grid_view_listener.hiddenVideosChanged.connect(self.videos_changed)
 
