@@ -115,6 +115,10 @@ class MainWindow(QMainWindow):
                          tooltip='Starts a manual search for new videos in youtube directory',
                          icon='folder_refresh.png')
 
+        thumb_tooltip = 'Starts a manual download of thumbnails for videos currently in play view and sub feed'
+        self.add_submenu('&Function', 'Manual thumbnail download', self.thumbnail_download,
+                         tooltip=thumb_tooltip, icon='folder_refresh.png')
+
         # FIXME: icon, look more related to action
         self.add_submenu('&Function', 'Manual DB grab', self.db_reload,
                          tooltip='Starts a manual grab of data for the model', icon='database.png', shortcut='Ctrl+E')
@@ -375,6 +379,14 @@ class MainWindow(QMainWindow):
         :return:
         """
         self.main_model.yt_dir_listener.manualCheck.emit()
+        # do_walk(os.path.join("d:/", "youtube"))
+
+    def thumbnail_download(self):
+        """
+        Sends a testChannels signal
+        :return:
+        """
+        self.main_model.grid_view_listener.thumbnailDownload.emit()
         # do_walk(os.path.join("d:/", "youtube"))
 
     def db_reload(self):

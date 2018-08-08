@@ -35,6 +35,7 @@ class GridViewListener(QObject):
     updateFromDb = pyqtSignal()
     scrollReachedEndGrid = pyqtSignal()
     scrollReachedEndPlay = pyqtSignal()
+    thumbnailDownload = pyqtSignal()
 
     # FIXME: move youtube-dl listener to its own listener?
     downloadFinished = pyqtSignal(VideoD)
@@ -55,6 +56,13 @@ class GridViewListener(QObject):
         self.updateFromDb.connect(self.update_from_db)
         self.scrollReachedEndGrid.connect(self.scroll_reached_end_grid)
         self.scrollReachedEndPlay.connect(self.db_update_downloaded_videos)
+        self.thumbnailDownload.connect(self.thumbnail_download)
+
+    def thumbnail_download(self):
+        self.model.update_thumbnails()
+        self.logger.info("Updating thumbnails complete")
+        self.downloadedVideosChanged.emit()
+        self.hiddenVideosChanged.emit()
 
     def scroll_reached_end_grid(self):
         add_value = read_config("Model", "loaded_videos")
