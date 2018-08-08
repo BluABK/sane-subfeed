@@ -101,6 +101,7 @@ def get_new_and_updated_videos(vid_paths):
     new_videos = []
     if len(vid_paths) > 0:
         youtube_keys = load_keys(1)
+        logger.info("Grabbing new video(s) information from youtube for: {}".format(vid_paths.keys()))
         response_videos = list_uploaded_videos_videos(youtube_keys[0], vid_paths.keys(), 30)
         for video in response_videos:
             video.vid_path = vid_paths[video.video_id]
@@ -108,10 +109,10 @@ def get_new_and_updated_videos(vid_paths):
             video.date_downloaded = datetime.datetime.utcnow()
             logger.info("Found new video: {} - {}".format(video.video_id, video.title))
             new_videos.append(video)
-        logger.info("Grabbing new video(s) information from youtube for {} videos".format(len(new_videos)))
-        download_thumbnails_threaded(new_videos)
 
     return_videos.extend(new_videos)
+    logger.info("Downloading thumbnails for: {]".format(return_videos))
+    download_thumbnails_threaded(return_videos)
     return return_videos
 
 
