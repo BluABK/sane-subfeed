@@ -8,7 +8,7 @@ import os
 from subprocess import check_output
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget, QLineEdit
 from PyQt5.QtGui import QIcon
 
 # Project internal libs
@@ -118,6 +118,9 @@ class MainWindow(QMainWindow):
         # FIXME: icon, look more related to action
         self.add_submenu('&Function', 'Manual DB grab', self.db_reload,
                          tooltip='Starts a manual grab of data for the model', icon='database.png', shortcut='Ctrl+E')
+
+        get_video = self.add_submenu('&Function', 'Get video', self.get_video, tooltip='Fetch video by URL')
+
         # View menu
         self.add_menu(menubar, '&View')
         view_grid_view = self.add_submenu('&View', 'Subscription feed', self.view_grid, shortcut='Ctrl+1',
@@ -152,6 +155,11 @@ class MainWindow(QMainWindow):
         toolbar.addAction(view_play_view)
         toolbar.addSeparator()
         toolbar.addAction(refresh_feed)
+        toolbar.addSeparator()
+        search_bar = QLineEdit(self)
+        search_bar.returnPressed.connect(self.get_video)
+        toolbar.addWidget(search_bar)
+        # toolbar.addAction(get_video)
         if read_config('Debug', 'show_unimplemented_gui'):  # FIXME: Implement
             toolbar.addAction(view_about_view)
 
@@ -236,6 +244,7 @@ class MainWindow(QMainWindow):
             pass
 
         return branchtag
+
 
     # Menu handling
     def add_menu(self, menubar, name):
@@ -392,6 +401,15 @@ class MainWindow(QMainWindow):
         :return:
         """
         self.main_model.main_window_listener.refreshSubs.emit()
+
+    def get_video(self, url):
+        """
+        Search for and fetch a video based on URL input string
+        :param url: String
+        :return:
+        """
+        self.logger.debug("get_video({}) called self.main_model.main_window_listener.getVideo.emit()".format(url))
+        self.main_model.main_window_listener.getVideo.emit()
 
     # Unused functions
     def context_menu_event(self, event):  # TODO: Unused, planned usage in future
