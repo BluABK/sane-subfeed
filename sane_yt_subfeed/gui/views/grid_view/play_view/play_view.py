@@ -27,3 +27,4 @@ class PlayView(GridView):
     def update_videos(self):
         for q_label, video in zip(self.q_labels.values(), self.main_model.downloaded_videos):
             q_label.set_video(video)
+            self.q_labels[video.video_id] = q_label
