@@ -8,7 +8,9 @@ from sane_yt_subfeed.controller.listeners import GridViewListener, DatabaseListe
     LISTENER_SIGNAL_NORMAL_REFRESH, ProgressBar
 from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, refresh_and_get_newest_videos, \
     get_best_downloaded_videos
+from sane_yt_subfeed.database.write_operations import UpdateVideosThread
 from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
 
 
 def remove_video(test_list, video):
@@ -95,3 +97,11 @@ class MainModel:
     def db_update_downloaded_videos(self):
         self.downloaded_videos = get_best_downloaded_videos(self.downloaded_videos_limit)
         self.grid_view_listener.downloadedVideosChanged.emit()
+
+    def update_thumbnails(self):
+        videos = []
+        videos.extend(self.downloaded_videos)
+        videos.extend(self.filtered_videos)
+        self.logger.info("Updating thumbnails for downloaded and filtered videos")
+        download_thumbnails_threaded(videos)
+        UpdateVideosThread(videos, update_existing=True).start()
