@@ -156,9 +156,9 @@ class MainWindow(QMainWindow):
         toolbar.addSeparator()
         toolbar.addAction(refresh_feed)
         toolbar.addSeparator()
-        search_bar = QLineEdit(self)
-        search_bar.returnPressed.connect(self.get_video)
-        toolbar.addWidget(search_bar)
+        self.get_video_search_bar = QLineEdit(self)
+        self.get_video_search_bar.returnPressed.connect(self.get_video)
+        toolbar.addWidget(self.get_video_search_bar)
         # toolbar.addAction(get_video)
         if read_config('Debug', 'show_unimplemented_gui'):  # FIXME: Implement
             toolbar.addAction(view_about_view)
@@ -402,14 +402,16 @@ class MainWindow(QMainWindow):
         """
         self.main_model.main_window_listener.refreshSubs.emit()
 
-    def get_video(self, url):
+    def get_video(self, url=None):
         """
         Search for and fetch a video based on URL input string
         :param url: String
         :return:
         """
+        if url is None:
+            url = self.get_video_search_bar.text()
         self.logger.debug("get_video({}) called self.main_model.main_window_listener.getVideo.emit()".format(url))
-        self.main_model.main_window_listener.getVideo.emit()
+        self.main_model.main_window_listener.getVideo.emit(url)
 
     # Unused functions
     def context_menu_event(self, event):  # TODO: Unused, planned usage in future

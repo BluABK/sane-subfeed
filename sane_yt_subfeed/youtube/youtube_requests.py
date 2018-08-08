@@ -158,13 +158,21 @@ def list_video(youtube_key, video_id, part='snippet'):
     :return: [list(dict): videos, dict: statistics]
     """
     # Retrieve the list of videos uploaded to the authenticated user's channel.
-    string_video_ids = ','.join(map(str, video_id))
+    logger.info("YouTube API list() for video id: {}".format(video_id))
+    video_as_list = []
+    string_video_id = ','.join(map(str, video_id))
 
     playlistitems_list_request = youtube_key.videos().list(
-        maxResults=1, part=part, id=string_video_ids).execute()['items']
-    video = VideoD.videos_item_new_video_d(playlistitems_list_request, grab_methods=[GRAB_METHOD_VIDEOS])
+        maxResults=50, part=part, id=string_video_id)
 
-    return video
+    playlistitems_list_response = playlistitems_list_request.execute()
+    logger.debug(playlistitems_list_response)
+    for search_result in playlistitems_list_response['items']:
+        video_as_list.append(VideoD.videos_item_new_video_d(search_result,
+                                                            grab_methods=[GRAB_METHOD_VIDEOS]))
+    logger.debug(video_as_list)
+
+    return video_as_list
 
 
 def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit, live_videos=True):

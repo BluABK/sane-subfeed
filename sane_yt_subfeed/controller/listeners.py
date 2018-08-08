@@ -135,7 +135,7 @@ class MainWindowListener(QObject):
     testChannels = pyqtSignal()
     refreshVideos = pyqtSignal(int)
     refreshSubs = pyqtSignal()
-    getVideo = pyqtSignal()
+    getVideo = pyqtSignal(str)
 
     def __init__(self, model):
         super().__init__()
@@ -183,14 +183,14 @@ class MainWindowListener(QObject):
         self.logger.info("Running test: channels test")
         main.run_channels_test()
 
-    @pyqtSlot()
+    @pyqtSlot(str)
     def get_video(self, video_url):
         """
         Fetches new videos and reloads the subscription feed
         :return:
         """
         self.logger.info("Fetching video: {}".format(video_url))
-        self.model.get_video()
+        self.model.get_video(video_url)
 
 
 class DatabaseListener(QObject):
