@@ -111,7 +111,7 @@ def get_new_and_updated_videos(vid_paths):
             new_videos.append(video)
 
     return_videos.extend(new_videos)
-    logger.info("Downloading thumbnails for: {]".format(return_videos))
+    logger.info("Downloading thumbnails for: {}".format(return_videos))
     download_thumbnails_threaded(return_videos)
     return return_videos
 
