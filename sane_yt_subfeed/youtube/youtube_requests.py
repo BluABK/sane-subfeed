@@ -233,6 +233,8 @@ def get_remote_subscriptions(youtube_oauth):
                 subs.append(channel)
             else:
                 # TODO: change to sqlalchemy core stmt
+                create_logger(__name__ + ".subscriptions").info(
+                    "Added channel {} - {}".format(channel.title, channel.id))
                 db_session.add(channel)
                 subs.append(channel)
             channel_ids.append(channel.id)
