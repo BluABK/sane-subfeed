@@ -144,13 +144,15 @@ class MainWindow(QMainWindow):
         # Toolbar of different views
         toolbar = self.addToolBar('View')
         toolbar.addAction(view_grid_view)
-        toolbar.addAction(view_play_view)
         toolbar.addAction(view_list_detailed_view)
-        if read_config('Debug', 'show_unimplemented_gui'):
+        if read_config('Debug', 'show_unimplemented_gui'):  # FIXME: Implement
             toolbar.addAction(view_list_tiled_view)
         toolbar.addAction(view_subs_view)
+        toolbar.addSeparator()
+        toolbar.addAction(view_play_view)
+        toolbar.addSeparator()
         toolbar.addAction(refresh_feed)
-        if read_config('Debug', 'show_unimplemented_gui'):
+        if read_config('Debug', 'show_unimplemented_gui'):  # FIXME: Implement
             toolbar.addAction(view_about_view)
 
         # Set MainWindow properties
