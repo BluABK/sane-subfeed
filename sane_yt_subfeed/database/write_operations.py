@@ -1,8 +1,10 @@
 import threading
+import time
 
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.engine_statements import update_video_statement_full, get_video_by_vidd_stmt, insert_item
-from sane_yt_subfeed.database.orm import engine
+from sane_yt_subfeed.database.models import Channel
+from sane_yt_subfeed.database.orm import engine, db_session
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.log_handler import create_logger
 
@@ -119,3 +121,11 @@ def check_for_unique(vid_list):
         else:
             compare_set.add(vid.video_id)
     return vid_list
+
+
+def delete_sub_not_in_list(subs):
+    delete_channels = db_session.query(Channel).filter(~Channel.id.in_(subs)).all()
+    for channel in delete_channels:
+        create_logger(__name__).warning("Deleting channel: {} - {}".format(channel.title, channel.id))
+    stmt = Channel.__table__.delete().where(~Channel.id.in_(subs))
+    engine.execute(stmt)
