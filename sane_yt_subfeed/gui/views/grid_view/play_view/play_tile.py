@@ -37,6 +37,8 @@ class PlayTile(VideoTile):
 
     def play_vid(self, file_path, player, mark_watched=True):
         # player = player.strip()
+        if read_config('Play', 'use_url_as_path'):
+            file_path = self.video.url_video
         if mark_watched:
             self.mark_watched()
         self.logger.info('Playing {}, with player: {}'.format(file_path, player))
