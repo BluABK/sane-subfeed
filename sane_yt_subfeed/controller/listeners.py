@@ -287,7 +287,7 @@ class YtDirListener(QObject):
                     if not downloaded_thumbnail:
                         self.logger.warning("Thumbnail path in db, but not on disk, for video: {}".format(vid.__dict__))
                     self.logger.info("Downloading thumbnail for: {}".format(vid.__dict__))
-                    download_thumbnails_threaded(vid)
+                    download_thumbnails_threaded([vid])
 
                 self.logger.info("Updating existing record in db")
                 db_session.commit()
