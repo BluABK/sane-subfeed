@@ -119,8 +119,8 @@ class MainWindow(QMainWindow):
         self.add_submenu('&Function', 'Manual DB grab', self.db_reload,
                          tooltip='Starts a manual grab of data for the model', icon='database.png', shortcut='Ctrl+E')
 
-        get_single_video = self.add_submenu('&Function', 'Get video', self.get_single_video,
-                                            tooltip='Fetch video by URL')
+        # get_single_video = self.add_submenu('&Function', 'Get video', self.get_single_video,
+        #                                     tooltip='Fetch video by URL')
 
         # View menu
         self.add_menu(menubar, '&View')
