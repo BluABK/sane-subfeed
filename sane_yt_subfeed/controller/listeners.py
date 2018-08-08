@@ -285,7 +285,7 @@ class YtDirListener(QObject):
                         "Thumbnail downloaded, but path didn't exist in db, for video: {}".format(vid.__dict__))
                 elif (not vid.thumbnail_path) or (not downloaded_thumbnail):
                     if not downloaded_thumbnail:
-                        self.logger.warning.info("Thumbnail path in db, but not on disk, for video: {}".format(vid.__dict__))
+                        self.logger.warning("Thumbnail path in db, but not on disk, for video: {}".format(vid.__dict__))
                     self.logger.info("Downloading thumbnail for: {}".format(vid.__dict__))
                     download_thumbnails_threaded(vid)
 
