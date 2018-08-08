@@ -1,14 +1,27 @@
+v0.3.4
+- Added optional video-grab input field on toolbar
+- More logging improvement across the entire project
+- DB now deletes unsubscribed channels when told to reload subscriptions
+- Scrolled views now load new videos when 100% scrolled to bottom, not 90%.
+- Removed ffmpeg import that created unnecessary dependencies.
+- NULL QPixmaps are now replaced with a custom 'Thumbnail N/A' image.
+- Fixed issue where SubFeedTile logger was accidentally named PlayView.
+
 v0.3.3
 - Added support for proxies to bypass geo blocks.
+
 v0.3.2
 - Optimized grid views by changing q_labels to dict, and reusing them.
 - Made GridView generic, and move specialized functions to sub_feed
 - Removed regrab_percentage and related functionality
 - Gave manual db grab shortcut(Ctrl+E)
+
 v0.3.1
 - Added scrollbar to GridView and PlayView
+
 v0.3.0
 - Cleaned version of v0.3.0-pre
+
 v0.3.0-pre
 - Added a Play View which shows your downloaded videos (gui).
 - Play View can recognise and add downloaded videos from a specified directory (config).
