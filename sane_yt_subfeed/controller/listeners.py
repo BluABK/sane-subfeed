@@ -135,7 +135,14 @@ class MainWindowListener(QObject):
     testChannels = pyqtSignal()
     refreshVideos = pyqtSignal(int)
     refreshSubs = pyqtSignal()
-    getVideo = pyqtSignal(str)
+    getSingleVideo = pyqtSignal(str)
+    downloadedVideosChanged = pyqtSignal()
+    updateFromDb = pyqtSignal()
+
+    # FIXME: move youtube-dl listener to its own listener?
+    downloadFinished = pyqtSignal(VideoD)
+    # FIXME: move to db listener
+    downloadedVideosChangedinDB = pyqtSignal()
 
     def __init__(self, model):
         super().__init__()
@@ -143,7 +150,10 @@ class MainWindowListener(QObject):
         self.refreshVideos.connect(self.refresh_videos)
         self.refreshSubs.connect(self.refresh_subs)
         self.testChannels.connect(self.test_channels)
-        self.getVideo.connect(self.get_video)
+        self.getSingleVideo.connect(self.get_single_video)
+        self.downloadFinished.connect(self.download_finished)
+        self.downloadedVideosChangedinDB.connect(self.download_finished_in_db)
+        self.updateFromDb.connect(self.update_from_db)
         self.logger = create_logger(__name__ + '.MainWindowListener')
 
     def run(self):
@@ -184,13 +194,34 @@ class MainWindowListener(QObject):
         main.run_channels_test()
 
     @pyqtSlot(str)
-    def get_video(self, video_url):
+    def get_single_video(self, video_url):
         """
-        Fetches new videos and reloads the subscription feed
+        Fetches a specified video based on url
         :return:
         """
         self.logger.info("Fetching video: {}".format(video_url))
-        self.model.get_video(video_url)
+        video_id = video_url.split('v=')[-1]    # FIXME: Make a proper input sanitizer
+        self.logger.debug("{} --> ID: {}".format(video_url, video_id))
+        video_d = list_uploaded_videos_videos(load_keys(1)[0], [video_id], 50)[0]
+        # self.logger.debug(video_d.__dict__)
+        use_youtube_dl = read_config('Youtube-dl', 'use_youtube_dl')
+        UpdateVideo(video_d, update_existing=True).start()
+        if use_youtube_dl:
+            # self.logger.info("Downloading video: {} - {} [{}]".format(video_d.channel_title, video_d.title,
+            #                                                           video_d.url_video))
+            YoutubeDownload(video_d, finished_listener=self.downloadFinished).start()
+
+    # YouTube-DL stuff
+    @pyqtSlot(VideoD)
+    def download_finished(self, video: VideoD):
+        UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
+
+    def download_finished_in_db(self):
+        self.model.db_update_downloaded_videos()
+
+    def update_from_db(self):
+        self.model.db_update_videos()
+        self.model.db_update_downloaded_videos()
 
 
 class DatabaseListener(QObject):

@@ -147,34 +147,6 @@ def list_uploaded_videos_videos(youtube_key, video_ids, req_limit, part='snippet
     return videos
 
 
-def list_video(youtube_key, video_id, part='snippet'):
-    """
-    Get a video from the API videos().list()
-    Quota cost: 2-3 units / part / request
-    :param part:
-    :param video_ids: a list of ids to request video from
-    :param req_limit:
-    :param youtube_key:
-    :return: [list(dict): videos, dict: statistics]
-    """
-    # Retrieve the list of videos uploaded to the authenticated user's channel.
-    logger.info("YouTube API list() for video id: {}".format(video_id))
-    video_as_list = []
-    string_video_id = ','.join(map(str, video_id))
-
-    playlistitems_list_request = youtube_key.videos().list(
-        maxResults=50, part=part, id=string_video_id)
-
-    playlistitems_list_response = playlistitems_list_request.execute()
-    logger.debug(playlistitems_list_response)
-    for search_result in playlistitems_list_response['items']:
-        video_as_list.append(VideoD.videos_item_new_video_d(search_result,
-                                                            grab_methods=[GRAB_METHOD_VIDEOS]))
-    logger.debug(video_as_list)
-
-    return video_as_list
-
-
 def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit, live_videos=True):
     """
     Get a list of videos through the API search()
