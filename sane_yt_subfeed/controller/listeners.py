@@ -266,11 +266,19 @@ class YtDirListener(QObject):
                 vid.vid_path = vid_path
                 vid.date_downloaded = datetime.datetime.utcnow()
                 vid.downloaded = True
+
                 thumb_path = os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(vid.video_id))
-                if os.path.isfile(thumb_path) and (not vid.thumbnail_path):
+                downloaded_thumbnail = os.path.isfile(thumb_path)
+                if downloaded_thumbnail and (not vid.thumbnail_path):
                     vid.thumbnail_path = thumb_path
                     self.logger.warning(
                         "Thumbnail downloaded, but path didn't exist in db, for video: {}".format(vid.__dict__))
+                elif (not vid.thumbnail_path) or (not downloaded_thumbnail):
+                    if not downloaded_thumbnail:
+                        self.warning.info("Thumbnail path in db, but not on disk, for video: {}".format(vid.__dict__))
+                    self.logger.info("Downloading thumbnail for: {}".format(vid.__dict__))
+                    download_thumbnails_threaded(vid)
+
                 self.logger.info("Updating existing record in db")
                 db_session.commit()
                 self.model.db_update_videos()
