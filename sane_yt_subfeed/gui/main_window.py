@@ -8,7 +8,7 @@ import os
 from subprocess import check_output
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget, QActionGroup
 from PyQt5.QtGui import QIcon
 
 # Project internal libs
@@ -16,6 +16,7 @@ from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import GRID_VIEW_ID, PLAY_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
+from sane_yt_subfeed.gui.toolbar import Toolbar
 from sane_yt_subfeed.gui.views.about_view import AboutView
 from sane_yt_subfeed.gui.views.config_view.config_view import ConfigView
 from sane_yt_subfeed.gui.views.grid_view.grid_scroll_area import GridScrollArea
@@ -145,8 +146,8 @@ class MainWindow(QMainWindow):
             view_about_view = self.add_submenu('&Help', 'About', self.view_about, shortcut='F1', tooltip='About me',
                                                icon='about.png')
 
-        # Toolbar of different views
-        toolbar = self.addToolBar('View')
+        toolbar = Toolbar(self)
+        self.addToolBar(toolbar)
         toolbar.addAction(view_grid_view)
         toolbar.addAction(view_play_view)
         toolbar.addAction(view_list_detailed_view)
@@ -156,6 +157,7 @@ class MainWindow(QMainWindow):
         toolbar.addAction(refresh_feed)
         if read_config('Debug', 'show_unimplemented_gui'):
             toolbar.addAction(view_about_view)
+        toolbar.create_action_group()
 
         # Set MainWindow properties
         app_title = 'Sane Subscription Feed'
