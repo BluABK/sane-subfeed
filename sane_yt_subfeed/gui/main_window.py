@@ -156,11 +156,12 @@ class MainWindow(QMainWindow):
         toolbar.addAction(view_play_view)
         toolbar.addSeparator()
         toolbar.addAction(refresh_feed)
-        toolbar.addSeparator()
-        self.get_video_search_bar = QLineEdit(self)
-        self.get_video_search_bar.returnPressed.connect(self.get_single_video)
-        toolbar.addWidget(self.get_video_search_bar)
-        # toolbar.addAction(get_video)
+        if read_config('Toolbar', 'show_download_video_field'):
+            toolbar.addSeparator()
+            self.get_video_search_bar = QLineEdit(self)
+            self.get_video_search_bar.returnPressed.connect(self.get_single_video)
+            toolbar.addWidget(self.get_video_search_bar)
+            # toolbar.addAction(get_video)
         if read_config('Debug', 'show_unimplemented_gui'):  # FIXME: Implement
             toolbar.addAction(view_about_view)
 
