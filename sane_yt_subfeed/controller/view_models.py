@@ -9,6 +9,8 @@ from sane_yt_subfeed.controller.listeners import GridViewListener, DatabaseListe
 from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, refresh_and_get_newest_videos, \
     get_best_downloaded_videos
 from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.youtube.update_videos import load_keys
+from sane_yt_subfeed.youtube.youtube_requests import list_video
 
 
 def remove_video(test_list, video):
@@ -95,3 +97,7 @@ class MainModel:
     def db_update_downloaded_videos(self):
         self.downloaded_videos = get_best_downloaded_videos(self.downloaded_videos_limit)
         self.grid_view_listener.downloadedVideosChanged.emit()
+
+    def get_video(self, url_string):
+        video_d = list_video(load_keys(1), url_string)
+        self.logger.debug(video_d.__dict__)

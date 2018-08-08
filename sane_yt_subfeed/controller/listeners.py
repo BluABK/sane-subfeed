@@ -35,6 +35,7 @@ class GridViewListener(QObject):
     updateFromDb = pyqtSignal()
     scrollReachedEndGrid = pyqtSignal()
     scrollReachedEndPlay = pyqtSignal()
+    getVideo = pyqtSignal(VideoD)
 
     # FIXME: move youtube-dl listener to its own listener?
     downloadFinished = pyqtSignal(VideoD)
@@ -55,6 +56,7 @@ class GridViewListener(QObject):
         self.updateFromDb.connect(self.update_from_db)
         self.scrollReachedEndGrid.connect(self.scroll_reached_end_grid)
         self.scrollReachedEndPlay.connect(self.db_update_downloaded_videos)
+        self.getVideo.connect(self.get_video)
 
     def scroll_reached_end_grid(self):
         add_value = read_config("Model", "loaded_videos")
@@ -111,6 +113,19 @@ class GridViewListener(QObject):
         self.hiddenVideosChanged.emit()
         UpdateVideo(video, update_existing=True).start()
 
+    @pyqtSlot(VideoD)
+    def get_video(self, video: VideoD):
+        self.model.hide_video_item(video)
+        self.logger.info(
+            "Video hidden from grid view(downloaded): {} - {} [{}]".format(video.channel_title, video.title,
+                                                                           video.url_video))
+        self.hiddenVideosChanged.emit()
+
+        use_youtube_dl = read_config('Youtube-dl', 'use_youtube_dl')
+        UpdateVideo(video, update_existing=True).start()
+        if use_youtube_dl:
+            YoutubeDownload(video, finished_listener=self.downloadFinished).start()
+
     def run(self):
         while True:
             time.sleep(2)
@@ -120,6 +135,7 @@ class MainWindowListener(QObject):
     testChannels = pyqtSignal()
     refreshVideos = pyqtSignal(int)
     refreshSubs = pyqtSignal()
+    getVideo = pyqtSignal()
 
     def __init__(self, model):
         super().__init__()
@@ -127,6 +143,7 @@ class MainWindowListener(QObject):
         self.refreshVideos.connect(self.refresh_videos)
         self.refreshSubs.connect(self.refresh_subs)
         self.testChannels.connect(self.test_channels)
+        self.getVideo.connect(self.get_video)
         self.logger = create_logger(__name__ + '.MainWindowListener')
 
     def run(self):
@@ -165,6 +182,15 @@ class MainWindowListener(QObject):
         """
         self.logger.info("Running test: channels test")
         main.run_channels_test()
+
+    @pyqtSlot()
+    def get_video(self, video_url):
+        """
+        Fetches new videos and reloads the subscription feed
+        :return:
+        """
+        self.logger.info("Fetching video: {}".format(video_url))
+        self.model.get_video()
 
 
 class DatabaseListener(QObject):
