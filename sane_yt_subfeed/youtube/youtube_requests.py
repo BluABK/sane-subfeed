@@ -8,7 +8,7 @@ from sane_yt_subfeed.database.detached_models.video_d import VideoD, GRAB_METHOD
     GRAB_METHOD_VIDEOS
 from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session, engine
-from sane_yt_subfeed.database.write_operations import engine_execute_first, engine_execute
+from sane_yt_subfeed.database.write_operations import engine_execute_first, engine_execute, delete_sub_not_in_list
 from sane_yt_subfeed.database.engine_statements import update_channel_from_remote, get_channel_by_id_stmt
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.pickle_handler import load_sub_list, load_youtube, dump_youtube, dump_sub_list
@@ -213,6 +213,7 @@ def get_remote_subscriptions(youtube_oauth):
     subs = []
     # Retrieve the list of subscribed channels for authenticated user's channel.
     update_stmts = []
+    channel_ids = []
     while subscription_list_request:
         subscription_list_response = subscription_list_request.execute()
 
@@ -234,8 +235,10 @@ def get_remote_subscriptions(youtube_oauth):
                 # TODO: change to sqlalchemy core stmt
                 db_session.add(channel)
                 subs.append(channel)
+            channel_ids.append(channel.id)
         subscription_list_request = youtube_oauth.playlistItems().list_next(
             subscription_list_request, subscription_list_response)
+    delete_sub_not_in_list(channel_ids)
     db_session.commit()
     return subs
 
