@@ -119,7 +119,8 @@ class MainWindow(QMainWindow):
         self.add_submenu('&Function', 'Manual DB grab', self.db_reload,
                          tooltip='Starts a manual grab of data for the model', icon='database.png', shortcut='Ctrl+E')
 
-        get_video = self.add_submenu('&Function', 'Get video', self.get_video, tooltip='Fetch video by URL')
+        get_single_video = self.add_submenu('&Function', 'Get video', self.get_single_video,
+                                            tooltip='Fetch video by URL')
 
         # View menu
         self.add_menu(menubar, '&View')
@@ -157,7 +158,7 @@ class MainWindow(QMainWindow):
         toolbar.addAction(refresh_feed)
         toolbar.addSeparator()
         self.get_video_search_bar = QLineEdit(self)
-        self.get_video_search_bar.returnPressed.connect(self.get_video)
+        self.get_video_search_bar.returnPressed.connect(self.get_single_video)
         toolbar.addWidget(self.get_video_search_bar)
         # toolbar.addAction(get_video)
         if read_config('Debug', 'show_unimplemented_gui'):  # FIXME: Implement
@@ -402,7 +403,7 @@ class MainWindow(QMainWindow):
         """
         self.main_model.main_window_listener.refreshSubs.emit()
 
-    def get_video(self, url=None):
+    def get_single_video(self, url=None):
         """
         Search for and fetch a video based on URL input string
         :param url: String
@@ -411,7 +412,7 @@ class MainWindow(QMainWindow):
         if url is None:
             url = self.get_video_search_bar.text()
         self.logger.debug("get_video({}) called self.main_model.main_window_listener.getVideo.emit()".format(url))
-        self.main_model.main_window_listener.getVideo.emit(url)
+        self.main_model.main_window_listener.getSingleVideo.emit(url)
 
     # Unused functions
     def context_menu_event(self, event):  # TODO: Unused, planned usage in future

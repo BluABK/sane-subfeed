@@ -10,7 +10,7 @@ from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, r
     get_best_downloaded_videos
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.update_videos import load_keys
-from sane_yt_subfeed.youtube.youtube_requests import list_video, list_uploaded_videos_videos
+from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_videos
 
 
 def remove_video(test_list, video):
@@ -97,8 +97,3 @@ class MainModel:
     def db_update_downloaded_videos(self):
         self.downloaded_videos = get_best_downloaded_videos(self.downloaded_videos_limit)
         self.grid_view_listener.downloadedVideosChanged.emit()
-
-    def get_video(self, url_string):
-        video_d = list_uploaded_videos_videos(load_keys(1)[0], [url_string], 50)[0]
-        self.logger.debug("{} - {} [{}]".format(video_d.channel_title, video_d.title, video_d.url_video))
-        self.logger.debug(video_d.__dict__)
