@@ -39,6 +39,7 @@ class GridView(QWidget):
         self.setAutoFillBackground(True)
         self.set_bgcolor()
 
+
     def videos_changed(self):
         self.logger.info('Updating tiles')
         self.update_grid()

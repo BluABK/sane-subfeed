@@ -30,7 +30,9 @@ class GridViewListener(QObject):
     tileDiscarded = pyqtSignal(VideoD)
     tileWatched = pyqtSignal(VideoD)
     hiddenVideosChanged = pyqtSignal()
+    hiddenVideosUpdated = pyqtSignal()
     downloadedVideosChanged = pyqtSignal()
+    downloadedVideosUpdated = pyqtSignal()
     updateGridViewFromDb = pyqtSignal()
     updateFromDb = pyqtSignal()
     scrollReachedEndGrid = pyqtSignal()
@@ -61,8 +63,8 @@ class GridViewListener(QObject):
     def thumbnail_download(self):
         self.model.update_thumbnails()
         self.logger.info("Updating thumbnails complete")
-        self.downloadedVideosChanged.emit()
-        self.hiddenVideosChanged.emit()
+        self.downloadedVideosUpdated.emit()
+        self.hiddenVideosUpdated.emit()
 
     def scroll_reached_end_grid(self):
         add_value = read_config("Model", "loaded_videos")
