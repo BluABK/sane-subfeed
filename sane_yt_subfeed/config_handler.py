@@ -83,7 +83,8 @@ defaults = {
     },
     'Logging': {
         'use_socket_log': 'False',
-        'log_level': '1'
+        'log_level': '1',
+        'logging_port': '19996'
     }
 }
 
