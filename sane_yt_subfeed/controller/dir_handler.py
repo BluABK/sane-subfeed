@@ -48,11 +48,10 @@ class VidEventHandler(PatternMatchingEventHandler):
             name = os.path.basename(event.src_path)
             self.logger.info("Discovered new file: {}".format(name))
             filename = name.split(".")
-            for s in filename:
-                if split_string in s:
-                    filename = str(s)
-            id = str(filename.split(split_string)[-1])
-            self.listener.newFile.emit(id, event.src_path)
+            if split_string in filename[-2]:
+                filename = str(filename[-2])
+                id = str(filename.split(split_string)[-1])
+                self.listener.newFile.emit(id, event.src_path)
 
 
 def manual_youtube_folder_check(input_path):
