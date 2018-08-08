@@ -125,6 +125,7 @@ class VideoTile(QWidget):
         logger.info('Mark downloaded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
                                                                 self.video.title))
         self.video.downloaded = True
+        self.video.date_downloaded = datetime.datetime.utcnow()
         self.parent.main_model.grid_view_listener.tileDownloaded.emit(self.video)
         if read_config('Gui', 'enable_auto_copy_to_clipboard'):
             self.copy_url()

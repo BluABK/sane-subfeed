@@ -3,6 +3,7 @@ import time
 
 from sqlalchemy import desc
 
+from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NORMAL_REFRESH, \
     LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.database.database_static_vars import ORDER_METHOD_DATE_DOWNLOADED_UPLOAD_DATE
@@ -53,7 +54,9 @@ def get_best_downloaded_videos(limit, filter_watched=True, sort_method=ORDER_MET
     if sort_method == ORDER_METHOD_DATE_DOWNLOADED_UPLOAD_DATE:
         db_query = db_query.order_by(desc(Video.date_downloaded), desc(Video.date_published))
 
-    if filter_watched:
+    if read_config('Play', 'use_url_as_path'):
+        db_query = db_query.filter(Video.downloaded == True, or_(Video.watched.is_(None), Video.watched == false()))
+    elif filter_watched:
         db_query = db_query.filter(Video.vid_path != "", or_(Video.watched.is_(None), Video.watched == false()))
     else:
         db_query = db_query.filter(Video.vid_path != "").limit(limit).all()
