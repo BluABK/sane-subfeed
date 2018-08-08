@@ -154,10 +154,11 @@ class MainWindow(QMainWindow):
         if read_config('Debug', 'show_unimplemented_gui'):
             toolbar.addAction(view_list_tiled_view)
         toolbar.addAction(view_subs_view)
-        toolbar.addAction(refresh_feed)
         if read_config('Debug', 'show_unimplemented_gui'):
             toolbar.addAction(view_about_view)
         toolbar.create_action_group()
+        # not included in exclusive action group
+        toolbar.addAction(refresh_feed)
 
         # Set MainWindow properties
         app_title = 'Sane Subscription Feed'
