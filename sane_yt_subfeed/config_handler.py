@@ -84,6 +84,9 @@ defaults = {
     'Logging': {
         'use_socket_log': 'False',
         'log_level': '1'
+    },
+    'Toolbar': {
+        'show_download_video_field': False
     }
 }
 
