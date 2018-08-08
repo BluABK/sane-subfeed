@@ -11,6 +11,7 @@ class SubFeedView(GridView):
         self.logger = create_logger(__name__ + ".SubFeedView")
 
         self.main_model.grid_view_listener.hiddenVideosChanged.connect(self.videos_changed)
+        self.main_model.grid_view_listener.hiddenVideosUpdated.connect(self.update_videos)
 
         self.logger.debug("Init grid")
         self.update_grid()
@@ -22,3 +23,7 @@ class SubFeedView(GridView):
     def get_feed(self):
         subscription_feed = self.main_model.filtered_videos
         return subscription_feed
+
+    def update_videos(self):
+        for q_label, video in zip(self.q_labels.values(), self.main_model.filtered_videos):
+            q_label.set_video(video)
