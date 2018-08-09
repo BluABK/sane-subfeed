@@ -1,6 +1,7 @@
 import datetime
 
 import sane_yt_subfeed.database.video as video_file
+from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 
 GRAB_METHOD_LIST = 'list()'
@@ -16,6 +17,7 @@ class VideoD:
     downloaded = False
     new = False
     missed = False
+    watch_prio = read_config('Play', 'default_watch_prio')
 
     def __init__(self, search_item, grab_methods=None):
         """
@@ -94,6 +96,7 @@ class VideoD:
         video.discarded = self.discarded
         video.vid_path = self.vid_path
         video.watched = self.watched
+        video.watch_prio = self.watch_prio
         video.date_downloaded = self.date_downloaded
         return video
 

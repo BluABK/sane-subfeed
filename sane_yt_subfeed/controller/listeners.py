@@ -196,7 +196,7 @@ class MainWindowListener(QObject):
         download_thumbnails_threaded([video_d])
         # self.logger.debug(video_d.__dict__)
         self.model.grid_view_listener.download_video(video_d)
-        
+
 
 class DatabaseListener(QObject):
     databaseUpdated = pyqtSignal()
