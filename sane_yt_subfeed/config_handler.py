@@ -88,7 +88,7 @@ defaults = {
         'logging_port': '19996'
     },
     'Toolbar': {
-        'show_download_video_field': False
+        'show_download_video_field': 'False'
     }
 }
 
