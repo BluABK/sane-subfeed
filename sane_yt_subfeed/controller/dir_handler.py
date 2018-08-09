@@ -28,6 +28,9 @@ class VidEventHandler(PatternMatchingEventHandler):
         self.listener = listener
         self.logger = create_logger(__name__ + "VidEventHandler")
 
+    def on_any_event(self, event):
+        self.logger.debug("{}: {}".format(event.event_type, event.__dict__))
+
     # def on_any_event(self, event):
     #     print("change")
     #     if event.event_type == 'created':
@@ -36,23 +39,28 @@ class VidEventHandler(PatternMatchingEventHandler):
     #         # img = Image.open(event.src_path)
     #         time.sleep(1)
 
-    # def on_modified(self, event):
+    def on_moved(self, event):
+        self.check_file(event.dest_path)
     #     print("change")
     #     # self.process(event)
 
     def on_created(self, event):
-        if not event.src_path:
+        self.check_file(event.src_path)
+
+    def check_file(self, path):
+        if not path:
             return
         split_string = "_v-id-"
-        if split_string in event.src_path:
-            name = os.path.basename(event.src_path)
-            self.logger.info("Discovered new file: {}".format(name))
+        if split_string in path:
+            name = os.path.basename(path)
             filename = name.split(".")
             if split_string in filename[-2]:
+                self.logger.info("Discovered new file: {}".format(name))
                 filename = str(filename[-2])
                 id = str(filename.split(split_string)[-1])
-                self.listener.newFile.emit(id, event.src_path)
-
+                self.listener.newFile.emit(id, path)
+            else:
+                self.logger.debug("Found file with invalid extension: {}".format(name))
 
 def manual_youtube_folder_check(input_path):
     # input_path = os.path.join(OS_PATH, input_folder)
