@@ -95,6 +95,7 @@ class GridViewListener(QObject):
                                                                            video.url_video))
         self.hiddenVideosChanged.emit()
 
+    def download_video(self, video):
         use_youtube_dl = read_config('Youtube-dl', 'use_youtube_dl')
         if read_config('Play', 'use_url_as_path'):
             UpdateVideo(video, update_existing=True,
@@ -134,6 +135,7 @@ class MainWindowListener(QObject):
     testChannels = pyqtSignal()
     refreshVideos = pyqtSignal(int)
     refreshSubs = pyqtSignal()
+    getSingleVideo = pyqtSignal(str)
 
     def __init__(self, model):
         super().__init__()
@@ -141,6 +143,7 @@ class MainWindowListener(QObject):
         self.refreshVideos.connect(self.refresh_videos)
         self.refreshSubs.connect(self.refresh_subs)
         self.testChannels.connect(self.test_channels)
+        self.getSingleVideo.connect(self.get_single_video)
         self.logger = create_logger(__name__ + '.MainWindowListener')
 
     def run(self):
@@ -180,6 +183,20 @@ class MainWindowListener(QObject):
         self.logger.info("Running test: channels test")
         main.run_channels_test()
 
+    @pyqtSlot(str)
+    def get_single_video(self, video_url):
+        """
+        Fetches a specified video based on url
+        :return:
+        """
+        self.logger.info("Fetching video: {}".format(video_url))
+        video_id = video_url.split('v=')[-1]  # FIXME: Make a proper input sanitizer
+        self.logger.debug("{} --> ID: {}".format(video_url, video_id))
+        video_d = list_uploaded_videos_videos(load_keys(1)[0], [video_id], 50)[0]
+        download_thumbnails_threaded([video_d])
+        # self.logger.debug(video_d.__dict__)
+        self.model.grid_view_listener.download_video(video_d)
+        
 
 class DatabaseListener(QObject):
     databaseUpdated = pyqtSignal()
