@@ -157,7 +157,7 @@ class MainWindowListener(QObject):
         hide_downloaded = read_config('Gui', 'hide_downloaded')
         if hide_downloaded:
             self.model.remote_update_videos(refresh_type=refresh_type)
-            self.model.grid_view_listener.hiddenVideosChanged.emit()
+            # self.model.grid_view_listener.hiddenVideosChanged.emit()
         else:
             self.model.remote_update_videos(refresh_type=refresh_type)
             self.logger.error('NOT IMPLEMENTED: disabled hide_downloaded')
