@@ -3,7 +3,6 @@ from PyQt5.QtCore import QThread
 # FIXME: imp*
 from PyQt5.QtWidgets import QProgressBar
 
-from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.listeners import GridViewListener, DatabaseListener, MainWindowListener, YtDirListener, \
     LISTENER_SIGNAL_NORMAL_REFRESH, ProgressBar
 from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, refresh_and_get_newest_videos, \
