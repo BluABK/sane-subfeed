@@ -1,12 +1,13 @@
 import datetime
 import time
 
-from sqlalchemy import desc
+from sqlalchemy import desc, asc
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NORMAL_REFRESH, \
     LISTENER_SIGNAL_DEEP_REFRESH
-from sane_yt_subfeed.database.database_static_vars import ORDER_METHOD_DATE_DOWNLOADED_UPLOAD_DATE
+from sane_yt_subfeed.database.database_static_vars import ORDER_METHOD_DATE_DOWNLOADED_UPLOAD_DATE, \
+    ORDER_METHOD_PRIO_DATE_DOWNLOADED_UPLOAD_DATE
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.engine_statements import get_video_by_vidd_stmt, get_video_by_id_stmt
 from sane_yt_subfeed.database.orm import db_session, engine
@@ -41,7 +42,7 @@ def get_newest_stored_videos(limit, filter_downloaded=False):
     return videos
 
 
-def get_best_downloaded_videos(limit, filter_watched=True, sort_method=ORDER_METHOD_DATE_DOWNLOADED_UPLOAD_DATE):
+def get_best_downloaded_videos(limit, filter_watched=True, sort_method=ORDER_METHOD_PRIO_DATE_DOWNLOADED_UPLOAD_DATE):
     """
 
     :param sort_method:
@@ -51,8 +52,8 @@ def get_best_downloaded_videos(limit, filter_watched=True, sort_method=ORDER_MET
     """
     db_query = db_session.query(Video)
 
-    if sort_method == ORDER_METHOD_DATE_DOWNLOADED_UPLOAD_DATE:
-        db_query = db_query.order_by(desc(Video.date_downloaded), desc(Video.date_published))
+    if sort_method == ORDER_METHOD_PRIO_DATE_DOWNLOADED_UPLOAD_DATE:
+        db_query = db_query.order_by(asc(Video.watch_prio), desc(Video.date_downloaded), desc(Video.date_published))
 
     if read_config('Play', 'use_url_as_path'):
         db_query = db_query.filter(Video.downloaded == True, or_(Video.watched.is_(None), Video.watched == false()))
