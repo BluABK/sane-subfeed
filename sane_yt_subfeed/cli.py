@@ -2,16 +2,29 @@ import sys
 
 import click
 
+from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.database.video import Video
+
+from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.main import run_with_gui, run_print, run_channels_test
 from sane_yt_subfeed.log_handler import logger
 
 
 @click.option(u'--no_gui', is_flag=True)
-@click.option(u'--test_channels', is_flag=True)
+@click.option(u'--test-channels', is_flag=True)
+@click.option(u'--update-watch-prio', is_flag=True)
 @click.command()
-def cli(no_gui, test_channels):
+def cli(no_gui, test_channels, update_watch_prio):
     if no_gui:
         run_print()
+    if update_watch_prio:
+        videos = db_session.query(Video).all()
+        watch_prio = read_config('Play', 'default_watch_prio')
+        for video in videos:
+            video.watch_prio = watch_prio
+        db_session.commit()
+        return
+
     if test_channels:
         run_channels_test()
     else:
