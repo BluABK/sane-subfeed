@@ -94,6 +94,7 @@ class GridViewListener(QObject):
             "Video hidden from grid view(downloaded): {} - {} [{}]".format(video.channel_title, video.title,
                                                                            video.url_video))
         self.hiddenVideosChanged.emit()
+        self.download_video(video)
 
     def download_video(self, video):
         use_youtube_dl = read_config('Youtube-dl', 'use_youtube_dl')
@@ -196,7 +197,7 @@ class MainWindowListener(QObject):
         download_thumbnails_threaded([video_d])
         # self.logger.debug(video_d.__dict__)
         self.model.grid_view_listener.download_video(video_d)
-        
+
 
 class DatabaseListener(QObject):
     databaseUpdated = pyqtSignal()

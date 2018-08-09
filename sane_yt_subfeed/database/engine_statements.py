@@ -21,6 +21,7 @@ def update_video_statement_full(db_video):
         discarded=db_video.discarded,
         vid_path=db_video.vid_path,
         watched=db_video.watched,
+        watch_prio=db_video.watch_prio,
         date_downloaded=db_video.date_downloaded)
 
 
@@ -49,4 +50,5 @@ def insert_item(video):
             "playlist_pos": video.playlist_pos, "url_video": video.url_video,
             "url_playlist_video": video.url_playlist_video, "thumbnails": video.thumbnails,
             "downloaded": video.downloaded, "search_item": video.search_item, "discarded": video.discarded,
-            "vid_path": video.vid_path, "watched": video.watched, "date_downloaded": video.date_downloaded}
+            "vid_path": video.vid_path, "watched": video.watched, "watch_prio": video.watch_prio,
+            "date_downloaded": video.date_downloaded}
