@@ -38,6 +38,7 @@ class GridViewListener(QObject):
     scrollReachedEndGrid = pyqtSignal()
     scrollReachedEndPlay = pyqtSignal()
     thumbnailDownload = pyqtSignal()
+    decreaseWatchPrio = pyqtSignal(VideoD)
 
     # FIXME: move youtube-dl listener to its own listener?
     downloadFinished = pyqtSignal(VideoD)
@@ -59,6 +60,13 @@ class GridViewListener(QObject):
         self.scrollReachedEndGrid.connect(self.scroll_reached_end_grid)
         self.scrollReachedEndPlay.connect(self.db_update_downloaded_videos)
         self.thumbnailDownload.connect(self.thumbnail_download)
+        self.decreaseWatchPrio.connect(self.decrease_watch_prio)
+
+    @pyqtSlot(VideoD)
+    def decrease_watch_prio(self, video):
+        self.logger.info("Decreasing watch prio for: {}".format(video.__dict__))
+        video.watch_prio += 1
+        UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
 
     def thumbnail_download(self):
         self.model.update_thumbnails()

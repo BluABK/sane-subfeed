@@ -163,3 +163,6 @@ class VideoTile(QWidget):
         logger.info(text)
 
         self.b.insertPlainText(text + '\n')
+
+    def decrease_prio(self):
+        self.parent.main_model.grid_view_listener.decreaseWatchPrio.emit(self.video)

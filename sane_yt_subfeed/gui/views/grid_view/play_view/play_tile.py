@@ -23,7 +23,9 @@ class PlayTile(VideoTile):
         """
         # if QMouseEvent.button() == Qt.MidButton:
         #     self.parent.play_vid(self.video.vid_path)
-        if QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
+        if QMouseEvent.button() == Qt.MidButton:
+            self.decrease_prio()
+        elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
             logger.error("Not Implemented: Select video")
         elif QMouseEvent.button() == Qt.LeftButton:
             self.play_vid(self.video.vid_path, self.get_default_player())

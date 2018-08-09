@@ -26,7 +26,7 @@ class Video(PermanentBase):
     search_item = Column(TextPickleType())
     vid_path = Column(String)
     watched = Column(Boolean)
-    watch_prio = Column(Boolean)
+    watch_prio = Column(Integer)
 
     def __init__(self, search_item):
         """
