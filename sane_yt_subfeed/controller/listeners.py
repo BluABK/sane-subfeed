@@ -320,27 +320,27 @@ class YtDirListener(QObject):
                     self.logger.info("Downloading thumbnail for: {}".format(vid.__dict__))
                     download_thumbnails_threaded([vid])
 
-                self.logger.info("Updating existing record in db")
+                self.logger.info("Updating existing record in db: {} - {}".format(vid.title, vid.__dict__))
                 db_session.commit()
                 self.model.db_update_videos()
                 self.model.db_update_downloaded_videos()
             else:
-                self.logger.info("File already downloaded by this system")
+                self.logger.info("File already downloaded by this system: {} - {}".format(vid.title, vid.__dict__))
             db_session.remove()
 
         else:
             db_session.remove()
             youtube_keys = load_keys(1)
-            self.logger.info("Grabbing new video information from youtube")
+            self.logger.info("Grabbing new video information from youtube: {}".format(vid_id))
             response_videos = list_uploaded_videos_videos(youtube_keys[0], [vid_id], 1)
             if len(response_videos) > 0:
                 video = response_videos[0]
                 video.vid_path = vid_path
                 video.downloaded = True
                 video.date_downloaded = datetime.datetime.utcnow()
-                self.logger.info("Downloading thumbnail")
+                self.logger.info("Downloading thumbnail: {} - {}".format(video.title, video.__dict__))
                 download_thumbnails_threaded([video])
-                self.logger.info("Adding new file to db")
+                self.logger.info("Adding new file to db: {} - {}".format(video.title, video.__dict__))
                 UpdateVideo(video,
                             finished_listeners=[self.model.grid_view_listener.downloadedVideosChangedinDB]).start()
             else:
