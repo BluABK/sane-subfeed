@@ -12,7 +12,7 @@
 * https://developers.google.com/youtube/v3/getting-started
 
 ## Migrate Database(for: sqlite3.OperationalError: no such column, when using old db)
-*   Add application to path:
+*   Add application to path(with multiple projects, must be done each time):
     ```
     pip install -e .
     ```
