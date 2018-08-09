@@ -1,3 +1,4 @@
+import math
 import os
 import shutil
 import threading
@@ -28,37 +29,45 @@ logger = create_logger(__name__)
 
 class DownloadThumbnail(threading.Thread):
 
-    def __init__(self, thread_list, video, force_dl_best, thumbnail_dict, progress_listener=None):
+    def __init__(self, videos, force_dl_best=True, progress_listener=None):
         threading.Thread.__init__(self)
         self.logger = create_logger(__name__ + ".DownloadThumbnail")
-        self.thread_list = thread_list
-        self.video = video
+        self.videos = videos
         self.force_dl_best = force_dl_best
-        self.thumbnail_dict = thumbnail_dict
         self.progress_listener = progress_listener
 
     def run(self):
-        vid_path = os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(self.video.video_id))
-        self.video.thumbnail_path = vid_path
-        if not os.path.exists(vid_path):
-            if self.force_dl_best:
-                force_download_best(self.video)
-            else:
-                quality = get_best_thumbnail(self.video)
-                crop = False
-                if 'standard' in quality['quality'] or 'high' in quality['quality'] or 'default' in quality['quality']:
-                    crop = True
-                download_file(self.thumbnail_dict['url'], vid_path, crop=crop, quality=quality['quality'])
-        self.thread_list.remove(self)
-        if self.progress_listener:
-            self.progress_listener.updateProgress.emit()
+        for video in self.videos:
+            vid_path = os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(video.video_id))
+            video.thumbnail_path = vid_path
+            if not os.path.exists(vid_path):
+                if self.force_dl_best:
+                    force_download_best(video)
+                    if not os.path.exists(vid_path):
+                        self.logger.warning(
+                            "force_download_best failed to download thumbnail for: {}".format(video.__dict__))
+                else:
+                    thumbnail_dict = get_best_thumbnail(video)
+                    quality = get_best_thumbnail(video)
+                    crop = False
+                    if 'standard' in quality['quality'] or 'high' in quality['quality'] or 'default' in quality[
+                        'quality']:
+                        crop = True
+                    download_file(thumbnail_dict['url'], vid_path, crop=crop, quality=quality['quality'])
+                    if not os.path.exists(vid_path):
+                        self.logger.warning(
+                            "download_file failed to download thumbnail for: {}".format(video.__dict__))
+            if self.progress_listener:
+                self.progress_listener.updateProgress.emit()
 
 
 def get_thumbnail_path(vid):
     return os.path.join(THUMBNAILS_PATH, '{}.jpg'.format(vid.video_id))
 
 
-def download_thumbnails_threaded(vid_list, progress_listener=None):
+def download_thumbnails_threaded(input_vid_list, progress_listener=None):
+    logger = create_logger(__name__ + ".download_thumbnails_threaded")
+
     thread_list = []
     thread_limit = int(read_config('Threading', 'img_threads'))
     force_dl_best = read_config('Thumbnails', 'force_download_best')
@@ -66,22 +75,24 @@ def download_thumbnails_threaded(vid_list, progress_listener=None):
     if progress_listener:
         progress_listener.setText.emit('Downloading thumbnails')
 
-    for vid in tqdm(vid_list, desc="Starting thumbnail threads", disable=read_config('Debug', 'disable_tqdm')):
-        thumbnail_dict = get_best_thumbnail(vid)
-        t = DownloadThumbnail(thread_list, vid, force_dl_best, thumbnail_dict, progress_listener=progress_listener)
+    vid_list = []
+    chunk_size = math.ceil(len(input_vid_list) / thread_limit)
+    for i in range(0, len(input_vid_list), chunk_size):
+        vid_list.append(input_vid_list[i:i + chunk_size])
+    counter = 0
+
+    logger.info(
+        "Starting thumbnail download threads for {} videos in {} threads".format(len(input_vid_list), len(vid_list)))
+    for vid_list_chunk in tqdm(vid_list, desc="Starting thumbnail threads",
+                               disable=read_config('Debug', 'disable_tqdm')):
+        t = DownloadThumbnail(vid_list_chunk, force_dl_best=force_dl_best, progress_listener=progress_listener)
         thread_list.append(t)
         t.start()
+        counter += 1
         if progress_listener:
             progress_listener.updateProgress.emit()
-        while len(thread_list) >= thread_limit:
-            time.sleep(0.0001)
     for t in tqdm(thread_list, desc="Waiting on thumbnail threads", disable=read_config('Debug', 'disable_tqdm')):
         t.join()
-    time.sleep(0.01)
-
-    # UpdateVideosThread(vid_list).start()
-    # return vid_list
-    # db_session.commit()
 
 
 def set_thumbnail(video):
@@ -179,11 +190,11 @@ def crop_blackbars(image_filename, quality):
     img = Image.open(image_filename)
     coords = None
     if quality == 'standard':
-        coords = (0, 60, 640, (480-60))
+        coords = (0, 60, 640, (480 - 60))
     elif quality == 'high':
-        coords = (0, 45, 480, (360-45))
+        coords = (0, 45, 480, (360 - 45))
     elif quality == 'default':
-        coords = (0, 11, 120, (90-11))
+        coords = (0, 11, 120, (90 - 11))
     cropped_img = img.crop(coords)
     cropped_img.save(os.path.join(THUMBNAILS_PATH, image_filename))
 
