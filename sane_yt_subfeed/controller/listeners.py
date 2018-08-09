@@ -123,6 +123,7 @@ class GridViewListener(QObject):
 
     @pyqtSlot(VideoD)
     def tile_watched(self, video: Video):
+        self.logger.info("Mark watched: {} - {}".format(video.title, video.__dict__))
         self.model.hide_downloaded_video_item(video)
         self.downloadedVideosChanged.emit()
         UpdateVideo(video, update_existing=True).start()
