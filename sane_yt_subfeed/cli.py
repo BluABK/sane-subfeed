@@ -1,3 +1,4 @@
+import datetime
 import sys
 
 import click
@@ -13,8 +14,9 @@ from sane_yt_subfeed.log_handler import logger
 @click.option(u'--no_gui', is_flag=True)
 @click.option(u'--test-channels', is_flag=True)
 @click.option(u'--update-watch-prio', is_flag=True)
+@click.option(u'--set-watched-day')
 @click.command()
-def cli(no_gui, test_channels, update_watch_prio):
+def cli(no_gui, test_channels, update_watch_prio, set_watched_day):
     if no_gui:
         run_print()
     if update_watch_prio:
@@ -25,6 +27,14 @@ def cli(no_gui, test_channels, update_watch_prio):
         db_session.commit()
         return
 
+    if set_watched_day:
+        videos = db_session.query(Video).filter(Video.downloaded == True).all()
+        for video in videos:
+            vid_age = datetime.datetime.utcnow() - video.date_published
+            if vid_age > datetime.timedelta(days=int(set_watched_day)):
+                video.watched = True
+        db_session.commit()
+        return
     if test_channels:
         run_channels_test()
     else:
