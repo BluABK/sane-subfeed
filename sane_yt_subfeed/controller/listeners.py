@@ -58,7 +58,7 @@ class GridViewListener(QObject):
         self.updateGridViewFromDb.connect(self.update_grid_view_from_db)
         self.updateFromDb.connect(self.update_from_db)
         self.scrollReachedEndGrid.connect(self.scroll_reached_end_grid)
-        self.scrollReachedEndPlay.connect(self.db_update_downloaded_videos)
+        self.scrollReachedEndPlay.connect(self.scroll_reached_end_play)
         self.thumbnailDownload.connect(self.thumbnail_download)
         self.decreaseWatchPrio.connect(self.decrease_watch_prio)
 
@@ -78,14 +78,14 @@ class GridViewListener(QObject):
         add_value = read_config("Model", "loaded_videos")
         self.model.videos_limit = self.model.videos_limit + add_value
         self.logger.info(
-            "Scroll for Grid View reached 80%, updating videos limit to {}".format(self.model.videos_limit))
+            "Scroll for Sub Feed reached end, updating videos limit to {}".format(self.model.videos_limit))
         self.model.db_update_videos()
 
-    def db_update_downloaded_videos(self):
+    def scroll_reached_end_play(self):
         add_value = read_config("Model", "loaded_videos")
         self.model.downloaded_videos_limit = self.model.downloaded_videos_limit + add_value
         self.logger.info(
-            "Scroll for Play View reached 80%, updating videos limit to {}".format(self.model.downloaded_videos_limit))
+            "Scroll for Play View reached end, updating videos limit to {}".format(self.model.downloaded_videos_limit))
         self.model.db_update_downloaded_videos()
 
     def update_from_db(self):
