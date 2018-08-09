@@ -207,7 +207,10 @@ def quality_404_check(img):
     """
     img_404 = Image.open(os.path.join(OS_PATH, '..', 'resources', 'quality404.jpg'))
     img_cmp = Image.open(img)
-    return ImageChops.difference(img_cmp, img_404).getbbox() is None
+    check = ImageChops.difference(img_cmp, img_404).getbbox() is None
+    if check:
+        logger.warning("Thumbnail: '{}' is YouTube 404 Image".format(img))
+    return check
 
 
 def resize_thumbnail(img_path, maxwidth, maxheight, out=True):
