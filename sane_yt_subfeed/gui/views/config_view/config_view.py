@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox, QScrollArea
 
 # Internal
-from sane_yt_subfeed.config_handler import read_config, defaults, get_size
+from sane_yt_subfeed.config_handler import read_config, DEFAULTS, get_size
 # import sane_yt_subfeed.gui.views.config_view.checkbox as checkbox
 from sane_yt_subfeed.gui.views.config_view import checkbox, combobox
 from sane_yt_subfeed.log_handler import create_logger
@@ -89,7 +89,7 @@ class ConfigViewWidget(QWidget):
         :return:
         """
         option = QLabel(description)
-        value = QCheckBox("(Default: {})".format(str(defaults[cfg_section][cfg_option])), self)
+        value = QCheckBox("(Default: {})".format(str(DEFAULTS[cfg_section][cfg_option])), self)
         value.setCheckState(2 if read_config(cfg_section, cfg_option) else 0)
         value.stateChanged.connect(value_listener)
         self.layout.addWidget(option, self.offset, 0)
@@ -107,7 +107,7 @@ class ConfigViewWidget(QWidget):
         :return:
         """
         option = QLabel(description)
-        value = QLabel(str(defaults[cfg_section][cfg_option]))
+        value = QLabel(str(DEFAULTS[cfg_section][cfg_option]))
         self.layout.addWidget(option, self.offset, 0)
         self.layout.addWidget(value, self.offset, 1)
         self.offset += 1

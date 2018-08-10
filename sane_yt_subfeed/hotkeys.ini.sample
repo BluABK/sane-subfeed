@@ -1,0 +1,25 @@
+[Global]
+preferences = Ctrl+P
+quit = Ctrl+Q
+copy_all_urls = Ctrl+D
+refresh_feed = Ctrl+R
+reload_subslist = Ctrl+L
+test_channels =
+manual_dir_search =
+manual_thumb_dl =
+manual_db_grab = Ctrl+E
+
+[View]
+subfeed = Ctrl+1
+playback = Ctrl+2
+detailed_list = Ctrl+3
+subscriptions = Ctrl+4
+
+[Subfeed]
+download = LeftButton
+dismiss = MidButton
+
+[Playback]
+prio_decrease = MidButton, Ctrl+LeftButton
+mark_watched = Alt+LeftButton
+play = MouseLeftButton

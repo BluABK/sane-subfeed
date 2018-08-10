@@ -13,6 +13,7 @@ keys.json
 keys_private.json
 *.pkl
 config.ini
+hotkeys.ini
 *.db
 *.db-journal
 *.db.*

@@ -22,6 +22,7 @@ from sane_yt_subfeed.gui.views.config_view.config_view import ConfigView
 from sane_yt_subfeed.gui.views.grid_view.grid_scroll_area import GridScrollArea
 from sane_yt_subfeed.gui.views.grid_view.play_view.play_view import PlayView
 from sane_yt_subfeed.gui.views.grid_view.sub_feed.sub_feed_view import SubFeedView
+from sane_yt_subfeed.gui.views.hotkeys_view.hotkeys_view import HotkeysView
 from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
 # from sane_yt_subfeed.uploads import Uploads
 from sane_yt_subfeed.gui.views.grid_view.grid_view import GridView
@@ -74,6 +75,7 @@ class MainWindow(QMainWindow):
         self.subs_view = SubscriptionsView(self)
         self.config_view = ConfigView(self)
         self.about_view = AboutView(self)
+        self.hotkeys_view = HotkeysView(self)
 
         self.init_ui()
 
@@ -131,7 +133,7 @@ class MainWindow(QMainWindow):
         self.add_menu(menubar, '&View')
         view_grid_view = self.add_submenu('&View', 'Subscription feed', self.view_grid, shortcut='Ctrl+1',
                                           tooltip='View subscription feed as a grid', icon='grid.png')
-        view_play_view = self.add_submenu('&View', 'Playable videos feed', self.view_play, shortcut='Ctrl+2',
+        view_play_view = self.add_submenu('&View', 'Playback feed', self.view_play, shortcut='Ctrl+2',
                                           tooltip='View downloaded videos as a grid',
                                           icon='play_view_basic.png')
         view_list_detailed_view = self.add_submenu('&View', 'Detailed List', self.view_list_detailed, shortcut='Ctrl+3',
@@ -145,8 +147,10 @@ class MainWindow(QMainWindow):
                                           tooltip='View Subscriptions', icon='subs.png')
 
         # Help menu
+        self.add_menu(menubar, '&Help')
+        view_hotkeys_view = self.add_submenu('&Help', 'Hotkeys', self.view_hotkeys, shortcut='F2',
+                                             tooltip='View hotkeys')
         if read_config('Debug', 'show_unimplemented_gui'):
-            self.add_menu(menubar, '&Help')
             view_about_view = self.add_submenu('&Help', 'About', self.view_about, shortcut='F1', tooltip='About me',
                                                icon='about.png')
 
@@ -198,6 +202,7 @@ class MainWindow(QMainWindow):
         self.central_widget.addWidget(self.config_view)
         if read_config('Debug', 'show_unimplemented_gui'):
             self.central_widget.addWidget(self.about_view)
+        self.central_widget.addWidget(self.hotkeys_view)
         self.central_widget.setCurrentWidget(self.grid_view)
 
         # if self.dimensions:
@@ -349,6 +354,13 @@ class MainWindow(QMainWindow):
         :return:
         """
         self.central_widget.setCurrentWidget(self.about_view)
+
+    def view_hotkeys(self):
+        """
+        Set View variable and CentralWidget to HotkeysView
+        :return:
+        """
+        self.central_widget.setCurrentWidget(self.hotkeys_view)
 
     # Function menu functions
     def clipboard_copy_urls(self):
