@@ -12,17 +12,19 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QSt
 from PyQt5.QtGui import QIcon
 
 # Project internal libs
+from sane_yt_subfeed.gui.views.config_view.config_view import ConfigViewWidget
+
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import GRID_VIEW_ID, PLAY_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.gui.toolbar import Toolbar
 from sane_yt_subfeed.gui.views.about_view import AboutView
-from sane_yt_subfeed.gui.views.config_view.config_view import ConfigView
+from sane_yt_subfeed.gui.views.config_view.config_window import ConfigWindow
+from sane_yt_subfeed.gui.views.config_view.hotkeys_view import HotkeysViewWidget
 from sane_yt_subfeed.gui.views.grid_view.grid_scroll_area import GridScrollArea
 from sane_yt_subfeed.gui.views.grid_view.play_view.play_view import PlayView
 from sane_yt_subfeed.gui.views.grid_view.sub_feed.sub_feed_view import SubFeedView
-from sane_yt_subfeed.gui.views.hotkeys_view.hotkeys_view import HotkeysView
 from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
 from sane_yt_subfeed.gui.views.list_detailed_view import ListDetailedView
 from sane_yt_subfeed.gui.views.list_tiled_view import ListTiledView
@@ -65,14 +67,15 @@ class MainWindow(QMainWindow):
         self.grid_view.set_view(SubFeedView(self.grid_view, self, main_model), GRID_VIEW_ID)
         self.play_view.set_view(PlayView(self.play_view, self, main_model), PLAY_VIEW_ID)
 
+        self.config_view = ConfigWindow(self)
+        self.hotkeys_view = ConfigWindow(self)
+        self.config_view.setWidget(ConfigViewWidget(self.config_view, self))
+        self.hotkeys_view.setWidget(HotkeysViewWidget(self.hotkeys_view, self))
+
         self.list_detailed_view = ListDetailedView(self)
         self.list_tiled_view = ListTiledView(self)
         self.subs_view = SubscriptionsView(self)
-        self.config_view = ConfigView(self)
         self.about_view = AboutView(self)
-        self.hotkeys_view = HotkeysView(self)
-        self.hotkeys_view.setGeometry(QRect(0, 55, 400, 425))
-        self.hotkeys_view.hide()
 
         self.init_ui()
 
@@ -357,11 +360,7 @@ class MainWindow(QMainWindow):
         Set View variable and CentralWidget to HotkeysView
         :return:
         """
-        if self.hotkeys_view.isVisible():
-            self.hotkeys_view.hide()
-        else:
-            self.hotkeys_view.show()
-        # self.central_widget.setCurrentWidget(self.hotkeys_view)
+        self.hotkeys_view.show()
 
     # Function menu functions
     def clipboard_copy_urls(self):

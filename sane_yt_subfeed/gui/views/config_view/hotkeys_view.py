@@ -1,25 +1,12 @@
 # PyQt5
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox, QScrollArea, QMainWindow
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox, QScrollArea
 
 # Internal
-from sane_yt_subfeed.config_handler import read_config, DEFAULTS_HOTKEYS, get_size
+from sane_yt_subfeed.config_handler import read_config, DEFAULTS_HOTKEYS
 # import sane_yt_subfeed.gui.views.config_view.checkbox as checkbox
-from sane_yt_subfeed.gui.views.config_view import checkbox, combobox
 from sane_yt_subfeed.log_handler import create_logger
 
-
-class HotkeysView(QScrollArea):
-
-    def __init__(self, parent):
-        super(HotkeysView, self).__init__(parent)
-
-        self.parent = parent
-        self.widget = HotkeysViewWidget(self, parent)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-
-        # self.resize(100, 100)
 
 
 class HotkeysViewWidget(QWidget):
