@@ -161,8 +161,7 @@ class MainWindow(QMainWindow):
         toolbar.addAction(view_subs_view)
         if read_config('Debug', 'show_unimplemented_gui'):
             toolbar.addAction(view_about_view)
-        toolbar.addAction(view_config_view)
-        # toolbar.addAction(view_hotkeys_view)
+
         toolbar.create_action_group()
         # not included in exclusive action group
         toolbar.addAction(refresh_feed)
@@ -198,7 +197,6 @@ class MainWindow(QMainWindow):
         if read_config('Debug', 'show_unimplemented_gui'):
             self.central_widget.addWidget(self.list_tiled_view)
         self.central_widget.addWidget(self.subs_view)
-        self.central_widget.addWidget(self.config_view)
         if read_config('Debug', 'show_unimplemented_gui'):
             self.central_widget.addWidget(self.about_view)
         # self.central_widget.addWidget(self.hotkeys_view)
@@ -344,7 +342,8 @@ class MainWindow(QMainWindow):
         Set View variable and CentralWidget to ConfigView
         :return:
         """
-        self.central_widget.setCurrentWidget(self.config_view)
+        self.config_view.show()
+        # self.central_widget.setCurrentWidget(self.config_view)
 
     def view_about(self):
         """
