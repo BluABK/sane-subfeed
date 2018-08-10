@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox
 from sane_yt_subfeed.config_handler import read_config, DEFAULTS, get_size, get_options
 # import sane_yt_subfeed.gui.views.config_view.checkbox as checkbox
 from sane_yt_subfeed.gui.views.config_view.config_items import checkbox, combobox
+from sane_yt_subfeed.gui.views.config_view.config_items.combobox import GenericConfigComboBox
 from sane_yt_subfeed.log_handler import create_logger
 
 
@@ -117,10 +118,9 @@ class ConfigViewWidget(QWidget):
             current_value = items.index(read_config(cfg_section, cfg_option))
         option = QLabel(description)
         # value = QCheckBox("(Default: {})".format(str(defaults[cfg_section][cfg_option])), self)
-        value = QComboBox()
+        value = GenericConfigComboBox(self, description, cfg_section, cfg_option, items, numeric=True)
         value.addItems(items)
         value.setCurrentIndex(current_value)
-        value.activated.connect(value_listener)
         self.layout.addWidget(option, self.offset, 0)
         self.layout.addWidget(value, self.offset, 1)
         self.offset += 1
