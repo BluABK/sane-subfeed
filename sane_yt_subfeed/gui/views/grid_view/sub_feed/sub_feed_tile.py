@@ -24,7 +24,7 @@ class SubFeedTile(VideoTile):
         menu = QMenu(self)
         copy_url_action = menu.addAction("Copy link")
         downloaded_item_action = menu.addAction("Copy link and mark as downloaded")
-        discard_item_action = menu.addAction("Discard video")
+        discard_item_action = menu.addAction("Dismiss video")
         open_thumbnail_file = menu.addAction("View image")
 
         action = menu.exec_(self.mapToGlobal(event.pos()))

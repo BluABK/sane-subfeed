@@ -64,7 +64,7 @@ class PlayTile(VideoTile):
         """
         menu = QMenu(self)
         copy_url_action = menu.addAction("Copy link")
-        discard_item_action = menu.addAction("Discard video(doesn't affect play_view)")
+        discard_item_action = menu.addAction("Dismiss video (BUG: Doesn't affect this view")
 
         alternative_player1 = read_config('Player', 'alternative_player1', literal_eval=False)
         alternative_player2 = read_config('Player', 'alternative_player2', literal_eval=False)

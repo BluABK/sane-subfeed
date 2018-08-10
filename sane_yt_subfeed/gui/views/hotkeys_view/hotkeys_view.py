@@ -1,6 +1,6 @@
 # PyQt5
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox, QScrollArea
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox, QScrollArea, QMainWindow
 
 # Internal
 from sane_yt_subfeed.config_handler import read_config, DEFAULTS_HOTKEYS, get_size
@@ -55,9 +55,9 @@ class HotkeysViewWidget(QWidget):
         self.layout = QGridLayout()
         self.setLayout(self.layout)
         self.populate_options()
-        mismatch = get_size() - self.offset
-        if mismatch != 0:
-            self.logger.warning("ConfigView is missing {} entries!".format(mismatch))
+        # mismatch = get_size(custom_ini="hotkeys") - self.offset
+        # if mismatch != 0:
+        #     self.logger.warning("HotkeysView is missing {} entries!".format(mismatch))
 
     def add_section(self, name):
         """

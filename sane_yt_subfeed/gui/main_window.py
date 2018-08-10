@@ -7,7 +7,7 @@ import os
 # PyQt5 libs
 from subprocess import check_output
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget, QLineEdit
 from PyQt5.QtGui import QIcon
 
@@ -71,6 +71,8 @@ class MainWindow(QMainWindow):
         self.config_view = ConfigView(self)
         self.about_view = AboutView(self)
         self.hotkeys_view = HotkeysView(self)
+        self.hotkeys_view.setGeometry(QRect(0, 55, 400, 425))
+        self.hotkeys_view.hide()
 
         self.init_ui()
 
@@ -160,6 +162,7 @@ class MainWindow(QMainWindow):
         if read_config('Debug', 'show_unimplemented_gui'):
             toolbar.addAction(view_about_view)
         toolbar.addAction(view_config_view)
+        # toolbar.addAction(view_hotkeys_view)
         toolbar.create_action_group()
         # not included in exclusive action group
         toolbar.addAction(refresh_feed)
@@ -198,7 +201,7 @@ class MainWindow(QMainWindow):
         self.central_widget.addWidget(self.config_view)
         if read_config('Debug', 'show_unimplemented_gui'):
             self.central_widget.addWidget(self.about_view)
-        self.central_widget.addWidget(self.hotkeys_view)
+        # self.central_widget.addWidget(self.hotkeys_view)
         self.central_widget.setCurrentWidget(self.grid_view)
 
         # if self.dimensions:
@@ -355,7 +358,11 @@ class MainWindow(QMainWindow):
         Set View variable and CentralWidget to HotkeysView
         :return:
         """
-        self.central_widget.setCurrentWidget(self.hotkeys_view)
+        if self.hotkeys_view.isVisible():
+            self.hotkeys_view.hide()
+        else:
+            self.hotkeys_view.show()
+        # self.central_widget.setCurrentWidget(self.hotkeys_view)
 
     # Function menu functions
     def clipboard_copy_urls(self):
