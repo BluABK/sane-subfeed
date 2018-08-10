@@ -71,26 +71,35 @@ def get_best_downloaded_videos(limit,
     return videos
 
 
-def compare_db_filtered(videos, limit, filters=(Video.discarded == False, Video.downloaded == False),
-                        sort_method=(desc(Video.date_published),)):
+def compare_db_filtered(videos, limit, discarded=False, downloaded=False):
     logger.info("Comparing filtered videos with DB")
-
-    # FIXME: move out of here
-    filter_days = read_config('Requests', 'filter_videos_days_old')
-    if filter_days >= 0:
-        date = datetime.datetime.utcnow() - datetime.timedelta(days=filter_days)
-        filters = filters + (Video.date_published > date,)
     return_list = []
-    # counter = 0
-    video_ids = [video.video_id for video in videos]
-    for i in range(0, len(video_ids), limit * 2):
-        temp_keys_list = video_ids[i:i + limit * 2]
-        return_list.extend(
-            db_session.query(Video).filter(Video.video_id.in_(temp_keys_list), *filters).order_by(*sort_method).limit(
-                limit - len(return_list)).all())
-    return_list = Video.to_video_ds(return_list)
+    counter = 0
+
+    filter_days = read_config('Requests', 'filter_videos_days_old')
+
+    for video in videos:
+        if filter_days >= 0:
+            date = datetime.datetime.utcnow() - datetime.timedelta(days=filter_days)
+            if video.date_published < date:
+                break
+        db_vid = get_vid_by_id(video.video_id)
+        if db_vid:
+            if db_vid.downloaded and downloaded:
+                continue
+            elif db_vid.discarded and discarded:
+                continue
+            else:
+                return_list.append(Video.to_video_d(video))
+                counter += 1
+        else:
+            return_list.append(video)
+            counter += 1
+        if counter >= limit:
+            break
     db_session.remove()
     return return_list
+
 
 
 def check_for_new(videos, deep_refresh=False):
@@ -130,7 +139,7 @@ def refresh_and_get_newest_videos(limit, filter_downloaded=False, progress_liste
         progress_listener.resetBar.emit()
     videos = refresh_uploads(progress_bar_listener=progress_listener, add_to_max=2 * limit, refresh_type=refresh_type)
     if filter_downloaded:
-        return_list = compare_db_filtered(videos, limit)
+        return_list = compare_db_filtered(videos, limit, discarded=true, downloaded=true)
     else:
         return_list = videos[:limit]
 
