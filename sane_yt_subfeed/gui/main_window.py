@@ -8,7 +8,7 @@ import os
 from subprocess import check_output
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget, QActionGroup, QLineEdit
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget, QLineEdit
 from PyQt5.QtGui import QIcon
 
 # Project internal libs
@@ -24,8 +24,6 @@ from sane_yt_subfeed.gui.views.grid_view.play_view.play_view import PlayView
 from sane_yt_subfeed.gui.views.grid_view.sub_feed.sub_feed_view import SubFeedView
 from sane_yt_subfeed.gui.views.hotkeys_view.hotkeys_view import HotkeysView
 from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
-# from sane_yt_subfeed.uploads import Uploads
-from sane_yt_subfeed.gui.views.grid_view.grid_view import GridView
 from sane_yt_subfeed.gui.views.list_detailed_view import ListDetailedView
 from sane_yt_subfeed.gui.views.list_tiled_view import ListTiledView
 from sane_yt_subfeed.log_handler import create_logger
@@ -256,7 +254,6 @@ class MainWindow(QMainWindow):
 
         return branchtag
 
-
     # Menu handling
     def add_menu(self, menubar, name):
         """
@@ -451,46 +448,6 @@ class MainWindow(QMainWindow):
         open_link_action = cmenu.addAction("Open link")
         close_action = cmenu.addAction("Close")
         action = cmenu.exec_(self.mapToGlobal(event.pos()))
-
-    def timer_event(self, e):  # TODO: Unused, planned usage in future (progressbar auto-refresh-timer)
-        """
-        Runs a generic timer
-        :param e:
-        :return:
-        """
-        if self.step >= 100:
-            self.timer.stop()
-            self.btn.setText('Finished')
-            return
-
-        self.step = self.step + 1
-        self.pbar.setValue(self.step)
-
-    def timer_do_action(self):  # TODO: Unused, planned usage in future (progressbar auto-refresh-timer)
-        """
-        Tick that clock!
-        :return:
-        """
-        if self.timer.isActive():
-            self.timer.stop()
-            self.btn.setText('Start')
-        else:
-            self.timer.start(100, self)
-            self.btn.setText('Stop')
-
-    def timer_progressbar(self):  # TODO: Unused, planned usage in future (progressbar auto-refresh-timer)
-        """
-        Progress, progress, progress!
-        :return:
-        """
-        if self.timer.isActive():
-            self.step = self.step + 1
-            self.pbar.setValue(self.step)
-            # self.timer.stop()
-            self.btn.setText('0')
-        else:
-            # self.timer.start(100, self)
-            self.btn.setText('1')
 
     # Misc cleanup handling
     @staticmethod
