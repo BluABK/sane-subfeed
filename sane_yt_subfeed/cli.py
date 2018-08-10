@@ -31,7 +31,7 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day):
         return
 
     if set_watched_day:
-        videos = db_session.query(Video).filter(Video.downloaded == True, or_(Video.vid_path.is_(None))).all()
+        videos = db_session.query(Video).filter(or_(Video.downloaded == True, (Video.vid_path.is_(None)))).all()
         for video in videos:
             vid_age = datetime.datetime.utcnow() - video.date_published
             if vid_age > datetime.timedelta(days=int(set_watched_day)):

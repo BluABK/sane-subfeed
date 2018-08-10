@@ -29,63 +29,69 @@ def get_newest_stored_videos(limit, filter_downloaded=False):
     :param filter_downloaded:
     :return: list(VideoD)
     """
+    filters = ()
+
+    filter_days = read_config('Requests', 'filter_videos_days_old')
+    if filter_days >= 0:
+        date = datetime.datetime.utcnow() - datetime.timedelta(days=filter_days)
+        filters = filters + (Video.date_published > date,)
+
     if filter_downloaded:
-        logger.info("Getting newest stored videos (filter: downloaded)")
-        db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(
-            Video.downloaded != '1', Video.discarded != '1').limit(
+        filters = filters + (Video.downloaded != '1', Video.discarded != '1')
+
+    logger.info("Getting newest stored videos (filters={})".format(filters))
+    db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(*filters
+            ).limit(
             limit).all()
-    else:
-        logger.info("Getting newest stored videos")
-        db_videos = db_session.query(Video).order_by(desc(Video.date_published)).limit(limit).all()
     videos = Video.to_video_ds(db_videos)
     db_session.remove()
     return videos
 
 
-def get_best_downloaded_videos(limit, filter_watched=True, sort_method=ORDER_METHOD_PRIO_DATE_DOWNLOADED_UPLOAD_DATE):
+def get_best_downloaded_videos(limit,
+                               filters=(or_(Video.watched == false(), or_(Video.watched.is_(None))),),
+                               sort_method=(
+                                       asc(Video.watch_prio), desc(Video.date_downloaded), desc(Video.date_published))):
     """
 
+    :param filters: Tuple of filters
     :param sort_method:
-    :param filter_watched:
     :param limit:
     :return: list(VideoD)
     """
     db_query = db_session.query(Video)
 
-    if sort_method == ORDER_METHOD_PRIO_DATE_DOWNLOADED_UPLOAD_DATE:
-        db_query = db_query.order_by(asc(Video.watch_prio), desc(Video.date_downloaded), desc(Video.date_published))
-
+    # FIXME: move out of this function
     if read_config('Play', 'use_url_as_path'):
-        db_query = db_query.filter(Video.downloaded == True, or_(Video.watched.is_(None), Video.watched == false()))
-    elif filter_watched:
-        db_query = db_query.filter(Video.vid_path != "", or_(Video.watched.is_(None), Video.watched == false()))
+        filters = filters + (Video.downloaded == True,)
     else:
-        db_query = db_query.filter(Video.vid_path != "").limit(limit).all()
-    db_videos = db_query.limit(limit).all()
+        filters = filters + (Video.vid_path.isnot(None),)
+
+    db_query = db_query.filter(*filters)
+    db_videos = db_query.order_by(*sort_method).limit(limit).all()
     videos = Video.to_video_ds(db_videos)
     db_session.remove()
     return videos
 
 
-def compare_db_filtered(videos, limit, discarded=False, downloaded=False):
+def compare_db_filtered(videos, limit, filters=(Video.discarded == False, Video.downloaded == False),
+                        sort_method=(desc(Video.date_published),)):
     logger.info("Comparing filtered videos with DB")
+
+    # FIXME: move out of here
+    filter_days = read_config('Requests', 'filter_videos_days_old')
+    if filter_days >= 0:
+        date = datetime.datetime.utcnow() - datetime.timedelta(days=filter_days)
+        filters = filters + (Video.date_published > date,)
     return_list = []
-    counter = 0
-    for video in videos:
-        db_vid = db_session.query(Video).get(video.video_id)
-        if db_vid:
-            if db_vid.downloaded and downloaded:
-                continue
-            elif db_vid.discarded and discarded:
-                continue
-            else:
-                return_list.append(db_vid.to_video_d(video))
-                counter += 1
-        else:
-            return_list.append(video)
-            counter += 1
-        if counter >= limit:
-            break
+    # counter = 0
+    video_ids = [video.video_id for video in videos]
+    for i in range(0, len(video_ids), limit * 2):
+        temp_keys_list = video_ids[i:i + limit * 2]
+        return_list.extend(
+            db_session.query(Video).filter(Video.video_id.in_(temp_keys_list), *filters).order_by(*sort_method).limit(
+                limit - len(return_list)).all())
+    return_list = Video.to_video_ds(return_list)
     db_session.remove()
     return return_list
 
@@ -127,7 +133,7 @@ def refresh_and_get_newest_videos(limit, filter_downloaded=False, progress_liste
         progress_listener.resetBar.emit()
     videos = refresh_uploads(progress_bar_listener=progress_listener, add_to_max=2 * limit, refresh_type=refresh_type)
     if filter_downloaded:
-        return_list = compare_db_filtered(videos, limit, True, True)
+        return_list = compare_db_filtered(videos, limit)
     else:
         return_list = videos[:limit]
 
@@ -149,6 +155,7 @@ def get_vid_by_id(video_id):
     stmt = get_video_by_id_stmt(video_id)
     db_video = engine.execute(stmt).first()
     return db_video
+
 
 def get_videos_by_ids(video_ids):
     db_videos = engine.execute(Video.__table__.select(Video.video_id.in_(video_ids)))

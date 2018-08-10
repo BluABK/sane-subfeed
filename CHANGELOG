@@ -1,3 +1,8 @@
+Current
+- Added priority to downloaded videos
+- Added option to filter videos based on age
+- Made views exclusive checkable
+
 v0.3.4
 - Added optional video-grab input field on toolbar
 - More logging improvement across the entire project
