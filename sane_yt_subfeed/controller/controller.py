@@ -10,6 +10,7 @@ from sane_yt_subfeed.database.read_operations import refresh_and_get_newest_vide
     get_best_downloaded_videos
 from sane_yt_subfeed.log_handler import create_logger
 
+
 class Controller:
 
     def __init__(self):
@@ -28,22 +29,16 @@ class Controller:
         start_with_stored_videos = read_config('Debug', 'start_with_stored_videos')
         if start_with_stored_videos:
             subscription_feed = get_newest_stored_videos(vid_limit, filter_downloaded=filter_dl)
-            if len(subscription_feed) < 1:
-                self.logger.warning('Used start_with_stored_videos=True, but there where no stored videos found')
-                print('Used start_with_stored_videos=True, but there where no stored videos found')
-                print('Get new videos? (y)')  # FIXME: Handle with GUI popup msg
-                user_response = input()
-                if user_response == 'n':
-                    exit(1)
-                else:
-                    subscription_feed = refresh_and_get_newest_videos(vid_limit, filter_downloaded=filter_dl)
+            self.logger.info(
+                'Used start_with_stored_videos=True, and got {} videos from DB'.format(len(subscription_feed)))
         else:
             subscription_feed = refresh_and_get_newest_videos(vid_limit, filter_downloaded=filter_dl)
 
         downloaded_videos = get_best_downloaded_videos(vid_limit)
 
         model = MainModel([], subscription_feed, downloaded_videos, vid_limit)
-        self.logger.info("Created MainModel: len(subscription_feed) = {}, vid_limit = {}".format(len(subscription_feed), vid_limit))
+        self.logger.info(
+            "Created MainModel: len(subscription_feed) = {}, vid_limit = {}".format(len(subscription_feed), vid_limit))
 
         grid_view_x = read_config('Gui', 'grid_view_x')
         grid_view_y = read_config('Gui', 'grid_view_y')
