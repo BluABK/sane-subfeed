@@ -13,13 +13,12 @@ tt_font_sizes = ['h1', 'h2', 'h3', 'h4', 'h5', 'p']
 
 
 class GenericConfigComboBox(QComboBox):
-    def __init__(self, parent, description, cfg_section, cfg_option, items, numeric=True):
+    def __init__(self, parent, description, cfg_section, cfg_option, items):
         super(QComboBox, self).__init__(parent=parent)
         self.description = description
         self.cfg_section = cfg_section
         self.cfg_option = cfg_option
         self.items = items
-        self.numeric = numeric
 
         self.addItems(self.items)
         current_item = read_config(cfg_section, cfg_option, literal_eval=False)
@@ -31,7 +30,6 @@ class GenericConfigComboBox(QComboBox):
         self.currentIndexChanged.connect(self.save_option)
 
     def save_option(self, value):
-        pass
-        # set_config(self.cfg_section, self.cfg_option, format(value))
+        set_config(self.cfg_section, self.cfg_option, format(self.itemText(value)))
 
 
