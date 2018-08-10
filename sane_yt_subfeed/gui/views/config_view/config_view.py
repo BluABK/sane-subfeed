@@ -91,7 +91,7 @@ class ConfigViewWidget(QWidget):
 
         return value  # Needed for connected listeners etc
 
-    def add_option_combobox(self, description, cfg_section, cfg_option, items, numeric=True):
+    def add_option_combobox(self, description, cfg_section, cfg_option, items):
         """
         Add an option w/ value to the ConfigView layout and increment the grid offset.
         :param numeric:
@@ -147,8 +147,7 @@ class ConfigViewWidget(QWidget):
                                  checkbox.gui_tooltip_pictures)
         self.add_option_combobox('\tTooltip picture width', 'Gui', 'tooltip_picture_width', list(range(1, 1000)))
         self.add_option_combobox('\tTooltip picture height', 'Gui', 'tooltip_picture_height', list(range(1, 1000)))
-        self.add_option_combobox('\tTooltip picture font size', 'Gui', 'tooltip_picture_size', list(range(1, 1000)),
-                                 numeric=False)
+        self.add_option_combobox('\tTooltip picture font size', 'Gui', 'tooltip_picture_size', list(range(1, 1000)))
         self.add_option_checkbox('Keep Aspect Ratop on resized thumbnails', 'Gui', 'keep_thumb_ar',
                                  checkbox.gui_keep_thumb_ar)
         self.add_option_checkbox('Auto copy to clipboard', 'Gui', 'enable_auto_copy_to_clipboard',
@@ -198,16 +197,11 @@ class ConfigViewWidget(QWidget):
         self.add_option_checkbox('Force download best quality, based on prioritised list',
                                  'Thumbnails', 'force_download_best',
                                  checkbox.thumbnails_force_download_best)
-        self.add_option_combobox('1. Priority', 'Thumbnails', '0',  thumb_qualities,
-                                 numeric=False)
-        self.add_option_combobox('2. Priority', 'Thumbnails', '1',  thumb_qualities,
-                                 numeric=False)
-        self.add_option_combobox('3. Priority', 'Thumbnails', '2',  thumb_qualities,
-                                 numeric=False)
-        self.add_option_combobox('4. Priority', 'Thumbnails', '3',  thumb_qualities,
-                                 numeric=False)
-        self.add_option_combobox('5. Priority', 'Thumbnails', '4',  thumb_qualities,
-                                 numeric=False)
+        self.add_option_combobox('1. Priority', 'Thumbnails', '0',  thumb_qualities)
+        self.add_option_combobox('2. Priority', 'Thumbnails', '1',  thumb_qualities)
+        self.add_option_combobox('3. Priority', 'Thumbnails', '2',  thumb_qualities)
+        self.add_option_combobox('4. Priority', 'Thumbnails', '3',  thumb_qualities)
+        self.add_option_combobox('5. Priority', 'Thumbnails', '4',  thumb_qualities)
 
         # Section [Threading]
         self.add_section('{}Threading{}'.format(self.deco_l, self.deco_r))
