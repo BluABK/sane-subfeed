@@ -1,28 +1,11 @@
 # PyQt5
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox, QScrollArea
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox
 
 # Internal
 from sane_yt_subfeed.config_handler import read_config, DEFAULTS, get_size, get_options
 # import sane_yt_subfeed.gui.views.config_view.checkbox as checkbox
-from sane_yt_subfeed.gui.views.config_view import checkbox, combobox
+from sane_yt_subfeed.gui.views.config_view.config_items import checkbox, combobox
 from sane_yt_subfeed.log_handler import create_logger
-
-
-class ConfigView(QScrollArea):
-
-    def __init__(self, main_window):
-        super(ConfigView, self).__init__()
-
-        self.main_window = main_window
-        self.widget = ConfigViewWidget(self, self.main_window)
-        self.setWidget(self.widget)
-        self.setWidgetResizable(True)
-
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.slider_lock = False
-        # self.resize(100, 100)
 
 
 class ConfigViewWidget(QWidget):
