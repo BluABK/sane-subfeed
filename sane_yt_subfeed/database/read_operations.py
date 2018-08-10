@@ -41,17 +41,16 @@ def get_newest_stored_videos(limit, filter_downloaded=False):
 
     logger.info("Getting newest stored videos (filters={})".format(filters))
     db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(*filters
-            ).limit(
-            limit).all()
+                                                                                    ).limit(
+        limit).all()
     videos = Video.to_video_ds(db_videos)
     db_session.remove()
     return videos
 
 
 def get_best_downloaded_videos(limit,
-                               filters=(or_(Video.watched == false(), or_(Video.watched.is_(None))),),
-                               sort_method=(
-                                       asc(Video.watch_prio), desc(Video.date_downloaded), desc(Video.date_published))):
+                               filters=(~Video.watched, Video.downloaded), sort_method=(
+        asc(Video.watch_prio), desc(Video.date_downloaded), desc(Video.date_published))):
     """
 
     :param filters: Tuple of filters
@@ -62,10 +61,8 @@ def get_best_downloaded_videos(limit,
     db_query = db_session.query(Video)
 
     # FIXME: move out of this function
-    if read_config('Play', 'use_url_as_path'):
-        filters = filters + (Video.downloaded == True,)
-    else:
-        filters = filters + (Video.vid_path.isnot(None),)
+    if not read_config('Play', 'use_url_as_path'):
+        filters = filters + (Video.vid_path,)
 
     db_query = db_query.filter(*filters)
     db_videos = db_query.order_by(*sort_method).limit(limit).all()
