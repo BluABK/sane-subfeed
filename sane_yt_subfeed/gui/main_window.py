@@ -34,7 +34,6 @@ ICO_PATH = os.path.join(OS_PATH, 'icons')
 
 
 class MainWindow(QMainWindow):
-    subs = []
     current_view = None
     grid_view = None
     subs_view = None
@@ -50,8 +49,6 @@ class MainWindow(QMainWindow):
         self.logger = create_logger(__name__)
         self.main_model = main_model
 
-        for fakech in range(100):
-            self.subs.append("Fake channel #{:3d}".format(fakech))
         self.clipboard = QApplication.clipboard()
         self.status_bar = self.statusBar()
         self.menus = {}
@@ -88,7 +85,7 @@ class MainWindow(QMainWindow):
         self.add_submenu('&File', 'Exit', qApp.quit, shortcut='Ctrl+Q', tooltip='Exit application')
 
         view_config_view = self.add_submenu('&File', 'Preferences', self.view_config, shortcut='Ctrl+P',
-                                            tooltip='Change application settings')
+                                            tooltip='Change application settings', icon='preferences.png')
         # Function menu
         self.add_menu(menubar, '&Function')
 
@@ -162,6 +159,7 @@ class MainWindow(QMainWindow):
         toolbar.addAction(view_subs_view)
         if read_config('Debug', 'show_unimplemented_gui'):
             toolbar.addAction(view_about_view)
+        toolbar.addAction(view_config_view)
         toolbar.create_action_group()
         # not included in exclusive action group
         toolbar.addAction(refresh_feed)
