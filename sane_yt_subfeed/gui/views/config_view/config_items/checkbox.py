@@ -17,10 +17,10 @@ class GenericConfigCheckBox(QCheckBox):
 
         self.setCheckState(2 if read_config(cfg_section, cfg_option) else 0)
 
-        self.stateChanged.connect(self.change_this_plz_apply_button)
+        self.stateChanged.connect(self.save_option)
 
-    def change_this_plz_apply_button(self, state):
+    def save_option(self, state):
         if state == Qt.Checked:
-            set_config('Gui', 'launch_gui', 'True')
+            set_config(self.cfg_section, self.cfg_option, 'True')
         else:
-            set_config('Gui', 'launch_gui', 'False')
+            set_config(self.cfg_section, self.cfg_option, 'False')
