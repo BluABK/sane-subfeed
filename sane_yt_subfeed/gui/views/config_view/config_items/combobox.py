@@ -1,7 +1,6 @@
-from PyQt5.QtCore import Qt  # PyCharm bug: Anything from QtCore will fail detection, but it *is* there.
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox
+from PyQt5.QtWidgets import QComboBox
 
-from sane_yt_subfeed.config_handler import read_config, set_config, read_entire_config, get_sections, get_options
+from sane_yt_subfeed.config_handler import read_config, set_config
 
    # FIXME: Get QComboBox to set strings not ints
 tt_font_sizes = ['h1', 'h2', 'h3', 'h4', 'h5', 'p']
