@@ -7,6 +7,7 @@ from sane_yt_subfeed.config_handler import read_config, DEFAULTS, get_size, get_
 from sane_yt_subfeed.gui.views.config_view.config_items import checkbox, combobox
 from sane_yt_subfeed.gui.views.config_view.config_items.checkbox import GenericConfigCheckBox
 from sane_yt_subfeed.gui.views.config_view.config_items.combobox import GenericConfigComboBox
+from sane_yt_subfeed.gui.views.config_view.config_items.line_edit import GenericLineEdit
 from sane_yt_subfeed.log_handler import create_logger
 
 
@@ -67,6 +68,22 @@ class ConfigViewWidget(QWidget):
         """
         option = QLabel(description)
         value = GenericConfigCheckBox(self, description, cfg_section, cfg_option)
+        self.layout.addWidget(option, self.offset, 0)
+        self.layout.addWidget(value, self.offset, 1)
+        self.offset += 1
+
+        return value  # Needed for connected listeners etc
+
+    def add_option_line_edit(self, description, cfg_section, cfg_option):
+        """
+        Add an option w/ text value to the ConfigView layout and increment the grid offset.
+        :param cfg_option:
+        :param cfg_section:
+        :param description:
+        :return:
+        """
+        option = QLabel(description)
+        value = GenericLineEdit(self, description, cfg_section, cfg_option)
         self.layout.addWidget(option, self.offset, 0)
         self.layout.addWidget(value, self.offset, 1)
         self.offset += 1
@@ -159,7 +176,7 @@ class ConfigViewWidget(QWidget):
         self.add_option_checkbox('Show channel grab methods', 'Debug', 'show_grab_method')
         self.add_option_checkbox('Log all YouTube API responses: search()', 'Debug', 'log_search')
         self.add_option_checkbox('Log all YouTube API responses: list()', 'Debug', 'log_list')
-        self.add_option_inactive('\t Haystack needle ', 'Debug', 'log_needle')
+        self.add_option_line_edit('\t Haystack needle ', 'Debug', 'log_needle')
         self.add_option_checkbox('Show unimplemented GUI elements', 'Debug', 'show_unimplemented_gui')
 
         # Section [Model]
@@ -193,7 +210,7 @@ class ConfigViewWidget(QWidget):
 
         # Section [Play]
         self.add_section('{}View: Playback{}'.format(self.deco_l, self.deco_r))
-        self.add_option_inactive('YouTube video directory', 'Play', 'yt_file_path')
+        self.add_option_line_edit('YouTube video directory', 'Play', 'yt_file_path')
         self.add_option_checkbox('Disable directory listener (inotify)', 'Play', 'disable_dir_listener')
         self.add_option_checkbox('Use URL as path', 'Play', 'use_url_as_path')
         self.add_option_combobox('Default watch priority', 'Play', 'default_watch_prio', list(range(0, 101)))
@@ -206,18 +223,18 @@ class ConfigViewWidget(QWidget):
         self.add_section('{}Download (geoblock failover) proxy{}'.format(self.deco_l, self.deco_r))
         _counter = 1
         for proxy in get_options('Youtube-dl_proxies'):
-            self.add_option_inactive('Proxy #{}'.format(_counter), 'Youtube-dl_proxies', proxy)
+            self.add_option_line_edit('Proxy #{}'.format(_counter), 'Youtube-dl_proxies', proxy)
             _counter += 1
 
         # Section [Player]
         self.add_section('{}Media player{}'.format(self.deco_l, self.deco_r))
-        self.add_option_inactive('Default Player', 'Player', 'default_player')
+        self.add_option_line_edit('Default Player', 'Player', 'default_player')
         _counter = 1
         for alt_player in get_options('Player'):
             if _counter == 1:  # Skip default player
                 _counter += 1
                 continue
-            self.add_option_inactive('Alternative Player #{}'.format(_counter), 'Player', alt_player)
+            self.add_option_line_edit('Alternative Player #{}'.format(_counter), 'Player', alt_player)
             _counter += 1
 
         # Section [Logging]
