@@ -7,6 +7,11 @@ thumb_qualities = ['maxres', 'standard', 'high', 'medium', 'default']   # FIXME:
 tt_font_sizes = ['h1', 'h2', 'h3', 'h4', 'h5', 'p']
 
 
+# ######################################################################## #
+# ################################# [GUI] ################################ #
+# ######################################################################## #
+
+
 def gui_grid_view_x(number):
     """
     Sets the integer value of the current setting
@@ -63,6 +68,11 @@ def gui_tooltip_picture_size(font_size):
     set_config('Gui', 'tooltip_picture_size', str(tt_font_sizes[font_size]))
 
 
+# ######################################################################## #
+# ################################ [Debug] ############################### #
+# ######################################################################## #
+
+
 def debug_channels_limit(value):
     """
     Sets the integer value of the current setting
@@ -75,6 +85,23 @@ def debug_channels_limit(value):
     else:
         value -= 1
     set_config('Debug', 'channels_limit', str(value))
+
+
+# ######################################################################## #
+# ################################ [Model] ############################### #
+# ######################################################################## #
+
+
+def model_loaded_videos(number):
+    """
+    Sets the integer value of the current setting
+    :return:
+    """
+    set_config('Model', 'loaded_videos', str(number + 1))
+
+# ######################################################################## #
+# ############################## [Requests] ############################## #
+# ######################################################################## #
 
 
 def requests_miss_limit(number):
@@ -91,6 +118,34 @@ def requests_test_pages(number):
     :return:
     """
     set_config('Requests', 'test_pages', str(number + 1))
+
+
+def requests_extra_list_pages(number):
+    """
+    Sets the integer value of the current setting
+    :return:
+    """
+    set_config('Requests', 'extra_list_pages', str(number + 1))
+
+
+def requests_deep_search_quota_k(number):
+    """
+    Sets the integer value of the current setting
+    :return:
+    """
+    set_config('Requests', 'deep_search_quota_k', str(number + 1))
+
+
+def requests_filter_videos_days_old(number):
+    """
+    Sets the integer value of the current setting
+    :return:
+    """
+    set_config('Requests', 'filter_videos_days_old', str(number + 1))
+
+# ######################################################################## #
+# ############################# [Thumbnails] ############################# #
+# ######################################################################## #
 
 
 def thumbnails_priority_1(quality):
@@ -139,3 +194,37 @@ def threading_img_threads(number):
     :return:
     """
     set_config('Threading', 'img_threads', str(number + 1))
+
+
+# ######################################################################## #
+# ################################ [Play] ################################ #
+# ######################################################################## #
+
+
+def play_default_watch_prio(number):
+    """
+    Sets the integer value of the current setting
+    :return:
+    """
+    set_config('Play', 'default_watch_prio', str(number + 1))
+
+
+# ######################################################################## #
+# ############################## [Logging] ############################### #
+# ######################################################################## #
+
+
+def logging_log_level(number):
+    """
+    Sets the integer value of the current setting
+    :return:
+    """
+    set_config('Logging', 'log_level', str(number + 1))
+
+
+def logging_port(number):
+    """
+    Sets the integer value of the current setting
+    :return:
+    """
+    set_config('Logging', 'logging_port', str(number + 1))
