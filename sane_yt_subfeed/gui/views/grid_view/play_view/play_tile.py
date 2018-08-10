@@ -1,4 +1,5 @@
 import os
+import sys
 import subprocess
 
 from PyQt5.QtCore import Qt, QEvent
@@ -79,6 +80,8 @@ class PlayTile(VideoTile):
         if alternative_player3:
             alternative_player3_action = menu.addAction("Play with alternative player 3")
 
+        open_thumbnail_file = menu.addAction("View image")
+
         action = menu.exec_(self.mapToGlobal(event.pos()))
         if action == copy_url_action:
             self.copy_url()
@@ -90,6 +93,15 @@ class PlayTile(VideoTile):
             self.play_vid(self.video.vid_path, alternative_player2)
         elif action == alternative_player3_action:
             self.play_vid(self.video.vid_path, alternative_player3)
+        elif action == open_thumbnail_file:
+            try:
+                if sys.platform.startswith('linux'):
+                    subprocess.call(["xdg-open", self.video.thumbnail_path])
+                else:
+                    os.startfile(self.video.thumbnail_path)
+            except Exception as e_anything:
+                self.logger.exception(e_anything)
+                pass
 
     def old_videos(self, vid_age):
         pass
