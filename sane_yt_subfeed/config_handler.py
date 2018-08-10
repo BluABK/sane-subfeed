@@ -5,12 +5,17 @@ from configparser import ConfigParser, NoSectionError, NoOptionError
 
 OS_PATH = os.path.dirname(__file__)
 CONFIG_PATH = os.path.join(OS_PATH, '..', 'config.ini')
+CONFIG__HOTKEYS_PATH = os.path.join(OS_PATH, '..', 'hotkeys.ini')
+SAMPLE_HOTKEYS_PATH = os.path.join(OS_PATH, '..', 'hotkeys.ini.sample')
 SAMPLE_PATH = os.path.join(OS_PATH, '..', 'config.ini.sample')
 
-parser = ConfigParser()
-parser.read(CONFIG_PATH)
+parser = None
+default_parser = ConfigParser()
+default_parser.read(CONFIG_PATH)
+hotkeys_parser = ConfigParser()
+hotkeys_parser.read(CONFIG_PATH)
 
-defaults = {
+DEFAULTS = {
     'Model': {
         'loaded_videos': '200'
     },
@@ -94,11 +99,64 @@ defaults = {
     }
 }
 
+DEFAULTS_HOTKEYS = {
+    'Global': {
+        'preferences': 'Ctrl+P',
+        'quit': 'Ctrl+Q',
+        'copy_all_urls': 'Ctrl+D',
+        'refresh_feed': 'Ctrl+R',
+        'reload_subslist': 'Ctrl+L',
+        'test_channels': "",
+        'manual_dir_search': "",
+        'manual_thumb_dl': "",
+        'manual_db_grab': 'Ctrl+E'
+    },
+    'View': {
+        'subfeed': 'Ctrl+1',
+        'playback': 'Ctrl+2',
+        'detailed_list': 'Ctrl+3',
+        'subscriptions': 'Ctrl+5'
+    },
+    'Subfeed': {
+        'download': 'LeftButton',
+        'dismiss': 'MidButton'
+    },
+    'Playback': {
+        'prio_decrease': 'MidButton, Ctrl+LeftButton',
+        'mark_watched': 'Alt+LeftButton',
+        'play': 'MouseLeftButton'
+    }
+}
 
-def read_config(section, option, literal_eval=True):
+
+def read_config(section, option, literal_eval=True, custom_ini=None):
+    """
+    Reads a configuration file (INI format)
+    :param section:
+    :param option:
+    :param literal_eval: eval config literally, instead of string
+    :param custom_ini: if set, use given custom config
+    :return:
+    """
+    config_path = CONFIG_PATH
+    sample_path = SAMPLE_PATH
+    defaults = DEFAULTS
+    parser = default_parser
+    # Support multiple configs
+    if custom_ini is not None:
+        # logger.debug("Reading custom config: {}".format(custom_ini))
+        if custom_ini == "hotkeys":
+            config_path = CONFIG__HOTKEYS_PATH
+            sample_path = SAMPLE_HOTKEYS_PATH
+            defaults = DEFAULTS_HOTKEYS
+            parser = hotkeys_parser
+        else:
+            # logger.critical("Custom config '{}' is not defined in handler!!".format(custom_ini))
+            raise ValueError("Custom config '{}' is not defined in handler!!".format(custom_ini))
+
     if literal_eval:
-        if not os.path.exists(CONFIG_PATH):
-            copyfile(SAMPLE_PATH, CONFIG_PATH)
+        if not os.path.exists(config_path):
+            copyfile(sample_path, config_path)
         try:
             value = parser.get(section, option)
         except (NoSectionError, NoOptionError):
@@ -111,8 +169,8 @@ def read_config(section, option, literal_eval=True):
         else:
             return ast.literal_eval(defaults[section][option])
     else:
-        if not os.path.exists(CONFIG_PATH):
-            copyfile(SAMPLE_PATH, CONFIG_PATH)
+        if not os.path.exists(config_path):
+            copyfile(sample_path, config_path)
         try:
             value = parser.get(section, option)
         except (NoSectionError, NoOptionError):
@@ -126,18 +184,24 @@ def read_config(section, option, literal_eval=True):
             return defaults[section][option]
 
 
-
-def read_entire_config():
+def read_entire_config(custom_ini=None):
     """
     Reads the entire config file into a nested dict-list-dict
     :return:
     """
+    _parser = default_parser
+    if custom_ini is not None:
+        if custom_ini == "hotkeys":
+            _parser = hotkeys_parser
+        else:
+            raise ValueError("Custom config '{}' is not defined in handler!!".format(custom_ini))
+
     config = {}
-    for section in parser.sections():
+    for section in _parser.sections():
         # print("[{}]".format(section))
         config[section] = []
         section_option = {}
-        for option in parser.options(section):
+        for option in _parser.options(section):
             value = read_config(section, option)
             section_option[option] = value
             config[section].append(section_option)
@@ -145,45 +209,74 @@ def read_entire_config():
     return config
 
 
-def get_sections():
+def get_sections(custom_ini=None):
     """
     Returns config sections
     :return:
     """
-    return parser.sections()
+    _parser = default_parser
+    if custom_ini is not None:
+        if custom_ini == "hotkeys":
+            _parser = hotkeys_parser
+        else:
+            raise ValueError("Custom config '{}' is not defined in handler!!".format(custom_ini))
+
+    return _parser.sections()
 
 
-def get_options(section):
+def get_options(section, custom_ini=None):
     """
     Returns config sections
     :return:
     """
-    return parser.options(section)
+    _parser = default_parser
+    if custom_ini is not None:
+        if custom_ini == "hotkeys":
+            _parser = hotkeys_parser
+        else:
+            raise ValueError("Custom config '{}' is not defined in handler!!".format(custom_ini))
+
+    return _parser.options(section)
 
 
-def get_size():
+def get_size(custom_ini=None):
     """
     Sums up sections and options
     :return:
     """
+    _parser = default_parser
+    if custom_ini is not None:
+        if custom_ini == "hotkeys":
+            _parser = hotkeys_parser
+        else:
+            raise ValueError("Custom config '{}' is not defined in handler!!".format(custom_ini))
+
     size = 0
-    for section in parser.sections():
+    for section in _parser.sections():
         size += 1
-        for option in parser.options(section):
+        for _ in _parser.options(section):
             size += 1
 
     return size
 
 
-def set_config(section, option, value):
+def set_config(section, option, value, custom_ini=None):
     """
     Sets the givenm option's value
+    :param custom_ini:
     :param section:
     :param option:
     :param value:
     :return:
     """
-    parser.set(section, option, value)
+    _parser = default_parser
+    if custom_ini is not None:
+        if custom_ini == "hotkeys":
+            _parser = hotkeys_parser
+        else:
+            raise ValueError("Custom config '{}' is not defined in handler!!".format(custom_ini))
+
+    _parser.set(section, option, value)
     with open(CONFIG_PATH, 'w') as config:
-        parser.write(config)
+        _parser.write(config)
 
