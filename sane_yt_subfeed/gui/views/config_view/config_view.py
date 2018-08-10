@@ -11,16 +11,17 @@ from sane_yt_subfeed.log_handler import create_logger
 
 class ConfigView(QScrollArea):
 
-    def __init__(self, parent):
-        super(ConfigView, self).__init__(parent)
+    def __init__(self, main_window):
+        super(ConfigView, self).__init__()
 
-        self.parent = parent
-        self.widget = ConfigViewWidget(self, parent)
+        self.main_window = main_window
+        self.widget = ConfigViewWidget(self, self.main_window)
+        self.setWidget(self.widget)
+        self.setWidgetResizable(True)
+
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.setWidgetResizable(True)
         self.slider_lock = False
-
         # self.resize(100, 100)
 
 
