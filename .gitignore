@@ -27,7 +27,7 @@ __pycache__
 *.png
 
 # Whitelist Project images
-!sane_yt_subfeed/gui/icons
+!sane_yt_subfeed/gui/icons/*
 !quality404.jpg
 !thumbnail_na.png
 
