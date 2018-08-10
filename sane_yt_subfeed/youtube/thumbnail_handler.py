@@ -77,7 +77,7 @@ def download_thumbnails_threaded(input_vid_list, progress_listener=None):
 
     vid_list = []
     chunk_size = math.ceil(len(input_vid_list) / thread_limit)
-    for i in range(0, len(input_vid_list), chunk_size):
+    for i in range(0, len(input_vid_list), max(chunk_size, 1)):
         vid_list.append(input_vid_list[i:i + chunk_size])
     counter = 0
 
