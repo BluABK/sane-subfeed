@@ -53,7 +53,7 @@ class PlayTile(VideoTile):
             player = read_config('Player', 'url_player', literal_eval=False)
         self.play_vid(file_path, player, mark_watched=mark_watched)
 
-    def play_vid_test(self, file_path, player, mark_watched=True):
+    def play_vid(self, file_path, player, mark_watched=True):
         # player = player.strip()
 
         if mark_watched:
