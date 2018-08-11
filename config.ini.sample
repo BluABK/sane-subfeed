@@ -17,6 +17,9 @@ enable_auto_copy_to_clipboard = False
 show_watched = False
 show_dismissed = False
 
+[SubFeed]
+show_downloaded = False
+
 [Debug]
 debug = False
 cached_subs = True

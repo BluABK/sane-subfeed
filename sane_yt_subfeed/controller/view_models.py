@@ -25,14 +25,14 @@ class MainModel:
     status_bar_thread = None
     status_bar_listener = None
 
-    def __init__(self, videos, filtered_videos, downloaded_videos, videos_limit):
+    def __init__(self, videos, videos_limit):
         super().__init__()
         self.logger = create_logger(__name__)
         self.videos_limit = videos_limit
         self.downloaded_videos_limit = videos_limit
         self.videos = videos
-        self.filtered_videos = filtered_videos
-        self.downloaded_videos = downloaded_videos
+        self.filtered_videos = []
+        self.downloaded_videos = []
 
         self.logger.info("Creating listeners and threads")
         self.grid_view_listener = GridViewListener(self)
@@ -71,17 +71,29 @@ class MainModel:
         self.logger.info("Getting newest stored videos from DB")
         # FIXME: only does filtered videos
         if filtered:
-            self.filtered_videos = get_newest_stored_videos(self.videos_limit, filtered)
+            show_downloaded = read_config('SubFeed', 'show_downloaded')
+            show_dismissed = read_config('GridView', 'show_dismissed')
+            update_filter = ()
+            if not show_downloaded:
+                update_filter += (~Video.downloaded,)
+            if not show_dismissed:
+                update_filter += (~Video.discarded,)
+            self.filtered_videos = get_newest_stored_videos(self.videos_limit, filters=update_filter)
             self.grid_view_listener.hiddenVideosChanged.emit()
         else:
             self.videos = get_newest_stored_videos(self.videos_limit, filtered)
 
     def remote_update_videos(self, filtered=True, refresh_type=LISTENER_SIGNAL_NORMAL_REFRESH):
         self.logger.info("Reloading and getting newest videos from YouTube")
-        # FIXME: only does filtered videos
+
         if filtered:
-            self.filtered_videos = refresh_and_get_newest_videos(self.videos_limit, filtered, self.status_bar_listener,
-                                                                 refresh_type=refresh_type)
+            show_downloaded = not read_config('SubFeed', 'show_downloaded')
+            show_dismissed = not read_config('GridView', 'show_dismissed')
+            self.filtered_videos = refresh_and_get_newest_videos(self.videos_limit,
+                                                                 progress_listener=self.status_bar_listener,
+                                                                 refresh_type=refresh_type,
+                                                                 filter_discarded=show_dismissed,
+                                                                 filter_downloaded=show_downloaded)
             self.grid_view_listener.hiddenVideosChanged.emit()
         else:
             self.videos = refresh_and_get_newest_videos(self.videos_limit, filtered, self.status_bar_listener,

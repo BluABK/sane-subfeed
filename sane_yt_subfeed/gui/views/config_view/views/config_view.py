@@ -72,6 +72,10 @@ class ConfigViewWidget(InputSuper):
         self.add_option_checkbox('Show watched videos', 'GridView', 'show_watched')
         self.add_option_checkbox('Show dismissed videos', 'GridView', 'show_dismissed')
 
+        # Section [GridView]
+        self.add_section('{}View: SubFeed{}'.format(self.deco_l, self.deco_r))
+        self.add_option_checkbox('Show downloaded videos', 'SubFeed', 'show_downloaded')
+
         # Section [Debug]
         self.add_section('{}Debug{}'.format(self.deco_l, self.deco_r))
         self.add_option_checkbox('Debug prints', 'Debug', 'debug')
