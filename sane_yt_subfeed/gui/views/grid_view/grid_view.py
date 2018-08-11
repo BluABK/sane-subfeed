@@ -2,6 +2,7 @@ import math
 
 from PyQt5 import sip
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QWidget, QGridLayout, QSizePolicy
 
 from sane_yt_subfeed.config_handler import read_config
@@ -39,6 +40,13 @@ class GridView(QWidget):
         self.setAutoFillBackground(True)
         self.set_bgcolor()
 
+        self.main_model.grid_view_listener.redrawVideos.connect(self.redraw_videos)
+
+    def redraw_videos(self, videos):
+        for video in videos:
+            if video.video_id in self.q_labels.keys():
+                self.logger.info("Redrawing video: {} - {}".format(video.title, video.__dict__))
+                self.q_labels[video.video_id].set_video(video)
 
     def videos_changed(self):
         self.logger.info('Updating tiles')
