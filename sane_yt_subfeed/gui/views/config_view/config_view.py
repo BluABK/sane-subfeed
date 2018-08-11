@@ -3,20 +3,23 @@ from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox
 
 # Internal
-from sane_yt_subfeed.config_handler import read_config, DEFAULTS, get_size, get_options
+from sane_yt_subfeed.config_handler import DEFAULTS, get_size, get_options
 # import sane_yt_subfeed.gui.views.config_view.checkbox as checkbox
 from sane_yt_subfeed.gui.views.config_view.config_item_types import THUMBNAIL_QUALITIES, TT_FONT_SIZES
 from sane_yt_subfeed.gui.views.config_view.config_items import checkbox, combobox
 from sane_yt_subfeed.gui.views.config_view.config_items.checkbox import GenericConfigCheckBox
 from sane_yt_subfeed.gui.views.config_view.config_items.combobox import GenericConfigComboBox
 from sane_yt_subfeed.gui.views.config_view.config_items.line_edit import GenericLineEdit
+from sane_yt_subfeed.gui.views.config_view.input_super import InputSuper
 from sane_yt_subfeed.log_handler import create_logger
 
 
-class ConfigViewWidget(QWidget):
+class ConfigViewWidget(InputSuper):
     """
     Configuration widget
     """
+    deco_l = "【"
+    deco_r = "】"
 
     def __init__(self, parent, root):
         """
@@ -25,19 +28,9 @@ class ConfigViewWidget(QWidget):
         :param clipboard:
         :param status_bar:
         """
-        super(ConfigViewWidget, self).__init__(parent)
-        self.parent = parent
-        self.root = root  # MainWindow
-        self.logger = create_logger(__name__)
-        self.clipboard = self.root.clipboard
-        self.status_bar = self.root.status_bar
-
-        self.offset = 0
-        self.layout = None
-        self.deco_l = "【"
-        self.deco_r = "】"
-
+        super().__init__(parent, root)
         self.init_ui()
+        self.populate_options()
 
     def init_ui(self):
         """
@@ -45,88 +38,10 @@ class ConfigViewWidget(QWidget):
         :return:
         """
         self.logger.info("Initializing UI")
-        self.layout = QGridLayout()
-        self.setLayout(self.layout)
-        self.populate_options()
         mismatch = get_size() - self.offset
         if mismatch != 0:
             self.logger.warning("ConfigView is missing {} entries!".format(mismatch))
 
-    def add_section(self, name):
-        """
-        Add a section to the ConfigView layout and increment grid offset.
-        :return:
-        """
-        self.layout.addWidget(QLabel(name), self.offset, 0)
-        self.offset += 1
-
-    def add_option_checkbox(self, description, cfg_section, cfg_option):
-        """
-        Add an option w/ value to the ConfigView layout and increment the grid offset.
-        :param cfg_option:
-        :param cfg_section:
-        :param description:
-        :return:
-        """
-        option = QLabel(description)
-        value = GenericConfigCheckBox(self, description, cfg_section, cfg_option)
-        self.layout.addWidget(option, self.offset, 0)
-        self.layout.addWidget(value, self.offset, 1)
-        self.offset += 1
-
-        return value  # Needed for connected listeners etc
-
-    def add_option_line_edit(self, description, cfg_section, cfg_option, cfg_validator=None):
-        """
-        Add an option w/ text value to the ConfigView layout and increment the grid offset.
-        :param cfg_option:
-        :param cfg_section:
-        :param description:
-        :return:
-        """
-        option = QLabel(description)
-        value = GenericLineEdit(self, description, cfg_section, cfg_option, cfg_validator=cfg_validator)
-        self.layout.addWidget(option, self.offset, 0)
-        self.layout.addWidget(value, self.offset, 1)
-        self.offset += 1
-
-        return value  # Needed for connected listeners etc
-
-    def add_option_inactive(self, description, cfg_section, cfg_option):
-        """
-        Add an option w/ UNEDITABLE value to the ConfigView layout and increment the grid offset.
-        :param cfg_option:
-        :param cfg_section:
-        :param description:
-        :return:
-        """
-        option = QLabel(description)
-        value = QLabel(str(DEFAULTS[cfg_section][cfg_option]))
-        self.layout.addWidget(option, self.offset, 0)
-        self.layout.addWidget(value, self.offset, 1)
-        self.offset += 1
-
-        return value  # Needed for connected listeners etc
-
-    def add_option_combobox(self, description, cfg_section, cfg_option, items):
-        """
-        Add an option w/ value to the ConfigView layout and increment the grid offset.
-        :param items:
-        :param cfg_option:
-        :param cfg_section:
-        :param description:
-        :return:
-        """
-
-        formated_items = [format(item) for item in items]
-
-        option = QLabel(description)
-        value = GenericConfigComboBox(self, description, cfg_section, cfg_option, formated_items)
-        self.layout.addWidget(option, self.offset, 0)
-        self.layout.addWidget(value, self.offset, 1)
-        self.offset += 1
-
-        return value  # Needed for connected listeners etc
 
     def populate_options(self):
         """
@@ -237,3 +152,4 @@ class ConfigViewWidget(QWidget):
         # Section [Toolbar]
         self.add_section('{}Toolbar{}'.format(self.deco_l, self.deco_r))
         self.add_option_checkbox('Show on-demand download video field?', 'Toolbar', 'show_download_video_field')
+
