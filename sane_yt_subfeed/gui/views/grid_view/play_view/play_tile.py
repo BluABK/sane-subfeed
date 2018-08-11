@@ -83,6 +83,7 @@ class PlayTile(VideoTile):
         copy_url_action = menu.addAction("Copy link")
         discard_item_action = menu.addAction("Dismiss video")
         watch_item_action = menu.addAction("Mark watched")
+        play_wo_action = menu.addAction("Play w/o mark watched")
 
         if alternative_player1:
             alternative_player1_action = menu.addAction("Play with alternative player 1")
@@ -101,6 +102,8 @@ class PlayTile(VideoTile):
             self.mark_discarded()
         elif action == watch_item_action:
             self.mark_watched()
+        elif action == play_wo_action:
+            self.config_play_video(self.video.vid_path, self.get_default_player(), mark_watched=False)
         elif action == alternative_player1_action and alternative_player1_action:
             self.play_vid(self.video.vid_path, alternative_player1)
         elif action == alternative_player2_action and alternative_player2_action:
