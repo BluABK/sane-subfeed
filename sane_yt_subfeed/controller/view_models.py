@@ -3,10 +3,12 @@ from PyQt5.QtCore import QThread
 # FIXME: imp*
 from PyQt5.QtWidgets import QProgressBar
 
+from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.listeners import GridViewListener, DatabaseListener, MainWindowListener, YtDirListener, \
     LISTENER_SIGNAL_NORMAL_REFRESH, ProgressBar
 from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, refresh_and_get_newest_videos, \
     get_best_downloaded_videos
+from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
@@ -94,7 +96,14 @@ class MainModel:
         return self.status_bar_progress
 
     def db_update_downloaded_videos(self):
-        self.downloaded_videos = get_best_downloaded_videos(self.downloaded_videos_limit)
+        show_watched = read_config('GridView', 'show_watched')
+        show_dismissed = read_config('GridView', 'show_dismissed')
+        update_filter = (Video.downloaded,)
+        if not show_watched:
+            update_filter += (~Video.watched,)
+        if not show_dismissed:
+            update_filter += (~Video.discarded,)
+        self.downloaded_videos = get_best_downloaded_videos(self.downloaded_videos_limit, filters=update_filter)
         self.grid_view_listener.downloadedVideosChanged.emit()
 
     def update_thumbnails(self):
