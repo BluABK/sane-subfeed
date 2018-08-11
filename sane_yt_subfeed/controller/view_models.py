@@ -62,6 +62,7 @@ class MainModel:
     def hide_video_item(self, video):
         self.logger.debug("Hiding video item: {}".format(video))
         remove_video(self.filtered_videos, video)
+        remove_video(self.downloaded_videos, video)
 
     def hide_downloaded_video_item(self, video):
         remove_video(self.downloaded_videos, video)
