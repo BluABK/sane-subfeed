@@ -139,13 +139,15 @@ class ConfigViewWidget(InputSuper):
         # Section [Player]
         self.add_section('{}Media player{}'.format(self.deco_l, self.deco_r))
         self.add_option_line_edit('Default Player', 'Player', 'default_player')
+        self.add_option_line_edit('Url Player', 'Player', 'url_player')
         _counter = 1
         for alt_player in get_options('Player'):
-            if _counter == 1:  # Skip default player
+            # if _counter == 1:  # Skip default player
+            #     _counter += 1
+            #     continue
+            if "alternative_player" in alt_player:
+                self.add_option_line_edit('Alternative Player #{}'.format(_counter), 'Player', alt_player)
                 _counter += 1
-                continue
-            self.add_option_line_edit('Alternative Player #{}'.format(_counter), 'Player', alt_player)
-            _counter += 1
 
         # Section [Logging]
         self.add_section('{}Logging{}'.format(self.deco_l, self.deco_r))

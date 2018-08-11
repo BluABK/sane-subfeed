@@ -71,6 +71,7 @@ proxy5 =
 
 [Player]
 default_player = ""
+url_player =
 alternative_player1 = ""
 alternative_player2 = ""
 alternative_player3 = ""
