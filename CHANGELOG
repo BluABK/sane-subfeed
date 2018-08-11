@@ -2,6 +2,8 @@ Current
 - Added priority to downloaded videos
 - Added option to filter videos based on age
 - Made views exclusive checkable
+- Added text edit to config view
+- Added Hotkeys View
 
 v0.3.4
 - Added optional video-grab input field on toolbar
