@@ -111,7 +111,7 @@ class InputSuper(QWidget):
     def input_read_config_default(self, section, option):
         return "Not implemented"
 
-    def input_read_config(self, section, option, literal_eval=False):
+    def input_read_config(self, section, option, literal_eval=True):
         return read_config(section, option, literal_eval=literal_eval)
 
     def output_set_config(self, section, option, value):
