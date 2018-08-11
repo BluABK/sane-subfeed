@@ -87,7 +87,8 @@ DEFAULTS = {
         'default_player': "",
         'alternative_player1': "",
         'alternative_player2': "",
-        'alternative_player3': ""
+        'alternative_player3': "",
+        'url_player': ""
     },
     'Logging': {
         'use_socket_log': 'False',

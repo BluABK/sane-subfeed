@@ -60,9 +60,9 @@ def get_best_downloaded_videos(limit,
     """
     db_query = db_session.query(Video)
 
-    # FIXME: move out of this function
-    if not read_config('Play', 'use_url_as_path'):
-        filters = filters + (~Video.vid_path,)
+    # # FIXME: move out of this function
+    # if not read_config('Play', 'use_url_as_path'):
+    #     filters = filters + (Video.vid_path != "",)
 
     db_query = db_query.filter(*filters)
     db_videos = db_query.order_by(*sort_method).limit(limit).all()
