@@ -40,7 +40,6 @@ class PlayTile(VideoTile):
             self.config_play_video(self.video.vid_path, self.get_default_player())
 
     def get_default_player(self):
-        print("default player")
         config_default_player = read_config('Player', 'default_player', literal_eval=False)
         if config_default_player:
             return config_default_player
@@ -73,8 +72,6 @@ class PlayTile(VideoTile):
         :return:
         """
         menu = QMenu(self)
-        copy_url_action = menu.addAction("Copy link")
-        discard_item_action = menu.addAction("Dismiss video (BUG: Doesn't affect this view")
 
         alternative_player1 = read_config('Player', 'alternative_player1', literal_eval=False)
         alternative_player2 = read_config('Player', 'alternative_player2', literal_eval=False)
@@ -83,6 +80,9 @@ class PlayTile(VideoTile):
         alternative_player1_action = None
         alternative_player2_action = None
         alternative_player3_action = None
+        copy_url_action = menu.addAction("Copy link")
+        discard_item_action = menu.addAction("Dismiss video")
+        watch_item_action = menu.addAction("Mark watched")
 
         if alternative_player1:
             alternative_player1_action = menu.addAction("Play with alternative player 1")
@@ -99,6 +99,8 @@ class PlayTile(VideoTile):
             self.copy_url()
         elif action == discard_item_action:
             self.mark_discarded()
+        elif action == watch_item_action:
+            self.mark_watched()
         elif action == alternative_player1_action and alternative_player1_action:
             self.play_vid(self.video.vid_path, alternative_player1)
         elif action == alternative_player2_action and alternative_player2_action:
