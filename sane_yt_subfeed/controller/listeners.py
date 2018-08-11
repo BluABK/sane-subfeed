@@ -106,6 +106,7 @@ class GridViewListener(QObject):
 
     def download_video(self, video):
         use_youtube_dl = read_config('Youtube-dl', 'use_youtube_dl')
+        video.downloaded = True
         if read_config('Play', 'use_url_as_path'):
             UpdateVideo(video, update_existing=True,
                         finished_listeners=[self.model.grid_view_listener.downloadedVideosChangedinDB]).start()
