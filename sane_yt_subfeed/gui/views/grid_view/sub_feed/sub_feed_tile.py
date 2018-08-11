@@ -4,6 +4,8 @@ import subprocess
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMenu, QApplication
+
+from sane_yt_subfeed.gui.views.grid_view.sub_feed.sub_thumbnail_tile import SubThumbnailTile
 from sane_yt_subfeed.log_handler import create_logger
 
 from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
@@ -14,6 +16,9 @@ class SubFeedTile(VideoTile):
     def __init__(self, parent, video, vid_id, clipboard, status_bar):
         super().__init__(parent, video, vid_id, clipboard, status_bar)
         self.logger = create_logger(__name__)
+
+    def init_thumbnailtile(self):
+        return SubThumbnailTile(self)
 
     def contextMenuEvent(self, event):
         """

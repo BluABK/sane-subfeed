@@ -1,0 +1,38 @@
+import os
+
+from PyQt5.QtCore import Qt, QSize, QPoint
+from PyQt5.QtGui import QPainter, QPixmap
+
+from sane_yt_subfeed.gui.views.grid_view.thumbnail_tile import ThumbnailTile
+from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.config_handler import read_config
+
+OS_PATH = os.path.dirname(__file__)
+ICONS_PATH = os.path.join(OS_PATH, '..', '..', '..', 'icons')
+RESOURCES_PATH = os.path.join(OS_PATH, '..', '..', '..', '..', 'resources')
+
+OVERLAY_NEW_PATH = os.path.join(ICONS_PATH, 'new_vid.png')
+OVERLAY_MISSED_PATH = os.path.join(ICONS_PATH, 'missed_vid.png')
+THUMBNAIL_NA_PATH = os.path.join(RESOURCES_PATH, 'thumbnail_na.png')
+
+
+class SubThumbnailTile(ThumbnailTile):
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.logger = create_logger(__name__)
+
+    def add_overlay(self, painter, thumb):
+        # show_dismissed = read_config('Play', 'show_dismissed')
+        if self.parent.video.missed or self.parent.video.new:
+            self.logger.debug("Adding [MISSED] overlay for: {} - {}".format(self.parent.video.title, self.__dict__))
+            if self.parent.video.missed:
+                overlay = QPixmap(OVERLAY_MISSED_PATH)
+            else:
+                self.logger.debug("Adding [NEW] overlay for: {} - {}".format(self.parent.video.title, self.__dict__))
+                overlay = QPixmap(OVERLAY_NEW_PATH)
+            resize_ratio = min(thumb.width() * 0.7 / thumb.width(), thumb.height() * 0.3 / thumb.height())
+            new_size = QSize(thumb.width() * resize_ratio, thumb.height() * resize_ratio)
+            overlay = overlay.scaled(new_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            point = QPoint(thumb.width() - overlay.width(), 0)
+            painter.drawPixmap(point, overlay)

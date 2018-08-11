@@ -37,7 +37,7 @@ class VideoTile(QWidget):
 
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(0, 0, 0, 4)
-        self.thumbnail_widget = ThumbnailTile(self)
+        self.thumbnail_widget = self.init_thumbnailtile()
         self.layout.addWidget(self.thumbnail_widget)
 
         self.title_widget = TitleTile(video.title, self)
@@ -51,6 +51,9 @@ class VideoTile(QWidget):
         self.setLayout(self.layout)
 
         self.set_video(video)
+
+    def init_thumbnailtile(self):
+        raise ValueError("ThumbnailTile initialised from VideoTile, not subclass!")
 
     def set_video(self, video):
         self.video = video

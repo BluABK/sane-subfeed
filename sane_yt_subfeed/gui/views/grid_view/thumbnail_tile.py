@@ -47,19 +47,15 @@ class ThumbnailTile(QLabel):
                 painter.drawPixmap(0, 0, thumb)
             else:
                 thumb = self
-                painter.drawPixmap(self.rect(), self.p)
+                painter.drawPixmap(thumb.rect(), thumb.p)
 
-            if self.parent.video.missed:
-                overlay = QPixmap(OVERLAY_MISSED_PATH)
-                resize_ratio = min(thumb.width() * 0.7 / thumb.width(), thumb.height() * 0.3 / thumb.height())
-                new_size = QSize(thumb.width() * resize_ratio, thumb.height() * resize_ratio)
-                overlay = overlay.scaled(new_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                point = QPoint(thumb.width() - overlay.width(), 0)
-                painter.drawPixmap(point, overlay)
-            elif self.parent.video.new:
-                overlay = QPixmap(OVERLAY_NEW_PATH)
-                resize_ratio = min(thumb.width() * 0.7 / thumb.width(), thumb.height() * 0.3 / thumb.height())
-                new_size = QSize(thumb.width() * resize_ratio, thumb.height() * resize_ratio)
-                overlay = overlay.scaled(new_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                point = QPoint(thumb.width() - overlay.width(), 0)
-                painter.drawPixmap(point, overlay)
+            self.add_overlay(painter, thumb)
+
+    def add_overlay(self, painter, thumb):
+        """
+        Add an overlay on top of the thumbnail
+        :param painter:
+        :param thumb:
+        :return:
+        """
+        pass

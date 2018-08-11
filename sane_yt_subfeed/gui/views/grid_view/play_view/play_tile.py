@@ -6,6 +6,7 @@ from PyQt5.QtCore import Qt, QEvent
 from PyQt5.QtWidgets import QApplication, QMenu
 
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.gui.views.grid_view.play_view.play_thumbnail_tile import PlayThumbnailTile
 from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
 from sane_yt_subfeed.log_handler import logger, create_logger
 
@@ -15,6 +16,9 @@ class PlayTile(VideoTile):
     def __init__(self, parent, video, vid_id, clipboard, status_bar):
         super().__init__(parent, video, vid_id, clipboard, status_bar)
         self.logger = create_logger(__name__)
+
+    def init_thumbnailtile(self):
+        return PlayThumbnailTile(self)
 
     def mousePressEvent(self, QMouseEvent):
         """

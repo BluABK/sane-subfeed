@@ -56,6 +56,10 @@ DEFAULTS = {
         'keep_thumb_ar': 'False',
         'enable_auto_copy_to_clipboard': 'False'
     },
+    'GridView': {
+        'show_watched': 'False',
+        'show_dismissed': 'False'
+    },
     'Thumbnails': {
         'force_download_best': 'True',
         '0': 'maxres',

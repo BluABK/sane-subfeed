@@ -29,8 +29,8 @@ class ConfigViewWidget(InputSuper):
         :param status_bar:
         """
         super().__init__(parent, root)
-        self.init_ui()
         self.populate_options()
+        self.init_ui()
 
     def init_ui(self):
         """
@@ -41,7 +41,6 @@ class ConfigViewWidget(InputSuper):
         mismatch = get_size() - self.offset
         if mismatch != 0:
             self.logger.warning("ConfigView is missing {} entries!".format(mismatch))
-
 
     def populate_options(self):
         """
@@ -67,6 +66,11 @@ class ConfigViewWidget(InputSuper):
         self.add_option_combobox('\tTooltip picture font size', 'Gui', 'tooltip_picture_size', TT_FONT_SIZES)
         self.add_option_checkbox('Keep Aspect Ratop on resized thumbnails', 'Gui', 'keep_thumb_ar')
         self.add_option_checkbox('Auto copy to clipboard', 'Gui', 'enable_auto_copy_to_clipboard')
+
+        # Section [GridView]
+        self.add_section('{}View: GridView{}'.format(self.deco_l, self.deco_r))
+        self.add_option_checkbox('Show watched videos', 'GridView', 'show_watched')
+        self.add_option_checkbox('Show dismissed videos', 'GridView', 'show_dismissed')
 
         # Section [Debug]
         self.add_section('{}Debug{}'.format(self.deco_l, self.deco_r))
@@ -152,4 +156,3 @@ class ConfigViewWidget(InputSuper):
         # Section [Toolbar]
         self.add_section('{}Toolbar{}'.format(self.deco_l, self.deco_r))
         self.add_option_checkbox('Show on-demand download video field?', 'Toolbar', 'show_download_video_field')
-
