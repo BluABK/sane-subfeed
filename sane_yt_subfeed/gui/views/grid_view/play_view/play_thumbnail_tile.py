@@ -30,7 +30,6 @@ class PlayThumbnailTile(ThumbnailTile):
         if ((not self.parent.video.vid_path) and url_as_path) or (self.parent.video.watched and show_watched) \
                 or (self.parent.video.discarded and show_dismissed):
             if not self.parent.video.vid_path:
-                self.logger.debug("Adding [NO FILE] overlay for: {} - {}".format(self.parent.video.title, self.__dict__))
                 overlay = QPixmap(OVERLAY_NO_FILE_PATH)
             elif self.parent.video.watched:
                 overlay = QPixmap(OVERLAY_WATCHED_PATH)

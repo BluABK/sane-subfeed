@@ -25,11 +25,9 @@ class SubThumbnailTile(ThumbnailTile):
     def add_overlay(self, painter, thumb):
         # show_dismissed = read_config('Play', 'show_dismissed')
         if self.parent.video.missed or self.parent.video.new:
-            self.logger.debug("Adding [MISSED] overlay for: {} - {}".format(self.parent.video.title, self.__dict__))
             if self.parent.video.missed:
                 overlay = QPixmap(OVERLAY_MISSED_PATH)
             else:
-                self.logger.debug("Adding [NEW] overlay for: {} - {}".format(self.parent.video.title, self.__dict__))
                 overlay = QPixmap(OVERLAY_NEW_PATH)
             resize_ratio = min(thumb.width() * 0.7 / thumb.width(), thumb.height() * 0.3 / thumb.height())
             new_size = QSize(thumb.width() * resize_ratio, thumb.height() * resize_ratio)
