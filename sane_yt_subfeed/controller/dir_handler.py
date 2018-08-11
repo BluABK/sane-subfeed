@@ -95,7 +95,7 @@ def get_new_and_updated_videos(vid_paths):
 
     return_videos = []
     for video in db_videos:
-        if not video.vid_path:
+        if not video.vid_path or not video.downloaded:
             video_d = Video.to_video_d(video)
             video_d.vid_path = vid_paths[video.video_id]
             video_d.downloaded = True
