@@ -35,21 +35,27 @@ class PlayTile(VideoTile):
         elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.AltModifier:
             self.mark_watched()
         elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ShiftModifier:
-            self.play_vid(self.video.vid_path, self.get_default_player(), mark_watched=False)
+            self.config_play_video(self.video.vid_path, self.get_default_player(), mark_watched=False)
         elif QMouseEvent.button() == Qt.LeftButton:
-            self.play_vid(self.video.vid_path, self.get_default_player())
+            self.config_play_video(self.video.vid_path, self.get_default_player())
 
     def get_default_player(self):
+        print("default player")
         config_default_player = read_config('Player', 'default_player', literal_eval=False)
         if config_default_player:
             return config_default_player
         else:
             return None
 
-    def play_vid(self, file_path, player, mark_watched=True):
-        # player = player.strip()
+    def config_play_video(self, file_path, player, mark_watched=True):
         if read_config('Play', 'use_url_as_path'):
             file_path = self.video.url_video
+            player = read_config('Player', 'url_player', literal_eval=False)
+        self.play_vid(file_path, player, mark_watched=mark_watched)
+
+    def play_vid_test(self, file_path, player, mark_watched=True):
+        # player = player.strip()
+
         if mark_watched:
             self.mark_watched()
         self.logger.info('Playing {}, with player: {}'.format(file_path, player))
@@ -73,6 +79,7 @@ class PlayTile(VideoTile):
         alternative_player1 = read_config('Player', 'alternative_player1', literal_eval=False)
         alternative_player2 = read_config('Player', 'alternative_player2', literal_eval=False)
         alternative_player3 = read_config('Player', 'alternative_player3', literal_eval=False)
+        url_player = read_config('Player', 'url_player', literal_eval=False)
         alternative_player1_action = None
         alternative_player2_action = None
         alternative_player3_action = None
@@ -83,6 +90,7 @@ class PlayTile(VideoTile):
             alternative_player2_action = menu.addAction("Play with alternative player 2")
         if alternative_player3:
             alternative_player3_action = menu.addAction("Play with alternative player 3")
+        url_player_action = menu.addAction("Play with url player")
 
         open_thumbnail_file = menu.addAction("View image")
 
@@ -91,12 +99,14 @@ class PlayTile(VideoTile):
             self.copy_url()
         elif action == discard_item_action:
             self.mark_discarded()
-        elif action == alternative_player1_action:
+        elif action == alternative_player1_action and alternative_player1_action:
             self.play_vid(self.video.vid_path, alternative_player1)
-        elif action == alternative_player2_action:
+        elif action == alternative_player2_action and alternative_player2_action:
             self.play_vid(self.video.vid_path, alternative_player2)
-        elif action == alternative_player3_action:
+        elif action == alternative_player3_action and alternative_player3_action:
             self.play_vid(self.video.vid_path, alternative_player3)
+        elif action == url_player_action:
+            self.play_vid(self.video.url_video, url_player)
         elif action == open_thumbnail_file:
             try:
                 if sys.platform.startswith('linux'):
@@ -106,6 +116,7 @@ class PlayTile(VideoTile):
             except Exception as e_anything:
                 self.logger.exception(e_anything)
                 pass
+
 
     def old_videos(self, vid_age):
         pass
