@@ -27,7 +27,8 @@ class PlayThumbnailTile(ThumbnailTile):
         url_as_path = read_config('Play', 'use_url_as_path')
         show_watched = read_config('GridView', 'show_watched')
         show_dismissed = read_config('GridView', 'show_dismissed')
-        if ((not self.parent.video.vid_path) and url_as_path) or (self.parent.video.watched and show_watched) \
+
+        if ((not self.parent.video.vid_path) and not url_as_path) or (self.parent.video.watched and show_watched) \
                 or (self.parent.video.discarded and show_dismissed):
             if not self.parent.video.vid_path:
                 overlay = QPixmap(OVERLAY_NO_FILE_PATH)
