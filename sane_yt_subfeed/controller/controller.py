@@ -25,32 +25,25 @@ class Controller:
         self.logger.info("Running Controller instance")
         vid_limit = read_config('Model', 'loaded_videos')
 
-        filter_dl = read_config('Gui', 'hide_downloaded')
         start_with_stored_videos = read_config('Debug', 'start_with_stored_videos')
+
+        model = MainModel([], vid_limit)
         if start_with_stored_videos:
-            subscription_feed = get_newest_stored_videos(vid_limit, filter_downloaded=filter_dl)
-            self.logger.info(
-                'Used start_with_stored_videos=True, and got {} videos from DB'.format(len(subscription_feed)))
+            model.db_update_videos()
         else:
-            subscription_feed = refresh_and_get_newest_videos(vid_limit, filter_downloaded=filter_dl)
+            model.remote_update_videos()
 
-        downloaded_videos = get_best_downloaded_videos(vid_limit)
+        model.db_update_downloaded_videos()
 
-        model = MainModel([], subscription_feed, downloaded_videos, vid_limit)
         self.logger.info(
-            "Created MainModel: len(subscription_feed) = {}, vid_limit = {}".format(len(subscription_feed), vid_limit))
+            "Created MainModel: len(subscription_feed) = {}, vid_limit = {}".format(len(model.filtered_videos),
+                                                                                    vid_limit))
 
-        grid_view_x = read_config('Gui', 'grid_view_x')
-        grid_view_y = read_config('Gui', 'grid_view_y')
-        tile_pref_height = read_config('Gui', 'tile_pref_height')
-        tile_pref_width = read_config('Gui', 'tile_pref_width')
-        # FIXME: static buffer
-        dimensions = [grid_view_x * tile_pref_width + 10, grid_view_y * tile_pref_height + 10]
+
 
         app = QApplication(sys.argv)
         self.logger.info("Created QApplication({})".format(sys.argv))
-        window = MainWindow(model, dimensions=dimensions)
-        self.logger.info("Created MainWindow({}, dimensions={})".format(model, dimensions))
+        window = MainWindow(model)
         window.show()
         self.logger.info("Executing Qt Application")
         app.exec_()

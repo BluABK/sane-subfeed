@@ -60,6 +60,9 @@ DEFAULTS = {
         'show_watched': 'False',
         'show_dismissed': 'False'
     },
+    'SubFeed': {
+        'show_downloaded': 'False',
+    },
     'Thumbnails': {
         'force_download_best': 'True',
         '0': 'maxres',
