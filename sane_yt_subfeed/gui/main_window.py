@@ -7,12 +7,12 @@ import os
 # PyQt5 libs
 from subprocess import check_output
 
-from PyQt5.QtCore import Qt, QRect
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget, QLineEdit
 from PyQt5.QtGui import QIcon
 
 # Project internal libs
-from sane_yt_subfeed.gui.views.config_view.config_view import ConfigViewWidget
+from sane_yt_subfeed.gui.views.config_view.views.config_view import ConfigViewWidget
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
@@ -21,7 +21,7 @@ from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.gui.toolbar import Toolbar
 from sane_yt_subfeed.gui.views.about_view import AboutView
 from sane_yt_subfeed.gui.views.config_view.config_window import ConfigWindow
-from sane_yt_subfeed.gui.views.config_view.hotkeys_view import HotkeysViewWidget
+from sane_yt_subfeed.gui.views.config_view.views.hotkeys_view import HotkeysViewWidget
 from sane_yt_subfeed.gui.views.grid_view.grid_scroll_area import GridScrollArea
 from sane_yt_subfeed.gui.views.grid_view.play_view.play_view import PlayView
 from sane_yt_subfeed.gui.views.grid_view.sub_feed.sub_feed_view import SubFeedView
