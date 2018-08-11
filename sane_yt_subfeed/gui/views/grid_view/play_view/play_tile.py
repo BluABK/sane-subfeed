@@ -33,7 +33,7 @@ class PlayTile(VideoTile):
         elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
             self.decrease_prio()
         elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.AltModifier:
-            self.mark_watched()
+            self.mark_discarded()
         elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ShiftModifier:
             self.config_play_video(self.video.vid_path, self.get_default_player(), mark_watched=False)
         elif QMouseEvent.button() == Qt.LeftButton:

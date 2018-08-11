@@ -134,6 +134,7 @@ class GridViewListener(QObject):
         self.logger.info("Video hidden from grid view(Discarded): {} - {} [{}]".format(video.channel_title, video.title,
                                                                                        video.url_video))
         self.hiddenVideosChanged.emit()
+        self.downloadedVideosChanged.emit()
         UpdateVideo(video, update_existing=True).start()
 
     def run(self):
