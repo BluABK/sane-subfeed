@@ -287,6 +287,10 @@ def set_config(section, option, value, custom_ini=None):
         else:
             raise ValueError("Custom config '{}' is not defined in handler!!".format(custom_ini))
 
-    _parser.set(section, option, value)
+    try:
+        _parser.set(section, option, value)
+    except NoSectionError:
+        _parser.add_section(section)
+        _parser.set(section, option, value)
     with open(CONFIG_PATH, 'w') as config:
         _parser.write(config)
