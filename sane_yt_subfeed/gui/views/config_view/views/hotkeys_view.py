@@ -69,6 +69,7 @@ class HotkeysViewWidget(InputSuper):
         self.manual_db_grab = self.add_option_line_edit('Manual DB grab', 'Global', 'manual_db_grab')
         self.download_video_by_url = self.add_option_line_edit('Download Video by URL/ID dialog', 'Global',
                                                                'download_video_by_url')
+        self.show_usage_history = self.add_option_line_edit('Show (usage) history', 'Global', 'show_usage_history')
 
         # Section [View]
         self.add_section('{}Views{}'.format(self.deco_l, self.deco_r))

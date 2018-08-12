@@ -9,6 +9,7 @@ from sane_yt_subfeed.gui.views.grid_view.thumbnail_tile import ThumbnailTile
 from sane_yt_subfeed.gui.views.grid_view.title_tile import TitleTile
 from sane_yt_subfeed.gui.views.grid_view.channel_tile import ChannelTile
 from sane_yt_subfeed.gui.views.grid_view.date_tile import DateTile
+from sane_yt_subfeed.history_handler import update_history
 from sane_yt_subfeed.log_handler import logger
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.models import Channel
@@ -109,7 +110,6 @@ class VideoTile(QWidget):
             else:
                 self.setToolTip("{}: {}".format(self.video.channel_title, self.video.title))
 
-
     def copy_url(self):
         """
         Copy selected video URL(s) to clipboard
@@ -127,6 +127,8 @@ class VideoTile(QWidget):
         """
         logger.info('Mark downloaded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
                                                                 self.video.title))
+        update_history('Downloaded:\t{} {} - {} '.format(self.video.url_video, self.video.channel_title,
+                                                         self.video.title))
         self.video.downloaded = True
         self.video.date_downloaded = datetime.datetime.utcnow()
         self.parent.main_model.grid_view_listener.tileDownloaded.emit(self.video)
@@ -142,8 +144,10 @@ class VideoTile(QWidget):
         Mark the video as discarded
         :return:
         """
-        logger.info('Mark discarded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
+        logger.info('Mark dismissed: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
                                                                self.video.title))
+        update_history('Dismissed:\t{} {} - {} '.format(self.video.url_video, self.video.channel_title,
+                                                        self.video.title))
         self.video.discarded = True
         self.parent.main_model.grid_view_listener.tileDiscarded.emit(self.video)
         self.status_bar.showMessage('Dismissed: {} ({} - {})'.format(self.video.url_video,
@@ -156,7 +160,9 @@ class VideoTile(QWidget):
         :return:
         """
         logger.debug('Mark watched: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
-                                                             self.video.title))
+                                                              self.video.title))
+        update_history('Watched:\t{} {} - {} '.format(self.video.url_video, self.video.channel_title,
+                                                      self.video.title))
         self.video.watched = True
         self.parent.main_model.grid_view_listener.tileWatched.emit(self.video)
 
