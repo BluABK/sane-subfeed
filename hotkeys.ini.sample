@@ -24,3 +24,4 @@ dismiss = MidButton
 prio_decrease = MidButton, Ctrl+LeftButton
 mark_watched = Alt+LeftButton
 play = MouseLeftButton
+ascending_sort_toggle = Ctrl+A
