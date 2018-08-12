@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QSt
 from PyQt5.QtGui import QIcon
 
 # Project internal libs
+from sane_yt_subfeed.gui.dialogs.input_dialog import SaneInputDialog
 from sane_yt_subfeed.gui.views.config_view.views.config_view import ConfigViewWidget
 
 from sane_yt_subfeed.config_handler import read_config, set_config
@@ -445,7 +446,8 @@ class MainWindow(QMainWindow):
         :param input_text: URL or ID
         :return:
         """
-        self.logger.debug("get_single_video({}) called self.main_model.main_window_listener.getVideo.emit()".format(input_text))
+        self.logger.debug(
+            "get_single_video({}) called self.main_model.main_window_listener.getVideo.emit()".format(input_text))
         self.main_model.main_window_listener.getSingleVideo.emit(input_text)
 
     def download_single_url_dialog(self):
@@ -453,10 +455,13 @@ class MainWindow(QMainWindow):
         Prompts user for downloading a video by URL/ID
         :return:
         """
-        input_text, ok = QInputDialog.getText(self, 'Download a video by URL/ID', 'URL/ID:')
-
-        if ok:
-            self.get_single_video(str(input_text))
+        input_dialog = SaneInputDialog(self, self, title='Download a video by URL/ID', label='URL/ID:',
+                                       ok_button_text='Download')
+        input_dialog.show()
+        # input_text, ok = QInputDialog.getText(self, 'Download a video by URL/ID', 'URL/ID:')
+        #
+        # if ok:
+        #     self.get_single_video(str(input_text))
 
     # Unused functions
     def context_menu_event(self, event):  # TODO: Unused, planned usage in future
