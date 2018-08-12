@@ -94,6 +94,7 @@ class PlayTile(VideoTile):
             alternative_player3_action = menu.addAction("Play with alternative player 3")
         url_player_action = menu.addAction("Play with url player")
 
+        menu.addSeparator()
         show_description_dialog = menu.addAction("View description")
         open_thumbnail_file = menu.addAction("View image")
         if read_config('Debug', 'debug'):
