@@ -133,7 +133,8 @@ DEFAULTS_HOTKEYS = {
     'Playback': {
         'prio_decrease': 'MidButton, Ctrl+LeftButton',
         'mark_watched': 'Alt+LeftButton',
-        'play': 'MouseLeftButton'
+        'play': 'MouseLeftButton',
+        'ascending_sort_toggle': 'Ctrl+A'
     }
 }
 

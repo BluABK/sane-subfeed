@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox, 
 # Internal
 from sane_yt_subfeed.config_handler import read_config, DEFAULTS_HOTKEYS, set_config
 # import sane_yt_subfeed.gui.views.config_view.checkbox as checkbox
+from sane_yt_subfeed.gui.views.config_view.config_items.line_edit import GenericLineEdit
 from sane_yt_subfeed.gui.views.config_view.input_super import InputSuper
 from sane_yt_subfeed.log_handler import create_logger
 
@@ -33,6 +34,21 @@ class HotkeysViewWidget(InputSuper):
         :return:
         """
         self.logger.info("Initializing UI")
+
+    def add_option_line_edit(self, description, cfg_section, cfg_option, cfg_validator=None):
+        """
+        Override of input super, to make LineEdit read only
+        :param cfg_option:
+        :param cfg_section:
+        :param description:
+        :return:
+        """
+        option = QLabel(description)
+        value = GenericLineEdit(self, description, cfg_section, cfg_option, cfg_validator=cfg_validator)
+        value.setReadOnly(True)
+        self.layout.addWidget(option, self.offset, 0)
+        self.layout.addWidget(value, self.offset, 1)
+        self.offset += 1
 
     def populate_options(self):
         """
@@ -72,6 +88,7 @@ class HotkeysViewWidget(InputSuper):
         self.prio_decrease = self.add_option_line_edit('Decrease priority', 'Playback', 'prio_decrease')
         self.mark_watched = self.add_option_line_edit('Mark watched', 'Playback', 'mark_watched')
         self.play_item = self.add_option_line_edit('Play video (implies: mark watched)', 'Playback', 'play')
+        self.toggle_ascending_sort = self.add_option_line_edit('Toggle ascending sort', 'Playback', 'ascending_sort_toggle')
 
     def input_read_config_default(self, section, option):
         return "Not implemented"
