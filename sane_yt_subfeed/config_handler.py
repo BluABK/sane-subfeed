@@ -63,6 +63,9 @@ DEFAULTS = {
     'SubFeed': {
         'show_downloaded': 'False',
     },
+    'PlaySort': {
+        'ascending_date': 'False'
+    },
     'Thumbnails': {
         'force_download_best': 'True',
         '0': 'maxres',
@@ -287,4 +290,3 @@ def set_config(section, option, value, custom_ini=None):
     _parser.set(section, option, value)
     with open(CONFIG_PATH, 'w') as config:
         _parser.write(config)
-

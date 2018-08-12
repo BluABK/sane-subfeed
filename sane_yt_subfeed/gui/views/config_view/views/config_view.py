@@ -76,6 +76,10 @@ class ConfigViewWidget(InputSuper):
         self.add_section('{}View: SubFeed{}'.format(self.deco_l, self.deco_r))
         self.add_option_checkbox('Show downloaded videos', 'SubFeed', 'show_downloaded')
 
+        # Section [PlaySort]
+        self.add_section('{}View: Play: Sort{}'.format(self.deco_l, self.deco_r))
+        self.add_option_checkbox('Sort by ascending date', 'PlaySort', 'ascending_date')
+
         # Section [Debug]
         self.add_section('{}Debug{}'.format(self.deco_l, self.deco_r))
         self.add_option_checkbox('Debug prints', 'Debug', 'debug')
