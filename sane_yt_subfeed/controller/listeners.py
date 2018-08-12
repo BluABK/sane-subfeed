@@ -109,6 +109,7 @@ class GridViewListener(QObject):
     def download_video(self, video):
         use_youtube_dl = read_config('Youtube-dl', 'use_youtube_dl')
         video.downloaded = True
+        video.date_downloaded = datetime.datetime.utcnow()
         UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
         if use_youtube_dl:
             YoutubeDownload(video, finished_listener=self.downloadFinished).start()
