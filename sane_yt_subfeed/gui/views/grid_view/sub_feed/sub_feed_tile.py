@@ -32,6 +32,8 @@ class SubFeedTile(VideoTile):
         copy_url_action = menu.addAction("Copy link")
         downloaded_item_action = menu.addAction("Copy link and mark as downloaded")
         discard_item_action = menu.addAction("Dismiss video")
+
+        menu.addSeparator()
         show_description_dialog = menu.addAction("View description")
         open_thumbnail_file = menu.addAction("View image")
         if read_config('Debug', 'debug'):
