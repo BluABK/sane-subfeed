@@ -10,7 +10,6 @@ from sane_yt_subfeed.gui.views.config_view.input_super import InputSuper
 from sane_yt_subfeed.log_handler import create_logger
 
 
-
 class HotkeysViewWidget(InputSuper):
     """
     Configuration widget
@@ -68,12 +67,15 @@ class HotkeysViewWidget(InputSuper):
         self.manual_dir_search = self.add_option_line_edit('Manual dir search', 'Global', 'manual_dir_search')
         self.manual_thumb_dl = self.add_option_line_edit('Manual thumbnail download', 'Global', 'manual_thumb_dl')
         self.manual_db_grab = self.add_option_line_edit('Manual DB grab', 'Global', 'manual_db_grab')
+        self.download_video_by_url = self.add_option_line_edit('Download Video by URL/ID dialog', 'Global',
+                                                               'download_video_by_url')
 
         # Section [View]
         self.add_section('{}Views{}'.format(self.deco_l, self.deco_r))
         self.view_subfeed = self.add_option_line_edit('Subscription Feed (Grid)', 'View', 'subfeed')
         self.view_playback = self.add_option_line_edit('Playback Feed', 'View', 'playback')
-        self.view_detailed_list = self.add_option_line_edit('Subscription feed (Detailed List)', 'View', 'detailed_list')
+        self.view_detailed_list = self.add_option_line_edit('Subscription feed (Detailed List)', 'View',
+                                                            'detailed_list')
         self.view_subscriptions = self.add_option_line_edit('Subscriptions list', 'View', 'subscriptions')
 
         # Section [Subfeed]
