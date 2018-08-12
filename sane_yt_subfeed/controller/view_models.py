@@ -2,6 +2,7 @@ from PyQt5.QtCore import QThread
 
 # FIXME: imp*
 from PyQt5.QtWidgets import QProgressBar
+from sqlalchemy import asc, desc
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.listeners import GridViewListener, DatabaseListener, MainWindowListener, YtDirListener, \
@@ -78,6 +79,7 @@ class MainModel:
                 update_filter += (~Video.downloaded,)
             if not show_dismissed:
                 update_filter += (~Video.discarded,)
+
             self.filtered_videos = get_newest_stored_videos(self.videos_limit, filters=update_filter)
             self.grid_view_listener.hiddenVideosChanged.emit()
         else:
@@ -109,14 +111,11 @@ class MainModel:
         return self.status_bar_progress
 
     def db_update_downloaded_videos(self):
-        show_watched = read_config('GridView', 'show_watched')
-        show_dismissed = read_config('GridView', 'show_dismissed')
-        update_filter = (Video.downloaded,)
-        if not show_watched:
-            update_filter += (~Video.watched,)
-        if not show_dismissed:
-            update_filter += (~Video.discarded,)
-        self.downloaded_videos = get_best_downloaded_videos(self.downloaded_videos_limit, filters=update_filter)
+
+        update_filter = self.config_get_filter_downloaded()
+        update_sort = self.config_get_sort_downloaded()
+        self.downloaded_videos = get_best_downloaded_videos(self.downloaded_videos_limit, filters=update_filter,
+                                                            sort_method=update_sort)
         self.grid_view_listener.downloadedVideosChanged.emit()
 
     def update_thumbnails(self):
@@ -126,3 +125,22 @@ class MainModel:
         self.logger.info("Updating thumbnails for downloaded and filtered videos")
         download_thumbnails_threaded(videos)
         UpdateVideosThread(videos, update_existing=True).start()
+
+    def config_get_filter_downloaded(self):
+        show_watched = read_config('GridView', 'show_watched')
+        show_dismissed = read_config('GridView', 'show_dismissed')
+        update_filter = (Video.downloaded,)
+        if not show_watched:
+            update_filter += (~Video.watched,)
+        if not show_dismissed:
+            update_filter += (~Video.discarded,)
+        return update_filter
+
+    def config_get_sort_downloaded(self):
+        ascending_date = read_config('PlaySort', 'ascending_date')
+        update_sort = (asc(Video.watch_prio),)
+        if ascending_date:
+            update_sort += (asc(Video.date_downloaded), asc(Video.date_published))
+        else:
+            update_sort += (desc(Video.date_downloaded), desc(Video.date_published))
+        return update_sort
