@@ -14,7 +14,7 @@ from PyQt5.QtGui import QIcon
 # Project internal libs
 from sane_yt_subfeed.gui.views.config_view.views.config_view import ConfigViewWidget
 
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import GRID_VIEW_ID, PLAY_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
@@ -122,9 +122,13 @@ class MainWindow(QMainWindow):
         self.add_submenu('&Function', 'Manual thumbnail download', self.thumbnail_download,
                          tooltip=thumb_tooltip, icon='folder_refresh.png')
 
-        # FIXME: icon, look more related to action
         self.add_submenu('&Function', 'Manual DB grab', self.db_reload,
                          tooltip='Starts a manual grab of data for the model', icon='database.png', shortcut='Ctrl+E')
+
+        # FIXME: icon, look more related to action
+        self.add_submenu('&Function', 'Toggle ascending date', self.toggle_ascending_sort,
+                         tooltip='Toggles the ascending date config option, and does a manual re-grab',
+                         icon='database.png', shortcut='Ctrl+A')
 
         # get_single_video = self.add_submenu('&Function', 'Get video', self.get_single_video,
         #                                     tooltip='Fetch video by URL')
@@ -419,6 +423,15 @@ class MainWindow(QMainWindow):
         Sends a testChannels signal
         :return:
         """
+        self.main_model.grid_view_listener.updateFromDb.emit()
+
+    def toggle_ascending_sort(self):
+        """
+        Sends a testChannels signal
+        :return:
+        """
+        toggle = read_config('PlaySort', 'ascending_date')
+        set_config('PlaySort', 'ascending_date', format(not toggle))
         self.main_model.grid_view_listener.updateFromDb.emit()
 
     def refresh_subs(self):
