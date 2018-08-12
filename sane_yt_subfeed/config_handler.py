@@ -117,7 +117,8 @@ DEFAULTS_HOTKEYS = {
         'test_channels': "",
         'manual_dir_search': "",
         'manual_thumb_dl': "",
-        'manual_db_grab': 'Ctrl+E'
+        'manual_db_grab': 'Ctrl+E',
+        'download_video_by_url': 'Ctrl+O'
     },
     'View': {
         'subfeed': 'Ctrl+1',
