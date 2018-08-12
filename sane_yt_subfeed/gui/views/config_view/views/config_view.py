@@ -162,7 +162,3 @@ class ConfigViewWidget(InputSuper):
         self.add_option_checkbox('Use socket instead of file', 'Logging', 'use_socket_log')
         self.add_option_line_edit('Log level', 'Logging', 'log_level', cfg_validator=QIntValidator())
         self.add_option_line_edit('Port', 'Logging', 'logging_port', cfg_validator=QIntValidator())
-
-        # Section [Toolbar]
-        self.add_section('{}Toolbar{}'.format(self.deco_l, self.deco_r))
-        self.add_option_checkbox('Show on-demand download video field?', 'Toolbar', 'show_download_video_field')
