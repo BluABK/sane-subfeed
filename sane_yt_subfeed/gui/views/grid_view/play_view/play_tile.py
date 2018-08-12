@@ -2,13 +2,14 @@ import os
 import sys
 import subprocess
 
-from PyQt5.QtCore import Qt, QEvent
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMenu
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.gui.views.grid_view.play_view.play_thumbnail_tile import PlayThumbnailTile
 from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
-from sane_yt_subfeed.log_handler import logger, create_logger
+from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.gui.dialogs.text_view_dialog import TextViewDialog
 
 
 class PlayTile(VideoTile):
@@ -93,6 +94,7 @@ class PlayTile(VideoTile):
             alternative_player3_action = menu.addAction("Play with alternative player 3")
         url_player_action = menu.addAction("Play with url player")
 
+        show_description_dialog = menu.addAction("View description")
         open_thumbnail_file = menu.addAction("View image")
 
         action = menu.exec_(self.mapToGlobal(event.pos()))
@@ -121,7 +123,11 @@ class PlayTile(VideoTile):
             except Exception as e_anything:
                 self.logger.exception(e_anything)
                 pass
-
+        elif action == show_description_dialog:
+            description_dialog = TextViewDialog(self.parent, self.video.description)
+            description_dialog.setWindowTitle("Video description for: {} - {}".format(self.video.channel_title,
+                                                                                      self.video.title))
+            description_dialog.show()
 
     def old_videos(self, vid_age):
         pass
