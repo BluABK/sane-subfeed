@@ -20,6 +20,9 @@ show_dismissed = False
 [SubFeed]
 show_downloaded = False
 
+[PlaySort]
+ascending_date = False
+
 [Debug]
 debug = False
 cached_subs = True
