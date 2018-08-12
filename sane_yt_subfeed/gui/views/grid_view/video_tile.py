@@ -127,7 +127,7 @@ class VideoTile(QWidget):
         """
         logger.info('Mark downloaded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
                                                                 self.video.title))
-        update_history('Downloaded:\t{} {} - {} '.format(self.video.url_video, self.video.channel_title,
+        update_history('Downloaded:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
                                                          self.video.title))
         self.video.downloaded = True
         self.video.date_downloaded = datetime.datetime.utcnow()
@@ -146,7 +146,7 @@ class VideoTile(QWidget):
         """
         logger.info('Mark dismissed: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
                                                                self.video.title))
-        update_history('Dismissed:\t{} {} - {} '.format(self.video.url_video, self.video.channel_title,
+        update_history('Dismissed:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
                                                         self.video.title))
         self.video.discarded = True
         self.parent.main_model.grid_view_listener.tileDiscarded.emit(self.video)
@@ -161,7 +161,7 @@ class VideoTile(QWidget):
         """
         logger.debug('Mark watched: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
                                                               self.video.title))
-        update_history('Watched:\t{} {} - {} '.format(self.video.url_video, self.video.channel_title,
+        update_history('Watched:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
                                                       self.video.title))
         self.video.watched = True
         self.parent.main_model.grid_view_listener.tileWatched.emit(self.video)
