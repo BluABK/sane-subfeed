@@ -4,6 +4,7 @@ import os
 import time
 
 from PyQt5.QtCore import *
+from googleapiclient.errors import HttpError
 from watchdog.observers import Observer
 
 from sane_yt_subfeed import main
@@ -173,12 +174,15 @@ class MainWindowListener(QObject):
         """
         self.logger.info("Reloading subfeed")
         hide_downloaded = read_config('Gui', 'hide_downloaded')
-        if hide_downloaded:
-            self.model.remote_update_videos(refresh_type=refresh_type)
-            # self.model.grid_view_listener.hiddenVideosChanged.emit()
-        else:
-            self.model.remote_update_videos(refresh_type=refresh_type)
-            self.logger.error('NOT IMPLEMENTED: disabled hide_downloaded')
+        try:
+            if hide_downloaded:
+                self.model.remote_update_videos(refresh_type=refresh_type)
+                # self.model.grid_view_listener.hiddenVideosChanged.emit()
+            else:
+                self.model.remote_update_videos(refresh_type=refresh_type)
+                self.logger.error('NOT IMPLEMENTED: disabled hide_downloaded')
+        except HttpError as e_http_error:
+            raise e_http_error  # Handle exceptions in parent call
 
     @pyqtSlot()
     def refresh_subs(self):

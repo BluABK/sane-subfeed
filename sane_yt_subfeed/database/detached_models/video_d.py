@@ -1,5 +1,6 @@
 import datetime
 
+from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 
@@ -22,6 +23,7 @@ class VideoD:
         Creates a Video object from a YouTube playlist_item
         :param search_item:
         """
+        self.logger = create_logger(__name__)
         self.grab_methods = []
         self.vid_path = ""
         self.date_downloaded = None

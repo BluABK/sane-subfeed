@@ -9,6 +9,8 @@ from PyQt5.QtGui import QIcon, QRegExpValidator
 from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QMenu, QStackedWidget, QStyleFactory
 
 # Project internal libs
+from googleapiclient.errors import HttpError
+
 from sane_yt_subfeed.absolute_paths import ICONS_PATH, VERSION_PATH
 from sane_yt_subfeed.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH

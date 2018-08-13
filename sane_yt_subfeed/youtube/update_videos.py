@@ -76,12 +76,8 @@ def refresh_uploads(progress_bar_listener=None, add_to_max=0,
             progress_bar_listener.updateProgress.emit()
         try:
             t.join()
-        # Store exceptions to lists, because raise breaks joining process and return
-        except HttpError as exc_gapi_http_error:  # FIXME: Handle HttpError exceptions
-            logger.error("A Google API HttpError exception occurred in thread {}! -- !!IMPLEMENT HANDLING!!".format(
-                t.thread_id), exc_info=exc_gapi_http_error)
-            refresh_ul_thread_exc_http.append(exc_gapi_http_error)
-            pass
+        except HttpError as e_http_error:
+            raise e_http_error  # Handle exceptions in parent call
         except Exception as exc_other:
             logger.critical("An *UNEXPECTED* exception occurred in thread {}!".format(t.thread_id), exc_info=exc_other)
             refresh_ul_thread_exc_other.append(exc_other)

@@ -142,7 +142,12 @@ def list_uploaded_videos(youtube_key, videos, uploads_playlist_id, req_limit):
     searched_pages = 0
     while playlistitems_list_request:
         searched_pages += 1
-        playlistitems_list_response = playlistitems_list_request.execute()
+        try:
+            playlistitems_list_response = playlistitems_list_request.execute()
+        except HttpError as e_http_error:
+            logger.error("Failed getting 'Uploaded videos' playlist items for channel: {}".format(uploads_playlist_id),
+                         exc_info=e_http_error)
+            raise e_http_error  # Handle in parent call
 
         # Grab information about each video.
         for search_result in playlistitems_list_response['items']:
