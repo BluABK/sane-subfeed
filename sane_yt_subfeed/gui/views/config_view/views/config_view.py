@@ -82,7 +82,7 @@ class ConfigViewWidget(InputSuper):
 
         # Section [Debug]
         self.add_section('{}Debug{}'.format(self.deco_l, self.deco_r))
-        self.add_option_checkbox('Debug prints', 'Debug', 'debug')
+        self.add_option_checkbox('Debug mode', 'Debug', 'debug')
         self.add_option_checkbox('Cache subscriptions', 'Debug', 'cached_subs')
         self.add_option_checkbox('Start with cached videos', 'Debug', 'start_with_stored_videos')
         self.add_option_line_edit('Channel limit', 'Debug', 'channels_limit', cfg_validator=QIntValidator())

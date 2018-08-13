@@ -118,7 +118,8 @@ DEFAULTS_HOTKEYS = {
         'manual_dir_search': "",
         'manual_thumb_dl': "",
         'manual_db_grab': 'Ctrl+E',
-        'download_video_by_url': 'Ctrl+O'
+        'download_video_by_url': 'Ctrl+O',
+        'show_usage_history': 'Ctrl+H'
     },
     'View': {
         'subfeed': 'Ctrl+1',

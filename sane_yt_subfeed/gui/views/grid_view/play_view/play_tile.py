@@ -3,7 +3,7 @@ import sys
 import subprocess
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QMenu
+from PyQt5.QtWidgets import QApplication, QMenu, QAction
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.gui.views.grid_view.play_view.play_thumbnail_tile import PlayThumbnailTile
@@ -94,8 +94,12 @@ class PlayTile(VideoTile):
             alternative_player3_action = menu.addAction("Play with alternative player 3")
         url_player_action = menu.addAction("Play with url player")
 
+        menu.addSeparator()
         show_description_dialog = menu.addAction("View description")
         open_thumbnail_file = menu.addAction("View image")
+        if read_config('Debug', 'debug'):
+            menu.addSeparator()
+            debug_log_video_obj = menu.addAction("Send to logger")
 
         action = menu.exec_(self.mapToGlobal(event.pos()))
         if action == copy_url_action:
@@ -128,6 +132,10 @@ class PlayTile(VideoTile):
             description_dialog.setWindowTitle("Video description for: {} - {}".format(self.video.channel_title,
                                                                                       self.video.title))
             description_dialog.show()
+
+        if read_config('Debug', 'debug'):
+            if action == debug_log_video_obj:
+                self.logger.debug(self.video.__dict__)
 
     def old_videos(self, vid_age):
         pass

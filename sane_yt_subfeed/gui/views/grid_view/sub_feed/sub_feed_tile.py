@@ -5,6 +5,7 @@ import subprocess
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMenu, QApplication
 
+from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.gui.views.grid_view.sub_feed.sub_thumbnail_tile import SubThumbnailTile
 from sane_yt_subfeed.log_handler import create_logger
 
@@ -31,8 +32,13 @@ class SubFeedTile(VideoTile):
         copy_url_action = menu.addAction("Copy link")
         downloaded_item_action = menu.addAction("Copy link and mark as downloaded")
         discard_item_action = menu.addAction("Dismiss video")
+
+        menu.addSeparator()
         show_description_dialog = menu.addAction("View description")
         open_thumbnail_file = menu.addAction("View image")
+        if read_config('Debug', 'debug'):
+            menu.addSeparator()
+            debug_log_video_obj = menu.addAction("Send to logger")
 
         action = menu.exec_(self.mapToGlobal(event.pos()))
         if action == copy_url_action:
@@ -55,6 +61,10 @@ class SubFeedTile(VideoTile):
             description_dialog.setWindowTitle("Video description for: {} - {}".format(self.video.channel_title,
                                                                                       self.video.title))
             description_dialog.show()
+
+        if read_config('Debug', 'debug'):
+            if action == debug_log_video_obj:
+                self.logger.debug(self.video.__dict__)
 
     def mousePressEvent(self, QMouseEvent):
         """
