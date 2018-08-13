@@ -9,7 +9,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget
 
 # Project internal libs
-from sane_yt_subfeed.absolute_paths import ICO_PATH, VERSION_PATH
+from sane_yt_subfeed.absolute_paths import ICONS_PATH, VERSION_PATH
 from sane_yt_subfeed.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import GRID_VIEW_ID, PLAY_VIEW_ID
@@ -184,7 +184,7 @@ class MainWindow(QMainWindow):
         if version:
             app_title += " v{}".format(version)
         self.setWindowTitle(app_title)
-        self.setWindowIcon(QIcon(os.path.join(ICO_PATH, 'yubbtubbz-padding.ico')))
+        self.setWindowIcon(QIcon(os.path.join(ICONS_PATH, 'yubbtubbz-padding.ico')))
         self.statusBar().showMessage('Ready.')
 
         progress_bar = self.main_model.new_status_bar_progress(self)
@@ -283,7 +283,7 @@ class MainWindow(QMainWindow):
         :return:
         """
         if icon:
-            this_icon = QIcon(os.path.join(ICO_PATH, icon))
+            this_icon = QIcon(os.path.join(ICONS_PATH, icon))
             submenu = QAction(this_icon, name, self)
         else:
             submenu = QAction(name, self)
