@@ -37,6 +37,8 @@ def get_channel_by_id_stmt(channel):
 def get_video_by_vidd_stmt(video_d):
     return Video.__table__.select().where(text("video_id = '{}'".format(video_d.video_id)))
 
+def get_video_ids_by_video_ids_stmt(video_ids):
+    return Video.__table__.select(Video.video_id.in_(video_ids))
 
 def get_video_by_id_stmt(video_id):
     return Video.__table__.select().where(text("video_id = '{}'".format(video_id)))
