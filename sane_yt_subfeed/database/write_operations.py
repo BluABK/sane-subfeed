@@ -1,10 +1,10 @@
 import threading
-from operator import itemgetter
+import time
 
 from sane_yt_subfeed.controller.database_listener import DatabaseListener
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.engine_statements import update_video_statement_full, get_video_by_vidd_stmt, insert_item, \
-    get_video_ids_by_video_ids_stmt
+    get_video_ids_by_video_ids_stmt, update_thumbnails_path_stmt
 from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import engine, db_session
 from sane_yt_subfeed.database.video import Video
@@ -24,7 +24,8 @@ def engine_execute(stmt):
 class UpdateVideosThread(threading.Thread):
     logger = create_logger(__name__ + ".UpdateVideosThread")
 
-    def __init__(self, video_list, update_existing=False, uniques_check=True, finished_listeners=None):
+    def __init__(self, video_list, update_existing=False, uniques_check=True, finished_listeners=None,
+                 only_thumbnails=False):
         """
         Init GetUploadsThread
         :param thread_id:
@@ -38,6 +39,7 @@ class UpdateVideosThread(threading.Thread):
         self.uniques_check = uniques_check
         self.finished_listeners = finished_listeners
         self.db_id = 0
+        self.only_thumbnails = only_thumbnails
 
     # TODO: Handle failed requests
     def run(self):
@@ -77,10 +79,47 @@ class UpdateVideosThread(threading.Thread):
             self.logger.debug("Thread {} - updating {} items".format(self.db_id, len(items_to_update)))
             for item in items_to_update:
                 engine.execute(update_video_statement_full(item))
+        DatabaseListener.static_instance.finishWrite.emit(self.db_id)
+        lock.release()
+        if self.finished_listeners:
+            for listener in self.finished_listeners:
+                listener.emit()
 
-        # FIXME: https://stackoverflow.com/questions/25694234/bulk-update-in-sqlalchemy-core-using-where
-        # if len(items_to_update) > 0:
-        #     engine.execute(items_to_update)
+
+class UpdateVideosThumbnailsThreaded(threading.Thread):
+    logger = create_logger(__name__ + ".UpdateVideosThread")
+
+    def __init__(self, video_list, finished_listeners=None):
+        """
+        Init GetUploadsThread
+        :param thread_id:
+        :param channel:
+        :param info:
+        :param debug:
+        """
+        threading.Thread.__init__(self)
+        self.video_list = video_list
+        self.finished_listeners = finished_listeners
+        self.db_id = 0
+
+    # TODO: Handle failed requests
+    def run(self):
+        """
+        Override threading.Thread.run() with its own code
+        :return:
+        """
+        self.db_id = threading.get_ident()
+
+        items_to_update = self.video_list
+        lock.acquire()
+        DatabaseListener.static_instance.startWrite.emit(self.db_id)
+        update_list = []
+        for item in items_to_update:
+            if not item.thumbnail_path:
+                self.logger.warning("Video missing thumbnail for update: {}".format(item))
+            else:
+                update_list.append({"thumbnail_path": item.thumbnail_path, "_video_id": item.video_id})
+        engine.execute(update_thumbnails_path_stmt(), update_list)
         DatabaseListener.static_instance.finishWrite.emit(self.db_id)
         lock.release()
         if self.finished_listeners:
