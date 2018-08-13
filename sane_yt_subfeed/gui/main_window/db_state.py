@@ -4,7 +4,7 @@ from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QPixmap, QPainter
 from PyQt5.QtWidgets import QLabel
 
-from sane_yt_subfeed.absolute_paths import ICO_PATH
+from sane_yt_subfeed.absolute_paths import ICONS_PATH
 from sane_yt_subfeed.log_handler import create_logger
 
 from sane_yt_subfeed.controller.database_listener import DatabaseListener
@@ -27,7 +27,7 @@ class DbStateIcon(QLabel):
             self.setText("read/write")
         elif state == DatabaseListener.DB_STATE_WRITE:
             self.logger.debug("Changing db state icon to write".format(state))
-            self.change_icon(os.path.join(ICO_PATH, 'database.png'))
+            self.change_icon(os.path.join(ICONS_PATH, 'database.png'))
         elif state == DatabaseListener.DB_STATE_READ:
             self.logger.debug("Changing db state icon to read".format(state))
             self.setText("read")
