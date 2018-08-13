@@ -1,6 +1,8 @@
 import threading
 import time
+from random import randint
 
+from sane_yt_subfeed.controller.database_listener import DatabaseListener
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.engine_statements import update_video_statement_full, get_video_by_vidd_stmt, insert_item
 from sane_yt_subfeed.database.models import Channel
@@ -36,6 +38,7 @@ class UpdateVideosThread(threading.Thread):
         self.update_existing = update_existing
         self.uniques_check = uniques_check
         self.finished_listeners = finished_listeners
+        self.db_id = randint(0, 9999)
 
     # TODO: Handle failed requests
     def run(self):
@@ -43,6 +46,7 @@ class UpdateVideosThread(threading.Thread):
         Override threading.Thread.run() with its own code
         :return:
         """
+        DatabaseListener.static_instance.startWrite.emit(self.db_id)
         if self.uniques_check:
             self.video_list = check_for_unique(self.video_list)
 
@@ -72,6 +76,7 @@ class UpdateVideosThread(threading.Thread):
         if self.finished_listeners:
             for listener in self.finished_listeners:
                 listener.emit()
+        DatabaseListener.static_instance.finishWrite.emit(self.db_id)
 
 
 class UpdateVideo(threading.Thread):
@@ -86,9 +91,11 @@ class UpdateVideo(threading.Thread):
         self.finished_listeners = finished_listeners
         self.video_d = video_d
         self.update_existing = update_existing
+        self.db_id = randint(0, 9999)
 
     # TODO: Handle failed requests
     def run(self):
+        DatabaseListener.static_instance.startWrite.emit(self.db_id)
         """
         Override threading.Thread.run() with its own code
         :return:
@@ -111,6 +118,7 @@ class UpdateVideo(threading.Thread):
         if self.finished_listeners:
             for listener in self.finished_listeners:
                 listener.emit()
+        DatabaseListener.static_instance.finishWrite.emit(self.db_id)
 
 
 def check_for_unique(vid_list):

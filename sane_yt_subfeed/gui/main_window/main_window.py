@@ -8,19 +8,20 @@ import os
 from subprocess import check_output
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget, QLineEdit, QMessageBox, \
-    QPushButton, QInputDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget
 from PyQt5.QtGui import QIcon
 
 # Project internal libs
+from sane_yt_subfeed.absolute_paths import ICO_PATH, VERSION_PATH
 from sane_yt_subfeed.gui.dialogs.input_dialog import SaneInputDialog
+from sane_yt_subfeed.gui.main_window.db_state import DbStateIcon
 from sane_yt_subfeed.gui.views.config_view.views.config_view import ConfigViewWidget
 
 from sane_yt_subfeed.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import GRID_VIEW_ID, PLAY_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
-from sane_yt_subfeed.gui.toolbar import Toolbar
+from sane_yt_subfeed.gui.main_window.toolbar import Toolbar
 from sane_yt_subfeed.gui.views.about_view import AboutView
 from sane_yt_subfeed.gui.views.config_view.config_window import ConfigWindow
 from sane_yt_subfeed.gui.views.config_view.views.hotkeys_view import HotkeysViewWidget
@@ -33,8 +34,7 @@ from sane_yt_subfeed.gui.views.list_tiled_view import ListTiledView
 from sane_yt_subfeed.log_handler import create_logger
 
 # Constants
-OS_PATH = os.path.dirname(__file__)
-ICO_PATH = os.path.join(OS_PATH, 'icons')
+
 
 
 class MainWindow(QMainWindow):
@@ -187,9 +187,10 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage('Ready.')
 
         progress_bar = self.main_model.new_status_bar_progress(self)
-        progress_bar.setFixedHeight(20)
+        # progress_bar.setFixedHeight(20)
         progress_bar.setVisible(False)
         self.statusBar().addPermanentWidget(progress_bar)
+        self.statusBar().addPermanentWidget(DbStateIcon(toolbar, self.main_model))
 
         # # Set a default view and layout
         # window_layout = QVBoxLayout()
@@ -231,7 +232,7 @@ class MainWindow(QMainWindow):
         version_str = None
         git_branchtag = self.get_git_tag()
         try:
-            with open(os.path.join(OS_PATH, '..', '..', 'VERSION'), 'r') as version_file:
+            with open(VERSION_PATH, 'r') as version_file:
                 version = version_file.readline()
                 if git_branchtag:
                     version_str = "{} [{}]".format(str(version), git_branchtag)

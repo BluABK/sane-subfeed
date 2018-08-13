@@ -4,17 +4,15 @@ import os
 import time
 
 from PyQt5.QtCore import *
+from watchdog.observers import Observer
 
 from sane_yt_subfeed import main
-
-from watchdog.observers import Observer
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.controller.dir_handler import VidEventHandler, manual_youtube_folder_check, \
-    CheckYoutubeFolderForNew
+from sane_yt_subfeed.controller.dir_handler import VidEventHandler, CheckYoutubeFolderForNew
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
-from sane_yt_subfeed.database.write_operations import UpdateVideo, UpdateVideosThread
+from sane_yt_subfeed.database.write_operations import UpdateVideo
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded, THUMBNAILS_PATH
 from sane_yt_subfeed.youtube.update_videos import load_keys
@@ -62,7 +60,6 @@ class GridViewListener(QObject):
         self.scrollReachedEndPlay.connect(self.scroll_reached_end_play)
         self.thumbnailDownload.connect(self.thumbnail_download)
         self.decreaseWatchPrio.connect(self.decrease_watch_prio)
-
 
     @pyqtSlot(VideoD)
     def decrease_watch_prio(self, video):
@@ -208,25 +205,6 @@ class MainWindowListener(QObject):
         download_thumbnails_threaded([video_d])
         # self.logger.debug(video_d.__dict__)
         self.model.grid_view_listener.download_video(video_d)
-
-
-class DatabaseListener(QObject):
-    databaseUpdated = pyqtSignal()
-    refreshVideos = pyqtSignal()
-
-    def __init__(self, model):
-        super().__init__()
-        self.model = model
-        self.refreshVideos.connect(self.refresh_videos)
-        self.logger = create_logger(__name__ + '.DatabaseListener')
-
-    def run(self):
-        while True:
-            time.sleep(2)
-
-    @pyqtSlot()
-    def refresh_videos(self):
-        self.logger.info('Reloading videos')
 
 
 class ProgressBar(QObject):

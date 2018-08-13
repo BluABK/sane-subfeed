@@ -5,8 +5,9 @@ from PyQt5.QtWidgets import QProgressBar
 from sqlalchemy import asc, desc
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.controller.listeners import GridViewListener, DatabaseListener, MainWindowListener, YtDirListener, \
+from sane_yt_subfeed.controller.listeners import GridViewListener, MainWindowListener, YtDirListener, \
     LISTENER_SIGNAL_NORMAL_REFRESH, ProgressBar
+from sane_yt_subfeed.controller.database_listener import DatabaseListener
 from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, refresh_and_get_newest_videos, \
     get_best_downloaded_videos
 from sane_yt_subfeed.database.video import Video

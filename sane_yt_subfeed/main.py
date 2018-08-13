@@ -1,10 +1,5 @@
 import datetime
-import sys
 import threading
-import time
-
-from PyQt5.QtWidgets import QApplication
-
 from timeit import default_timer
 
 from tqdm import tqdm
@@ -12,11 +7,10 @@ from tqdm import tqdm
 from sane_yt_subfeed.controller.controller import Controller
 from sane_yt_subfeed.database.models import Test
 from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.gui.main_window import MainWindow
-from sane_yt_subfeed.youtube.update_videos import refresh_uploads, load_keys
-from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions, list_uploaded_videos, \
-    list_uploaded_videos_search, list_uploaded_videos_page
 from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.youtube.update_videos import refresh_uploads, load_keys
+from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions, list_uploaded_videos_search, \
+    list_uploaded_videos_page
 
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 logger = create_logger(__name__)
