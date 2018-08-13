@@ -10,9 +10,9 @@ GRAB_METHOD_VIDEOS = 'videos()'
 
 
 class VideoD:
-    thumbnail_path = None
-    playlist_pos = None
-    url_playlist_video = None
+    thumbnail_path = ""
+    playlist_pos = -1
+    url_playlist_video = ""
     discarded = False
     downloaded = False
     new = False

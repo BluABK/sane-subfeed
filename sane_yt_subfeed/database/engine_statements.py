@@ -1,11 +1,12 @@
-from sqlalchemy import text
+from sqlalchemy import text, bindparam
 
 from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.video import Video
 
 
 def update_video_statement_full(db_video):
-    return Video.__table__.update().where("video_id = '{}'".format(db_video.video_id)).values(
+    # video_ids = set(video.video_id for video in db_video)
+    return Video.__table__.update().where(Video.video_id==format(db_video.video_id)).values(
         video_id=db_video.video_id,
         channel_title=db_video.channel_title,
         title=db_video.title,
@@ -24,6 +25,27 @@ def update_video_statement_full(db_video):
         watch_prio=db_video.watch_prio,
         date_downloaded=db_video.date_downloaded)
 
+def update_video_statement_selective(db_video, values):
+    # video_ids = set(video.video_id for video in db_video)
+    return Video.__table__.update().where(Video.video_id==format(db_video.video_id)).values(*values)
+
+
+
+
+def update_thumbnails_path_stmt():
+    return Video.__table__.update().where(Video.video_id == bindparam('_video_id')).values({
+            'thumbnail_path': bindparam('thumbnail_path')})
+#         'playlist_pos': bindparam('playlist_pos'),
+#         'url_video': bindparam('url_video'),
+#         'url_playlist_video': bindparam('url_playlist_video'),
+#         'thumbnails': bindparam('thumbnails'),
+#         'downloaded': bindparam('downloaded'),
+#         'search_item': bindparam('search_item'),
+#         'discarded': bindparam('discarded'),
+#         'vid_path': bindparam('vid_path'),
+#         'watched': bindparam('watched'),
+#         'watch_prio': bindparam('watch_prio'),
+#     })
 
 def update_channel_from_remote(channel):
     return Channel.__table__.update().where("id = '{}'".format(channel.id)).values(
