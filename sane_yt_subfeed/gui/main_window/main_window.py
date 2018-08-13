@@ -1,37 +1,36 @@
 # !/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# std libs
 import os
-
-# PyQt5 libs
 from subprocess import check_output
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget
 from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget
 
 # Project internal libs
 from sane_yt_subfeed.absolute_paths import ICO_PATH, VERSION_PATH
-from sane_yt_subfeed.gui.dialogs.input_dialog import SaneInputDialog
-from sane_yt_subfeed.gui.main_window.db_state import DbStateIcon
-from sane_yt_subfeed.gui.views.config_view.views.config_view import ConfigViewWidget
-
 from sane_yt_subfeed.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import GRID_VIEW_ID, PLAY_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
+from sane_yt_subfeed.gui.dialogs.input_dialog import SaneInputDialog
+from sane_yt_subfeed.gui.dialogs.text_view_dialog import TextViewDialog
+from sane_yt_subfeed.gui.main_window.db_state import DbStateIcon
 from sane_yt_subfeed.gui.main_window.toolbar import Toolbar
 from sane_yt_subfeed.gui.views.about_view import AboutView
 from sane_yt_subfeed.gui.views.config_view.config_window import ConfigWindow
+from sane_yt_subfeed.gui.views.config_view.views.config_view import ConfigViewWidget
 from sane_yt_subfeed.gui.views.config_view.views.hotkeys_view import HotkeysViewWidget
 from sane_yt_subfeed.gui.views.grid_view.grid_scroll_area import GridScrollArea
 from sane_yt_subfeed.gui.views.grid_view.play_view.play_view import PlayView
 from sane_yt_subfeed.gui.views.grid_view.sub_feed.sub_feed_view import SubFeedView
-from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
 from sane_yt_subfeed.gui.views.list_detailed_view import ListDetailedView
 from sane_yt_subfeed.gui.views.list_tiled_view import ListTiledView
+from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
+from sane_yt_subfeed.history_handler import get_history
 from sane_yt_subfeed.log_handler import create_logger
+
 
 # Constants
 
@@ -91,6 +90,8 @@ class MainWindow(QMainWindow):
         self.add_menu(menubar, '&File')
         self.add_submenu('&File', 'Download by URL/ID', self.download_single_url_dialog, shortcut='Ctrl+O',
                          tooltip='Download a video by URL/ID')
+        self.add_submenu('&File', 'View history', self.usage_history_dialog, shortcut='Ctrl+H',
+                         tooltip='Show usage history in a dialog box')
         self.add_submenu('&File', 'Preferences', self.view_config, shortcut='Ctrl+P',
                          tooltip='Change application settings', icon='preferences.png')
         self.add_submenu('&File', 'Exit', qApp.quit, shortcut='Ctrl+Q', tooltip='Exit application')
@@ -459,10 +460,16 @@ class MainWindow(QMainWindow):
         input_dialog = SaneInputDialog(self, self, title='Download a video by URL/ID', label='URL/ID:',
                                        ok_button_text='Download')
         input_dialog.show()
-        # input_text, ok = QInputDialog.getText(self, 'Download a video by URL/ID', 'URL/ID:')
-        #
-        # if ok:
-        #     self.get_single_video(str(input_text))
+
+    def usage_history_dialog(self):
+        """
+        Pop-up a TextViewDialog with usage history
+        :return:
+        """
+        history = get_history()
+        history_dialog = TextViewDialog(self, history)
+        history_dialog.setWindowTitle("Usage history")
+        history_dialog.show()
 
     # Unused functions
     def context_menu_event(self, event):  # TODO: Unused, planned usage in future
