@@ -4,7 +4,7 @@ import time
 from sane_yt_subfeed.controller.database_listener import DatabaseListener
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.engine_statements import update_video_statement_full, get_video_by_vidd_stmt, insert_item, \
-    get_video_ids_by_video_ids_stmt, update_thumbnails_path_stmt
+    get_video_ids_by_video_ids_stmt, update_thumbnails_path_stmt, update_video_stmt
 from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import engine, db_session
 from sane_yt_subfeed.database.video import Video
@@ -77,8 +77,13 @@ class UpdateVideosThread(threading.Thread):
                 engine.execute(Video.__table__.insert(), items_to_add[i:i + step])
         if len(items_to_update) > 0:
             self.logger.debug("Thread {} - updating {} items".format(self.db_id, len(items_to_update)))
+            update_list = []
+            # FIXME: add step to update
             for item in items_to_update:
-                engine.execute(update_video_statement_full(item))
+                item_dict = item.__dict__
+                item_dict["_video_id"] = item.video_id
+                update_list.append(item_dict)
+            engine.execute(update_video_stmt(), update_list)
         DatabaseListener.static_instance.finishWrite.emit(self.db_id)
         lock.release()
         if self.finished_listeners:
