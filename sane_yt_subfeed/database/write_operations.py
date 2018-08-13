@@ -92,7 +92,6 @@ class UpdateVideosThread(threading.Thread):
 
 
 class UpdateVideosThumbnailsThreaded(threading.Thread):
-    logger = create_logger(__name__ + ".UpdateVideosThread")
 
     def __init__(self, video_list, finished_listeners=None):
         """
@@ -102,6 +101,7 @@ class UpdateVideosThumbnailsThreaded(threading.Thread):
         :param info:
         :param debug:
         """
+        self.logger = create_logger(__name__ + ".UpdateVideosThread")
         threading.Thread.__init__(self)
         self.video_list = video_list
         self.finished_listeners = finished_listeners
@@ -124,7 +124,10 @@ class UpdateVideosThumbnailsThreaded(threading.Thread):
                 self.logger.warning("Video missing thumbnail for update: {}".format(item))
             else:
                 update_list.append({"thumbnail_path": item.thumbnail_path, "_video_id": item.video_id})
-        engine.execute(update_thumbnails_path_stmt(), update_list)
+        try:
+            engine.execute(update_thumbnails_path_stmt(), update_list)
+        except Exception as e:
+            self.logger.critical("Failed to update thumbnails: {} - {}".format(e, update_list))
         DatabaseListener.static_instance.finishWrite.emit(self.db_id)
         lock.release()
         if self.finished_listeners:
