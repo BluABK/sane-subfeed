@@ -182,7 +182,10 @@ class MainWindowListener(QObject):
                 self.model.remote_update_videos(refresh_type=refresh_type)
                 self.logger.error('NOT IMPLEMENTED: disabled hide_downloaded')
         except HttpError as e_http_error:
-            raise e_http_error  # Handle exceptions in parent call
+            self.logger.error("Caught HTTP Error", exc_info=e_http_error)
+            self.model.exception_listener.send_exception(e_http_error)
+            pass
+            # raise e_http_error  # FIXME: Since listener is a sort of thread, it never reaches MainWindow
 
     @pyqtSlot()
     def refresh_subs(self):
@@ -361,3 +364,22 @@ class YtDirListener(QObject):
         CheckYoutubeFolderForNew(youtube_folder,
                                  db_listeners=[self.model.grid_view_listener.downloadedVideosChangedinDB,
                                                self.model.grid_view_listener.updateGridViewFromDb]).start()
+
+
+class ExceptionListener(QObject):
+    sendException = pyqtSignal(Exception)
+
+    def __init__(self, model):
+        super().__init__()
+        self.logger = create_logger(__name__ + '.YtDirListener')
+        self.model = model
+
+        self.sendException.connect(self.send_exception)
+
+    def run(self):
+        while True:
+            time.sleep(2)
+
+    @pyqtSlot(Exception)
+    def send_exception(self, exc):
+        self.logger.error("ExceptionListener caught Exception", exc_info=exc)
