@@ -1,3 +1,5 @@
+from googleapiclient.errors import HttpError
+
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.generate_keys import GenerateKeys
 from sane_yt_subfeed.pickle_handler import load_batch_build_key, dump_batch_build_key
@@ -15,6 +17,10 @@ YT_VIDEO_URL = YOUTUBE_URL + YOUTUBE_PARM_VIDEO
 
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 logger = create_logger(__name__)
+
+# Thread exception lists
+refresh_ul_thread_exc_http = []
+refresh_ul_thread_exc_other = []
 
 
 def refresh_uploads(progress_bar_listener=None, add_to_max=0,
@@ -64,7 +70,19 @@ def refresh_uploads(progress_bar_listener=None, add_to_max=0,
     for t in tqdm(thread_list, desc="Waiting for video update threads", disable=read_config('Debug', 'disable_tqdm')):
         if progress_bar_listener:
             progress_bar_listener.updateProgress.emit()
-        t.join()
+        try:
+            t.join()
+        # Store exceptions to lists, because raise breaks joining process and return
+        except HttpError as exc_gapi_http_error:    # FIXME: Handle HttpError exceptions
+            logger.error("A Google API HttpError exception occurred in thread {}! -- !!IMPLEMENT HANDLING!!".format(
+                t.thread_id), exc_info=exc_gapi_http_error)
+            refresh_ul_thread_exc_http.append(exc_gapi_http_error)
+            pass
+        except Exception as exc_other:
+            logger.critical("An *UNEXPECTED* exception occurred in thread {}!".format(t.thread_id), exc_info=exc_other)
+            refresh_ul_thread_exc_other.append(exc_other)
+            pass
+
 
     return sorted(videos, key=lambda video: video.date_published, reverse=True)
 
