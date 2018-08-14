@@ -60,16 +60,16 @@ class GetUploadsThread(threading.Thread):
             list_pages = 0
             list_videos = []
             search_videos = []
-            # for test in channel.tests:
-            #     if test.test_pages > list_pages:
-            #         list_pages = test.test_pages
-            #     if test.test_miss < miss or test.test_pages > pages:
-            #         db_session.remove()
-            list_uploaded_videos_search(self.youtube, self.channel_id, search_videos, self.search_pages)
-                    # break
+            for test in channel.tests:
+                if test.test_pages > list_pages:
+                    list_pages = test.test_pages
+                if test.test_miss < miss or test.test_pages > pages:
+                    db_session.remove()
+                    list_uploaded_videos_search(self.youtube, self.channel_id, search_videos, self.search_pages)
+                    break
             db_session.remove()
-            # list_uploaded_videos(self.youtube, list_videos, self.playlist_id,
-            #                      min(pages + extra_pages, list_pages + extra_pages))
+            list_uploaded_videos(self.youtube, list_videos, self.playlist_id,
+                                 min(pages + extra_pages, list_pages + extra_pages))
 
             if len(search_videos) > 0:
                 return_videos = self.merge_two_videos_list_grab_info(list_videos, search_videos)
