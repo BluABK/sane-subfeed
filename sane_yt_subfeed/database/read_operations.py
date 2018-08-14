@@ -138,8 +138,11 @@ def refresh_and_get_newest_videos(limit, filter_downloaded=True, filter_discarde
         return_list = check_for_new(return_list)
 
     UpdateVideosThread(videos).start()
-    download_thumbnails_threaded(return_list, progress_listener=progress_listener)
-    UpdateVideosThumbnailsThreaded(return_list).start()
+    if len(return_list) > 0:
+        download_thumbnails_threaded(return_list, progress_listener=progress_listener)
+        UpdateVideosThumbnailsThreaded(return_list).start()
+    else:
+        logger.info("Skipping thumbnails download and db update as return list is empty")
     if progress_listener:
         progress_listener.progress_bar.setVisible(False)
         progress_listener.resetBar.emit()
