@@ -2,6 +2,7 @@ import threading
 import timeit
 
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.database.detached_models.video_d import GRAB_METHOD_SEARCH
 from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_search, get_channel_uploads, \
@@ -57,19 +58,24 @@ class GetUploadsThread(threading.Thread):
             pages = read_config('Requests', 'test_pages')
             extra_pages = read_config('Requests', 'extra_list_pages')
             list_pages = 0
-            temp_videos = []
+            list_videos = []
+            search_videos = []
             for test in channel.tests:
                 if test.test_pages > list_pages:
                     list_pages = test.test_pages
                 if test.test_miss < miss or test.test_pages > pages:
                     db_session.remove()
-                    list_uploaded_videos_search(self.youtube, self.channel_id, temp_videos, self.search_pages)
+                    list_uploaded_videos_search(self.youtube, self.channel_id, search_videos, self.search_pages)
                     break
             db_session.remove()
-            list_uploaded_videos(self.youtube, temp_videos, self.playlist_id,
+            list_uploaded_videos(self.youtube, list_videos, self.playlist_id,
                                  min(pages + extra_pages, list_pages + extra_pages))
-            self.merge_same_videos_in_list(temp_videos)
-            self.videos.extend(temp_videos)
+
+            if len(search_videos) > 0:
+                return_videos = self.merge_two_videos_list(list_videos, search_videos)
+            else:
+                return_videos = list_videos
+            self.videos.extend(return_videos)
 
         else:
             use_playlist_items = read_config('Debug', 'use_playlistItems')
@@ -80,9 +86,32 @@ class GetUploadsThread(threading.Thread):
 
         self.job_done = True
 
+    #     videos_dict = {}
+    #     for video in videos:
+    #         if video.video_id in videos_dict:
+    #             if GRAB_METHOD_SEARCH in video.grab_methods:
+    #                 videos_dict[video.video_id].extend(video.grab_methods)
+    #             else:
+    #                 temp_vid =
+    #         else:
+    #             videos_dict[video.video_id] = video
+    def merge_two_videos_list(self, high_prio_list, low_prio_list):
+        high_prio_dict = {video.video_id: video for video in high_prio_list}
+        low_prio_dict = {video.video_id: video for video in low_prio_list}
+        output_list = []
+        for video in high_prio_dict.values():
+            if video.video_id in low_prio_dict:
+                video.grab_methods.extend(low_prio_dict[video.video_id].grab_methods)
+            output_list.append(video)
+        for video in low_prio_dict.values():
+            if video.video_id in low_prio_dict:
+                continue
+            output_list.append(video)
+        return output_list
+
+
     @staticmethod
     def merge_same_videos_in_list(videos):
-
         # start_time = timeit.default_timer()
         for commpare_vid in videos:
             for vid in videos:
