@@ -115,19 +115,22 @@ class UpdateVideosThumbnailsThreaded(threading.Thread):
         """
         self.db_id = threading.get_ident()
 
-        items_to_update = self.video_list
+
         lock.acquire()
         DatabaseListener.static_instance.startWrite.emit(self.db_id)
         update_list = []
-        for item in items_to_update:
-            if not item.thumbnail_path:
-                self.logger.warning("Video missing thumbnail for update: {}".format(item))
-            else:
-                update_list.append({"thumbnail_path": item.thumbnail_path, "_video_id": item.video_id})
-        try:
-            engine.execute(update_thumbnails_path_stmt(), update_list)
-        except Exception as e:
-            self.logger.critical("Failed to update thumbnails: {} - {}".format(e, update_list))
+        if len(self.video_list):
+            for item in self.video_list:
+                if not item.thumbnail_path:
+                    self.logger.warning("Video missing thumbnail for update: {}".format(item))
+                else:
+                    update_list.append({"thumbnail_path": item.thumbnail_path, "_video_id": item.video_id})
+            try:
+                engine.execute(update_thumbnails_path_stmt(), update_list)
+            except Exception as e:
+                self.logger.critical("Failed to update thumbnails: {} - {}".format(e, update_list), exc_info=1)
+        else:
+            self.logger.info("Skipping update as self.video_list is empty")
         DatabaseListener.static_instance.finishWrite.emit(self.db_id)
         lock.release()
         if self.finished_listeners:
