@@ -84,9 +84,10 @@ def list_uploaded_videos(youtube_key, videos, uploads_playlist_id, req_limit):
         for search_result in playlistitems_list_response['items']:
             if read_config('Debug', 'log_list') and read_config('Debug', 'log_needle') != 'unset':
                 if search_result['snippet']['channelTitle'] == str(read_config('Debug', 'log_needle')):
-                    logger_list_search.debug("list():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
+                    logger_list_search.debug("list():\t {} ({}) - {} | Desc: {}".format(search_result['snippet']['channelTitle'],
                                                                              search_result['snippet']['publishedAt'],
-                                                                             search_result['snippet']['title']))
+                                                                             search_result['snippet']['title'],
+                                                                             search_result['snippet']['description']))
 
             if read_config('Debug', 'log_list') and read_config('Debug', 'log_needle') == 'unset':
                 logger_list_search.debug("list():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
@@ -179,8 +180,9 @@ def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit, live
                         if search_result['snippet']['liveBroadcastContent'] != "none":
                             title += " [LIVESTREAM]"
                             logger_list_search.debug(
-                                "search():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
-                                                                  search_result['snippet']['publishedAt'], title))
+                                "search():\t {} ({}) - {} | Desc: {}".format(search_result['snippet']['channelTitle'],
+                                                                  search_result['snippet']['publishedAt'], title,
+                                                                             search_result['snippet']['description']))
 
                 if read_config('Debug', 'log_search') and read_config('Debug', 'log_needle') == 'unset':
                     title = search_result['snippet']['title']
