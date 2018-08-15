@@ -38,9 +38,9 @@ class ConfigViewWidget(InputSuper):
         :return:
         """
         self.logger.info("Initializing UI")
-        mismatch = get_size() - self.offset
+        mismatch = get_size() - (self.offset - self.section_count)
         if mismatch != 0:
-            self.logger.warning("ConfigView is missing {} entries!".format(mismatch))
+            self.logger.warning("ConfigView is missing {} options!".format(mismatch))
 
     def populate_options(self):
         """
