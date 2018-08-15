@@ -18,8 +18,13 @@ class ConfigViewWidget(InputSuper):
     """
     Configuration widget
     """
-    deco_l = "【"
-    deco_r = "】"
+    # deco_l = "【"
+    # deco_r = "】"
+    # deco_l = "┣━━━━━━━━━━━━━━━━━━━━━━━━ "
+    # deco_r = " ━━━━━━━━━━━━━━━━━━━━━━━━┣"
+
+    deco_l = ""
+    deco_r = ""
 
     def __init__(self, parent, root):
         """
@@ -49,16 +54,15 @@ class ConfigViewWidget(InputSuper):
         """
 
         # Section [Gui]
-        self.add_section('{}GUI{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
         self.add_option_checkbox('Launch GUI', 'Gui', 'launch_gui', tab_id='GUI')
         self.add_option_checkbox('Hide downloaded videos from feed', 'Gui',
                                  'hide_downloaded', tab_id='GUI')
         self.add_option_line_edit('Grid view X', 'Gui', 'grid_view_x', cfg_validator=QIntValidator(), tab_id='GUI')
         self.add_option_line_edit('Grid view Y', 'Gui', 'grid_view_y', cfg_validator=QIntValidator(), tab_id='GUI')
         self.add_option_checkbox('Grey background on old (1d+) videos', 'Gui', 'grey_old_videos', tab_id='GUI')
-        self.add_option_line_edit('\tGrid tile height (px)', 'Gui', 'tile_pref_height', cfg_validator=QIntValidator(),
+        self.add_option_line_edit('Grid tile height (px)', 'Gui', 'tile_pref_height', cfg_validator=QIntValidator(),
                                   tab_id='GUI')
-        self.add_option_line_edit('\tGrid tile width (px)', 'Gui', 'tile_pref_width', cfg_validator=QIntValidator(),
+        self.add_option_line_edit('Grid tile width (px)', 'Gui', 'tile_pref_width', cfg_validator=QIntValidator(),
                                   tab_id='GUI')
         self.add_option_checkbox('Embed thumbnails in tooltips', 'Gui', 'tooltip_pictures', tab_id='GUI')
         self.add_option_line_edit('\tTooltip picture width', 'Gui', 'tooltip_picture_width',
@@ -71,20 +75,26 @@ class ConfigViewWidget(InputSuper):
         self.add_option_checkbox('Auto copy to clipboard', 'Gui', 'enable_auto_copy_to_clipboard', tab_id='GUI')
 
         # Section [GridView]
-        self.add_section('{}View: GridView{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
+        self.add_section('{}Grid Views{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
         self.add_option_checkbox('Show watched videos', 'GridView', 'show_watched', tab_id='GUI')
         self.add_option_checkbox('Show dismissed videos', 'GridView', 'show_dismissed', tab_id='GUI')
 
         # Section [GridView]
-        self.add_section('{}View: SubFeed{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
+        self.add_section('{}Subscription feed{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
         self.add_option_checkbox('Show downloaded videos', 'SubFeed', 'show_downloaded', tab_id='GUI')
 
+        # Section [Play]
+        self.add_section('{}Playback feed{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
+        self.add_option_line_edit('YouTube video directory', 'Play', 'yt_file_path', tab_id='GUI')
+        self.add_option_checkbox('Disable directory listener (inotify)', 'Play', 'disable_dir_listener', tab_id='GUI')
+        self.add_option_checkbox('Use URL as path', 'Play', 'use_url_as_path', tab_id='GUI')
+        self.add_option_line_edit('Default watch priority', 'Play', 'default_watch_prio', cfg_validator=QIntValidator(),
+                                  tab_id='GUI')
         # Section [PlaySort]
-        self.add_section('{}View: Play: Sort{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
+        # self.add_section('{}Play: Sort{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
         self.add_option_checkbox('Sort by ascending date', 'PlaySort', 'ascending_date', tab_id='GUI')
 
         # Section [Debug]
-        self.add_section('{}Debug{}'.format(self.deco_l, self.deco_r), tab_id='Debug')
         self.add_option_checkbox('Debug mode', 'Debug', 'debug', tab_id='Debug')
         self.add_option_checkbox('Cache subscriptions', 'Debug', 'cached_subs', tab_id='Debug')
         self.add_option_checkbox('Start with cached videos', 'Debug', 'start_with_stored_videos', tab_id='Debug')
@@ -100,12 +110,10 @@ class ConfigViewWidget(InputSuper):
         self.add_option_checkbox('Show unimplemented GUI elements', 'Debug', 'show_unimplemented_gui', tab_id='Debug')
 
         # Section [Model]
-        self.add_section('{}Model{}'.format(self.deco_l, self.deco_r), tab_id='Model')
         self.add_option_line_edit('Videos to load by default', 'Model', 'loaded_videos', cfg_validator=QIntValidator(),
                                   tab_id='Model')
 
         # Section [Requests]
-        self.add_section('{}Requests{}'.format(self.deco_l, self.deco_r), tab_id='Requests')
         self.add_option_checkbox('Use tests', 'Requests', 'use_tests', tab_id='Requests')
         self.add_option_line_edit('Missed video limit', 'Requests', 'miss_limit', cfg_validator=QIntValidator(),
                                   tab_id='Requests')
@@ -119,7 +127,6 @@ class ConfigViewWidget(InputSuper):
                                   cfg_validator=QIntValidator(), tab_id='Requests')
 
         # Section [Thumbnails]
-        self.add_section('{}Thumbnails{}'.format(self.deco_l, self.deco_r), tab_id='Thumbnails')
         self.add_option_checkbox('Force download best quality, based on prioritised list',
                                  'Thumbnails', 'force_download_best', tab_id='Thumbnails')
         self.add_option_combobox('1. Priority', 'Thumbnails', '0', THUMBNAIL_QUALITIES, tab_id='Thumbnails')
@@ -129,31 +136,20 @@ class ConfigViewWidget(InputSuper):
         self.add_option_combobox('5. Priority', 'Thumbnails', '4', THUMBNAIL_QUALITIES, tab_id='Thumbnails')
 
         # Section [Threading]
-        self.add_section('{}Threading{}'.format(self.deco_l, self.deco_r), tab_id='Threading')
         self.add_option_line_edit('Image/thumbnail download thread limit', 'Threading', 'img_threads',
                                   cfg_validator=QIntValidator(), tab_id='Threading')
 
-        # Section [Play]
-        self.add_section('{}View: Playback{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
-        self.add_option_line_edit('YouTube video directory', 'Play', 'yt_file_path', tab_id='GUI')
-        self.add_option_checkbox('Disable directory listener (inotify)', 'Play', 'disable_dir_listener', tab_id='GUI')
-        self.add_option_checkbox('Use URL as path', 'Play', 'use_url_as_path', tab_id='GUI')
-        self.add_option_line_edit('Default watch priority', 'Play', 'default_watch_prio', cfg_validator=QIntValidator(),
-                                  tab_id='GUI')
 
         # Section [Youtube-dl]
-        self.add_section('{}Downloading / youtube-dl{}'.format(self.deco_l, self.deco_r), tab_id='Download')
         self.add_option_checkbox('Use youtube-dl?', 'Youtube-dl', 'use_youtube_dl', tab_id='Download')
 
         # Section [Youtube-dl_proxies]
-        self.add_section('{}Download (geoblock failover) proxy{}'.format(self.deco_l, self.deco_r), tab_id='Download')
         _counter = 1
         for proxy in get_options('Youtube-dl_proxies'):
-            self.add_option_line_edit('Proxy #{}'.format(_counter), 'Youtube-dl_proxies', proxy, tab_id='Download')
+            self.add_option_line_edit('Geoblock proxy #{}'.format(_counter), 'Youtube-dl_proxies', proxy, tab_id='Download')
             _counter += 1
 
         # Section [Player]
-        self.add_section('{}Media player{}'.format(self.deco_l, self.deco_r), tab_id='Media player')
         self.add_option_line_edit('Default Player', 'Player', 'default_player', tab_id='Media player')
         self.add_option_line_edit('Url Player', 'Player', 'url_player', tab_id='Media player')
         _counter = 1
@@ -167,7 +163,6 @@ class ConfigViewWidget(InputSuper):
                 _counter += 1
 
         # Section [Logging]
-        self.add_section('{}Logging{}'.format(self.deco_l, self.deco_r), tab_id='Logging')
         self.add_option_checkbox('Use socket instead of file', 'Logging', 'use_socket_log', tab_id='Logging')
         self.add_option_line_edit('Log level', 'Logging', 'log_level', cfg_validator=QIntValidator(), tab_id='Logging')
         self.add_option_line_edit('Port', 'Logging', 'logging_port', cfg_validator=QIntValidator(), tab_id='Logging')
