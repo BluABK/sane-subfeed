@@ -1,3 +1,5 @@
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QTabWidget, QVBoxLayout
 
 from sane_yt_subfeed.gui.views.config_view.config_items.checkbox import GenericConfigCheckBox
@@ -27,6 +29,9 @@ class InputSuper(QWidget):
         self.status_bar = self.root.status_bar
         self.offset = 0
         self.section_count = 0
+        self.section_fontsize = 10
+        self.section_fontfamily = "Helvetica"
+        self.section_fontstyle = QFont.Black
 
         self.layout = QGridLayout()
         # self.layout = QVBoxLayout()
@@ -95,9 +100,15 @@ class InputSuper(QWidget):
         :return:
         """
         if tab_id is None:
-            self.layout.addWidget(QLabel(name), self.offset, 0)
+            this_label = QLabel(name)
+            this_label.setFont(QFont(self.section_fontfamily, self.section_fontsize, self.section_fontstyle))
+            # this_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)    # Make section "centered" in GridView
+            self.layout.addWidget(this_label, self.offset, 0)
         else:
-            self.tab_index[tab_id].layout.addWidget(QLabel(name), self.offset, 0)
+            this_label = QLabel(name)
+            # this_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)    # Make section "centered" in GridView
+            this_label.setFont(QFont(self.section_fontfamily, self.section_fontsize, self.section_fontstyle))
+            self.tab_index[tab_id].layout.addWidget(this_label, self.offset, 0)
         self.section_count += 1
         self.offset += 1
 
