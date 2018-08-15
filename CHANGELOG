@@ -20,6 +20,7 @@ v0.4.0
 - Added "play w/o mark watched" to PlayView context menu
 - Added a usage history dialog (Ctrl+H)
 - Added GetUploadsThread exception handling
+- Improved geo proxy code to handle more generic error messages thrown at it.
 - Replaced optional video-grab input field on toolbar with a dialog prompt (Ctrl+O)
 - Changed '_v-id-' identification string/syntax
 - Made the system able to detect moved files
