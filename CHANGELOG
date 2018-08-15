@@ -1,9 +1,33 @@
-Current
+v0.4.0
 - Added priority to downloaded videos
 - Added option to filter videos based on age
 - Made views exclusive checkable
 - Added text edit to config view
-- Added Hotkeys View
+- Added Hotkeys View and made both it and ConfigView into popout windows
+- Added ascending sort
+- Added missing section handling
+- Added gui.dialogs with SaneInputDialog and TextViewDialog
+- Added "No File" thumbnail overlay and made it update/vanish when download is finished
+- Made Subfeed View use show_downloaded and show_dismissed
+- Implemented show_watched and show_dismissed for PlayView
+- Added option to pipe instead of downloading the youtube-dl request
+- Made SubFeedView and PlayView inherit and override ThumbnailTile, and split out overlay drawing from setPixmap() to add_overlay()
+- Moved icons from gui/ to resources/
+- Fixed issue where YouTube API search() would return truncated descriptions
+- Significantly optimised DB performance
+- Added "tray" icon that indicates when DB is writing/busy
+- Added "View description" and "View image" functionality to SubfeedView and PlayView context menus
+- Added "play w/o mark watched" to PlayView context menu
+- Added a usage history dialog (Ctrl+H)
+- Added GetUploadsThread exception handling
+- Improved geo proxy code to handle more generic error messages thrown at it.
+- Replaced optional video-grab input field on toolbar with a dialog prompt (Ctrl+O)
+- Changed '_v-id-' identification string/syntax
+- Made the system able to detect moved files
+- Fixed download_thumbnails_threaded Exception when receiving len 0 video list
+- Fixed compare_db_filtered not returning videos not in db
+- Removed defunct check for empty DB
+- DEBUG: Added "Send to logger" context menu option for videos in GridViews
 
 v0.3.4
 - Added optional video-grab input field on toolbar
