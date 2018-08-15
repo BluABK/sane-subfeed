@@ -1,9 +1,11 @@
 import datetime
+import threading
 import time
 
 from sqlalchemy import desc, asc
 
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.controller.database_listener import DatabaseListener
 from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NORMAL_REFRESH, \
     LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.database.engine_statements import get_video_by_vidd_stmt, get_video_by_id_stmt
@@ -32,9 +34,9 @@ def get_newest_stored_videos(limit, filters=(~Video.downloaded, ~Video.discarded
         date = datetime.datetime.utcnow() - datetime.timedelta(days=filter_days)
         filters = filters + (Video.date_published > date,)
 
-    db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(*filters
-                                                                                    ).limit(
-        limit).all()
+    DatabaseListener.static_instance.startRead.emit(threading.get_ident())
+    db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(*filters).limit(limit).all()
+    DatabaseListener.static_instance.finishRead.emit(threading.get_ident())
     videos = Video.to_video_ds(db_videos)
     db_session.remove()
     return videos
@@ -53,7 +55,9 @@ def get_best_downloaded_videos(limit,
     db_query = db_session.query(Video)
 
     db_query = db_query.filter(*filters)
+    DatabaseListener.static_instance.startRead.emit(threading.get_ident())
     db_videos = db_query.order_by(*sort_method).limit(limit).all()
+    DatabaseListener.static_instance.finishRead.emit(threading.get_ident())
     videos = Video.to_video_ds(db_videos)
     db_session.remove()
     return videos
@@ -66,6 +70,7 @@ def compare_db_filtered(videos, limit, discarded=False, downloaded=False):
 
     filter_days = read_config('Requests', 'filter_videos_days_old')
 
+    DatabaseListener.static_instance.startRead.emit(threading.get_ident())
     for video in videos:
         if filter_days >= 0:
             date = datetime.datetime.utcnow() - datetime.timedelta(days=filter_days)
@@ -86,6 +91,7 @@ def compare_db_filtered(videos, limit, discarded=False, downloaded=False):
             counter += 1
         if counter >= limit:
             break
+    DatabaseListener.static_instance.finishRead.emit(threading.get_ident())
     db_session.remove()
     return return_list
 
@@ -95,6 +101,7 @@ def check_for_new(videos, deep_refresh=False):
     logger.info("Checking for new videos{}".format((" (deep refresh)" if deep_refresh else "")))
     # FIXME: add to progress bar
     # start_time = timeit.default_timer()
+    DatabaseListener.static_instance.startRead.emit(threading.get_ident())
     for vid in videos:
         stmt = get_video_by_vidd_stmt(vid)
         db_video = engine.execute(stmt).first()
@@ -117,6 +124,7 @@ def check_for_new(videos, deep_refresh=False):
         else:
             pass
     # print(timeit.default_timer() - start_time)
+    DatabaseListener.static_instance.finishRead.emit(threading.get_ident())
     return videos
 
 
@@ -151,11 +159,15 @@ def refresh_and_get_newest_videos(limit, filter_downloaded=True, filter_discarde
 
 def get_vid_by_id(video_id):
     stmt = get_video_by_id_stmt(video_id)
+    DatabaseListener.static_instance.startRead.emit(threading.get_ident())
     db_video = engine.execute(stmt).first()
+    DatabaseListener.static_instance.finishRead.emit(threading.get_ident())
     return db_video
 
 
 def get_videos_by_ids(video_ids):
+    DatabaseListener.static_instance.startRead.emit(threading.get_ident())
     db_videos = engine.execute(Video.__table__.select(Video.video_id.in_(video_ids)))
+    DatabaseListener.static_instance.finishRead.emit(threading.get_ident())
     return_videos = Video.to_video_ds(db_videos)
     return return_videos
