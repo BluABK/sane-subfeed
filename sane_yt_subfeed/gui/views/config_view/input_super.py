@@ -26,6 +26,7 @@ class InputSuper(QWidget):
         self.clipboard = self.root.clipboard
         self.status_bar = self.root.status_bar
         self.offset = 0
+        self.section_count = 0
 
         self.layout = QGridLayout()
         # self.layout = QVBoxLayout()
@@ -97,6 +98,7 @@ class InputSuper(QWidget):
             self.layout.addWidget(QLabel(name), self.offset, 0)
         else:
             self.tab_index[tab_id].layout.addWidget(QLabel(name), self.offset, 0)
+        self.section_count += 1
         self.offset += 1
 
     def add_option_checkbox(self, description, cfg_section, cfg_option, tab_id=None):

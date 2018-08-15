@@ -250,7 +250,7 @@ def get_options(section, custom_ini=None):
     return _parser.options(section)
 
 
-def get_size(custom_ini=None):
+def get_size(custom_ini=None, incl_sections=False):
     """
     Sums up sections and options
     :return:
@@ -264,7 +264,8 @@ def get_size(custom_ini=None):
 
     size = 0
     for section in _parser.sections():
-        size += 1
+        if incl_sections:
+            size += 1
         for _ in _parser.options(section):
             size += 1
 
