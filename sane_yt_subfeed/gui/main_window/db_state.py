@@ -18,8 +18,9 @@ class DbStateIcon(QLabel):
         self.main_model = main_model
 
         self.base_icon = QPixmap(os.path.join(ICONS_PATH, 'database.png'))
-        self.full_icon = self.base_icon.scaled(QSize(self.height(), self.height()), Qt.KeepAspectRatio,
-                                               Qt.SmoothTransformation)
+        self.base_icon = self.base_icon.scaled(QSize(self.height(), self.height()), Qt.KeepAspectRatio,
+                                            Qt.SmoothTransformation)
+        self.full_icon = self.base_icon.copy()
         self.sane_painter = QPainter(self.full_icon)
         self.default_dot = QPixmap(os.path.join(ICONS_PATH, 'default_dot.png')).scaled(
             QSize(self.height() * 0.3, self.height() * 0.3), Qt.KeepAspectRatio, Qt.SmoothTransformation)
@@ -28,35 +29,34 @@ class DbStateIcon(QLabel):
         self.write_dot = QPixmap(os.path.join(ICONS_PATH, 'green_dot.png')).scaled(
             QSize(self.height() * 0.3, self.height() * 0.3), Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
-        self.draw_read_icon(self.default_dot)
-        self.draw_write_icon(self.default_dot)
-
         self.setPixmap(self.full_icon)
 
         DatabaseListener.static_instance.dbStateChanged.connect(self.change_state)
 
-    def draw_write_icon(self, pixmap):
-        self.sane_painter.drawPixmap(self.full_icon.width() * 0.6, self.full_icon.height() * 0.6, pixmap)
+    @staticmethod
+    def draw_write_icon(base_icon, pixmap, painter):
+        painter.drawPixmap(base_icon.width() * 0.6, base_icon.height() * 0.6, pixmap)
 
-    def draw_read_icon(self, pixmap):
-        self.sane_painter.drawPixmap(self.full_icon.width() * 0.1, self.full_icon.height() * 0.6, pixmap)
+    @staticmethod
+    def draw_read_icon(base_icon, pixmap, painter):
+        painter.drawPixmap(base_icon.width() * 0.1, base_icon.height() * 0.6, pixmap)
 
     def change_state(self, state):
+        self.full_icon = self.base_icon.copy()
+        # self.full_icon = self.base_icon.scaled(QSize(self.height(), self.height()), Qt.KeepAspectRatio,
+        #                                     Qt.SmoothTransformation)
+        painter = QPainter(self.full_icon)
+
         if state == DatabaseListener.DB_STATE_READ_WRITE:
             self.logger.debug("Changing db state icon to read/write".format(state))
-            self.draw_read_icon(self.read_dot)
-            self.draw_write_icon(self.write_dot)
+            self.draw_read_icon(self.full_icon, self.read_dot, painter)
+            self.draw_write_icon(self.full_icon, self.write_dot, painter)
         elif state == DatabaseListener.DB_STATE_WRITE:
             self.logger.debug("Changing db state icon to write".format(state))
-            self.draw_read_icon(self.default_dot)
-            self.draw_write_icon(self.write_dot)
+            self.draw_write_icon(self.full_icon, self.write_dot, painter)
         elif state == DatabaseListener.DB_STATE_READ:
             self.logger.debug("Changing db state icon to read".format(state))
-            self.draw_read_icon(self.read_dot)
-            self.draw_write_icon(self.default_dot)
+            self.draw_read_icon(self.full_icon, self.read_dot, painter)
         else:
             self.logger.debug("Changing db state icon to idle".format(state))
-            self.draw_read_icon(self.default_dot)
-            self.draw_write_icon(self.default_dot)
         self.setPixmap(self.full_icon)
-
