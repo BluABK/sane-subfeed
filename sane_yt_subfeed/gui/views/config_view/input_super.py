@@ -79,6 +79,15 @@ class InputSuper(QWidget):
         self.tabs.addTab(tab, name)
         self.tab_index[name] = tab
 
+    def set_tab_layouts(self):
+        """
+        Call this function *AFTER* having populated tabs
+        :return:
+        """
+        for tab_id, tab in self.tab_index.items():
+            self.logger.info("Setting tab layout for '{}' | {}".format(tab_id, tab.__dict__))
+            tab.setLayout(tab.layout)
+
     def add_section(self, name, tab_id=None):
         """
         Add a section to the ConfigView layout and increment grid offset.

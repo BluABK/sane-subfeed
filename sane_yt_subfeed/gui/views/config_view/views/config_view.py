@@ -56,14 +56,17 @@ class ConfigViewWidget(InputSuper):
         self.add_option_line_edit('Grid view X', 'Gui', 'grid_view_x', cfg_validator=QIntValidator(), tab_id='GUI')
         self.add_option_line_edit('Grid view Y', 'Gui', 'grid_view_y', cfg_validator=QIntValidator(), tab_id='GUI')
         self.add_option_checkbox('Grey background on old (1d+) videos', 'Gui', 'grey_old_videos', tab_id='GUI')
-        self.add_option_line_edit('\tGrid tile height (px)', 'Gui', 'tile_pref_height', cfg_validator=QIntValidator(), tab_id='GUI')
-        self.add_option_line_edit('\tGrid tile width (px)', 'Gui', 'tile_pref_width', cfg_validator=QIntValidator(), tab_id='GUI')
+        self.add_option_line_edit('\tGrid tile height (px)', 'Gui', 'tile_pref_height', cfg_validator=QIntValidator(),
+                                  tab_id='GUI')
+        self.add_option_line_edit('\tGrid tile width (px)', 'Gui', 'tile_pref_width', cfg_validator=QIntValidator(),
+                                  tab_id='GUI')
         self.add_option_checkbox('Embed thumbnails in tooltips', 'Gui', 'tooltip_pictures', tab_id='GUI')
         self.add_option_line_edit('\tTooltip picture width', 'Gui', 'tooltip_picture_width',
                                   cfg_validator=QIntValidator(), tab_id='GUI')
         self.add_option_line_edit('\tTooltip picture height', 'Gui', 'tooltip_picture_height',
                                   cfg_validator=QIntValidator(), tab_id='GUI')
-        self.add_option_combobox('\tTooltip picture font size', 'Gui', 'tooltip_picture_size', TT_FONT_SIZES, tab_id='GUI')
+        self.add_option_combobox('\tTooltip picture font size', 'Gui', 'tooltip_picture_size', TT_FONT_SIZES,
+                                 tab_id='GUI')
         self.add_option_checkbox('Keep Aspect Ratop on resized thumbnails', 'Gui', 'keep_thumb_ar', tab_id='GUI')
         self.add_option_checkbox('Auto copy to clipboard', 'Gui', 'enable_auto_copy_to_clipboard', tab_id='GUI')
 
@@ -85,7 +88,8 @@ class ConfigViewWidget(InputSuper):
         self.add_option_checkbox('Debug mode', 'Debug', 'debug', tab_id='Debug')
         self.add_option_checkbox('Cache subscriptions', 'Debug', 'cached_subs', tab_id='Debug')
         self.add_option_checkbox('Start with cached videos', 'Debug', 'start_with_stored_videos', tab_id='Debug')
-        self.add_option_line_edit('Channel limit', 'Debug', 'channels_limit', cfg_validator=QIntValidator(), tab_id='Debug')
+        self.add_option_line_edit('Channel limit', 'Debug', 'channels_limit', cfg_validator=QIntValidator(),
+                                  tab_id='Debug')
         self.add_option_checkbox('Use playlistItems', 'Debug', 'use_playlistitems', tab_id='Debug')
         self.add_option_checkbox('Disable tooltips', 'Debug', 'disable_tooltips', tab_id='Debug')
         self.add_option_checkbox('Disable tqdm (cli)', 'Debug', 'disable_tqdm', tab_id='Debug')
@@ -97,13 +101,16 @@ class ConfigViewWidget(InputSuper):
 
         # Section [Model]
         self.add_section('{}Model{}'.format(self.deco_l, self.deco_r), tab_id='Model')
-        self.add_option_line_edit('Videos to load by default', 'Model', 'loaded_videos', cfg_validator=QIntValidator(), tab_id='Model')
+        self.add_option_line_edit('Videos to load by default', 'Model', 'loaded_videos', cfg_validator=QIntValidator(),
+                                  tab_id='Model')
 
         # Section [Requests]
         self.add_section('{}Requests{}'.format(self.deco_l, self.deco_r), tab_id='Requests')
         self.add_option_checkbox('Use tests', 'Requests', 'use_tests', tab_id='Requests')
-        self.add_option_line_edit('Missed video limit', 'Requests', 'miss_limit', cfg_validator=QIntValidator(), tab_id='Requests')
-        self.add_option_line_edit('Test pages', 'Requests', 'test_pages', cfg_validator=QIntValidator(), tab_id='Requests')
+        self.add_option_line_edit('Missed video limit', 'Requests', 'miss_limit', cfg_validator=QIntValidator(),
+                                  tab_id='Requests')
+        self.add_option_line_edit('Test pages', 'Requests', 'test_pages', cfg_validator=QIntValidator(),
+                                  tab_id='Requests')
         self.add_option_line_edit('Additional list pages', 'Requests', 'extra_list_pages',
                                   cfg_validator=QIntValidator(), tab_id='Requests')
         self.add_option_line_edit('Deep search API quota limit per request (in K)', 'Requests', 'deep_search_quota_k',
@@ -131,7 +138,8 @@ class ConfigViewWidget(InputSuper):
         self.add_option_line_edit('YouTube video directory', 'Play', 'yt_file_path', tab_id='GUI')
         self.add_option_checkbox('Disable directory listener (inotify)', 'Play', 'disable_dir_listener', tab_id='GUI')
         self.add_option_checkbox('Use URL as path', 'Play', 'use_url_as_path', tab_id='GUI')
-        self.add_option_line_edit('Default watch priority', 'Play', 'default_watch_prio', cfg_validator=QIntValidator(), tab_id='GUI')
+        self.add_option_line_edit('Default watch priority', 'Play', 'default_watch_prio', cfg_validator=QIntValidator(),
+                                  tab_id='GUI')
 
         # Section [Youtube-dl]
         self.add_section('{}Downloading / youtube-dl{}'.format(self.deco_l, self.deco_r), tab_id='Download')
@@ -154,7 +162,8 @@ class ConfigViewWidget(InputSuper):
             #     _counter += 1
             #     continue
             if "alternative_player" in alt_player:
-                self.add_option_line_edit('Alternative Player #{}'.format(_counter), 'Player', alt_player, tab_id='Media player')
+                self.add_option_line_edit('Alternative Player #{}'.format(_counter), 'Player', alt_player,
+                                          tab_id='Media player')
                 _counter += 1
 
         # Section [Logging]
@@ -162,3 +171,6 @@ class ConfigViewWidget(InputSuper):
         self.add_option_checkbox('Use socket instead of file', 'Logging', 'use_socket_log', tab_id='Logging')
         self.add_option_line_edit('Log level', 'Logging', 'log_level', cfg_validator=QIntValidator(), tab_id='Logging')
         self.add_option_line_edit('Port', 'Logging', 'logging_port', cfg_validator=QIntValidator(), tab_id='Logging')
+
+        # All done? Set tab layouts
+        self.set_tab_layouts()
