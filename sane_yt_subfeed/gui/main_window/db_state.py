@@ -16,29 +16,47 @@ class DbStateIcon(QLabel):
         self.logger = create_logger(__name__)
         self.sane_parent = sane_parent
         self.main_model = main_model
+
+        self.base_icon = QPixmap(os.path.join(ICONS_PATH, 'database.png'))
+        self.full_icon = self.base_icon.scaled(QSize(self.height(), self.height()), Qt.KeepAspectRatio,
+                                               Qt.SmoothTransformation)
+        self.sane_painter = QPainter(self.full_icon)
+        self.default_dot = QPixmap(os.path.join(ICONS_PATH, 'default_dot.png')).scaled(
+            QSize(self.height() * 0.3, self.height() * 0.3), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.read_dot = QPixmap(os.path.join(ICONS_PATH, 'blue_dot.png')).scaled(
+            QSize(self.height() * 0.3, self.height() * 0.3), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.write_dot = QPixmap(os.path.join(ICONS_PATH, 'green_dot.png')).scaled(
+            QSize(self.height() * 0.3, self.height() * 0.3), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+        self.draw_read_icon(self.default_dot)
+        self.draw_write_icon(self.default_dot)
+
+        self.setPixmap(self.full_icon)
+
         DatabaseListener.static_instance.dbStateChanged.connect(self.change_state)
-        self.change_state(DatabaseListener.DB_STATE_IDLE)
+
+    def draw_write_icon(self, pixmap):
+        self.sane_painter.drawPixmap(self.full_icon.width() * 0.6, self.full_icon.height() * 0.6, pixmap)
+
+    def draw_read_icon(self, pixmap):
+        self.sane_painter.drawPixmap(self.full_icon.width() * 0.1, self.full_icon.height() * 0.6, pixmap)
 
     def change_state(self, state):
-        if self.isHidden():
-            self.show()
         if state == DatabaseListener.DB_STATE_READ_WRITE:
             self.logger.debug("Changing db state icon to read/write".format(state))
-            self.setText("read/write")
+            self.draw_read_icon(self.read_dot)
+            self.draw_write_icon(self.write_dot)
         elif state == DatabaseListener.DB_STATE_WRITE:
             self.logger.debug("Changing db state icon to write".format(state))
-            self.change_icon(os.path.join(ICONS_PATH, 'database.png'))
+            self.draw_read_icon(self.default_dot)
+            self.draw_write_icon(self.write_dot)
         elif state == DatabaseListener.DB_STATE_READ:
             self.logger.debug("Changing db state icon to read".format(state))
-            self.setText("read")
+            self.draw_read_icon(self.read_dot)
+            self.draw_write_icon(self.default_dot)
         else:
             self.logger.debug("Changing db state icon to idle".format(state))
-            self.hide()
-        self.update()
+            self.draw_read_icon(self.default_dot)
+            self.draw_write_icon(self.default_dot)
+        self.setPixmap(self.full_icon)
 
-    def change_icon(self, icon_path):
-        full_icon = QPixmap(icon_path)
-        scaled_icon = full_icon.scaled(QSize(self.height(), self.height()), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.setPixmap(scaled_icon)
-        # painter = QPainter(self)
-        # painter.drawPixmap(0, 0, p)
