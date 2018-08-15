@@ -1,12 +1,10 @@
 import threading
-import timeit
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.database.detached_models.video_d import GRAB_METHOD_SEARCH
 from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_search, get_channel_uploads, \
-    list_uploaded_videos, list_uploaded_videos_videos
+from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_search, list_uploaded_videos, \
+    list_uploaded_videos_videos
 from sane_yt_subfeed.log_handler import create_logger
 
 
@@ -32,6 +30,7 @@ class GetUploadsThread(threading.Thread):
         self.channel_id = channel_id
         self.playlist_id = playlist_id
         self.deep_search = deep_search
+        self.exc = None
 
     # TODO: Handle failed requests
     def run(self):
@@ -39,52 +38,67 @@ class GetUploadsThread(threading.Thread):
         Override threading.Thread.run() with its own code
         :return:
         """
+        try:
 
-        # youtube = youtube_auth_keys()
+            # youtube = youtube_auth_keys()
 
-        # self.videos = get_channel_uploads(self.youtube, channel_id)
-        use_tests = read_config('Requests', 'use_tests')
+            # self.videos = get_channel_uploads(self.youtube, channel_id)
+            use_tests = read_config('Requests', 'use_tests')
 
-        if self.deep_search:
-            temp_videos = []
-            list_uploaded_videos_search(self.youtube, self.channel_id, temp_videos, self.search_pages)
-            list_uploaded_videos(self.youtube, temp_videos, self.playlist_id, self.list_pages)
-            self.merge_same_videos_in_list(temp_videos)
-            self.videos.extend(temp_videos)
+            if self.deep_search:
+                temp_videos = []
+                list_uploaded_videos_search(self.youtube, self.channel_id, temp_videos, self.search_pages)
+                list_uploaded_videos(self.youtube, temp_videos, self.playlist_id, self.list_pages)
+                self.merge_same_videos_in_list(temp_videos)
+                self.videos.extend(temp_videos)
 
-        elif use_tests:
-            channel = db_session.query(Channel).get(self.channel_id)
-            miss = read_config('Requests', 'miss_limit')
-            pages = read_config('Requests', 'test_pages')
-            extra_pages = read_config('Requests', 'extra_list_pages')
-            list_pages = 0
-            list_videos = []
-            search_videos = []
-            for test in channel.tests:
-                if test.test_pages > list_pages:
-                    list_pages = test.test_pages
-                if test.test_miss < miss or test.test_pages > pages:
-                    db_session.remove()
-                    list_uploaded_videos_search(self.youtube, self.channel_id, search_videos, self.search_pages)
-                    break
-            db_session.remove()
-            list_uploaded_videos(self.youtube, list_videos, self.playlist_id,
-                                 min(pages + extra_pages, list_pages + extra_pages))
+            elif use_tests:
+                channel = db_session.query(Channel).get(self.channel_id)
+                miss = read_config('Requests', 'miss_limit')
+                pages = read_config('Requests', 'test_pages')
+                extra_pages = read_config('Requests', 'extra_list_pages')
+                list_pages = 0
+                list_videos = []
+                search_videos = []
+                for test in channel.tests:
+                    if test.test_pages > list_pages:
+                        list_pages = test.test_pages
+                    if test.test_miss < miss or test.test_pages > pages:
+                        db_session.remove()
+                        list_uploaded_videos_search(self.youtube, self.channel_id, search_videos, self.search_pages)
+                        break
+                db_session.remove()
+                list_uploaded_videos(self.youtube, list_videos, self.playlist_id,
+                                     min(pages + extra_pages, list_pages + extra_pages))
 
-            if len(search_videos) > 0:
-                return_videos = self.merge_two_videos_list_grab_info(list_videos, search_videos)
+                if len(search_videos) > 0:
+                    return_videos = self.merge_two_videos_list_grab_info(list_videos, search_videos)
+                else:
+                    return_videos = list_videos
+                self.videos.extend(return_videos)
+
             else:
-                return_videos = list_videos
-            self.videos.extend(return_videos)
+                use_playlist_items = read_config('Debug', 'use_playlistItems')
+                if use_playlist_items:
+                    list_uploaded_videos(self.youtube, self.videos, self.playlist_id, self.list_pages)
+                else:
+                    list_uploaded_videos_search(self.youtube, self.channel_id, self.videos, self.search_pages)
 
-        else:
-            use_playlist_items = read_config('Debug', 'use_playlistItems')
-            if use_playlist_items:
-                list_uploaded_videos(self.youtube, self.videos, self.playlist_id, self.list_pages)
-            else:
-                list_uploaded_videos_search(self.youtube, self.channel_id, self.videos, self.search_pages)
+        except Exception as e:
+            # Save the exception details, but don't rethrow.
+            self.exc = e
+            pass
 
         self.job_done = True
+
+    def join(self, **kwargs):
+        """
+        Override Threading join() with one that handles exceptions
+        :return:
+        """
+        super(GetUploadsThread, self).join()
+        if self.exc:
+            raise self.exc
 
     @staticmethod
     def merge_two_videos_list(high_prio_list, low_prio_list):
