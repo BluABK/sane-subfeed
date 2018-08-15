@@ -4,6 +4,7 @@ v0.4.0
 - Made views exclusive checkable
 - Added text edit to config view
 - Added Hotkeys View and made both it and ConfigView into popout windows
+- Split ConfigView into multiple tabs per section/category
 - Added ascending sort
 - Added missing section handling
 - Added gui.dialogs with SaneInputDialog and TextViewDialog
