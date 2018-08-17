@@ -37,7 +37,6 @@ from sane_yt_subfeed.log_handler import create_logger
 # Constants
 
 
-
 class MainWindow(QMainWindow):
     current_view = None
     grid_view = None
@@ -153,9 +152,8 @@ class MainWindow(QMainWindow):
                                                    tooltip='View subscription feed as a detailed list',
                                                    icon='table.png')
         # FIXME: icon
-        view_play_view = self.add_submenu('&View', 'Downloads', self.view_downloads, shortcut='Ctrl+4',
-                                          tooltip='Shows in progress downloads',
-                                          icon='play_view_basic.png')
+        view_downloads_view = self.add_submenu('&View', 'Downloads', self.view_downloads, shortcut='Ctrl+4',
+                                               tooltip='Shows in progress downloads')
         view_subs_view = self.add_submenu('&View', 'Subscriptions', self.view_subs, shortcut='Ctrl+5',
                                           tooltip='View Subscriptions', icon='subs.png')
         if read_config('Debug', 'show_unimplemented_gui'):
@@ -176,6 +174,7 @@ class MainWindow(QMainWindow):
         toolbar.addAction(view_grid_view)
         toolbar.addAction(view_play_view)
         toolbar.addAction(view_list_detailed_view)
+        toolbar.addAction(view_downloads_view)
         if read_config('Debug', 'show_unimplemented_gui'):  # FIXME: Implement
             toolbar.addAction(view_list_tiled_view)
         toolbar.addAction(view_subs_view)
