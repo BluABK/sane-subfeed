@@ -8,6 +8,7 @@ class DownloadTile(QWidget):
         self.sane_paret = parent
         self.download_progress_listener = download_progress_listener
         self.video = download_progress_listener.video
+        self.total_bytes = None
 
         self.sane_layout = QGridLayout()
         self.sane_layout.setAlignment(Qt.AlignTop)
@@ -53,6 +54,7 @@ class DownloadTile(QWidget):
         self.download_progress_listener.updateProgress.connect(self.update_progress)
 
     def update_progress(self, event):
+        # print(format(event))
         if "status" in event:
             self.status_value.setText(event["status"])
         if "_eta_str" in event:
@@ -61,3 +63,8 @@ class DownloadTile(QWidget):
             self.speed_value.setText(event["_speed_str"])
         if "_total_bytes_str" in event:
             self.total_size_value.setText(event["_total_bytes_str"])
+        if "total_bytes" in event and not self.total_bytes:
+            self.total_bytes = event["total_bytes"]
+            self.progress_bar.setMaximum(event["total_bytes"])
+        if "downloaded_bytes" in event and self.total_bytes:
+            self.progress_bar.setValue(event["downloaded_bytes"])
