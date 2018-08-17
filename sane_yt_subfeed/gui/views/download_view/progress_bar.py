@@ -8,6 +8,6 @@ class DownloadProgressBar(QProgressBar):
         self.sane_parent = parent
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.setMaximum(1000)
-        self.setTextVisible(True)
+        # self.setTextVisible(True)
         self.setAlignment(Qt.AlignCenter)
 
