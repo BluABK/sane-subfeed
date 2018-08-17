@@ -39,6 +39,15 @@ class GridScrollArea(QScrollArea):
                 self.model.grid_view_listener.scrollReachedEndPlay.emit()
             self.slider_lock = True
 
+    def keyPressEvent(self, event):
+        super().keyPressEvent(event)
+        if event.key() == Qt.Key_Home:
+            self.verticalScrollBar().setValue(0)
+        elif event.key() == Qt.Key_End:
+            # FIXME: do something with auto reload so that this is not needed
+            self.verticalScrollBar().setValue(self.verticalScrollBar().maximum()-1)
+
+
     def resizeEvent(self, QResizeEvent):
         self.widget.resize_event()
         super().resizeEvent(QResizeEvent)
