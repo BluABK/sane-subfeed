@@ -99,6 +99,7 @@ class DownloadTile(QWidget):
             if self.total_bytes == int(event["total_bytes"]):
                 pass
             else:
+                self.logger.debug("Downloading new item: {}".format(event))
                 self.total_bytes = int(event["total_bytes"])
                 self.progress_bar.setMaximum(int(event["total_bytes"]))
         else:
@@ -107,3 +108,7 @@ class DownloadTile(QWidget):
             self.progress_bar.setValue(int(event["downloaded_bytes"]))
         else:
             self.logger.warning("downloaded_bytes not in: {}".format(event))
+        if "_percent_str" in event:
+            self.progress_bar.setFormat(event["_percent_str"])
+        # print("max: {}, min: {}, percentage: {}".format(self.progress_bar.maximum(), self.progress_bar.minimum(),
+        #                                                 int(event["downloaded_bytes"]) / self.total_bytes * 100))
