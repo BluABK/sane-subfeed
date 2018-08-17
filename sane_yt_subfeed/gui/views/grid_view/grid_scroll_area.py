@@ -45,8 +45,7 @@ class GridScrollArea(QScrollArea):
             self.verticalScrollBar().setValue(0)
         elif event.key() == Qt.Key_End:
             # FIXME: do something with auto reload so that this is not needed
-            self.verticalScrollBar().setValue(self.verticalScrollBar().maximum()-1)
-
+            self.verticalScrollBar().setValue(self.verticalScrollBar().maximum() - 1)
 
     def resizeEvent(self, QResizeEvent):
         self.widget.resize_event()
