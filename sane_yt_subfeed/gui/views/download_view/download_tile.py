@@ -12,6 +12,7 @@ class DownloadTile(QWidget):
         self.download_progress_listener = download_progress_listener
         self.video = download_progress_listener.video
         self.total_bytes = None
+        self.video_downloaded = False
 
         self.setFixedHeight(read_config('DownloadView', 'download_tile_height'))
 
@@ -62,15 +63,32 @@ class DownloadTile(QWidget):
     def update_progress(self, event):
         # print(format(event))
         if "status" in event:
-            self.status_value.setText(event["status"])
+            if event["status"] == "finished":
+                if not self.video_downloaded:
+                    self.video_downloaded = True
+                    self.status_value.setText("Finished downloading video")
+                else:
+                    self.status_value.setText("Finished")
+            elif "downloading" == event["status"]:
+                if self.video_downloaded:
+                    self.status_value.setText("Downloading audio")
+                else:
+                    self.status_value.setText("Downloading video")
+            else:
+                self.status_value.setText(event["status"])
+
+            # self.status_value.setText(event["status"])
         if "_eta_str" in event:
             self.eta_value.setText(event["_eta_str"])
         if "_speed_str" in event:
             self.speed_value.setText(event["_speed_str"])
         if "_total_bytes_str" in event:
             self.total_size_value.setText(event["_total_bytes_str"])
-        if "total_bytes" in event and not self.total_bytes:
-            self.total_bytes = event["total_bytes"]
-            self.progress_bar.setMaximum(event["total_bytes"])
+        if "total_bytes" in event:
+            if self.total_bytes == event["total_bytes"]:
+                pass
+            else:
+                self.total_bytes = event["total_bytes"]
+                self.progress_bar.setMaximum(event["total_bytes"])
         if "downloaded_bytes" in event and self.total_bytes:
             self.progress_bar.setValue(event["downloaded_bytes"])
