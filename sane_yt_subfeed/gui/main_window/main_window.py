@@ -153,7 +153,7 @@ class MainWindow(QMainWindow):
                                                    icon='table.png')
         # FIXME: icon
         view_downloads_view = self.add_submenu('&View', 'Downloads', self.view_downloads, shortcut='Ctrl+4',
-                                               tooltip='Shows in progress downloads')
+                                               tooltip='Shows in progress downloads', icon='download_view.png')
         view_subs_view = self.add_submenu('&View', 'Subscriptions', self.view_subs, shortcut='Ctrl+5',
                                           tooltip='View Subscriptions', icon='subs.png')
         if read_config('Debug', 'show_unimplemented_gui'):
