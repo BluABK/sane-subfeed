@@ -63,6 +63,9 @@ DEFAULTS = {
     'SubFeed': {
         'show_downloaded': 'False',
     },
+    'DownloadView': {
+        'download_tile_height': '200'
+    },
     'PlaySort': {
         'ascending_date': 'False'
     },
@@ -130,9 +133,6 @@ DEFAULTS_HOTKEYS = {
     'Subfeed': {
         'download': 'LeftButton',
         'dismiss': 'MidButton'
-    },
-    'DownloadView': {
-        'download_tile_height': '200'
     },
     'Playback': {
         'prio_decrease': 'MidButton, Ctrl+LeftButton',
