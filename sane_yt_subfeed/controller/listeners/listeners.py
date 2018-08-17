@@ -9,6 +9,7 @@ from watchdog.observers import Observer
 from sane_yt_subfeed import main
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.dir_handler import VidEventHandler, CheckYoutubeFolderForNew
+from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
@@ -16,7 +17,6 @@ from sane_yt_subfeed.database.write_operations import UpdateVideo
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded, THUMBNAILS_PATH
 from sane_yt_subfeed.youtube.update_videos import load_keys
-from sane_yt_subfeed.youtube.youtube_dl_handler import YoutubeDownload
 from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_cached_oauth, list_uploaded_videos_videos
 
 LISTENER_SIGNAL_NORMAL_REFRESH = 0
@@ -24,6 +24,8 @@ LISTENER_SIGNAL_DEEP_REFRESH = 1
 
 
 class GridViewListener(QObject):
+    static_self = None
+
     tileDownloaded = pyqtSignal(VideoD)
     tileDiscarded = pyqtSignal(VideoD)
     tileWatched = pyqtSignal(VideoD)
@@ -48,6 +50,7 @@ class GridViewListener(QObject):
         super().__init__()
         self.model = model
         self.logger = create_logger(__name__ + '.GridViewListener')
+        self.GridViewListener = self
 
         self.tileDownloaded.connect(self.tile_downloaded)
         self.tileWatched.connect(self.tile_watched)
@@ -101,15 +104,9 @@ class GridViewListener(QObject):
             "Video hidden from grid view(downloaded): {} - {} [{}]".format(video.channel_title, video.title,
                                                                            video.url_video))
         self.hiddenVideosChanged.emit()
-        self.download_video(video)
-
-    def download_video(self, video):
-        use_youtube_dl = read_config('Youtube-dl', 'use_youtube_dl')
-        video.downloaded = True
-        video.date_downloaded = datetime.datetime.utcnow()
-        UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
-        if use_youtube_dl:
-            YoutubeDownload(video, finished_listener=self.downloadFinished).start()
+        DownloadHandler.download_video(video,
+                                       youtube_dl_finished_listener=[self.downloadFinished],
+                                       db_update_listeners=[self.downloadedVideosChangedinDB])
 
     @pyqtSlot(VideoD)
     def download_finished(self, video: VideoD):
@@ -204,7 +201,10 @@ class MainWindowListener(QObject):
         video_d = list_uploaded_videos_videos(load_keys(1)[0], [video_id], 50)[0]
         download_thumbnails_threaded([video_d])
         # self.logger.debug(video_d.__dict__)
-        self.model.grid_view_listener.download_video(video_d)
+        # DownloadHandler.download_video(video_d)
+        DownloadHandler.download_video(video_d,
+                                       youtube_dl_finished_listener=[GridViewListener.static_self.downloadFinished],
+                                       db_update_listeners=[GridViewListener.static_self.downloadedVideosChangedinDB])
 
 
 class ProgressBar(QObject):
@@ -247,7 +247,6 @@ class ProgressBar(QObject):
 
     def set_text(self, text):
         self.progress_bar.setFormat(text)
-        # self.progress_bar.text = text
         self.progress_bar.update()
 
     def reset_bar(self):
