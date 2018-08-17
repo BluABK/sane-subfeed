@@ -37,4 +37,4 @@ class DownloadHandler(QObject):
             download_progress_signal = DownloadProgressSignals(video)
             DownloadHandler.static_self.newYTDLDownlaod.emit(download_progress_signal)
             YoutubeDownload(video, download_progress_listener=download_progress_signal,
-                            finished_listener=youtube_dl_finished_listener).start()
+                            finished_listeners=youtube_dl_finished_listener).start()

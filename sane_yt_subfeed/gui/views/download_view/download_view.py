@@ -15,9 +15,11 @@ class DownloadView(QWidget):
         self.sane_layout.setAlignment(Qt.AlignTop)
         self.setLayout(self.sane_layout)
 
-        self.test_widget = DownloadTile(self, "")
-        self.sane_layout.addWidget(self.test_widget)
+        self.widgets = []
+
         DownloadHandler.static_self.newYTDLDownlaod.connect(self.new_download)
 
-    def new_download(self):
-        print("hello world")
+    def new_download(self, download_progress_listener):
+        widget = DownloadTile(self, download_progress_listener)
+        self.widgets.append(widget)
+        self.sane_layout.addWidget(widget)
