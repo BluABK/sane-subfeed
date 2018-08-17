@@ -3,15 +3,12 @@ from __future__ import unicode_literals
 import datetime
 import os
 import threading
-import time
-import re
 
 from youtube_dl import YoutubeDL
-from youtube_dl.utils import ExtractorError, DownloadError
-
-from sane_yt_subfeed.config_handler import read_config, get_options
+from youtube_dl.utils import DownloadError
 
 from sane_yt_subfeed import create_logger
+from sane_yt_subfeed.config_handler import read_config, get_options
 
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 logger = create_logger(__name__)
@@ -28,20 +25,18 @@ class MyLogger(object):
         pass
 
 
-def my_hook(d):
-    time.sleep(0.01)
-    if d['status'] == 'finished':
-        pass
+
         # logger.info("DL status == 'finished")
 
 
 # FIXME: because of formating string, for channel, it can't do batch dl
 class YoutubeDownload(threading.Thread):
-    def __init__(self, video, finished_listener=None):
+    def __init__(self, video, finished_listener=None, download_progress_listener= None):
         threading.Thread.__init__(self)
         logger.debug("Created thread")
         self.video = video
         self.listener = finished_listener
+        self.download_progress_listener = download_progress_listener
         # FIXME: faux filename, as the application is currently not able to get final filname from youtube-dl
         # file_name = "{channel_title} - {date} - %(title)s (%(fps)s_%(vcodec)s_%(acodec)s).%(ext)s".format(
         #     channel_title=self.video.channel_title, date=self.video.date_published.strftime("%Y-%m-%d"))
@@ -60,14 +55,14 @@ class YoutubeDownload(threading.Thread):
 
         self.ydl_opts = {
             'logger': MyLogger(),
-            'progress_hooks': [my_hook],
+            'progress_hooks': [self.my_hook],
             'outtmpl': file_path,
             'forcefilename': 'True'
         }
 
         self.proxy_ydl_opts = {
             'logger': MyLogger(),
-            'progress_hooks': [my_hook],
+            'progress_hooks': [self.my_hook],
             'outtmpl': file_path,
             'forcefilename': 'True',
             'proxy': None
@@ -137,3 +132,6 @@ class YoutubeDownload(threading.Thread):
         if self.listener:
             self.video.date_downloaded = datetime.datetime.utcnow()
             self.listener.emit(self.video)
+
+    def my_hook(self, event):
+        self.download_progress_listener.updateProgress.emit(event)
