@@ -1,7 +1,6 @@
 import threading
-import time
 
-from sane_yt_subfeed.controller.database_listener import DatabaseListener
+from sane_yt_subfeed.controller.listeners.database_listener import DatabaseListener
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.engine_statements import update_video_statement_full, get_video_by_vidd_stmt, insert_item, \
     get_video_ids_by_video_ids_stmt, update_thumbnails_path_stmt, update_video_stmt

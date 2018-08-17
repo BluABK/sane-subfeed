@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QSt
 # Project internal libs
 from sane_yt_subfeed.absolute_paths import ICONS_PATH, VERSION_PATH
 from sane_yt_subfeed.config_handler import read_config, set_config
-from sane_yt_subfeed.controller.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
+from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import GRID_VIEW_ID, PLAY_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.gui.dialogs.input_dialog import SaneInputDialog

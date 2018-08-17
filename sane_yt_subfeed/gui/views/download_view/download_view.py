@@ -1,8 +1,7 @@
-import time
-
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 
+from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
 from sane_yt_subfeed.gui.views.download_view.download_tile import DownloadTile
 
 
@@ -18,3 +17,7 @@ class DownloadView(QWidget):
 
         self.test_widget = DownloadTile(self, "")
         self.sane_layout.addWidget(self.test_widget)
+        DownloadHandler.static_self.newYTDLDownlaod.connect(self.new_download)
+
+    def new_download(self):
+        print("hello world")
