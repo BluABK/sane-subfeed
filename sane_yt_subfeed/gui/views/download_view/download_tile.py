@@ -12,32 +12,52 @@ class DownloadTile(QWidget):
         self.sane_layout = QGridLayout()
         self.sane_layout.setAlignment(Qt.AlignTop)
 
-        self.title_bar = QLabel("Title:", parent=self)
-        self.thumbnail = QLabel("Img", parent=self)
+        self.title_bar = QLabel(self.video.title, parent=self)
+        self.thumbnail = QLabel("Not Implemented", parent=self)
         self.progress_bar = QProgressBar(parent=self)
 
         self.status = QLabel("Status:", parent=self)
         self.duration = QLabel("Duration:", parent=self)
         self.upload = QLabel("Uploaded:", parent=self)
         self.eta = QLabel("ETA:", parent=self)
+        self.speed = QLabel("Speed:", parent=self)
+        self.total_size = QLabel("Total size:", parent=self)
 
-        self.status_value = QLabel("Not Implemented", parent=self)
+        self.status_value = QLabel("No update", parent=self)
         self.duration_value = QLabel("Not Implemented", parent=self)
-        self.upload_value = QLabel("Not Implemented", parent=self)
-        self.eta_value = QLabel("Not Implemented", parent=self)
+        self.upload_value = QLabel(self.video.date_published.strftime("%Y-%m-%d %H:%M:%S"), parent=self)
+        self.eta_value = QLabel("No update", parent=self)
+        self.speed_value = QLabel("No update:", parent=self)
+        self.total_size_value = QLabel("No update:", parent=self)
 
         self.sane_layout.addWidget(self.title_bar, 0, 0, 1, 3)
-        self.sane_layout.addWidget(self.thumbnail, 1, 0, 4, 1)
-        self.sane_layout.addWidget(self.progress_bar, 5, 0, 1, 3)
+        self.sane_layout.addWidget(self.thumbnail, 1, 0, 6, 1)
+        self.sane_layout.addWidget(self.progress_bar, 7, 0, 1, 3)
 
         self.sane_layout.addWidget(self.status, 1, 1)
         self.sane_layout.addWidget(self.duration, 2, 1)
         self.sane_layout.addWidget(self.upload, 3, 1)
         self.sane_layout.addWidget(self.eta, 4, 1)
+        self.sane_layout.addWidget(self.speed, 5, 1)
+        self.sane_layout.addWidget(self.total_size, 6, 1)
 
         self.sane_layout.addWidget(self.status_value, 1, 2)
         self.sane_layout.addWidget(self.duration_value, 2, 2)
         self.sane_layout.addWidget(self.upload_value, 3, 2)
         self.sane_layout.addWidget(self.eta_value, 4, 2)
+        self.sane_layout.addWidget(self.speed_value, 5, 2)
+        self.sane_layout.addWidget(self.total_size_value, 6, 2)
 
         self.setLayout(self.sane_layout)
+
+        self.download_progress_listener.updateProgress.connect(self.update_progress)
+
+    def update_progress(self, event):
+        if "status" in event:
+            self.status_value.setText(event["status"])
+        if "_eta_str" in event:
+            self.eta_value.setText(event["_eta_str"])
+        if "_speed_str" in event:
+            self.speed_value.setText(event["_speed_str"])
+        if "_total_bytes_str" in event:
+            self.total_size_value.setText(event["_total_bytes_str"])
