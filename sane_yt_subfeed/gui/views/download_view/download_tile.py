@@ -1,6 +1,9 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QProgressBar, QWidget
 
+from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.gui.views.download_view.download_thumbnail import DownloadThumbnailWidget
+
 
 class DownloadTile(QWidget):
     def __init__(self, parent, download_progress_listener, *args, **kwargs):
@@ -10,11 +13,13 @@ class DownloadTile(QWidget):
         self.video = download_progress_listener.video
         self.total_bytes = None
 
+        self.setFixedHeight(read_config('DownloadView', 'download_tile_height'))
+
         self.sane_layout = QGridLayout()
         self.sane_layout.setAlignment(Qt.AlignTop)
 
         self.title_bar = QLabel(self.video.title, parent=self)
-        self.thumbnail = QLabel("Not Implemented", parent=self)
+        self.thumbnail = DownloadThumbnailWidget(self, self.video)
         self.progress_bar = QProgressBar(parent=self)
 
         self.status = QLabel("Status:", parent=self)
@@ -50,6 +55,7 @@ class DownloadTile(QWidget):
         self.sane_layout.addWidget(self.total_size_value, 6, 2)
 
         self.setLayout(self.sane_layout)
+
 
         self.download_progress_listener.updateProgress.connect(self.update_progress)
 
