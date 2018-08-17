@@ -13,6 +13,7 @@ class DownloadTile(QWidget):
         self.video = download_progress_listener.video
         self.total_bytes = None
         self.video_downloaded = False
+        self.finished = False
 
         self.setFixedHeight(read_config('DownloadView', 'download_tile_height'))
 
@@ -57,7 +58,6 @@ class DownloadTile(QWidget):
 
         self.setLayout(self.sane_layout)
 
-
         self.download_progress_listener.updateProgress.connect(self.update_progress)
 
     def update_progress(self, event):
@@ -69,6 +69,7 @@ class DownloadTile(QWidget):
                     self.status_value.setText("Finished downloading video")
                 else:
                     self.status_value.setText("Finished")
+                    self.finished = True
             elif "downloading" == event["status"]:
                 if self.video_downloaded:
                     self.status_value.setText("Downloading audio")
@@ -76,8 +77,6 @@ class DownloadTile(QWidget):
                     self.status_value.setText("Downloading video")
             else:
                 self.status_value.setText(event["status"])
-
-            # self.status_value.setText(event["status"])
         if "_eta_str" in event:
             self.eta_value.setText(event["_eta_str"])
         if "_speed_str" in event:
