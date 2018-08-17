@@ -3,11 +3,11 @@ from PyQt5.QtWidgets import QGridLayout, QLabel, QProgressBar, QWidget
 
 
 class DownloadTile(QWidget):
-    def __init__(self, parent, video, *args, **kwargs):
+    def __init__(self, parent, download_progress_listener, *args, **kwargs):
         super(DownloadTile, self).__init__(parent, *args, **kwargs)
         self.sane_paret = parent
-
-        self.video = video
+        self.download_progress_listener = download_progress_listener
+        self.video = download_progress_listener.video
 
         self.sane_layout = QGridLayout()
         self.sane_layout.setAlignment(Qt.AlignTop)
