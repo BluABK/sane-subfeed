@@ -83,6 +83,10 @@ class ConfigViewWidget(InputSuper):
         self.add_section('{}Subscription feed{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
         self.add_option_checkbox('Show downloaded videos', 'SubFeed', 'show_downloaded', tab_id='GUI')
 
+        # Section [DownloadView]
+        self.add_section('{}Downloads view{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
+        self.add_option_checkbox('Download view tile height', 'DownloadView', 'download_tile_height', tab_id='GUI')
+
         # Section [Play]
         self.add_section('{}Playback feed{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
         self.add_option_line_edit('YouTube video directory', 'Play', 'yt_file_path', tab_id='GUI')

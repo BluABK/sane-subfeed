@@ -131,6 +131,9 @@ DEFAULTS_HOTKEYS = {
         'download': 'LeftButton',
         'dismiss': 'MidButton'
     },
+    'DownloadView': {
+        'download_tile_height': '200'
+    },
     'Playback': {
         'prio_decrease': 'MidButton, Ctrl+LeftButton',
         'mark_watched': 'Alt+LeftButton',
