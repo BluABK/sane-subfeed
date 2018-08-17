@@ -1,5 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QLabel, QProgressBar, QWidget
+from sane_yt_subfeed.log_handler import create_logger
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.gui.views.download_view.download_thumbnail import DownloadThumbnailWidget
@@ -8,6 +9,8 @@ from sane_yt_subfeed.gui.views.download_view.download_thumbnail import DownloadT
 class DownloadTile(QWidget):
     def __init__(self, parent, download_progress_listener, *args, **kwargs):
         super(DownloadTile, self).__init__(parent, *args, **kwargs)
+        self.logger = create_logger(__name__)
+        self.logger.debug("Starting init")
         self.sane_paret = parent
         self.download_progress_listener = download_progress_listener
         self.video = download_progress_listener.video
@@ -60,6 +63,8 @@ class DownloadTile(QWidget):
 
         self.download_progress_listener.updateProgress.connect(self.update_progress)
 
+        self.logger.debug("Init done")
+
     def update_progress(self, event):
         # print(format(event))
         if "status" in event:
@@ -84,10 +89,14 @@ class DownloadTile(QWidget):
         if "_total_bytes_str" in event:
             self.total_size_value.setText(event["_total_bytes_str"])
         if "total_bytes" in event:
-            if self.total_bytes == event["total_bytes"]:
+            if self.total_bytes == int(event["total_bytes"]):
                 pass
             else:
-                self.total_bytes = event["total_bytes"]
-                self.progress_bar.setMaximum(event["total_bytes"])
+                self.total_bytes = int(event["total_bytes"])
+                self.progress_bar.setMaximum(int(event["total_bytes"]))
+        else:
+            self.logger.warning("total_bytes not in: {}".format(event))
         if "downloaded_bytes" in event and self.total_bytes:
-            self.progress_bar.setValue(event["downloaded_bytes"])
+            self.progress_bar.setValue(int(event["downloaded_bytes"]))
+        else:
+            self.logger.warning("downloaded_bytes not in: {}".format(event))
