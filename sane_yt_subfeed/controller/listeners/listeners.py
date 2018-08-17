@@ -50,7 +50,7 @@ class GridViewListener(QObject):
         super().__init__()
         self.model = model
         self.logger = create_logger(__name__ + '.GridViewListener')
-        self.GridViewListener = self
+        GridViewListener.static_self = self
 
         self.tileDownloaded.connect(self.tile_downloaded)
         self.tileWatched.connect(self.tile_watched)
