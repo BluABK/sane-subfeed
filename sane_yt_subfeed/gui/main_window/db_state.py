@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QLabel
 from sane_yt_subfeed.absolute_paths import ICONS_PATH
 from sane_yt_subfeed.log_handler import create_logger
 
-from sane_yt_subfeed.controller.database_listener import DatabaseListener
+from sane_yt_subfeed.controller.listeners.database_listener import DatabaseListener
 
 
 class DbStateIcon(QLabel):

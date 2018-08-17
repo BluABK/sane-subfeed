@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QSt
 # Project internal libs
 from sane_yt_subfeed.absolute_paths import ICONS_PATH, VERSION_PATH
 from sane_yt_subfeed.config_handler import read_config, set_config
-from sane_yt_subfeed.controller.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
+from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import GRID_VIEW_ID, PLAY_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.gui.dialogs.input_dialog import SaneInputDialog
@@ -22,6 +22,8 @@ from sane_yt_subfeed.gui.views.about_view import AboutView
 from sane_yt_subfeed.gui.views.config_view.config_window import ConfigWindow
 from sane_yt_subfeed.gui.views.config_view.views.config_view import ConfigViewWidget
 from sane_yt_subfeed.gui.views.config_view.views.hotkeys_view import HotkeysViewWidget
+from sane_yt_subfeed.gui.views.download_view.dl_scroll_area import DownloadScrollArea
+from sane_yt_subfeed.gui.views.download_view.download_view import DownloadView
 from sane_yt_subfeed.gui.views.grid_view.grid_scroll_area import GridScrollArea
 from sane_yt_subfeed.gui.views.grid_view.play_view.play_view import PlayView
 from sane_yt_subfeed.gui.views.grid_view.sub_feed.sub_feed_view import SubFeedView
@@ -33,7 +35,6 @@ from sane_yt_subfeed.log_handler import create_logger
 
 
 # Constants
-
 
 
 class MainWindow(QMainWindow):
@@ -67,6 +68,8 @@ class MainWindow(QMainWindow):
         self.play_view = GridScrollArea(self, main_model)
         self.grid_view.set_view(SubFeedView(self.grid_view, self, main_model), GRID_VIEW_ID)
         self.play_view.set_view(PlayView(self.play_view, self, main_model), PLAY_VIEW_ID)
+
+        self.download_view = DownloadScrollArea(self, main_model)
 
         self.config_view = ConfigWindow(self)
         self.hotkeys_view = ConfigWindow(self)
@@ -148,12 +151,15 @@ class MainWindow(QMainWindow):
         view_list_detailed_view = self.add_submenu('&View', 'Detailed List', self.view_list_detailed, shortcut='Ctrl+3',
                                                    tooltip='View subscription feed as a detailed list',
                                                    icon='table.png')
-        if read_config('Debug', 'show_unimplemented_gui'):
-            view_list_tiled_view = self.add_submenu('&View', 'Tiled List', self.view_list_tiled, shortcut='Ctrl+4',
-                                                    tooltip='View subscription feed as a tiled list',
-                                                    icon='tiled_list.png')
+        # FIXME: icon
+        view_downloads_view = self.add_submenu('&View', 'Downloads', self.view_downloads, shortcut='Ctrl+4',
+                                               tooltip='Shows in progress downloads')
         view_subs_view = self.add_submenu('&View', 'Subscriptions', self.view_subs, shortcut='Ctrl+5',
                                           tooltip='View Subscriptions', icon='subs.png')
+        if read_config('Debug', 'show_unimplemented_gui'):
+            view_list_tiled_view = self.add_submenu('&View', 'Tiled List', self.view_list_tiled, shortcut='Ctrl+9',
+                                                    tooltip='View subscription feed as a tiled list',
+                                                    icon='tiled_list.png')
 
         # Help menu
         self.add_menu(menubar, '&Help')
@@ -168,6 +174,7 @@ class MainWindow(QMainWindow):
         toolbar.addAction(view_grid_view)
         toolbar.addAction(view_play_view)
         toolbar.addAction(view_list_detailed_view)
+        toolbar.addAction(view_downloads_view)
         if read_config('Debug', 'show_unimplemented_gui'):  # FIXME: Implement
             toolbar.addAction(view_list_tiled_view)
         toolbar.addAction(view_subs_view)
@@ -201,6 +208,7 @@ class MainWindow(QMainWindow):
         # Display the window
         self.central_widget.addWidget(self.grid_view)
         self.central_widget.addWidget(self.play_view)
+        self.central_widget.addWidget(self.download_view)
         self.central_widget.addWidget(self.list_detailed_view)
         if read_config('Debug', 'show_unimplemented_gui'):
             self.central_widget.addWidget(self.list_tiled_view)
@@ -212,17 +220,6 @@ class MainWindow(QMainWindow):
 
         # if self.dimensions:
         #     self.resize(self.dimensions[0], self.dimensions[1])
-
-    # Qt Overrides
-    def keyPressEvent(self, QKeyEvent):
-        if QKeyEvent.key() == Qt.Key_Control:
-            # self.logger.debug("ctrl pressed")
-            self.hotkey_ctrl_down = True
-
-    def keyReleaseEvent(self, QKeyEvent):
-        if QKeyEvent.key() == Qt.Key_Control:
-            # self.logger.debug("ctrl released")
-            self.hotkey_ctrl_down = False
 
     # Internal
     def determine_version(self):
@@ -323,6 +320,14 @@ class MainWindow(QMainWindow):
         """
         # FIXME: hotfix for actions using self.grid_view(refresh and copy urls)
         self.central_widget.setCurrentWidget(self.play_view)
+
+    def view_downloads(self):
+        """
+        Set View variable and CentralWidget to GridView
+        :return:
+        """
+        # FIXME: hotfix for actions using self.grid_view(refresh and copy urls)
+        self.central_widget.setCurrentWidget(self.download_view)
 
     def view_subs(self):
         """
