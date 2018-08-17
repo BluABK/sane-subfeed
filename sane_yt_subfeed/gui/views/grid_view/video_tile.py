@@ -74,12 +74,24 @@ class VideoTile(QWidget):
             self.channel_widget.setText(self.video.channel_title)
 
         vid_age = datetime.datetime.utcnow() - self.video.date_published
-        self.date_widget.setText(format(vid_age))
+        self.date_widget.setText(self.strfdelta(vid_age, "{hours}:{minutes}:{seconds}", "{days} days "))
         self.old_videos(vid_age)
 
         self.thumbnail_widget.setPixmap(QPixmap(video.thumbnail_path))
 
         self.update()
+
+    @staticmethod
+    def strfdelta(tdelta, hours, days):
+        d = {}
+        d["hours"], rem = divmod(tdelta.seconds, 3600)
+        d["minutes"], d["seconds"] = divmod(rem, 60)
+        if int(tdelta.days) > 0:
+            return_string = "{}{}".format(days.format(days=tdelta.days), hours.format(**d))
+        else:
+            return_string = "{}".format(hours.format(**d))
+
+        return return_string
 
     def old_videos(self, vid_age):
         if read_config('Gui', 'grey_old_videos'):
