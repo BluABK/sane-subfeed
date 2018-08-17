@@ -26,7 +26,7 @@ class DownloadTile(QWidget):
 
         self.sane_layout = QGridLayout()
         # self.sane_layout.setAlignment(Qt.AlignLeading)
-        self.sane_layout.setContentsMargins(0, 1, 50, 0)
+        self.sane_layout.setContentsMargins(0, 1, 30, 0)
         # self.setContentsMargins(0, 1, 50, 0)
 
         self.title_bar = SmallLabel(self.video.title, parent=self)
@@ -101,11 +101,11 @@ class DownloadTile(QWidget):
             else:
                 self.logger.debug("Downloading new item: {}".format(event))
                 self.total_bytes = int(event["total_bytes"])
-                self.progress_bar.setMaximum(int(event["total_bytes"]))
+                # self.progress_bar.setMaximum(int(event["total_bytes"]))
         else:
             self.logger.warning("total_bytes not in: {}".format(event))
         if "downloaded_bytes" in event and self.total_bytes:
-            self.progress_bar.setValue(int(event["downloaded_bytes"]))
+            self.progress_bar.setValue(int(int((event["downloaded_bytes"]/self.total_bytes)*1000)))
         else:
             self.logger.warning("downloaded_bytes not in: {}".format(event))
         if "_percent_str" in event:
