@@ -4,6 +4,7 @@ v0.4.0
 - Made views exclusive checkable
 - Added text edit to config view
 - Added Hotkeys View and made both it and ConfigView into popout windows
+- Added darkmode versions of select icons
 - Split ConfigView into multiple tabs per section/category
 - Added ascending sort
 - Added missing section handling
@@ -28,6 +29,7 @@ v0.4.0
 - Fixed download_thumbnails_threaded Exception when receiving len 0 video list
 - Fixed compare_db_filtered not returning videos not in db
 - Removed defunct check for empty DB
+- Made the home and end key scroll to value 0 and value maximum-1
 - DEBUG: Added "Send to logger" context menu option for videos in GridViews
 
 v0.3.4
