@@ -1,5 +1,9 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGridLayout, QLabel, QProgressBar, QWidget
+from PyQt5.QtGui import QPalette
+from PyQt5.QtWidgets import QGridLayout, QProgressBar, QWidget, QSizePolicy
+
+from sane_yt_subfeed.gui.views.download_view.progress_bar import DownloadProgressBar
+from sane_yt_subfeed.gui.views.download_view.small_label import SmallLabel
 from sane_yt_subfeed.log_handler import create_logger
 
 from sane_yt_subfeed.config_handler import read_config
@@ -21,29 +25,32 @@ class DownloadTile(QWidget):
         self.setFixedHeight(read_config('DownloadView', 'download_tile_height'))
 
         self.sane_layout = QGridLayout()
-        self.sane_layout.setAlignment(Qt.AlignTop)
+        # self.sane_layout.setAlignment(Qt.AlignLeading)
+        self.sane_layout.setContentsMargins(0, 1, 50, 0)
+        # self.setContentsMargins(0, 1, 50, 0)
 
-        self.title_bar = QLabel(self.video.title, parent=self)
+        self.title_bar = SmallLabel(self.video.title, parent=self)
         self.thumbnail = DownloadThumbnailWidget(self, self.video)
-        self.progress_bar = QProgressBar(parent=self)
+        self.progress_bar = DownloadProgressBar(self)
+        # self.progress_bar.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
-        self.status = QLabel("Status:", parent=self)
-        self.duration = QLabel("Duration:", parent=self)
-        self.upload = QLabel("Uploaded:", parent=self)
-        self.eta = QLabel("ETA:", parent=self)
-        self.speed = QLabel("Speed:", parent=self)
-        self.total_size = QLabel("Total size:", parent=self)
+        self.status = SmallLabel("Status:", parent=self)
+        self.duration = SmallLabel("Duration:", parent=self)
+        self.upload = SmallLabel("Uploaded:", parent=self)
+        self.eta = SmallLabel("ETA:", parent=self)
+        self.speed = SmallLabel("Speed:", parent=self)
+        self.total_size = SmallLabel("Total size:", parent=self)
 
-        self.status_value = QLabel("No update", parent=self)
-        self.duration_value = QLabel("Not Implemented", parent=self)
-        self.upload_value = QLabel(self.video.date_published.strftime("%Y-%m-%d %H:%M:%S"), parent=self)
-        self.eta_value = QLabel("No update", parent=self)
-        self.speed_value = QLabel("No update:", parent=self)
-        self.total_size_value = QLabel("No update:", parent=self)
+        self.status_value = SmallLabel("No update", parent=self)
+        self.duration_value = SmallLabel("Not Implemented", parent=self)
+        self.upload_value = SmallLabel(self.video.date_published.strftime("%Y-%m-%d %H:%M:%S"), parent=self)
+        self.eta_value = SmallLabel("No update", parent=self)
+        self.speed_value = SmallLabel("No update:", parent=self)
+        self.total_size_value = SmallLabel("No update:", parent=self)
 
         self.sane_layout.addWidget(self.title_bar, 0, 0, 1, 3)
         self.sane_layout.addWidget(self.thumbnail, 1, 0, 6, 1)
-        self.sane_layout.addWidget(self.progress_bar, 7, 0, 1, 3)
+        self.sane_layout.addWidget(self.progress_bar, 7, 0, 1, 10)
 
         self.sane_layout.addWidget(self.status, 1, 1)
         self.sane_layout.addWidget(self.duration, 2, 1)
