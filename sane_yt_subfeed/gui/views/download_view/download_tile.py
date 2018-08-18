@@ -48,9 +48,9 @@ class DownloadTile(QWidget):
         self.speed_value = SmallLabel("No update:", parent=self)
         self.total_size_value = SmallLabel("No update:", parent=self)
 
-        self.sane_layout.addWidget(self.title_bar, 0, 0, 1, 3)
+        self.sane_layout.addWidget(self.title_bar, 0, 0, 1, 4)
         self.sane_layout.addWidget(self.thumbnail, 1, 0, 6, 1)
-        self.sane_layout.addWidget(self.progress_bar, 7, 0, 1, 10)
+        self.sane_layout.addWidget(self.progress_bar, 7, 0, 1, 4)
 
         self.sane_layout.addWidget(self.status, 1, 1)
         self.sane_layout.addWidget(self.duration, 2, 1)
@@ -76,6 +76,7 @@ class DownloadTile(QWidget):
     def finished_download(self):
         self.finished = True
         self.progress_bar.setValue(1000)
+        self.progress_bar.setFormat("100.0%")
         self.status_value.setText("Finished")
 
     def update_progress(self, event):
