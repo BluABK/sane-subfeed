@@ -162,7 +162,7 @@ class UpdateVideo(threading.Thread):
         # self.logger.debug("Run")
         # start = default_timer()
         lock.acquire()
-        stmt = get_video_by_vidd_stmt(VideoD.to_video(self.video_d))
+        stmt = get_video_by_vidd_stmt(Video.video_d_to_video(self.video_d))
         db_video = engine.execute(stmt).first()
         if db_video:
             if self.update_existing:
