@@ -1,6 +1,5 @@
 import datetime
 
-import sane_yt_subfeed.database.video as video_file
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 
@@ -89,16 +88,7 @@ class VideoD:
             self.thumbnails['available_quality'].append("maxres")  # 1280x720 px
             self.thumbnails['maxres'] = thumbnails_item['maxres']
 
-    def to_video(self):
-        video = video_file.Video(self.search_item)
-        video.downloaded = self.downloaded
-        video.thumbnail_path = self.thumbnail_path
-        video.discarded = self.discarded
-        video.vid_path = self.vid_path
-        video.watched = self.watched
-        video.watch_prio = self.watch_prio
-        video.date_downloaded = self.date_downloaded
-        return video
+
 
     @staticmethod
     def playlist_item_new_video_d(playlist_item, grab_methods=None):
