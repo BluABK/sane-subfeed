@@ -35,11 +35,14 @@ class DownloadView(QWidget):
         self.sane_layout.addWidget(widget)
 
     def clear_downloads(self):
+        widgets_to_delete = []
         for widget in self.widgets:
             if widget.finished:
-                self.logger.info("Removing widget for video: {} - {}".format(widget.video.title, widget.__dict__))
-                # self.sane_layout.removeWidget(widget)
-                sip.delete(widget)
-                self.widgets.remove(widget)
+                widgets_to_delete.append(widget)
             else:
                 self.logger.debug("Widget not finished: {}".format(widget.__dict__))
+        while widgets_to_delete:
+            widget = widgets_to_delete.pop()
+            self.logger.info("Removing widget for video: {} - {}".format(widget.video.title, widget.__dict__))
+            sip.delete(widget)
+            self.widgets.remove(widget)
