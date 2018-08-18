@@ -94,6 +94,11 @@ class PlayTile(VideoTile):
             alternative_player3_action = menu.addAction("Play with alternative player 3")
         url_player_action = menu.addAction("Play with url player")
 
+        if not self.video.vid_path:
+            download_video = menu.addAction("Download video")
+        else:
+            download_video = None
+
         menu.addSeparator()
         show_description_dialog = menu.addAction("View description")
         open_thumbnail_file = menu.addAction("View image")
@@ -118,6 +123,8 @@ class PlayTile(VideoTile):
             self.play_vid(self.video.vid_path, alternative_player3)
         elif action == url_player_action:
             self.play_vid(self.video.url_video, url_player)
+        elif download_video and action == download_video:
+            self.mark_downloaded()
         elif action == open_thumbnail_file:
             try:
                 if sys.platform.startswith('linux'):
