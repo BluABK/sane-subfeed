@@ -26,7 +26,7 @@ class DownloadTile(QWidget):
 
         self.sane_layout = QGridLayout()
         # self.sane_layout.setAlignment(Qt.AlignLeading)
-        self.sane_layout.setContentsMargins(0, 1, 30, 0)
+        self.sane_layout.setContentsMargins(0, 1, 10, 0)
         # self.setContentsMargins(0, 1, 50, 0)
 
         self.title_bar = SmallLabel(self.video.title, parent=self)
