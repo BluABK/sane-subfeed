@@ -69,8 +69,14 @@ class DownloadTile(QWidget):
         self.setLayout(self.sane_layout)
 
         self.download_progress_listener.updateProgress.connect(self.update_progress)
+        self.download_progress_listener.finishedDownload.connect(self.finished_download)
 
         self.logger.debug("Init done")
+
+    def finished_download(self):
+        self.finished = True
+        self.progress_bar.setValue(1000)
+        self.status_value.setText("Finished")
 
     def update_progress(self, event):
         # print(format(event))
@@ -81,7 +87,6 @@ class DownloadTile(QWidget):
                     self.status_value.setText("Finished downloading video")
                 else:
                     self.status_value.setText("Finished")
-                    self.finished = True
             elif "downloading" == event["status"]:
                 if self.video_downloaded:
                     self.status_value.setText("Downloading audio")
@@ -105,7 +110,7 @@ class DownloadTile(QWidget):
         else:
             self.logger.warning("total_bytes not in: {}".format(event))
         if "downloaded_bytes" in event and self.total_bytes:
-            self.progress_bar.setValue(int(int((event["downloaded_bytes"]/self.total_bytes)*1000)))
+            self.progress_bar.setValue(int(int((event["downloaded_bytes"] / self.total_bytes) * 1000)))
         else:
             self.logger.warning("downloaded_bytes not in: {}".format(event))
         if "_percent_str" in event:

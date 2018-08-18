@@ -38,7 +38,7 @@ class DownloadView(QWidget):
         for widget in self.widgets:
             if widget.finished:
                 self.logger.info("Removing widget for video: {} - {}".format(widget.video.title, widget.__dict__))
-                self.sane_layout.removeWidget(widget)
+                # self.sane_layout.removeWidget(widget)
                 sip.delete(widget)
                 self.widgets.remove(widget)
             else:
