@@ -26,6 +26,9 @@ class DownloadView(QWidget):
 
         self.widgets = []
 
+        DownloadHandler.static_self.loadDBDownloadTiles.emit()
+
+        DownloadHandler.static_self.dbDownloadTiles.connect(self.update_widgets)
         DownloadHandler.static_self.newYTDLDownlaod.connect(self.new_download)
 
     def new_download(self, download_progress_listener):
@@ -46,3 +49,6 @@ class DownloadView(QWidget):
             self.logger.info("Removing widget for video: {} - {}".format(widget.video.title, widget.__dict__))
             sip.delete(widget)
             self.widgets.remove(widget)
+
+    def update_widgets(self, widget_list):
+        print(widget_list)

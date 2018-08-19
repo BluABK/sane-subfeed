@@ -11,7 +11,7 @@ from sane_yt_subfeed.gui.views.download_view.download_thumbnail import DownloadT
 
 
 class DownloadTile(QWidget):
-    def __init__(self, parent, download_progress_listener, *args, **kwargs):
+    def __init__(self, parent, download_progress_listener, db_download_tile=None, *args, **kwargs):
         super(DownloadTile, self).__init__(parent, *args, **kwargs)
         self.logger = create_logger(__name__)
         self.logger.debug("Starting init")
@@ -24,6 +24,8 @@ class DownloadTile(QWidget):
         self.finished_date = None
         self.started_date = None
         self.last_event = None
+        self.cleared = False
+
 
         self.setFixedHeight(read_config('DownloadView', 'download_tile_height'))
 
@@ -74,7 +76,22 @@ class DownloadTile(QWidget):
         self.download_progress_listener.updateProgress.connect(self.update_progress)
         self.download_progress_listener.finishedDownload.connect(self.finished_download)
 
+        if db_download_tile:
+            self.update_from_db_tile(db_download_tile)
+        else:
+            pass
         self.logger.debug("Init done")
+
+    def update_from_db_tile(self, db_download_tile):
+        self.finished = db_download_tile.finished
+        self.started_date = db_download_tile.started_date
+        self.finished_date = db_download_tile.finished_date
+        self.video = db_download_tile.video
+        self.video_downloaded = db_download_tile.video_downloaded
+        self.total_bytes = db_download_tile.total_bytes
+        self.last_event = db_download_tile.last_event
+
+        self.update_progress(self.last_event)
 
     def finished_download(self):
         self.finished = True
