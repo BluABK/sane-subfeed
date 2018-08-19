@@ -28,3 +28,11 @@ class DBDownloadTile(PermanentBase):
         self.total_bytes = download_tile.total_bytes
         self.last_event = download_tile.last_event
         self.cleared = download_tile.cleared
+
+    def update_tile(self, download_tile):
+        self.finished = download_tile.finished
+        self.started_date = download_tile.started_date
+        self.finished_date = download_tile.finished_date
+        self.total_bytes = download_tile.total_bytes
+        self.last_event = download_tile.last_event
+        self.cleared = download_tile.cleared
