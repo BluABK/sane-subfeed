@@ -6,6 +6,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMenu, QAction
 
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.default_application_handler import open_with_default_application
 from sane_yt_subfeed.gui.views.grid_view.play_view.play_thumbnail_tile import PlayThumbnailTile
 from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
 from sane_yt_subfeed.log_handler import create_logger
@@ -119,14 +120,7 @@ class PlayTile(VideoTile):
         elif action == url_player_action:
             self.play_vid(self.video.url_video, url_player)
         elif action == open_thumbnail_file:
-            try:
-                if sys.platform.startswith('linux'):
-                    subprocess.call(["xdg-open", self.video.thumbnail_path])
-                else:
-                    os.startfile(self.video.thumbnail_path)
-            except Exception as e_anything:
-                self.logger.exception(e_anything)
-                pass
+            open_with_default_application(self.video.thumbnail_path)
         elif action == show_description_dialog:
             description_dialog = TextViewDialog(self.parent, self.video.description)
             description_dialog.setWindowTitle("Video description for: {} - {}".format(self.video.channel_title,
