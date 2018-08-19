@@ -90,7 +90,8 @@ class DownloadTile(QWidget):
         self.total_bytes = db_download_tile.total_bytes
         self.last_event = db_download_tile.last_event
 
-        self.update_progress(self.last_event)
+        if self.last_event:
+            self.update_progress(self.last_event)
 
     def finished_download(self):
         self.finished = True
