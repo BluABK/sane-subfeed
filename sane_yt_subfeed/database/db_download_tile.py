@@ -12,7 +12,7 @@ class DBDownloadTile(PermanentBase):
     finished = Column(Boolean)
     started_date = Column(DateTime)
     finished_date = Column(DateTime)
-    video_id = Column(String, ForeignKey('video.video_id'))
+    video_id = Column(String, ForeignKey('video.video_id'), unique=True)
     video = relationship('Video')
     video_downloaded = Column(Boolean)
     total_bytes = Column(Integer)

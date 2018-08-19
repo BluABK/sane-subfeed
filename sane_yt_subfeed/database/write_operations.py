@@ -1,6 +1,7 @@
 import threading
 
 from sane_yt_subfeed.controller.listeners.database_listener import DatabaseListener
+from sane_yt_subfeed.database.db_download_tile import DBDownloadTile
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.engine_statements import update_video_statement_full, get_video_by_vidd_stmt, insert_item, \
     get_video_ids_by_video_ids_stmt, update_thumbnails_path_stmt, update_video_stmt
@@ -114,7 +115,6 @@ class UpdateVideosThumbnailsThreaded(threading.Thread):
         """
         self.db_id = threading.get_ident()
 
-
         lock.acquire()
         DatabaseListener.static_instance.startWrite.emit(self.db_id)
         update_list = []
@@ -188,6 +188,14 @@ def check_for_unique(vid_list):
         else:
             compare_set.add(vid.video_id)
     return vid_list
+
+
+def update_event_download_tile(download_tile):
+    lock.acquire()
+    stmt = DBDownloadTile.__table__.update().where(DBDownloadTile.video_id == download_tile.video.video_id).values({
+        'last_event': download_tile.last_event})
+    engine.execute(stmt)
+    lock.release()
 
 
 def delete_sub_not_in_list(subs):

@@ -1,6 +1,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette
 from PyQt5.QtWidgets import QGridLayout, QProgressBar, QWidget, QSizePolicy, QMenu
+from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
+from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
 
 from sane_yt_subfeed.gui.views.download_view.progress_bar import DownloadProgressBar
 from sane_yt_subfeed.gui.views.download_view.small_label import SmallLabel
@@ -93,6 +95,9 @@ class DownloadTile(QWidget):
         if self.last_event:
             self.update_progress(self.last_event)
 
+        self.speed_value.setText("n/a")
+        self.eta_value.setText("n/a")
+
     def finished_download(self):
         self.finished = True
         self.progress_bar.setValue(1000)
@@ -137,6 +142,8 @@ class DownloadTile(QWidget):
             self.logger.warning("downloaded_bytes not in: {}".format(event))
         if "_percent_str" in event:
             self.progress_bar.setFormat(event["_percent_str"])
+
+        DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
 
     def contextMenuEvent(self, event):
         """

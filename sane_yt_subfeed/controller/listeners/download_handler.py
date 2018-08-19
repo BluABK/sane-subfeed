@@ -10,7 +10,7 @@ from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownl
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.youtube.youtube_dl_handler import YoutubeDownload
 
-from sane_yt_subfeed.database.write_operations import UpdateVideo
+from sane_yt_subfeed.database.write_operations import UpdateVideo, update_event_download_tile
 
 from sane_yt_subfeed.config_handler import read_config
 
@@ -32,6 +32,7 @@ class DownloadHandler(QObject):
     loadDBDownloadTiles = pyqtSignal()
     dbDownloadTiles = pyqtSignal(list)
     newDownloadTile = pyqtSignal(DDBDownloadTile)
+    updateDownloadTile = pyqtSignal(DDBDownloadTile)
 
     def __init__(self, main_model):
         super(DownloadHandler, self).__init__()
@@ -39,12 +40,18 @@ class DownloadHandler(QObject):
         self.main_model = main_model
         self.loadDBDownloadTiles.connect(self.load_db_download_tiles)
         self.newDownloadTile.connect(self.new_download_tile)
+        self.updateDownloadTile.connect(self.update_download_tile)
 
     def run(self):
         while True:
             time.sleep(2)
 
-    def new_download_tile(self, new_tile):
+    @staticmethod
+    def update_download_tile(download_tile):
+        update_event_download_tile(download_tile)
+
+    @staticmethod
+    def new_download_tile(new_tile):
         result = db_session.query(DBDownloadTile).filter(
             DBDownloadTile.video_id == new_tile.video.video_id).first()
         if not result:
