@@ -21,6 +21,9 @@ class DDBDownloadTile:
         self.last_event = download_tile.last_event
         self.cleared = download_tile.cleared
 
+        # Other
+        self.progress_listener = None
+
     @staticmethod
     def list_detach(download_tile_list):
         return_list = []

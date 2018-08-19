@@ -40,12 +40,11 @@ class DownloadView(QWidget):
         # for download in db_downloads:
         #     self.new_download(download, emit_signal=False)
 
-    def new_download(self, download_progress_listener, emit_signal=True):
+    def new_download(self, download_progress_listener):
 
         self.logger.info("New download signal received: {}".format(download_progress_listener.__dict__))
         widget = DownloadTile(self, download_progress_listener)
-        if emit_signal:
-            DownloadHandler.static_self.newDownloadTile.emit(DDBDownloadTile(widget))
+        DownloadHandler.static_self.newDownloadTile.emit(DDBDownloadTile(widget))
         self.widgets.append(widget)
         self.sane_layout.addWidget(widget)
 
@@ -63,6 +62,10 @@ class DownloadView(QWidget):
             self.widgets.remove(widget)
 
     @pyqtSlot(list)
-    def update_widgets(self, listener_list):
-        for listener in listener_list:
-            self.new_download(listener, emit_signal=False)
+    def update_widgets(self, d_db_download_til_list):
+        self.logger.info("Adding loaded downloads: {}".format(d_db_download_til_list))
+        for db_download_tile in d_db_download_til_list:
+            widget = DownloadTile(self, db_download_tile.progress_listener, db_download_tile)
+            DownloadHandler.static_self.newDownloadTile.emit(DDBDownloadTile(widget))
+            self.widgets.append(widget)
+            self.sane_layout.addWidget(widget)

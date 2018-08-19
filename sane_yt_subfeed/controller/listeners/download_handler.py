@@ -56,11 +56,10 @@ class DownloadHandler(QObject):
         db_result = db_session.query(DBDownloadTile).filter(DBDownloadTile.cleared == false()).all()
         detached_db_result = DDBDownloadTile.list_detach(db_result)
         use_youtube_dl = read_config('Youtube-dl', 'use_youtube_dl')
-        return_listeners = []
         for tile in detached_db_result:
             if use_youtube_dl:
-                return_listeners.append(DownloadHandler.download_using_youtube_dl(tile.video, wait=True))
-        self.dbDownloadTiles.emit(return_listeners)
+                tile.progress_listener = DownloadHandler.download_using_youtube_dl(tile.video, wait=True)
+        self.dbDownloadTiles.emit(detached_db_result)
 
     @staticmethod
     def download_video(video, db_update_listeners=None, youtube_dl_finished_listener=None):
