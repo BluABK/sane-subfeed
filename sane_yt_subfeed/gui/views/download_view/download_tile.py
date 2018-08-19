@@ -95,6 +95,8 @@ class DownloadTile(QWidget):
         if self.last_event:
             self.update_progress(self.last_event)
 
+        if self.finished:
+            self.status_value.setText("Finished")
         self.speed_value.setText("n/a")
         self.eta_value.setText("n/a")
 
@@ -103,6 +105,7 @@ class DownloadTile(QWidget):
         self.progress_bar.setValue(1000)
         self.progress_bar.setFormat("100.0%")
         self.status_value.setText("Finished")
+        DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
 
     def update_progress(self, event):
         self.last_event = event
@@ -143,7 +146,7 @@ class DownloadTile(QWidget):
         if "_percent_str" in event:
             self.progress_bar.setFormat(event["_percent_str"])
 
-        DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
+        DownloadHandler.static_self.updateDownloadTileEvent.emit(DDBDownloadTile(self))
 
     def contextMenuEvent(self, event):
         """

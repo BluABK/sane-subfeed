@@ -52,6 +52,8 @@ class DownloadView(QWidget):
         widgets_to_delete = []
         for widget in self.widgets:
             if widget.finished:
+                widget.cleared = True
+                DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(widget))
                 widgets_to_delete.append(widget)
             else:
                 self.logger.debug("Widget not finished: {}".format(widget.__dict__))
