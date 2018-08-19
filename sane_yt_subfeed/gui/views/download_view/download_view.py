@@ -31,7 +31,7 @@ class DownloadView(QWidget):
 
         self.widgets = []
 
-        # DownloadHandler.static_self.dbDownloadTiles.connect(self.update_widgets)
+        DownloadHandler.static_self.dbDownloadTiles.connect(self.update_widgets)
         DownloadHandler.static_self.newYTDLDownlaod.connect(self.new_download)
 
         DownloadHandler.static_self.loadDBDownloadTiles.emit()

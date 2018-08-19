@@ -54,8 +54,13 @@ class DownloadHandler(QObject):
 
     def load_db_download_tiles(self):
         db_result = db_session.query(DBDownloadTile).filter(DBDownloadTile.cleared == false()).all()
-        DDBDownloadTile.list_detach(db_result)
-        self.dbDownloadTiles.emit(db_result)
+        detached_db_result = DDBDownloadTile.list_detach(db_result)
+        use_youtube_dl = read_config('Youtube-dl', 'use_youtube_dl')
+        return_listeners = []
+        for tile in detached_db_result:
+            if use_youtube_dl:
+                return_listeners.append(DownloadHandler.download_using_youtube_dl(tile.video, wait=True))
+        self.dbDownloadTiles.emit(return_listeners)
 
     @staticmethod
     def download_video(video, db_update_listeners=None, youtube_dl_finished_listener=None):
@@ -65,9 +70,15 @@ class DownloadHandler(QObject):
         UpdateVideo(video, update_existing=True,
                     finished_listeners=db_update_listeners).start()
         if use_youtube_dl:
-            event = threading.Event()
-            event.set()
-            download_progress_signal = DownloadProgressSignals(video, event)
+            download_progress_signal = DownloadHandler.download_using_youtube_dl(video, youtube_dl_finished_listener)
             DownloadHandler.static_self.newYTDLDownlaod.emit(download_progress_signal)
-            YoutubeDownload(video, event, download_progress_listener=download_progress_signal,
-                            finished_listeners=youtube_dl_finished_listener).start()
+
+    @staticmethod
+    def download_using_youtube_dl(video, youtube_dl_finished_listener=None, wait=False):
+        event = threading.Event()
+        if not wait:
+            event.set()
+        download_progress_signal = DownloadProgressSignals(video, event)
+        YoutubeDownload(video, event, download_progress_listener=download_progress_signal,
+                        finished_listeners=youtube_dl_finished_listener).start()
+        return download_progress_signal
