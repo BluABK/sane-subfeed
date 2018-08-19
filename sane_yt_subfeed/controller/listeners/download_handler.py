@@ -1,4 +1,5 @@
 import datetime
+import threading
 import time
 
 from PyQt5.QtCore import QObject, pyqtSignal
@@ -18,9 +19,10 @@ class DownloadProgressSignals(QObject):
     updateProgress = pyqtSignal(dict)
     finishedDownload = pyqtSignal()
 
-    def __init__(self, video):
+    def __init__(self, video, threading_event):
         super(DownloadProgressSignals, self).__init__()
         self.video = video
+        self.threading_event = threading_event
 
 
 class DownloadHandler(QObject):
@@ -63,7 +65,9 @@ class DownloadHandler(QObject):
         UpdateVideo(video, update_existing=True,
                     finished_listeners=db_update_listeners).start()
         if use_youtube_dl:
-            download_progress_signal = DownloadProgressSignals(video)
+            event = threading.Event()
+            event.set()
+            download_progress_signal = DownloadProgressSignals(video, event)
             DownloadHandler.static_self.newYTDLDownlaod.emit(download_progress_signal)
-            YoutubeDownload(video, download_progress_listener=download_progress_signal,
+            YoutubeDownload(video, event, download_progress_listener=download_progress_signal,
                             finished_listeners=youtube_dl_finished_listener).start()
