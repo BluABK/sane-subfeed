@@ -40,8 +40,6 @@ class MainModel:
 
         self.download_progress_signals = []
 
-        self.download_signal = DownloadHandler()
-
         self.logger.info("Creating listeners and threads")
         self.grid_view_listener = GridViewListener(self)
         self.grid_thread = QThread()
@@ -60,6 +58,12 @@ class MainModel:
         self.main_w_thread.setObjectName('main_w_thread')
         self.main_window_listener.moveToThread(self.main_w_thread)
         self.main_w_thread.start()
+
+        self.download_handler = DownloadHandler(self)
+        self.download_thread = QThread()
+        self.download_thread.setObjectName('download_thread')
+        self.download_handler.moveToThread(self.download_thread)
+        self.download_thread.start()
 
         if read_config("Play", "yt_file_path", literal_eval=False):
             self.yt_dir_listener = YtDirListener(self)
