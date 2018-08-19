@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette
-from PyQt5.QtWidgets import QGridLayout, QProgressBar, QWidget, QSizePolicy
+from PyQt5.QtWidgets import QGridLayout, QProgressBar, QWidget, QSizePolicy, QMenu
 
 from sane_yt_subfeed.gui.views.download_view.progress_bar import DownloadProgressBar
 from sane_yt_subfeed.gui.views.download_view.small_label import SmallLabel
@@ -25,7 +25,6 @@ class DownloadTile(QWidget):
         self.started_date = None
         self.last_event = None
         self.cleared = False
-
 
         self.setFixedHeight(read_config('DownloadView', 'download_tile_height'))
 
@@ -137,5 +136,30 @@ class DownloadTile(QWidget):
             self.logger.warning("downloaded_bytes not in: {}".format(event))
         if "_percent_str" in event:
             self.progress_bar.setFormat(event["_percent_str"])
-        # print("max: {}, min: {}, percentage: {}".format(self.progress_bar.maximum(), self.progress_bar.minimum(),
-        #                                                 int(event["downloaded_bytes"]) / self.total_bytes * 100))
+
+    def contextMenuEvent(self, event):
+        """
+        Override context menu event to set own custom menu
+        :param event:
+        :return:
+        """
+        menu = QMenu(self)
+
+        is_paused = not self.download_progress_listener.threading_event.is_set()
+
+        pause_action = None
+        continue_dl_action = None
+
+        if is_paused:
+            continue_dl_action = menu.addAction("Continue download")
+        else:
+            pause_action = menu.addAction("Pause download")
+
+        action = menu.exec_(self.mapToGlobal(event.pos()))
+
+        if action == pause_action and pause_action:
+            self.download_progress_listener.threading_event.clear()
+            self.speed_value.setText("n/a")
+            self.eta_value.setText("n/a")
+        elif action == continue_dl_action and continue_dl_action:
+            self.download_progress_listener.threading_event.set()
