@@ -21,6 +21,8 @@ class Controller:
         # self.grid_view_listener.moveToThread(self.thread)
 
     def run(self):
+        app = QApplication(sys.argv)
+
         self.logger.info("Running Controller instance")
         vid_limit = read_config('Model', 'loaded_videos')
 
@@ -38,9 +40,6 @@ class Controller:
             "Created MainModel: len(subscription_feed) = {}, vid_limit = {}".format(len(model.filtered_videos),
                                                                                     vid_limit))
 
-
-
-        app = QApplication(sys.argv)
         self.logger.info("Created QApplication({})".format(sys.argv))
         window = MainWindow(model)
         window.show()
