@@ -94,10 +94,9 @@ class GridView(QWidget):
             counter += 1
 
         for key in q_labels_keys_to_delete:
-            widget = self.q_labels[key]
-            self.grid.removeWidget(widget)
-            sip.delete(widget)
-            self.q_labels.pop(key)
+            self.grid.removeWidget(self.q_labels[key])
+            self.q_labels[key].deleteLater()
+            del self.q_labels[key]
         self.logger.debug(
             "Updated view: currently {} widgets and {} items_x".format(video_counter, self.items_x))
         self.resize_event()
