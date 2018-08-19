@@ -21,6 +21,9 @@ class DownloadTile(QWidget):
         self.total_bytes = None
         self.video_downloaded = False
         self.finished = False
+        self.finished_date = None
+        self.started_date = None
+        self.last_event = None
 
         self.setFixedHeight(read_config('DownloadView', 'download_tile_height'))
 
@@ -80,6 +83,7 @@ class DownloadTile(QWidget):
         self.status_value.setText("Finished")
 
     def update_progress(self, event):
+        self.last_event = event
         # print(format(event))
         if "status" in event:
             if event["status"] == "finished":
