@@ -1,12 +1,29 @@
 <img src="https://img.bluabk.net/python_2018-07-28_19-10-08.png" alt="drawing" width="800px"/>
 
+## Compatibility
+This code has mainly been tested on the following platforms:
+*   Windows 10, Python 3.7.0 with PyQt 5.11 (x64)
+*   Linux/Debian 9, Python 3.5.3 with PyQt 5.10 (x64)
+
+### Known incompatibilities
+#### x86 versions of Python
+There's currently issues with memory leaks that leads to memory use above x86 python limit, causing it to crash. 
+
 ## Prerequisites
 
-*   Python 3
+*   Python 3 (3.5+ is recommended)
 *   The pip package management tool
-*   Other requirements:
-    ```
+
+Other requirements:
+
+Python 3.6 and above:
+
     pip install -r requirements.txt
+    
+Python 3.5 and below: 
+
+    pip install -r requirements-py35.txt
+
 
 ### Set up OAuth and API keys (pick _one_ option)
 OAuth is required for access to your own youtube account (like retrieving subscriptions list). 
