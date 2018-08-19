@@ -63,7 +63,7 @@ class PlayTile(VideoTile):
         if not os.path.isfile(file_path):
             self.logger.warning('os.path.isfile returns False for File: {}'.format(file_path))
         if player:
-            subprocess.Popen([player, file_path], shell=True)
+            subprocess.Popen([player, file_path])
         else:
             subprocess.Popen([file_path], shell=True)
 
