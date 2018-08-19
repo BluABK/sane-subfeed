@@ -29,12 +29,13 @@ class MyLogger(object):
 
 # FIXME: because of formating string, for channel, it can't do batch dl
 class YoutubeDownload(threading.Thread):
-    def __init__(self, video, finished_listeners=None, download_progress_listener=None):
+    def __init__(self, video, threading_event, finished_listeners=None, download_progress_listener=None):
         threading.Thread.__init__(self)
         logger.debug("Created thread")
         self.video = video
         self.listeners = finished_listeners
         self.download_progress_listener = download_progress_listener
+        self.threading_event = threading_event
         # FIXME: faux filename, as the application is currently not able to get final filname from youtube-dl
         # file_name = "{channel_title} - {date} - %(title)s (%(fps)s_%(vcodec)s_%(acodec)s).%(ext)s".format(
         #     channel_title=self.video.channel_title, date=self.video.date_published.strftime("%Y-%m-%d"))
@@ -99,6 +100,7 @@ class YoutubeDownload(threading.Thread):
 
     def run(self):
         logger.debug("Started download thread")
+        self.threading_event.wait()
         # url_list = []
         # for video in self.videos:
         #     url_list.append(video.url_video)
@@ -137,3 +139,4 @@ class YoutubeDownload(threading.Thread):
 
     def my_hook(self, event):
         self.download_progress_listener.updateProgress.emit(event)
+        self.threading_event.wait()

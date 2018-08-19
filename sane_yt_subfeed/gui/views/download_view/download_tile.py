@@ -1,6 +1,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette
-from PyQt5.QtWidgets import QGridLayout, QProgressBar, QWidget, QSizePolicy
+from PyQt5.QtWidgets import QGridLayout, QProgressBar, QWidget, QSizePolicy, QMenu
+from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
+from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
 
 from sane_yt_subfeed.gui.views.download_view.progress_bar import DownloadProgressBar
 from sane_yt_subfeed.gui.views.download_view.small_label import SmallLabel
@@ -11,7 +13,7 @@ from sane_yt_subfeed.gui.views.download_view.download_thumbnail import DownloadT
 
 
 class DownloadTile(QWidget):
-    def __init__(self, parent, download_progress_listener, *args, **kwargs):
+    def __init__(self, parent, download_progress_listener, db_download_tile=None, *args, **kwargs):
         super(DownloadTile, self).__init__(parent, *args, **kwargs)
         self.logger = create_logger(__name__)
         self.logger.debug("Starting init")
@@ -24,6 +26,7 @@ class DownloadTile(QWidget):
         self.finished_date = None
         self.started_date = None
         self.last_event = None
+        self.cleared = False
 
         self.setFixedHeight(read_config('DownloadView', 'download_tile_height'))
 
@@ -74,13 +77,35 @@ class DownloadTile(QWidget):
         self.download_progress_listener.updateProgress.connect(self.update_progress)
         self.download_progress_listener.finishedDownload.connect(self.finished_download)
 
+        if db_download_tile:
+            self.update_from_db_tile(db_download_tile)
+        else:
+            pass
         self.logger.debug("Init done")
+
+    def update_from_db_tile(self, db_download_tile):
+        self.finished = db_download_tile.finished
+        self.started_date = db_download_tile.started_date
+        self.finished_date = db_download_tile.finished_date
+        self.video = db_download_tile.video
+        self.video_downloaded = db_download_tile.video_downloaded
+        self.total_bytes = db_download_tile.total_bytes
+        self.last_event = db_download_tile.last_event
+
+        if self.last_event:
+            self.update_progress(self.last_event)
+
+        if self.finished:
+            self.status_value.setText("Finished")
+        self.speed_value.setText("n/a")
+        self.eta_value.setText("n/a")
 
     def finished_download(self):
         self.finished = True
         self.progress_bar.setValue(1000)
         self.progress_bar.setFormat("100.0%")
         self.status_value.setText("Finished")
+        DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
 
     def update_progress(self, event):
         self.last_event = event
@@ -120,5 +145,32 @@ class DownloadTile(QWidget):
             self.logger.warning("downloaded_bytes not in: {}".format(event))
         if "_percent_str" in event:
             self.progress_bar.setFormat(event["_percent_str"])
-        # print("max: {}, min: {}, percentage: {}".format(self.progress_bar.maximum(), self.progress_bar.minimum(),
-        #                                                 int(event["downloaded_bytes"]) / self.total_bytes * 100))
+
+        DownloadHandler.static_self.updateDownloadTileEvent.emit(DDBDownloadTile(self))
+
+    def contextMenuEvent(self, event):
+        """
+        Override context menu event to set own custom menu
+        :param event:
+        :return:
+        """
+        menu = QMenu(self)
+
+        is_paused = not self.download_progress_listener.threading_event.is_set()
+
+        pause_action = None
+        continue_dl_action = None
+
+        if is_paused:
+            continue_dl_action = menu.addAction("Continue download")
+        else:
+            pause_action = menu.addAction("Pause download")
+
+        action = menu.exec_(self.mapToGlobal(event.pos()))
+
+        if action == pause_action and pause_action:
+            self.download_progress_listener.threading_event.clear()
+            self.speed_value.setText("n/a")
+            self.eta_value.setText("n/a")
+        elif action == continue_dl_action and continue_dl_action:
+            self.download_progress_listener.threading_event.set()
