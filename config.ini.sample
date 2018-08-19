@@ -79,11 +79,11 @@ proxy4 =
 proxy5 =
 
 [Player]
-default_player = ""
+default_player =
 url_player =
-alternative_player1 = ""
-alternative_player2 = ""
-alternative_player3 = ""
+alternative_player1 =
+alternative_player2 =
+alternative_player3 = 
 
 [Logging]
 use_socket_log = False
