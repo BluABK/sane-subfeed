@@ -24,14 +24,12 @@ class MyLogger(object):
     def error(self, msg):
         pass
 
-
-
         # logger.info("DL status == 'finished")
 
 
 # FIXME: because of formating string, for channel, it can't do batch dl
 class YoutubeDownload(threading.Thread):
-    def __init__(self, video, finished_listeners=None, download_progress_listener= None):
+    def __init__(self, video, finished_listeners=None, download_progress_listener=None):
         threading.Thread.__init__(self)
         logger.debug("Created thread")
         self.video = video
@@ -49,7 +47,8 @@ class YoutubeDownload(threading.Thread):
 
         self.proxies = []
         for proxy_option in get_options('Youtube-dl_proxies'):
-            this_proxy_option = read_config('Youtube-dl_proxies', proxy_option, literal_eval=False).strip('"').strip("'")
+            this_proxy_option = read_config('Youtube-dl_proxies', proxy_option, literal_eval=False).strip('"').strip(
+                "'")
             if this_proxy_option is not "" and this_proxy_option is not None:
                 self.proxies.append(this_proxy_option)
 
@@ -130,6 +129,8 @@ class YoutubeDownload(threading.Thread):
                 self.video.vid_path = os.path.join(self.youtube_folder, name)
 
         self.video.date_downloaded = datetime.datetime.utcnow()
+
+        self.download_progress_listener.finishedDownload.emit()
         if self.listeners:
             for listener in self.listeners:
                 listener.emit(self.video)

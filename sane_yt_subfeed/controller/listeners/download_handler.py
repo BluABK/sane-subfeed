@@ -11,6 +11,7 @@ from sane_yt_subfeed.config_handler import read_config
 
 class DownloadProgressSignals(QObject):
     updateProgress = pyqtSignal(dict)
+    finishedDownload = pyqtSignal()
 
     def __init__(self, video):
         super(DownloadProgressSignals, self).__init__()

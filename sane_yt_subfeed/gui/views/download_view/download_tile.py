@@ -26,7 +26,7 @@ class DownloadTile(QWidget):
 
         self.sane_layout = QGridLayout()
         # self.sane_layout.setAlignment(Qt.AlignLeading)
-        self.sane_layout.setContentsMargins(0, 1, 50, 0)
+        self.sane_layout.setContentsMargins(0, 1, 10, 0)
         # self.setContentsMargins(0, 1, 50, 0)
 
         self.title_bar = SmallLabel(self.video.title, parent=self)
@@ -48,9 +48,9 @@ class DownloadTile(QWidget):
         self.speed_value = SmallLabel("No update:", parent=self)
         self.total_size_value = SmallLabel("No update:", parent=self)
 
-        self.sane_layout.addWidget(self.title_bar, 0, 0, 1, 3)
+        self.sane_layout.addWidget(self.title_bar, 0, 0, 1, 4)
         self.sane_layout.addWidget(self.thumbnail, 1, 0, 6, 1)
-        self.sane_layout.addWidget(self.progress_bar, 7, 0, 1, 10)
+        self.sane_layout.addWidget(self.progress_bar, 7, 0, 1, 4)
 
         self.sane_layout.addWidget(self.status, 1, 1)
         self.sane_layout.addWidget(self.duration, 2, 1)
@@ -69,8 +69,15 @@ class DownloadTile(QWidget):
         self.setLayout(self.sane_layout)
 
         self.download_progress_listener.updateProgress.connect(self.update_progress)
+        self.download_progress_listener.finishedDownload.connect(self.finished_download)
 
         self.logger.debug("Init done")
+
+    def finished_download(self):
+        self.finished = True
+        self.progress_bar.setValue(1000)
+        self.progress_bar.setFormat("100.0%")
+        self.status_value.setText("Finished")
 
     def update_progress(self, event):
         # print(format(event))
@@ -81,7 +88,6 @@ class DownloadTile(QWidget):
                     self.status_value.setText("Finished downloading video")
                 else:
                     self.status_value.setText("Finished")
-                    self.finished = True
             elif "downloading" == event["status"]:
                 if self.video_downloaded:
                     self.status_value.setText("Downloading audio")
@@ -99,11 +105,16 @@ class DownloadTile(QWidget):
             if self.total_bytes == int(event["total_bytes"]):
                 pass
             else:
+                self.logger.debug("Downloading new item: {}".format(event))
                 self.total_bytes = int(event["total_bytes"])
-                self.progress_bar.setMaximum(int(event["total_bytes"]))
+                # self.progress_bar.setMaximum(int(event["total_bytes"]))
         else:
             self.logger.warning("total_bytes not in: {}".format(event))
         if "downloaded_bytes" in event and self.total_bytes:
-            self.progress_bar.setValue(int(event["downloaded_bytes"]))
+            self.progress_bar.setValue(int(int((event["downloaded_bytes"] / self.total_bytes) * 1000)))
         else:
             self.logger.warning("downloaded_bytes not in: {}".format(event))
+        if "_percent_str" in event:
+            self.progress_bar.setFormat(event["_percent_str"])
+        # print("max: {}, min: {}, percentage: {}".format(self.progress_bar.maximum(), self.progress_bar.minimum(),
+        #                                                 int(event["downloaded_bytes"]) / self.total_bytes * 100))

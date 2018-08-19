@@ -61,11 +61,14 @@ class MainModel:
         self.main_window_listener.moveToThread(self.main_w_thread)
         self.main_w_thread.start()
 
-        self.yt_dir_listener = YtDirListener(self)
-        self.yt_dir_thread = QThread()
-        self.yt_dir_thread.setObjectName('yt_dir_thread')
-        self.yt_dir_listener.moveToThread(self.yt_dir_thread)
-        self.yt_dir_thread.start()
+        if read_config("Play", "yt_file_path", literal_eval=False):
+            self.yt_dir_listener = YtDirListener(self)
+            self.yt_dir_thread = QThread()
+            self.yt_dir_thread.setObjectName('yt_dir_thread')
+            self.yt_dir_listener.moveToThread(self.yt_dir_thread)
+            self.yt_dir_thread.start()
+        else:
+            self.logger.warning("No youtube file path provided, directory listener is disabled")
 
     def hide_video_item(self, video):
         self.logger.debug("Hiding video item: {}".format(video))

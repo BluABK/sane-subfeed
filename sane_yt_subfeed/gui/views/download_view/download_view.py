@@ -1,6 +1,7 @@
 from PyQt5 import sip
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
+from sane_yt_subfeed.log_handler import create_logger
 
 from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
 from sane_yt_subfeed.gui.views.download_view.buttons.buttons_tile import ButtonsTile
@@ -12,6 +13,7 @@ class DownloadView(QWidget):
     def __init__(self, parent, *args, **kwargs):
         super(DownloadView, self).__init__(parent, *args, **kwargs)
         self.sane_paret = parent
+        self.logger = create_logger(__name__)
 
         self.sane_layout = QVBoxLayout()
         self.sane_layout.setAlignment(Qt.AlignTop)
@@ -27,13 +29,20 @@ class DownloadView(QWidget):
         DownloadHandler.static_self.newYTDLDownlaod.connect(self.new_download)
 
     def new_download(self, download_progress_listener):
+        self.logger.info("New download signal received: {}".format(download_progress_listener.__dict__))
         widget = DownloadTile(self, download_progress_listener)
         self.widgets.append(widget)
         self.sane_layout.addWidget(widget)
 
     def clear_downloads(self):
+        widgets_to_delete = []
         for widget in self.widgets:
             if widget.finished:
-                self.sane_layout.removeWidget(widget)
-                sip.delete(widget)
-                self.widgets.remove(widget)
+                widgets_to_delete.append(widget)
+            else:
+                self.logger.debug("Widget not finished: {}".format(widget.__dict__))
+        while widgets_to_delete:
+            widget = widgets_to_delete.pop()
+            self.logger.info("Removing widget for video: {} - {}".format(widget.video.title, widget.__dict__))
+            sip.delete(widget)
+            self.widgets.remove(widget)
