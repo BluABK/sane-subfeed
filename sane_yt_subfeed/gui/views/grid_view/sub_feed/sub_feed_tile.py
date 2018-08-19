@@ -6,6 +6,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMenu, QApplication
 
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.default_application_handler import open_with_default_application
 from sane_yt_subfeed.gui.views.grid_view.sub_feed.sub_thumbnail_tile import SubThumbnailTile
 from sane_yt_subfeed.log_handler import create_logger
 
@@ -48,14 +49,7 @@ class SubFeedTile(VideoTile):
         elif action == discard_item_action:
             self.mark_discarded()
         elif action == open_thumbnail_file:
-            try:
-                if sys.platform.startswith('linux'):
-                    subprocess.call(["xdg-open", self.video.thumbnail_path])
-                else:
-                    os.startfile(self.video.thumbnail_path)
-            except Exception as e_anything:
-                self.logger.exception(e_anything)
-                pass
+            open_with_default_application(self.video.thumbnail_path)
         elif action == show_description_dialog:
             description_dialog = TextViewDialog(self.parent, self.video.description)
             description_dialog.setWindowTitle("Video description for: {} - {}".format(self.video.channel_title,
