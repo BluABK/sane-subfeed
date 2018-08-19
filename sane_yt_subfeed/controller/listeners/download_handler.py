@@ -5,7 +5,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from sqlalchemy import false
 
 from sane_yt_subfeed.database.db_download_tile import DBDownloadTile
-from sane_yt_subfeed.database.detached_models.d_db_download_tile.db_download_tile import DDBDownloadTile
+from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.youtube.youtube_dl_handler import YoutubeDownload
 
@@ -29,17 +29,26 @@ class DownloadHandler(QObject):
     newYTDLDownlaod = pyqtSignal(DownloadProgressSignals)
     loadDBDownloadTiles = pyqtSignal()
     dbDownloadTiles = pyqtSignal(list)
-    newDownloadTile = pyqtSignal()
+    newDownloadTile = pyqtSignal(DDBDownloadTile)
 
     def __init__(self, main_model):
         super(DownloadHandler, self).__init__()
         DownloadHandler.static_self = self
         self.main_model = main_model
         self.loadDBDownloadTiles.connect(self.load_db_download_tiles)
+        self.newDownloadTile.connect(self.new_download_tile)
 
     def run(self):
         while True:
             time.sleep(2)
+
+    def new_download_tile(self, new_tile):
+        result = db_session.query(DBDownloadTile).filter(
+            DBDownloadTile.video_id == new_tile.video.video_id).first()
+        if not result:
+            db_session.add(DBDownloadTile(new_tile))
+            db_session.commit()
+        db_session.remove()
 
     def load_db_download_tiles(self):
         db_result = db_session.query(DBDownloadTile).filter(DBDownloadTile.cleared == false()).all()

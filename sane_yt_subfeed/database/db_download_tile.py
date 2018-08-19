@@ -2,7 +2,8 @@ from sqlalchemy import Column, Integer, Boolean, DateTime, String, ForeignKey
 from sqlalchemy.orm import relationship
 
 from sane_yt_subfeed.database.decorators import TextPickleType
-from sane_yt_subfeed.database.orm import PermanentBase
+from sane_yt_subfeed.database.orm import PermanentBase, db_session
+from sane_yt_subfeed.database.video import Video
 
 
 class DBDownloadTile(PermanentBase):
@@ -22,7 +23,7 @@ class DBDownloadTile(PermanentBase):
         self.finished = download_tile.finished
         self.started_date = download_tile.started_date
         self.finished_date = download_tile.finished_date
-        self.video = download_tile.video
+        self.video = db_session.query(Video).get(download_tile.video.video_id)
         self.video_downloaded = download_tile.video_downloaded
         self.total_bytes = download_tile.total_bytes
         self.last_event = download_tile.last_event

@@ -1,6 +1,11 @@
 from PyQt5 import sip
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
+from sqlalchemy import false
+
+from sane_yt_subfeed.database.db_download_tile import DBDownloadTile
+from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
+from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.log_handler import create_logger
 
 from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
@@ -26,14 +31,20 @@ class DownloadView(QWidget):
 
         self.widgets = []
 
-        DownloadHandler.static_self.loadDBDownloadTiles.emit()
-
         DownloadHandler.static_self.dbDownloadTiles.connect(self.update_widgets)
         DownloadHandler.static_self.newYTDLDownlaod.connect(self.new_download)
 
+        DownloadHandler.static_self.loadDBDownloadTiles.emit()
+        # # FIXME: remove and fix signals instead
+        # db_downloads = db_session.query(DBDownloadTile).filter(DBDownloadTile.cleared == false())
+        # for download in db_downloads:
+        #     self.new_download(download, emit_signal=False)
+
     def new_download(self, download_progress_listener):
+
         self.logger.info("New download signal received: {}".format(download_progress_listener.__dict__))
         widget = DownloadTile(self, download_progress_listener)
+        DownloadHandler.static_self.newDownloadTile.emit(DDBDownloadTile(widget))
         self.widgets.append(widget)
         self.sane_layout.addWidget(widget)
 
@@ -50,5 +61,7 @@ class DownloadView(QWidget):
             sip.delete(widget)
             self.widgets.remove(widget)
 
+    @pyqtSlot(list)
     def update_widgets(self, widget_list):
+        print("hello")
         print(widget_list)
