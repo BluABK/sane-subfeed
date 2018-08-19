@@ -101,3 +101,15 @@ class Video(PermanentBase):
         self.watched = video_d.watched
         self.watch_prio = video_d.watch_prio
         self.date_downloaded = video_d.date_downloaded
+
+    @staticmethod
+    def video_d_to_video(video_d):
+        video = Video(video_d.search_item)
+        video.downloaded = video_d.downloaded
+        video.thumbnail_path = video_d.thumbnail_path
+        video.discarded = video_d.discarded
+        video.vid_path = video_d.vid_path
+        video.watched = video_d.watched
+        video.watch_prio = video_d.watch_prio
+        video.date_downloaded = video_d.date_downloaded
+        return video
