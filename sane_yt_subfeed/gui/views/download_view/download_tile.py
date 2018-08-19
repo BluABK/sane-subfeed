@@ -38,6 +38,8 @@ class DownloadTile(QWidget):
         self.title_bar = SmallLabel(self.video.title, parent=self)
         self.thumbnail = DownloadThumbnailWidget(self, self.video)
         self.progress_bar = DownloadProgressBar(self)
+
+        self.percentage_downloaded = 0
         # self.progress_bar.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
         self.status = SmallLabel("Status:", parent=self)
@@ -141,12 +143,15 @@ class DownloadTile(QWidget):
             self.logger.warning("total_bytes not in: {}".format(event))
         if "downloaded_bytes" in event and self.total_bytes:
             self.progress_bar.setValue(int(int((event["downloaded_bytes"] / self.total_bytes) * 1000)))
+            percentage_downloaded = int((event["downloaded_bytes"] / self.total_bytes) * 100)
+            if percentage_downloaded > self.percentage_downloaded:
+                self.percentage_downloaded = percentage_downloaded
+                DownloadHandler.static_self.updateDownloadTileEvent.emit(DDBDownloadTile(self))
         else:
             self.logger.warning("downloaded_bytes not in: {}".format(event))
         if "_percent_str" in event:
             self.progress_bar.setFormat(event["_percent_str"])
 
-        DownloadHandler.static_self.updateDownloadTileEvent.emit(DDBDownloadTile(self))
 
     def contextMenuEvent(self, event):
         """
