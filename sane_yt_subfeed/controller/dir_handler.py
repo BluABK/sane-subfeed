@@ -113,6 +113,7 @@ def get_new_and_updated_videos(vid_paths):
         for video in response_videos:
             video.vid_path = vid_paths[video.video_id]
             video.downloaded = True
+            video.watched = False
             video.date_downloaded = datetime.datetime.utcnow()
             logger.info("Found new video: {} - {}".format(video.video_id, video.title))
             new_videos.append(video)

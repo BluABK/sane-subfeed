@@ -3,7 +3,7 @@ import time
 from PyQt5.QtCore import QThread
 # FIXME: imp*
 from PyQt5.QtWidgets import QProgressBar
-from sqlalchemy import asc, desc
+from sqlalchemy import asc, desc, false, or_
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.listeners.database_listener import DatabaseListener
@@ -145,7 +145,7 @@ class MainModel:
         show_dismissed = read_config('GridView', 'show_dismissed')
         update_filter = (Video.downloaded,)
         if not show_watched:
-            update_filter += (~Video.watched,)
+            update_filter += (or_(Video.watched == false(), Video.watched == None),)
         if not show_dismissed:
             update_filter += (~Video.discarded,)
         return update_filter
