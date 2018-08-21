@@ -316,6 +316,7 @@ class YtDirListener(QObject):
                 video = response_videos[0]
                 video.vid_path = vid_path
                 video.downloaded = True
+                video.watched = False
                 video.date_downloaded = datetime.datetime.utcnow()
                 self.logger.info("Downloading thumbnail: {} - {}".format(video.title, video.__dict__))
                 download_thumbnails_threaded([video])
