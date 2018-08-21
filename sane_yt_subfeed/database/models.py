@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 
 from sane_yt_subfeed.database.decorators import TextPickleType
@@ -14,6 +14,8 @@ class Channel(PermanentBase):
     thumbnails = Column(TextPickleType())
     snippet = Column(TextPickleType)
     playlist_id = Column(String)
+    subscribed = Column(Boolean)
+    subscribed_override = Column(Boolean)
 
     tests = relationship('Test', back_populates='channel')
     costs = relationship('RunCost', back_populates='channel')
@@ -25,6 +27,8 @@ class Channel(PermanentBase):
         self.thumbnails = youtube_response['thumbnails']
         self.snippet = youtube_response
         self.playlist_id = playlist_id
+        self.subscribed = True
+        self.subscribed_override = False
 
 
 class Test(PermanentBase):
