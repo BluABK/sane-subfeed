@@ -132,7 +132,9 @@ class DownloadTile(QWidget):
             self.speed_value.setText(event["_speed_str"])
         if "_total_bytes_str" in event:
             self.total_size_value.setText(event["_total_bytes_str"])
-        if "total_bytes" in event:
+        if "total_bytes" in event or "total_bytes_estimate" in event:
+            if "total_bytes" not in event:
+                event["total_bytes"] = event["total_bytes_estimate"]
             if self.total_bytes == int(event["total_bytes"]):
                 pass
             else:
@@ -148,7 +150,8 @@ class DownloadTile(QWidget):
                 self.percentage_downloaded = percentage_downloaded
                 DownloadHandler.static_self.updateDownloadTileEvent.emit(DDBDownloadTile(self))
         else:
-            self.logger.warning("downloaded_bytes not in: {}".format(event))
+            if not "downloaded_bytes" in event:
+                self.logger.warning("downloaded_bytes not in: {}".format(event))
         if "_percent_str" in event:
             self.progress_bar.setFormat(event["_percent_str"])
 
