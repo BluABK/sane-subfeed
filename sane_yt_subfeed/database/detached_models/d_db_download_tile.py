@@ -28,5 +28,5 @@ class DDBDownloadTile:
     def list_detach(download_tile_list):
         return_list = []
         for download_tile in download_tile_list:
-            return_list.append(DDBDownloadTile(download_tile))
+            return_list.append(DDBDownloadTile(download_tile, db_download_tile=True))
         return return_list

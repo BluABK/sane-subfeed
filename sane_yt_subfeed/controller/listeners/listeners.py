@@ -9,6 +9,7 @@ from watchdog.observers import Observer
 from sane_yt_subfeed import main
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.dir_handler import VidEventHandler, CheckYoutubeFolderForNew
+from sane_yt_subfeed.controller.listeners import static_listeners
 from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.orm import db_session
@@ -51,6 +52,7 @@ class GridViewListener(QObject):
         self.model = model
         self.logger = create_logger(__name__ + '.GridViewListener')
         GridViewListener.static_self = self
+        static_listeners.STATIC_GRID_VIEW_LISTENER = self
 
         self.tileDownloaded.connect(self.tile_downloaded)
         self.tileWatched.connect(self.tile_watched)

@@ -18,8 +18,16 @@ class DownloadTile(QWidget):
         self.logger = create_logger(__name__)
         self.logger.debug("Starting init")
         self.sane_paret = parent
-        self.download_progress_listener = download_progress_listener
-        self.video = download_progress_listener.video
+
+        if download_progress_listener:
+            self.download_progress_listener = download_progress_listener
+            self.video = download_progress_listener.video
+            self.download_progress_listener.updateProgress.connect(self.update_progress)
+            self.download_progress_listener.finishedDownload.connect(self.finished_download)
+        elif db_download_tile:
+            self.download_progress_listener = None
+            self.video = db_download_tile.video
+
         self.total_bytes = None
         self.video_downloaded = False
         self.finished = False
@@ -75,9 +83,6 @@ class DownloadTile(QWidget):
         self.sane_layout.addWidget(self.total_size_value, 6, 2)
 
         self.setLayout(self.sane_layout)
-
-        self.download_progress_listener.updateProgress.connect(self.update_progress)
-        self.download_progress_listener.finishedDownload.connect(self.finished_download)
 
         if db_download_tile:
             self.update_from_db_tile(db_download_tile)
@@ -155,30 +160,30 @@ class DownloadTile(QWidget):
         if "_percent_str" in event:
             self.progress_bar.setFormat(event["_percent_str"])
 
-
     def contextMenuEvent(self, event):
         """
         Override context menu event to set own custom menu
         :param event:
         :return:
         """
-        menu = QMenu(self)
+        if self.download_progress_listener:
+            menu = QMenu(self)
 
-        is_paused = not self.download_progress_listener.threading_event.is_set()
+            is_paused = not self.download_progress_listener.threading_event.is_set()
 
-        pause_action = None
-        continue_dl_action = None
+            pause_action = None
+            continue_dl_action = None
 
-        if is_paused:
-            continue_dl_action = menu.addAction("Continue download")
-        else:
-            pause_action = menu.addAction("Pause download")
+            if is_paused:
+                continue_dl_action = menu.addAction("Continue download")
+            else:
+                pause_action = menu.addAction("Pause download")
 
-        action = menu.exec_(self.mapToGlobal(event.pos()))
+            action = menu.exec_(self.mapToGlobal(event.pos()))
 
-        if action == pause_action and pause_action:
-            self.download_progress_listener.threading_event.clear()
-            self.speed_value.setText("n/a")
-            self.eta_value.setText("n/a")
-        elif action == continue_dl_action and continue_dl_action:
-            self.download_progress_listener.threading_event.set()
+            if action == pause_action and pause_action:
+                self.download_progress_listener.threading_event.clear()
+                self.speed_value.setText("n/a")
+                self.eta_value.setText("n/a")
+            elif action == continue_dl_action and continue_dl_action:
+                self.download_progress_listener.threading_event.set()
