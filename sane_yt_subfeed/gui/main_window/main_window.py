@@ -93,6 +93,8 @@ class MainWindow(QMainWindow):
         self.add_menu(menubar, '&File')
         self.add_submenu('&File', 'Download by URL/ID', self.download_single_url_dialog, shortcut='Ctrl+O',
                          tooltip='Download a video by URL/ID')
+        self.add_submenu('&File', 'Subscribe to a channel', self.add_subscription_dialog,
+                         tooltip='Subscribe to a channel by Title/ID')
         self.add_submenu('&File', 'View history', self.usage_history_dialog, shortcut='Ctrl+H',
                          tooltip='Show usage history in a dialog box')
         self.add_submenu('&File', 'Preferences', self.view_config, shortcut='Ctrl+P',
@@ -227,7 +229,6 @@ class MainWindow(QMainWindow):
         Attempt to determine current release version based on VERSION.txt (and git)
         :return:
         """
-        version_str = None
         git_branchtag = self.get_git_tag()
         try:
             with open(VERSION_PATH, 'r') as version_file:
@@ -247,7 +248,6 @@ class MainWindow(QMainWindow):
         Gets git branch/commit_tag if in a git environment
         :return:
         """
-        branchtag = None
         try:
             branchtag = check_output("git rev-parse --abbrev-ref HEAD", shell=True).decode("UTF-8").strip('\n') + ' / '
         except Exception as e:
@@ -381,7 +381,6 @@ class MainWindow(QMainWindow):
         Adds the url of each video in the view to a string, separated by newline and puts it on clipboard.
         :return:
         """
-        grid_items = 20
         urls = ""
         for q_label in self.grid_view.q_labels:
             urls += "{}\n".format(q_label.video.url_video)
@@ -457,8 +456,19 @@ class MainWindow(QMainWindow):
         :return:
         """
         self.logger.debug(
-            "get_single_video({}) called self.main_model.main_window_listener.getVideo.emit()".format(input_text))
+            "get_single_video({}) called self.main_model.main_window_listener.getSingleVideo.emit()".format(input_text))
         self.main_model.main_window_listener.getSingleVideo.emit(input_text)
+
+    def add_subscription(self, input_text):
+        """
+        Add a YouTube subscription (On YouTube).
+        :param input_text: URL or ID
+        :return:
+        """
+        self.logger.debug(
+            "add_subscription({}) called self.main_model.main_window_listener.addYouTubeSubscription.emit()".format(
+                input_text))
+        self.main_model.main_window_listener.addYouTubeChannelSubscription.emit(input_text)
 
     def download_single_url_dialog(self):
         """
@@ -467,6 +477,15 @@ class MainWindow(QMainWindow):
         """
         input_dialog = SaneInputDialog(self, self, title='Download a video by URL/ID', label='URL/ID:',
                                        ok_button_text='Download')
+        input_dialog.show()
+
+    def add_subscription_dialog(self):
+        """
+        Prompts user for a channel/ID to add a YouTube subscription to.
+        :return:
+        """
+        input_dialog = SaneInputDialog(self, self, title='Subscribe to channel Title/ID', label='Title/ID:',
+                                       ok_button_text='Subscribe')
         input_dialog.show()
 
     def usage_history_dialog(self):
