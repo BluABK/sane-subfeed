@@ -1,5 +1,6 @@
 import time
 
+from googleapiclient.errors import HttpError
 from tqdm import tqdm
 
 from sane_yt_subfeed.authentication import youtube_auth_oauth
@@ -273,3 +274,37 @@ def get_remote_subscriptions_cached_oauth():
         dump_youtube(youtube_oauth)
         temp_subscriptions = get_remote_subscriptions(youtube_oauth)
     return temp_subscriptions
+
+
+def add_subscription(youtube_oauth, channel_id):
+    """
+    Add a YouTube subscription (On YouTube).
+    :param youtube_oauth:
+    :param channel_id:
+    :return: Returns True if successful, False if not.
+    """
+    response = youtube_oauth.subscriptions().insert(
+        part='snippet',
+        body=dict(
+            snippet=dict(
+                resourceId=dict(
+                    channelId=channel_id
+                )
+            )
+        )
+    )
+    try:
+        response.execute()
+    except HttpError as exc_http:
+        logger.error("Failed adding subscription to '{}', HTTP Error {}: {}".format(channel_id, exc_http.resp.status,
+                                                                                    exc_http.content),
+                     exc_info=exc_http)
+        raise exc_http
+
+    except Exception as exc:
+        _msg = "Unhandled exception occurred when adding subscription to '{}'".format(channel_id)
+        logger.critical("{} | response={}".format(_msg, response.__dict__), exc_info=exc)
+        raise exc
+
+    logger.info("Added subscription: {} / {}".format(channel_id, response['snippet']['title']))
+    return response
