@@ -29,11 +29,44 @@ logger = create_logger(__name__)
 logger_list_search = create_logger("youtube_requests: list()/search()", logfile="debug_list_search.log")
 
 
+def get_channel_uploads_playlist_id(youtube_key, channel_id):
+    """
+    Get a channel's "Uploaded videos" playlist ID, given channel ID.
+    :param youtube_key:
+    :param channel_id:
+    :return: list_uploaded_videos(channel_uploads_playlist_id, debug=debug, limit=limit)
+    """
+    # Get channel
+    channel = channels_list_by_id(youtube_key, part='contentDetails',
+                                  id=channel_id)  # FIXME: stats unnecessary?
+
+    # Get ID of uploads playlist
+    # TODO: store channel_id in channel, making one less extra request
+    return channel['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+
+
+def get_channel(youtube_key, channel_id):
+    """
+    Get a channel response, given its ID.
+    :param youtube_key:
+    :param channel_id:
+    :return: A channelList response
+    """
+    # Get channel
+    channel = channels_list_by_id(youtube_key, part='contentDetails,snippet',
+                                  id=channel_id)  # FIXME: stats unnecessary?
+
+    # Get ID of uploads playlist
+    # TODO: store channel_id in channel, making one less extra request
+    return channel['items'][0]  # Send full response since id is outside of snippet
+
+
 def get_channel_uploads(youtube_key, channel_id, videos, req_limit):
     """
     Get a channel's "Uploaded videos" playlist, given channel ID.
-    :param req_limit:
-    :param videos:
+    Carries videos and req_limit for use outside this scope.
+    :param req_limit: carried from outside scope
+    :param videos: carried from outside scope
     :param youtube_key:
     :param channel_id:
     :return: list_uploaded_videos(channel_uploads_playlist_id, debug=debug, limit=limit)
@@ -277,9 +310,11 @@ def get_remote_subscriptions_cached_oauth():
     return temp_subscriptions
 
 
-def add_subscription(channel_id):
+def add_subscription_remote(channel_id):
     """
     Add a YouTube subscription (On YouTube).
+
+    DEPRECATED: Google doesn't let you, see supported op table https://developers.google.com/youtube/v3/getting-started
     :param youtube_oauth:
     :param channel_id:
     :return: returns response or raises exception
@@ -298,9 +333,8 @@ def add_subscription(channel_id):
     try:
         response.execute()
     except HttpError as exc_http:
-        logger.error("Failed adding subscription to '{}', HTTP Error {}: {}".format(channel_id, exc_http.resp.status,
-                                                                                    exc_http.content),
-                     exc_info=exc_http)
+        _msg = "Failed adding subscription to '{}', HTTP Error {}".format(channel_id, exc_http.resp.status)
+        logger.error("{}: {}".format(_msg, exc_http.content), exc_info=exc_http)
         raise exc_http
 
     except Exception as exc:
@@ -328,3 +362,42 @@ def add_subscription(channel_id):
 
     logger.info("Added subscription: {} / {}".format(channel_id, response['snippet']['title']))
     return response
+
+
+def add_subscription_local(youtube_auth, channel_id):
+    """
+    Add a YouTube subscription (Local/DB).
+    :param youtube_auth:
+    :param channel_id:
+    :return:
+    """
+    # FIXME: Somewhat duplicate code of get_remote_subscriptions, move to own function -- START
+    # Get ID of uploads playlist
+    # channel_uploads_playlist_id = get_channel_uploads_playlist_id(youtube_auth, channel_id)
+    channel_response = get_channel(youtube_auth, channel_id)
+    channel_uploads_playlist_id = channel_response['contentDetails']['relatedPlaylists']['uploads']
+    channel = Channel(channel_response, channel_uploads_playlist_id, channel_list_response=True)
+    db_channel = engine_execute_first(get_channel_by_id_stmt(channel))
+    if db_channel:
+        engine_execute(update_channel_from_remote(channel))
+    else:
+        # TODO: change to sqlalchemy core stmt
+        create_logger(__name__ + ".subscriptions").info(
+            "Added channel {} - {}".format(channel.title, channel.id))
+        db_session.add(channel)
+
+    db_session.commit()
+    # FIXME: Somewhat duplicate code of get_remote_subscriptions, move to own function -- END
+
+    logger.info("Added subscription (Local/DB): {} / {}".format(channel_id, channel.title))
+
+
+def add_subscription(youtube_auth, channel_id):
+    """
+    Add a YouTube Channel subscription.
+    :param youtube_auth: api key or oauth
+    :param channel_id:
+    :return: returns response or raises exception
+    """
+    add_subscription_local(youtube_auth, channel_id)
+    # add_subscription_remote(channel_id) # DEPRECATED, see its docstring

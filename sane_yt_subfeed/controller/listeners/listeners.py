@@ -221,7 +221,7 @@ class MainWindowListener(QObject):
         """
         self.logger.info("Adding subscription to channel: '{}'".format(channnel_id))
         # FIXME: Add handing for looking up by-title, not just the ID
-        add_subscription(channnel_id)
+        add_subscription(load_keys(1)[0], channnel_id)
 
 
 class ProgressBar(QObject):
