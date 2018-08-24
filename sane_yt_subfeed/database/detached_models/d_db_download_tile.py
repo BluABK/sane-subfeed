@@ -1,8 +1,3 @@
-from sqlalchemy import Column, Integer, Boolean, DateTime, String, ForeignKey
-from sqlalchemy.orm import relationship
-
-from sane_yt_subfeed.database.decorators import TextPickleType
-from sane_yt_subfeed.database.orm import PermanentBase
 from sane_yt_subfeed.database.video import Video
 
 
