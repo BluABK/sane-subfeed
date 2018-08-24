@@ -60,6 +60,7 @@ def update_video_stmt():
         'watch_prio': bindparam('watch_prio'),
     })
 
+
 def update_channel_from_remote(channel):
     return Channel.__table__.update().where("id = '{}'".format(channel.id)).values(
         title=channel.title, description=channel.description, snippet=channel.snippet, playlist_id=channel.playlist_id)
@@ -69,11 +70,17 @@ def get_channel_by_id_stmt(channel):
     return Channel.__table__.select().where(text("id = '{}'".format(channel.id)))
 
 
+def get_channel_by_title_stmt(channel):
+    return Channel.__table__.select().where(text("title = '{}'".format(channel.title)))
+
+
 def get_video_by_vidd_stmt(video_d):
     return Video.__table__.select().where(text("video_id = '{}'".format(video_d.video_id)))
 
+
 def get_video_ids_by_video_ids_stmt(video_ids):
     return Video.__table__.select(Video.video_id.in_(video_ids))
+
 
 def get_video_by_id_stmt(video_id):
     return Video.__table__.select().where(text("video_id = '{}'".format(video_id)))

@@ -199,8 +199,12 @@ def update_event_download_tile(download_tile):
 
 
 def delete_sub_not_in_list(subs):
-    delete_channels = db_session.query(Channel).filter(~Channel.id.in_(subs)).all()
+    delete_channels = db_session.query(Channel).filter(~Channel.id.in_(subs)).all()  # FIXME: Option A: don't select rows where subscription_override = True
     for channel in delete_channels:
-        create_logger(__name__).warning("Deleting channel: {} - {}".format(channel.title, channel.id))
-    stmt = Channel.__table__.delete().where(~Channel.id.in_(subs))
+        if channel.subscribed_override:
+            create_logger(__name__).warning("IMPLEMENT ME: Omitting channel deletion for: {} - {}".format(
+                channel.title, channel.id))
+        else:
+            create_logger(__name__).warning("Deleting channel: {} - {}".format(channel.title, channel.id))
+    stmt = Channel.__table__.delete().where(~Channel.id.in_(subs))  # FIXME: Option B: Don't select channels where subscription_override = True
     engine.execute(stmt)

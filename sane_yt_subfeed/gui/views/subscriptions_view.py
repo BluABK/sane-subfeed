@@ -29,7 +29,8 @@ class SubscriptionsView(QWidget):
         if headers:
             self.headers = headers
         else:
-            self.headers = ['ID', 'Title', 'Uploaded Videos Playlist ID', 'Description']
+            self.headers = ['ID', 'Title', 'Uploaded Videos Playlist ID', 'Description', 'Subscribed on YouTube?',
+                            'Force subscription?']
         self.init_ui()
 
     def init_ui(self):
@@ -54,7 +55,7 @@ class SubscriptionsView(QWidget):
         self.subs_table = QTableWidget()
         self.subs_table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.subs_table.setRowCount(len(self.subs))
-        self.subs_table.setColumnCount(4)
+        self.subs_table.setColumnCount(6)
 
         # Set the Headers
         self.subs_table.setHorizontalHeaderLabels(self.headers)
@@ -62,6 +63,8 @@ class SubscriptionsView(QWidget):
         self.subs_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         self.subs_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
         # self.subs_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        self.subs_table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
+        self.subs_table.horizontalHeader().setSectionResizeMode(5, QHeaderView.ResizeToContents)
 
         # self.subs_table.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
         # Set the tooltips to headings
@@ -76,6 +79,14 @@ class SubscriptionsView(QWidget):
             self.subs_table.setItem(row, 1, QTableWidgetItem(self.subs[row].title))
             self.subs_table.setItem(row, 2, QTableWidgetItem(self.subs[row].playlist_id))
             self.subs_table.setItem(row, 3, QTableWidgetItem(self.subs[row].description))
+            if self.subs[row].subscribed:
+                self.subs_table.setItem(row, 4, QTableWidgetItem(self.subs[row].subscribed))
+            else:
+                self.subs_table.setItem(row, 4, QTableWidgetItem("UNSET"))
+            if self.subs[row].subscribed_override:
+                self.subs_table.setItem(row, 5, QTableWidgetItem(self.subs[row].subscribed_override))
+            else:
+                self.subs_table.setItem(row, 5, QTableWidgetItem("UNSET"))
 
             # Enable table sorting after the table has been populated otherwise sorting may interfere with the
             # insertion order (see setItem() for details)

@@ -18,7 +18,8 @@ from sane_yt_subfeed.database.write_operations import UpdateVideo
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded, THUMBNAILS_PATH
 from sane_yt_subfeed.youtube.update_videos import load_keys
-from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_cached_oauth, list_uploaded_videos_videos
+from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_cached_oauth, list_uploaded_videos_videos, get_subscriptions
+from sane_yt_subfeed.database.engine_statements import get_channel_by_id_stmt, get_channel_by_title_stmt
 
 LISTENER_SIGNAL_NORMAL_REFRESH = 0
 LISTENER_SIGNAL_DEEP_REFRESH = 1
@@ -144,6 +145,7 @@ class MainWindowListener(QObject):
     refreshVideos = pyqtSignal(int)
     refreshSubs = pyqtSignal()
     getSingleVideo = pyqtSignal(str)
+    addYouTubeChannelSubscription = pyqtSignal(str)
 
     def __init__(self, model):
         super().__init__()
@@ -200,6 +202,23 @@ class MainWindowListener(QObject):
         self.logger.info("Fetching video: {}".format(video_url))
         video_id = video_url.split('v=')[-1]  # FIXME: Make a proper input sanitizer
         self.logger.debug("{} --> ID: {}".format(video_url, video_id))
+        video_d = list_uploaded_videos_videos(load_keys(1)[0], [video_id], 50)[0]
+        download_thumbnails_threaded([video_d])
+        # self.logger.debug(video_d.__dict__)
+        # DownloadHandler.download_video(video_d)
+        DownloadHandler.download_video(video_d,
+                                       youtube_dl_finished_listener=[GridViewListener.static_self.downloadFinished],
+                                       db_update_listeners=[GridViewListener.static_self.downloadedVideosChangedinDB])
+
+    @pyqtSlot(str)
+    def add_youtube_channel_subscription(self, channnel_id):
+        """
+        Fetches a specified video based on url
+        :return:
+        """
+        self.logger.info("Adding subscription to channel: '{}'".format(channnel_id))
+        # FIXME: Add handing for looking up by-title, not just the ID
+
         video_d = list_uploaded_videos_videos(load_keys(1)[0], [video_id], 50)[0]
         download_thumbnails_threaded([video_d])
         # self.logger.debug(video_d.__dict__)
