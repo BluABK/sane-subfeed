@@ -37,15 +37,15 @@ def get_channel_uploads_playlist_id(youtube_key, channel_id):
     :return: list_uploaded_videos(channel_uploads_playlist_id, debug=debug, limit=limit)
     """
     # Get channel
-    channel = channels_list_by_id(youtube_key, part='contentDetails',
-                                  id=channel_id)  # FIXME: stats unnecessary?
+    channel = channels_list(youtube_key, part='contentDetails',
+                            id=channel_id)  # FIXME: stats unnecessary?
 
     # Get ID of uploads playlist
     # TODO: store channel_id in channel, making one less extra request
     return channel['items'][0]['contentDetails']['relatedPlaylists']['uploads']
 
 
-def get_channel(youtube_key, channel_id):
+def get_channel_by_id(youtube_key, channel_id):
     """
     Get a channel response, given its ID.
     :param youtube_key:
@@ -53,12 +53,41 @@ def get_channel(youtube_key, channel_id):
     :return: A channelList response
     """
     # Get channel
-    channel = channels_list_by_id(youtube_key, part='contentDetails,snippet',
-                                  id=channel_id)  # FIXME: stats unnecessary?
+    channel = channels_list(youtube_key, part='contentDetails,snippet',
+                            id=channel_id)  # FIXME: stats unnecessary?
 
     # Get ID of uploads playlist
     # TODO: store channel_id in channel, making one less extra request
     return channel['items'][0]  # Send full response since id is outside of snippet
+
+
+def get_channel_by_username(youtube_key, username):
+    """
+    Get a channel response, given its ID.
+    :param youtube_key:
+    :param channel_id:
+    :return: A channelList response
+    """
+    # Get channel
+    channel = channels_list(youtube_key, part='contentDetails,snippet',
+                            forUsername=username)  # FIXME: stats unnecessary?
+
+    # Get ID of uploads playlist
+    # TODO: store channel_id in channel, making one less extra request
+    return channel['items'][0]  # Send full response since id is outside of snippet
+
+
+def search_for_channel(youtube_key, query):
+    """
+    Get a channel by searching for it
+    :param youtube_key:
+    :param query:
+    :return: searchList response items
+    """
+    search_response = youtube_key.search().list(part='snippet', maxResults=50, q=query, type='channel')
+    search_response.execute()
+
+    return search_response['items']
 
 
 def get_channel_uploads(youtube_key, channel_id, videos, req_limit):
@@ -72,8 +101,8 @@ def get_channel_uploads(youtube_key, channel_id, videos, req_limit):
     :return: list_uploaded_videos(channel_uploads_playlist_id, debug=debug, limit=limit)
     """
     # Get channel
-    channel = channels_list_by_id(youtube_key, part='contentDetails',
-                                  id=channel_id)  # FIXME: stats unnecessary?
+    channel = channels_list(youtube_key, part='contentDetails',
+                            id=channel_id)  # FIXME: stats unnecessary?
 
     # Get ID of uploads playlist
     # TODO: store channel_id in channel, making one less extra request
@@ -83,7 +112,7 @@ def get_channel_uploads(youtube_key, channel_id, videos, req_limit):
     return list_uploaded_videos(youtube_key, videos, req_limit, channel_uploads_playlist_id)
 
 
-def channels_list_by_id(youtube_key, **kwargs):
+def channels_list(youtube_key, **kwargs):
     """
     Get a youtube#channelListResponse,
     :param youtube_key:
@@ -258,8 +287,8 @@ def get_remote_subscriptions(youtube_oauth):
         for page in tqdm(subscription_list_response['items'], desc="Adding and updating channels by page",
                          disable=read_config('Debug', 'disable_tqdm')):
             # Get channel
-            channel_response = channels_list_by_id(youtube_oauth, part='contentDetails',
-                                                   id=page['snippet']['resourceId']['channelId'])
+            channel_response = channels_list(youtube_oauth, part='contentDetails',
+                                             id=page['snippet']['resourceId']['channelId'])
 
             # Get ID of uploads playlist
             channel_uploads_playlist_id = channel_response['items'][0]['contentDetails']['relatedPlaylists']['uploads']
@@ -364,9 +393,10 @@ def add_subscription_remote(channel_id):
     return response
 
 
-def add_subscription_local(youtube_auth, channel_id):
+def add_subscription_local(youtube_auth, channel_id, by_username=False):
     """
     Add a YouTube subscription (Local/DB).
+    :param by_username:
     :param youtube_auth:
     :param channel_id:
     :return:
@@ -374,7 +404,10 @@ def add_subscription_local(youtube_auth, channel_id):
     # FIXME: Somewhat duplicate code of get_remote_subscriptions, move to own function -- START
     # Get ID of uploads playlist
     # channel_uploads_playlist_id = get_channel_uploads_playlist_id(youtube_auth, channel_id)
-    channel_response = get_channel(youtube_auth, channel_id)
+    if by_username:
+        channel_response = get_channel_by_username(youtube_auth, channel_id)
+    else:
+        channel_response = get_channel_by_id(youtube_auth, channel_id)
     channel_uploads_playlist_id = channel_response['contentDetails']['relatedPlaylists']['uploads']
     channel = Channel(channel_response, channel_uploads_playlist_id, channel_list_response=True)
     db_channel = engine_execute_first(get_channel_by_id_stmt(channel))
@@ -392,12 +425,13 @@ def add_subscription_local(youtube_auth, channel_id):
     logger.info("Added subscription (Local/DB): {} / {}".format(channel_id, channel.title))
 
 
-def add_subscription(youtube_auth, channel_id):
+def add_subscription(youtube_auth, channel_id, by_username=False):
     """
     Add a YouTube Channel subscription.
+    :param by_username:
     :param youtube_auth: api key or oauth
     :param channel_id:
     :return: returns response or raises exception
     """
-    add_subscription_local(youtube_auth, channel_id)
+    add_subscription_local(youtube_auth, channel_id, by_username=by_username)
     # add_subscription_remote(channel_id) # DEPRECATED, see its docstring

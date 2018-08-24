@@ -147,7 +147,8 @@ class MainWindowListener(QObject):
     refreshVideos = pyqtSignal(int)
     refreshSubs = pyqtSignal()
     getSingleVideo = pyqtSignal(str)
-    addYouTubeChannelSubscription = pyqtSignal(str)
+    addYouTubeChannelSubscriptionById = pyqtSignal(str)
+    addYouTubeChannelSubscriptionByUsername = pyqtSignal(str)
 
     def __init__(self, model):
         super().__init__()
@@ -156,7 +157,8 @@ class MainWindowListener(QObject):
         self.refreshSubs.connect(self.refresh_subs)
         self.testChannels.connect(self.test_channels)
         self.getSingleVideo.connect(self.get_single_video)
-        self.addYouTubeChannelSubscription.connect(self.add_youtube_channel_subscription)
+        self.addYouTubeChannelSubscriptionById.connect(self.add_youtube_channel_subscription_by_id)
+        self.addYouTubeChannelSubscriptionByUsername.connect(self.add_youtube_channel_subscription_by_username)
         self.logger = create_logger(__name__ + '.MainWindowListener')
 
     def run(self):
@@ -214,14 +216,22 @@ class MainWindowListener(QObject):
                                        db_update_listeners=[GridViewListener.static_self.downloadedVideosChangedinDB])
 
     @pyqtSlot(str)
-    def add_youtube_channel_subscription(self, channnel_id):
+    def add_youtube_channel_subscription_by_id(self, channel_id):
         """
-        Fetches a specified video based on url
+        Subscribes to a channel based on channel ID
         :return:
         """
-        self.logger.info("Adding subscription to channel: '{}'".format(channnel_id))
-        # FIXME: Add handing for looking up by-title, not just the ID
-        add_subscription(load_keys(1)[0], channnel_id)
+        self.logger.info("Adding subscription to channel: '{}'".format(channel_id))
+        add_subscription(load_keys(1)[0], channel_id)
+
+    @pyqtSlot(str)
+    def add_youtube_channel_subscription_by_username(self, username):
+        """
+        Subscribes to a channel based on username
+        :return:
+        """
+        self.logger.info("Adding subscription to channel: '{}'".format(username))
+        add_subscription(load_keys(1)[0], username, by_username=True)
 
 
 class ProgressBar(QObject):
