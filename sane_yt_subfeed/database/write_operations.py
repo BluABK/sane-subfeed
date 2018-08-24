@@ -4,7 +4,7 @@ from sane_yt_subfeed.controller.listeners.database_listener import DatabaseListe
 from sane_yt_subfeed.database.db_download_tile import DBDownloadTile
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.engine_statements import update_video_statement_full, get_video_by_vidd_stmt, insert_item, \
-    get_video_ids_by_video_ids_stmt, update_thumbnails_path_stmt, update_video_stmt
+    get_video_ids_by_video_ids_stmt, update_thumbnails_path_stmt, update_video_stmt, update_channel_from_remote
 from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import engine, db_session
 from sane_yt_subfeed.database.video import Video
@@ -199,12 +199,12 @@ def update_event_download_tile(download_tile):
 
 
 def delete_sub_not_in_list(subs):
-    delete_channels = db_session.query(Channel).filter(~Channel.id.in_(subs)).all()  # FIXME: Option A: don't select rows where subscription_override = True
+    delete_channels = db_session.query(Channel).filter(~Channel.id.in_(subs)).all()
     for channel in delete_channels:
-        if channel.subscribed_override:
-            create_logger(__name__).warning("IMPLEMENT ME: Omitting channel deletion for: {} - {}".format(
-                channel.title, channel.id))
-        else:
-            create_logger(__name__).warning("Deleting channel: {} - {}".format(channel.title, channel.id))
-    stmt = Channel.__table__.delete().where(~Channel.id.in_(subs))  # FIXME: Option B: Don't select channels where subscription_override = True
-    engine.execute(stmt)
+        if channel.subscribed or channel.subscribed is None:
+            channel.subscribed = False
+            create_logger(__name__).warning(
+                "Setting unsubscribed for channel: {} - {}".format(channel.title, channel.__dict__))
+            stmt = update_channel_from_remote(channel)
+            engine.execute(stmt)
+    # stmt = Channel.__table__.delete().where(~Channel.id.in_(subs))
