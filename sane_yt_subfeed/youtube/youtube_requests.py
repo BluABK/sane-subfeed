@@ -1,6 +1,7 @@
 import time
 
 from googleapiclient.errors import HttpError
+from sqlalchemy import or_
 from tqdm import tqdm
 
 from sane_yt_subfeed.authentication import youtube_auth_oauth
@@ -257,7 +258,7 @@ def get_subscriptions(cached_subs):
 
 def get_stored_subscriptions():
     logger.info("Getting subscriptions from DB.")
-    channels = db_session.query(Channel).all()
+    channels = db_session.query(Channel).filter(or_(Channel.subscribed, Channel.subscribed_override)).all()
     if len(channels) < 1:
         return get_remote_subscriptions_cached_oauth()
     return channels
