@@ -466,7 +466,7 @@ class MainWindow(QMainWindow):
         :return:
         """
         self.logger.debug(
-            "add_subscription({}) called self.main_model.main_window_listener.addYouTubeSubscription.emit()".format(
+            "add_subscription({}) called self.main_model.main_window_listener.addYouTubeChannelSubscription.emit()".format(
                 input_text))
         self.main_model.main_window_listener.addYouTubeChannelSubscription.emit(input_text)
 
@@ -475,8 +475,8 @@ class MainWindow(QMainWindow):
         Prompts user for downloading a video by URL/ID
         :return:
         """
-        input_dialog = SaneInputDialog(self, self, title='Download a video by URL/ID', label='URL/ID:',
-                                       ok_button_text='Download')
+        input_dialog = SaneInputDialog(self, self, self.get_single_video, title='Download a video by URL/ID',
+                                       label='URL/ID:', ok_button_text='Download')
         input_dialog.show()
 
     def add_subscription_dialog(self):
@@ -484,8 +484,8 @@ class MainWindow(QMainWindow):
         Prompts user for a channel/ID to add a YouTube subscription to.
         :return:
         """
-        input_dialog = SaneInputDialog(self, self, title='Subscribe to channel Title/ID', label='Title/ID:',
-                                       ok_button_text='Subscribe')
+        input_dialog = SaneInputDialog(self, self, self.add_subscription, title='Subscribe to channel Title/ID',
+                                       label='Title/ID:', ok_button_text='Subscribe')
         input_dialog.show()
 
     def usage_history_dialog(self):
