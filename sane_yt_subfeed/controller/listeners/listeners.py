@@ -16,6 +16,7 @@ from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideo
 from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.pickle_handler import load_youtube
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded, THUMBNAILS_PATH
 from sane_yt_subfeed.youtube.update_videos import load_keys
 from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_cached_oauth, list_uploaded_videos_videos, \
@@ -220,7 +221,7 @@ class MainWindowListener(QObject):
         """
         self.logger.info("Adding subscription to channel: '{}'".format(channnel_id))
         # FIXME: Add handing for looking up by-title, not just the ID
-        add_subscription(load_keys(1)[0], channnel_id)
+        add_subscription(channnel_id)
 
 
 class ProgressBar(QObject):
