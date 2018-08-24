@@ -3,17 +3,16 @@ import threading
 import time
 
 from PyQt5.QtCore import QObject, pyqtSignal
-from sqlalchemy import false, text
+from sqlalchemy import false
 
 from sane_yt_subfeed import create_logger
+from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.controller.listeners import static_listeners
 from sane_yt_subfeed.database.db_download_tile import DBDownloadTile
 from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
-from sane_yt_subfeed.database.orm import db_session, engine
-from sane_yt_subfeed.youtube.youtube_dl_handler import YoutubeDownload
-
+from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.write_operations import UpdateVideo, update_event_download_tile
-
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.youtube.youtube_dl_handler import YoutubeDownload
 
 
 class DownloadProgressSignals(QObject):
@@ -82,9 +81,14 @@ class DownloadHandler(QObject):
         db_result = db_session.query(DBDownloadTile).filter(DBDownloadTile.cleared == false()).all()
         detached_db_result = DDBDownloadTile.list_detach(db_result)
         use_youtube_dl = read_config('Youtube-dl', 'use_youtube_dl')
+        download_finished_signals = [static_listeners.STATIC_GRID_VIEW_LISTENER.downloadFinished]
         for tile in detached_db_result:
-            if use_youtube_dl:
-                tile.progress_listener = DownloadHandler.download_using_youtube_dl(tile.video, wait=True)
+            if use_youtube_dl and not tile.finished:
+                self.logger.info("Starting paused in progress download for: {}".format(tile.video.__dict__))
+                tile.progress_listener = \
+                    DownloadHandler.download_using_youtube_dl(tile.video,
+                                                              youtube_dl_finished_listener=download_finished_signals,
+                                                              wait=True)
         self.dbDownloadTiles.emit(detached_db_result)
 
     @staticmethod

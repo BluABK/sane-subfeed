@@ -67,7 +67,11 @@ class DownloadView(QWidget):
     def update_widgets(self, d_db_download_til_list):
         self.logger.info("Adding loaded downloads: {}".format(d_db_download_til_list))
         for db_download_tile in d_db_download_til_list:
-            widget = DownloadTile(self, db_download_tile.progress_listener, db_download_tile)
-            DownloadHandler.static_self.newDownloadTile.emit(DDBDownloadTile(widget))
-            self.widgets.append(widget)
-            self.sane_layout.addWidget(widget)
+            if db_download_tile.video:
+                widget = DownloadTile(self, db_download_tile.progress_listener, db_download_tile=db_download_tile)
+                DownloadHandler.static_self.newDownloadTile.emit(DDBDownloadTile(widget))
+                self.widgets.append(widget)
+                self.sane_layout.addWidget(widget)
+            else:
+                self.logger.warning(
+                    "Download tile without video, grabbed from db: {}".format(db_download_tile.__dict__))

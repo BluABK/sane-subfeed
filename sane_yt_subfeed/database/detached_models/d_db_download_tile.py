@@ -1,8 +1,3 @@
-from sqlalchemy import Column, Integer, Boolean, DateTime, String, ForeignKey
-from sqlalchemy.orm import relationship
-
-from sane_yt_subfeed.database.decorators import TextPickleType
-from sane_yt_subfeed.database.orm import PermanentBase
 from sane_yt_subfeed.database.video import Video
 
 
@@ -28,5 +23,5 @@ class DDBDownloadTile:
     def list_detach(download_tile_list):
         return_list = []
         for download_tile in download_tile_list:
-            return_list.append(DDBDownloadTile(download_tile))
+            return_list.append(DDBDownloadTile(download_tile, db_download_tile=True))
         return return_list
