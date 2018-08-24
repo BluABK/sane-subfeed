@@ -306,5 +306,23 @@ def add_subscription(youtube_oauth, channel_id):
         logger.critical("{} | response={}".format(_msg, response.__dict__), exc_info=exc)
         raise exc
 
+    # FIXME: Somewhat duplicate code of get_remote_subscriptions, move to own function -- START
+    # Get ID of uploads playlist
+    channel_uploads_playlist_id = response['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+    channel = Channel(channel_id, channel_uploads_playlist_id)
+    db_channel = engine_execute_first(get_channel_by_id_stmt(channel))
+    if db_channel:
+        engine_execute(update_channel_from_remote(channel))
+        # subs.append(channel)
+    else:
+        # TODO: change to sqlalchemy core stmt
+        create_logger(__name__ + ".subscriptions").info(
+            "Added channel {} - {}".format(channel.title, channel.id))
+        db_session.add(channel)
+        # subs.append(channel)
+
+    db_session.commit()
+    # FIXME: Somewhat duplicate code of get_remote_subscriptions, move to own function -- END
+
     logger.info("Added subscription: {} / {}".format(channel_id, response['snippet']['title']))
     return response
