@@ -18,8 +18,16 @@ class DownloadTile(QWidget):
         self.logger = create_logger(__name__)
         self.logger.debug("Starting init")
         self.sane_paret = parent
-        self.download_progress_listener = download_progress_listener
-        self.video = download_progress_listener.video
+
+        if download_progress_listener:
+            self.download_progress_listener = download_progress_listener
+            self.video = download_progress_listener.video
+            self.download_progress_listener.updateProgress.connect(self.update_progress)
+            self.download_progress_listener.finishedDownload.connect(self.finished_download)
+        elif db_download_tile:
+            self.download_progress_listener = None
+            self.video = db_download_tile.video
+
         self.total_bytes = None
         self.video_downloaded = False
         self.finished = False
@@ -76,9 +84,6 @@ class DownloadTile(QWidget):
 
         self.setLayout(self.sane_layout)
 
-        self.download_progress_listener.updateProgress.connect(self.update_progress)
-        self.download_progress_listener.finishedDownload.connect(self.finished_download)
-
         if db_download_tile:
             self.update_from_db_tile(db_download_tile)
         else:
@@ -132,7 +137,9 @@ class DownloadTile(QWidget):
             self.speed_value.setText(event["_speed_str"])
         if "_total_bytes_str" in event:
             self.total_size_value.setText(event["_total_bytes_str"])
-        if "total_bytes" in event:
+        if "total_bytes" in event or "total_bytes_estimate" in event:
+            if "total_bytes" not in event:
+                event["total_bytes"] = event["total_bytes_estimate"]
             if self.total_bytes == int(event["total_bytes"]):
                 pass
             else:
@@ -148,10 +155,10 @@ class DownloadTile(QWidget):
                 self.percentage_downloaded = percentage_downloaded
                 DownloadHandler.static_self.updateDownloadTileEvent.emit(DDBDownloadTile(self))
         else:
-            self.logger.warning("downloaded_bytes not in: {}".format(event))
+            if not "downloaded_bytes" in event:
+                self.logger.warning("downloaded_bytes not in: {}".format(event))
         if "_percent_str" in event:
             self.progress_bar.setFormat(event["_percent_str"])
-
 
     def contextMenuEvent(self, event):
         """
@@ -159,23 +166,24 @@ class DownloadTile(QWidget):
         :param event:
         :return:
         """
-        menu = QMenu(self)
+        if self.download_progress_listener:
+            menu = QMenu(self)
 
-        is_paused = not self.download_progress_listener.threading_event.is_set()
+            is_paused = not self.download_progress_listener.threading_event.is_set()
 
-        pause_action = None
-        continue_dl_action = None
+            pause_action = None
+            continue_dl_action = None
 
-        if is_paused:
-            continue_dl_action = menu.addAction("Continue download")
-        else:
-            pause_action = menu.addAction("Pause download")
+            if is_paused:
+                continue_dl_action = menu.addAction("Continue download")
+            else:
+                pause_action = menu.addAction("Pause download")
 
-        action = menu.exec_(self.mapToGlobal(event.pos()))
+            action = menu.exec_(self.mapToGlobal(event.pos()))
 
-        if action == pause_action and pause_action:
-            self.download_progress_listener.threading_event.clear()
-            self.speed_value.setText("n/a")
-            self.eta_value.setText("n/a")
-        elif action == continue_dl_action and continue_dl_action:
-            self.download_progress_listener.threading_event.set()
+            if action == pause_action and pause_action:
+                self.download_progress_listener.threading_event.clear()
+                self.speed_value.setText("n/a")
+                self.eta_value.setText("n/a")
+            elif action == continue_dl_action and continue_dl_action:
+                self.download_progress_listener.threading_event.set()
