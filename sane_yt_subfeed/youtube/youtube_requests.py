@@ -281,7 +281,7 @@ def add_subscription(youtube_oauth, channel_id):
     Add a YouTube subscription (On YouTube).
     :param youtube_oauth:
     :param channel_id:
-    :return: Returns True if successful, False if not.
+    :return: returns response or raises exception
     """
     response = youtube_oauth.subscriptions().insert(
         part='snippet',
