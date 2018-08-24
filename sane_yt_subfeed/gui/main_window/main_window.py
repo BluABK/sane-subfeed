@@ -94,7 +94,7 @@ class MainWindow(QMainWindow):
         self.add_submenu('&File', 'Download by URL/ID', self.download_single_url_dialog, shortcut='Ctrl+O',
                          tooltip='Download a video by URL/ID')
         self.add_submenu('&File', 'Subscribe to a channel', self.add_subscription_dialog,
-                         tooltip='Subscribe to a channel by Title/ID')
+                         tooltip='Local override: Subscribe to a channel by Title/ID (Will *NOT* affect YouTube!)')
         self.add_submenu('&File', 'View history', self.usage_history_dialog, shortcut='Ctrl+H',
                          tooltip='Show usage history in a dialog box')
         self.add_submenu('&File', 'Preferences', self.view_config, shortcut='Ctrl+P',
@@ -484,8 +484,8 @@ class MainWindow(QMainWindow):
         Prompts user for a channel/ID to add a YouTube subscription to.
         :return:
         """
-        input_dialog = SaneInputDialog(self, self, self.add_subscription, title='Subscribe to channel Title/ID',
-                                       label='Title/ID:', ok_button_text='Subscribe')
+        input_dialog = SaneInputDialog(self, self, self.add_subscription, title='[Local] Subscribe to channel Title/ID',
+                                       label='[Local] Subscribe to channel by Title/ID:', ok_button_text='Subscribe')
         input_dialog.show()
 
     def usage_history_dialog(self):
