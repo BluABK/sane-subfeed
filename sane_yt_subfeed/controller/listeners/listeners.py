@@ -18,7 +18,8 @@ from sane_yt_subfeed.database.write_operations import UpdateVideo
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded, THUMBNAILS_PATH
 from sane_yt_subfeed.youtube.update_videos import load_keys
-from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_cached_oauth, list_uploaded_videos_videos, get_subscriptions
+from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_cached_oauth, list_uploaded_videos_videos, \
+    get_subscriptions, add_subscription
 from sane_yt_subfeed.database.engine_statements import get_channel_by_id_stmt, get_channel_by_title_stmt
 
 LISTENER_SIGNAL_NORMAL_REFRESH = 0
@@ -154,6 +155,7 @@ class MainWindowListener(QObject):
         self.refreshSubs.connect(self.refresh_subs)
         self.testChannels.connect(self.test_channels)
         self.getSingleVideo.connect(self.get_single_video)
+        self.addYouTubeChannelSubscription.connect(self.add_youtube_channel_subscription)
         self.logger = create_logger(__name__ + '.MainWindowListener')
 
     def run(self):
@@ -218,14 +220,7 @@ class MainWindowListener(QObject):
         """
         self.logger.info("Adding subscription to channel: '{}'".format(channnel_id))
         # FIXME: Add handing for looking up by-title, not just the ID
-
-        video_d = list_uploaded_videos_videos(load_keys(1)[0], [video_id], 50)[0]
-        download_thumbnails_threaded([video_d])
-        # self.logger.debug(video_d.__dict__)
-        # DownloadHandler.download_video(video_d)
-        DownloadHandler.download_video(video_d,
-                                       youtube_dl_finished_listener=[GridViewListener.static_self.downloadFinished],
-                                       db_update_listeners=[GridViewListener.static_self.downloadedVideosChangedinDB])
+        add_subscription(load_keys(1)[0], channnel_id)
 
 
 class ProgressBar(QObject):
