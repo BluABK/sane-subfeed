@@ -277,13 +277,14 @@ def get_remote_subscriptions_cached_oauth():
     return temp_subscriptions
 
 
-def add_subscription(youtube_oauth, channel_id):
+def add_subscription(channel_id):
     """
     Add a YouTube subscription (On YouTube).
     :param youtube_oauth:
     :param channel_id:
     :return: returns response or raises exception
     """
+    youtube_oauth = load_youtube()
     response = youtube_oauth.subscriptions().insert(
         part='snippet',
         body=dict(
