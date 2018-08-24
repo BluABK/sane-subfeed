@@ -80,13 +80,17 @@ class SubscriptionsView(QWidget):
             self.subs_table.setItem(row, 2, QTableWidgetItem(self.subs[row].playlist_id))
             self.subs_table.setItem(row, 3, QTableWidgetItem(self.subs[row].description))
             if self.subs[row].subscribed:
-                self.subs_table.setItem(row, 4, QTableWidgetItem(self.subs[row].subscribed))
+                # self.subs_table.setItem(row, 4, QTableWidgetItem(self.subs[row].subscribed))
+                self.subs_table.setItem(row, 4, QTableWidgetItem("Yes"))
             else:
-                self.subs_table.setItem(row, 4, QTableWidgetItem("UNSET"))
+                # self.subs_table.setItem(row, 4, QTableWidgetItem("UNSET"))
+                self.subs_table.setItem(row, 4, QTableWidgetItem("No"))
             if self.subs[row].subscribed_override:
-                self.subs_table.setItem(row, 5, QTableWidgetItem(self.subs[row].subscribed_override))
+                # self.subs_table.setItem(row, 5, QTableWidgetItem(self.subs[row].subscribed_override))
+                self.subs_table.setItem(row, 5, QTableWidgetItem("Yes"))
             else:
-                self.subs_table.setItem(row, 5, QTableWidgetItem("UNSET"))
+                # self.subs_table.setItem(row, 5, QTableWidgetItem("UNSET"))
+                self.subs_table.setItem(row, 5, QTableWidgetItem("No"))
 
             # Enable table sorting after the table has been populated otherwise sorting may interfere with the
             # insertion order (see setItem() for details)
