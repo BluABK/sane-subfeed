@@ -168,6 +168,13 @@ class ConfigViewWidget(InputSuper):
 
         # Section [Logging]
         self.add_option_checkbox('Use socket instead of file', 'Logging', 'use_socket_log', tab_id='Logging')
+        self.add_option_info('Value\t Level', None, tab_id='Logging')
+        self.add_option_info('50\t CRITICAL', None, tab_id='Logging')
+        self.add_option_info('40\t ERROR', None, tab_id='Logging')
+        self.add_option_info('30\t WARNING', None, tab_id='Logging')
+        self.add_option_info('20\t INFO', None, tab_id='Logging')
+        self.add_option_info('10\t DEBUG', None, tab_id='Logging')
+        self.add_option_info('0\t NOT SET', None, tab_id='Logging')
         self.add_option_line_edit('Log level', 'Logging', 'log_level', cfg_validator=QIntValidator(), tab_id='Logging')
         self.add_option_line_edit('Port', 'Logging', 'logging_port', cfg_validator=QIntValidator(), tab_id='Logging')
 
