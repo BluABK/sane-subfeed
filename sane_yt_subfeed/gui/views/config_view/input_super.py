@@ -34,6 +34,7 @@ class InputSuper(QWidget):
         self.section_fontstyle = QFont.Black
 
         self.layout = QGridLayout()
+        self.layout.setAlignment(Qt.AlignTop)
         # self.layout = QVBoxLayout()
 
         # Initialize tab screen
@@ -62,14 +63,23 @@ class InputSuper(QWidget):
 
         # Create tabs - Part 1: Set layouts
         self.tab_gui.layout = QGridLayout()
+        self.tab_gui.layout.setAlignment(Qt.AlignTop)
         self.tab_model.layout = QGridLayout()
+        self.tab_model.layout.setAlignment(Qt.AlignTop)
         self.tab_requests.layout = QGridLayout()
+        self.tab_requests.layout.setAlignment(Qt.AlignTop)
         self.tab_thumbnails.layout = QGridLayout()
+        self.tab_thumbnails.layout.setAlignment(Qt.AlignTop)
         self.tab_threading.layout = QGridLayout()
+        self.tab_threading.layout.setAlignment(Qt.AlignTop)
         self.tab_downloads.layout = QGridLayout()
+        self.tab_downloads.layout.setAlignment(Qt.AlignTop)
         self.tab_mediaplayer.layout = QGridLayout()
+        self.tab_mediaplayer.layout.setAlignment(Qt.AlignTop)
         self.tab_logging.layout = QGridLayout()
+        self.tab_logging.layout.setAlignment(Qt.AlignTop)
         self.tab_debug.layout = QGridLayout()
+        self.tab_debug.layout.setAlignment(Qt.AlignTop)
 
         # Create tabs - Part 2: Set self layout and add tabs to it
         self.layout.addWidget(self.tabs)
