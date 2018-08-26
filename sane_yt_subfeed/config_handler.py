@@ -104,6 +104,9 @@ DEFAULTS = {
         'alternative_player3': "",
         'url_player': ""
     },
+    'DefaultApp': {
+      'Image': ""
+    },
     'Logging': {
         'use_socket_log': 'False',
         'log_level': '1',

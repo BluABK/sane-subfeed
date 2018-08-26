@@ -145,14 +145,14 @@ class ConfigViewWidget(InputSuper):
         self.add_option_line_edit('Image/thumbnail download thread limit', 'Threading', 'img_threads',
                                   cfg_validator=QIntValidator(), tab_id='Threading')
 
-
         # Section [Youtube-dl]
         self.add_option_checkbox('Use youtube-dl?', 'Youtube-dl', 'use_youtube_dl', tab_id='Download')
 
         # Section [Youtube-dl_proxies]
         _counter = 1
         for proxy in get_options('Youtube-dl_proxies'):
-            self.add_option_line_edit('Geoblock proxy #{}'.format(_counter), 'Youtube-dl_proxies', proxy, tab_id='Download')
+            self.add_option_line_edit('Geoblock proxy #{}'.format(_counter), 'Youtube-dl_proxies', proxy,
+                                      tab_id='Download')
             _counter += 1
 
         # Section [Player]
@@ -167,6 +167,9 @@ class ConfigViewWidget(InputSuper):
                 self.add_option_line_edit('Alternative Player #{}'.format(_counter), 'Player', alt_player,
                                           tab_id='Media player')
                 _counter += 1
+
+        # Section [DefaultApp]
+        self.add_option_line_edit('Image viewer', 'DefaultApp', 'Image', tab_id='Default Application')
 
         # Section [Logging]
         self.add_option_checkbox('Use socket instead of file', 'Logging', 'use_socket_log', tab_id='Logging')
