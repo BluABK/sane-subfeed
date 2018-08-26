@@ -176,6 +176,30 @@ class InputSuper(QWidget):
 
         return value  # Needed for connected listeners etc
 
+    def add_option_info(self, left_text, right_text, tab_id=None):
+        """
+        Add flavourtext in the ConfigView option column and increment the grid offset.
+        :param right_text: optional flavourtext
+        :param left_text: optional flavourtext
+        :param tab_id:
+        :return:
+        """
+
+        if tab_id is None:
+            if left_text:
+                self.layout.addWidget(QLabel(left_text), self.offset, 0)
+            if right_text:
+                self.layout.addWidget(QLabel(right_text), self.offset, 1)
+        else:
+            if left_text:
+                self.tab_index[tab_id].layout.addWidget(QLabel(left_text), self.offset, 0)
+            if right_text:
+                self.tab_index[tab_id].layout.addWidget(QLabel(right_text), self.offset, 1)
+
+        # Only increment offset if widgets were actually added
+        # if left_text or right_text:
+        self.offset += 1
+
     def add_option_combobox(self, description, cfg_section, cfg_option, items, tab_id=None):
         """
         Add an option w/ value to the ConfigView layout and increment the grid offset.
