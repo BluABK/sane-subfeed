@@ -21,7 +21,7 @@ class TitleTile(QLabel):
         t_font.setWeight(QFont.DemiBold)
         t_font.setStyleHint(QFont.Helvetica)
         # t_font.setPixelSize(5)
-        t_font.setPixelSize(self.height()*0.45)
+        t_font.setPixelSize(self.height()*0.40)  # Was 0.45, but causes issues where multi-line utf8 makes text go oob
         self.setFont(t_font)
 
     def update_font(self):
