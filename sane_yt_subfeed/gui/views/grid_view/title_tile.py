@@ -3,6 +3,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QFontMetrics
 from PyQt5.QtWidgets import QLabel
 
+from sane_yt_subfeed.config_handler import read_config
+
 
 class TitleTile(QLabel):
 
@@ -20,8 +22,9 @@ class TitleTile(QLabel):
         t_font = self.font()
         t_font.setWeight(QFont.DemiBold)
         t_font.setStyleHint(QFont.Helvetica)
+        t_font.setFixedPitch(True)
         # t_font.setPixelSize(5)
-        t_font.setPixelSize(self.height()*0.40)  # Was 0.45, but causes issues where multi-line utf8 makes text go oob
+        t_font.setPixelSize(self.height() * read_config('GridView', 'title_tile_pixel_size'))
         self.setFont(t_font)
 
     def update_font(self):
@@ -29,6 +32,10 @@ class TitleTile(QLabel):
         metrics = QFontMetrics(self.font())
         elided = metrics.elidedText(self.parent.video.title, Qt.ElideRight, self.width() * 1.8)
         self.setText(elided)
+
+    # def detect_and_resize_utf8(self, text):
+
+
 
     # def resizeEvent(self, *args, **kwargs):
     #     margins = self.parent.layout.getContentsMargins()

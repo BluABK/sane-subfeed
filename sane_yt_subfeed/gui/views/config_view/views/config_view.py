@@ -1,5 +1,5 @@
 # PyQt5
-from PyQt5.QtGui import QIntValidator
+from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox
 
 # Internal
@@ -82,6 +82,8 @@ class ConfigViewWidget(InputSuper):
         # Section [GridView]
         self.add_section('{}Subscription feed{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
         self.add_option_checkbox('Show downloaded videos', 'SubFeed', 'show_downloaded', tab_id='GUI')
+        self.add_option_line_edit('Title-tile pixel size', 'GridView', 'title_tile_pixel_size',
+                                  cfg_validator=QDoubleValidator(), tab_id='GUI')
 
         # Section [DownloadView]
         self.add_section('{}Downloads view{}'.format(self.deco_l, self.deco_r), tab_id='GUI')

@@ -16,6 +16,7 @@ enable_auto_copy_to_clipboard = False
 [GridView]
 show_watched = False
 show_dismissed = False
+title_tile_pixel_size = 0.40
 
 [SubFeed]
 show_downloaded = False
