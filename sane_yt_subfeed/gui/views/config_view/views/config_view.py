@@ -174,6 +174,7 @@ class ConfigViewWidget(InputSuper):
         self.add_option_info('30\t WARNING', None, tab_id='Logging')
         self.add_option_info('20\t INFO', None, tab_id='Logging')
         self.add_option_info('10\t DEBUG', None, tab_id='Logging')
+        self.add_option_info('5\t SPAM (Custom level)', None, tab_id='Logging')
         self.add_option_info('0\t NOT SET', None, tab_id='Logging')
         self.add_option_line_edit('Log level', 'Logging', 'log_level', cfg_validator=QIntValidator(), tab_id='Logging')
         self.add_option_line_edit('Port', 'Logging', 'logging_port', cfg_validator=QIntValidator(), tab_id='Logging')
