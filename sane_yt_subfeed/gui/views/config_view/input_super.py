@@ -47,6 +47,7 @@ class InputSuper(QWidget):
         self.tab_threading = QWidget()
         self.tab_downloads = QWidget()
         self.tab_mediaplayer = QWidget()
+        self.tab_defaultapp = QWidget()
         self.tab_logging = QWidget()
         self.tab_debug = QWidget()
 
@@ -58,6 +59,7 @@ class InputSuper(QWidget):
         self.add_tab(self.tab_threading, "Threading")
         self.add_tab(self.tab_downloads, "Download")
         self.add_tab(self.tab_mediaplayer, "Media player")
+        self.add_tab(self.tab_defaultapp, "Default Application")
         self.add_tab(self.tab_logging, "Logging")
         self.add_tab(self.tab_debug, "Debug")
 
@@ -76,6 +78,8 @@ class InputSuper(QWidget):
         self.tab_downloads.layout.setAlignment(Qt.AlignTop)
         self.tab_mediaplayer.layout = QGridLayout()
         self.tab_mediaplayer.layout.setAlignment(Qt.AlignTop)
+        self.tab_defaultapp.layout = QGridLayout()
+        self.tab_defaultapp.layout.setAlignment(Qt.AlignTop)
         self.tab_logging.layout = QGridLayout()
         self.tab_logging.layout.setAlignment(Qt.AlignTop)
         self.tab_debug.layout = QGridLayout()

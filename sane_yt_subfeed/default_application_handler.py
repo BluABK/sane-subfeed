@@ -30,7 +30,8 @@ def open_with_default_application(file_path):
     """
     # Determine file type
     if is_image(file_path):
-        custom_app = read_config('DefaultApp', 'Image')
+        custom_app = read_config('DefaultApp', 'Image', literal_eval=False)
+        print(custom_app)
     else:
         logger.error("No default application extensions specified for {}".format(file_path))
         return
@@ -40,7 +41,8 @@ def open_with_default_application(file_path):
                 try:
                     subprocess.call(custom_app, file_path)
                 except Exception as e:
-                    logger.debug("{} (custom)".format(FAIL_LOG_MSG.format(file_path, custom_app)), exc_info=e)
+                    logger.error("{} (custom)".format(FAIL_LOG_MSG.format(file_path, custom_app)), exc_info=e)
+                    pass
             else:
                 for open_file_handler in OPEN_FILE_HANDLERS_LINUX:
                     try:
@@ -53,7 +55,14 @@ def open_with_default_application(file_path):
 
         else:
             # OS = Windows
-            os.startfile(file_path)
+            if custom_app:
+                try:
+                    subprocess.Popen("{} {}".format(custom_app, file_path))  # startfile doesn't really do arguments...
+                except Exception as e:
+                    logger.error("{} (custom)".format(FAIL_LOG_MSG.format(file_path, custom_app)), exc_info=e)
+                    pass
+            else:
+                os.startfile(file_path)
     except Exception as e_anything:
         logger.exception(e_anything)
         pass
