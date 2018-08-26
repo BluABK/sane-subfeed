@@ -58,7 +58,8 @@ DEFAULTS = {
     },
     'GridView': {
         'show_watched': 'False',
-        'show_dismissed': 'False'
+        'show_dismissed': 'False',
+        'title_tile_pixel_size': '0.40'
     },
     'SubFeed': {
         'show_downloaded': 'False',
