@@ -57,7 +57,7 @@ def open_with_default_application(file_path):
             # OS = Windows
             if custom_app:
                 try:
-                    subprocess.Popen("{} {}".format(custom_app, file_path))  # startfile doesn't really do arguments...
+                    subprocess.Popen([custom_app, file_path])  # os.startfile doesn't really do arguments...
                 except Exception as e:
                     logger.error("{} (custom)".format(FAIL_LOG_MSG.format(file_path, custom_app)), exc_info=e)
                     pass
