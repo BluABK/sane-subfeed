@@ -4,7 +4,7 @@
 import os
 from subprocess import check_output
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QFile, QTextStream
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget
 
@@ -18,6 +18,7 @@ from sane_yt_subfeed.gui.dialogs.input_dialog import SaneInputDialog
 from sane_yt_subfeed.gui.dialogs.text_view_dialog import TextViewDialog
 from sane_yt_subfeed.gui.main_window.db_state import DbStateIcon
 from sane_yt_subfeed.gui.main_window.toolbar import Toolbar
+from sane_yt_subfeed.gui.themes import themes
 from sane_yt_subfeed.gui.views.about_view import AboutView
 from sane_yt_subfeed.gui.views.config_view.config_window import ConfigWindow
 from sane_yt_subfeed.gui.views.config_view.views.config_view import ConfigViewWidget
@@ -53,6 +54,10 @@ class MainWindow(QMainWindow):
         self.logger = create_logger(__name__)
         self.main_model = main_model
 
+        self.themes_list = [themes.BREEZE_NATIVE, themes.BREEZE_LIGHT, themes.BREEZE_DARK]
+        self.current_theme = None
+        self.current_theme_idx = 0
+
         self.clipboard = QApplication.clipboard()
         self.status_bar = self.statusBar()
         self.menus = {}
@@ -85,6 +90,10 @@ class MainWindow(QMainWindow):
 
     def init_ui(self):
         self.logger.info("Initialized UI")
+
+        # Set the theme
+        # self.setStyleSheet(get_theme_external('breeze', subtheme='dark').readAll())
+
         # Define a menu and status bar
         menubar = self.menuBar()
         self.statusBar()
@@ -164,6 +173,14 @@ class MainWindow(QMainWindow):
             view_list_tiled_view = self.add_submenu('&View', 'Tiled List', self.view_list_tiled, shortcut='Ctrl+9',
                                                     tooltip='View subscription feed as a tiled list',
                                                     icon='tiled_list.png')
+
+        # Theme menu
+        self.add_menu(menubar, '&Theme')
+        self.add_submenu('&Theme', 'Cycle theme', self.cycle_themes, shortcut='F5',
+                         tooltip='Cycle theme')
+        self.add_submenu('&Theme', 'Default', self.set_theme_native, tooltip='Set theme to system default')
+        self.add_submenu('&Theme', 'Breeze Light', self.set_theme_breeze_light, tooltip='Set theme to Breeze Light')
+        self.add_submenu('&Theme', 'Breeze Dark', self.set_theme_breeze_dark, tooltip='Set theme to Breeze Dark')
 
         # Help menu
         self.add_menu(menubar, '&Help')
@@ -262,6 +279,32 @@ class MainWindow(QMainWindow):
             return "N/A"
 
         return branchtag
+
+    # Theme handling
+    def set_theme(self, theme):
+        theme_file = QFile(theme)
+        theme_file.open(QFile.ReadOnly | QFile.Text)
+        theme_stream = QTextStream(theme_file)
+        self.setStyleSheet(theme_stream.readAll())
+        self.current_theme = theme
+
+    def set_theme_native(self):
+        self.set_theme(themes.BREEZE_NATIVE)
+
+    def set_theme_breeze_dark(self):
+        self.set_theme(themes.BREEZE_DARK)
+
+    def set_theme_breeze_light(self):
+        self.set_theme(themes.BREEZE_LIGHT)
+
+    def cycle_themes(self):
+        if self.current_theme_idx >= len(self.themes_list) - 1:
+            self.current_theme_idx = -1
+
+        self.current_theme_idx += 1
+        self.set_theme(self.themes_list[self.current_theme_idx])
+        self.logger.info("Cycled to theme: '{}'".format(self.themes_list[self.current_theme_idx]))
+
 
     # Menu handling
     def add_menu(self, menubar, name):
