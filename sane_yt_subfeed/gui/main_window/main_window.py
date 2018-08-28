@@ -49,12 +49,13 @@ class MainWindow(QMainWindow):
     hotkey_ctrl_down = False
 
     # noinspection PyArgumentList
-    def __init__(self, main_model: MainModel, dimensions=None, position=None):
+    def __init__(self, app: QApplication, main_model: MainModel, dimensions=None, position=None):
         super().__init__()
         self.logger = create_logger(__name__)
+        self.app = app
         self.main_model = main_model
 
-        self.themes_list = [themes.BREEZE_NATIVE, themes.BREEZE_LIGHT, themes.BREEZE_DARK]
+        self.themes_list = [None, themes.BREEZE_LIGHT, themes.BREEZE_DARK]
         self.current_theme = None
         self.current_theme_idx = 0
 
@@ -282,14 +283,19 @@ class MainWindow(QMainWindow):
 
     # Theme handling
     def set_theme(self, theme):
+        """
+        Applies a StyleSheet to the QApplication
+        :param theme:
+        :return:
+        """
         theme_file = QFile(theme)
         theme_file.open(QFile.ReadOnly | QFile.Text)
         theme_stream = QTextStream(theme_file)
-        self.setStyleSheet(theme_stream.readAll())
+        self.app.setStyleSheet(theme_stream.readAll())
         self.current_theme = theme
 
     def set_theme_native(self):
-        self.set_theme(themes.BREEZE_NATIVE)
+        self.set_theme(None)
 
     def set_theme_breeze_dark(self):
         self.set_theme(themes.BREEZE_DARK)
