@@ -345,7 +345,7 @@ class MainWindow(QMainWindow):
     def set_theme_breeze_light(self):
         self.set_theme(themes.BREEZE_LIGHT)
 
-    def add_available_qstyles_to_menu(self, menu, subsubmenu=False):  # FIXME: Make list more dynamic (somehow)
+    def add_available_qstyles_to_menu(self, menu, subsubmenu=False):
         for name, _ in QSTYLES_AVAILABLE.items():
             action = self.set_qstyle
 
