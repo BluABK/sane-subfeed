@@ -9,6 +9,7 @@ from sane_yt_subfeed.gui.views.grid_view.thumbnail_tile import ThumbnailTile
 from sane_yt_subfeed.gui.views.grid_view.title_tile import TitleTile
 from sane_yt_subfeed.gui.views.grid_view.channel_tile import ChannelTile
 from sane_yt_subfeed.gui.views.grid_view.date_tile import DateTile
+from sane_yt_subfeed.history_handler import update_history
 from sane_yt_subfeed.log_handler import logger
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.models import Channel
@@ -37,7 +38,7 @@ class VideoTile(QWidget):
 
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(0, 0, 0, 4)
-        self.thumbnail_widget = ThumbnailTile(self)
+        self.thumbnail_widget = self.init_thumbnailtile()
         self.layout.addWidget(self.thumbnail_widget)
 
         self.title_widget = TitleTile(video.title, self)
@@ -51,6 +52,9 @@ class VideoTile(QWidget):
         self.setLayout(self.layout)
 
         self.set_video(video)
+
+    def init_thumbnailtile(self):
+        raise ValueError("ThumbnailTile initialised from VideoTile, not subclass!")
 
     def set_video(self, video):
         self.video = video
@@ -70,12 +74,24 @@ class VideoTile(QWidget):
             self.channel_widget.setText(self.video.channel_title)
 
         vid_age = datetime.datetime.utcnow() - self.video.date_published
-        self.date_widget.setText(format(vid_age))
+        self.date_widget.setText(self.strfdelta(vid_age, "{hours}:{minutes}:{seconds}", "{days} days "))
         self.old_videos(vid_age)
 
         self.thumbnail_widget.setPixmap(QPixmap(video.thumbnail_path))
 
         self.update()
+
+    @staticmethod
+    def strfdelta(tdelta, hours, days):
+        d = {}
+        d["hours"], rem = divmod(tdelta.seconds, 3600)
+        d["minutes"], d["seconds"] = divmod(rem, 60)
+        if int(tdelta.days) > 0:
+            return_string = "{}{}".format(days.format(days=tdelta.days), hours.format(**d))
+        else:
+            return_string = "{}".format(hours.format(**d))
+
+        return return_string
 
     def old_videos(self, vid_age):
         if read_config('Gui', 'grey_old_videos'):
@@ -106,7 +122,6 @@ class VideoTile(QWidget):
             else:
                 self.setToolTip("{}: {}".format(self.video.channel_title, self.video.title))
 
-
     def copy_url(self):
         """
         Copy selected video URL(s) to clipboard
@@ -124,7 +139,10 @@ class VideoTile(QWidget):
         """
         logger.info('Mark downloaded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
                                                                 self.video.title))
+        update_history('Downloaded:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
+                                                         self.video.title))
         self.video.downloaded = True
+        self.video.date_downloaded = datetime.datetime.utcnow()
         self.parent.main_model.grid_view_listener.tileDownloaded.emit(self.video)
         if read_config('Gui', 'enable_auto_copy_to_clipboard'):
             self.copy_url()
@@ -138,8 +156,10 @@ class VideoTile(QWidget):
         Mark the video as discarded
         :return:
         """
-        logger.info('Mark discarded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
+        logger.info('Mark dismissed: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
                                                                self.video.title))
+        update_history('Dismissed:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
+                                                        self.video.title))
         self.video.discarded = True
         self.parent.main_model.grid_view_listener.tileDiscarded.emit(self.video)
         self.status_bar.showMessage('Dismissed: {} ({} - {})'.format(self.video.url_video,
@@ -151,8 +171,10 @@ class VideoTile(QWidget):
         Mark the video as downloaded
         :return:
         """
-        logger.info('Mark watched: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
-                                                             self.video.title))
+        logger.debug('Mark watched: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
+                                                              self.video.title))
+        update_history('Watched:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
+                                                      self.video.title))
         self.video.watched = True
         self.parent.main_model.grid_view_listener.tileWatched.emit(self.video)
 
@@ -162,3 +184,6 @@ class VideoTile(QWidget):
         logger.info(text)
 
         self.b.insertPlainText(text + '\n')
+
+    def decrease_prio(self):
+        self.parent.main_model.grid_view_listener.decreaseWatchPrio.emit(self.video)

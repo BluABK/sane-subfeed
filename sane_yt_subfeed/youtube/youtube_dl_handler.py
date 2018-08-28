@@ -3,15 +3,12 @@ from __future__ import unicode_literals
 import datetime
 import os
 import threading
-import time
-import re
 
 from youtube_dl import YoutubeDL
-from youtube_dl.utils import ExtractorError, DownloadError
-
-from sane_yt_subfeed.config_handler import read_config, get_options
+from youtube_dl.utils import DownloadError
 
 from sane_yt_subfeed import create_logger
+from sane_yt_subfeed.config_handler import read_config, get_options
 
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 logger = create_logger(__name__)
@@ -27,21 +24,18 @@ class MyLogger(object):
     def error(self, msg):
         pass
 
-
-def my_hook(d):
-    time.sleep(0.01)
-    if d['status'] == 'finished':
-        pass
         # logger.info("DL status == 'finished")
 
 
 # FIXME: because of formating string, for channel, it can't do batch dl
 class YoutubeDownload(threading.Thread):
-    def __init__(self, video, finished_listener=None):
+    def __init__(self, video, threading_event, finished_listeners=None, download_progress_listener=None):
         threading.Thread.__init__(self)
         logger.debug("Created thread")
         self.video = video
-        self.listener = finished_listener
+        self.listeners = finished_listeners
+        self.download_progress_listener = download_progress_listener
+        self.threading_event = threading_event
         # FIXME: faux filename, as the application is currently not able to get final filname from youtube-dl
         # file_name = "{channel_title} - {date} - %(title)s (%(fps)s_%(vcodec)s_%(acodec)s).%(ext)s".format(
         #     channel_title=self.video.channel_title, date=self.video.date_published.strftime("%Y-%m-%d"))
@@ -54,20 +48,21 @@ class YoutubeDownload(threading.Thread):
 
         self.proxies = []
         for proxy_option in get_options('Youtube-dl_proxies'):
-            this_proxy_option = read_config('Youtube-dl_proxies', proxy_option, literal_eval=False).strip('"').strip("'")
+            this_proxy_option = read_config('Youtube-dl_proxies', proxy_option, literal_eval=False).strip('"').strip(
+                "'")
             if this_proxy_option is not "" and this_proxy_option is not None:
                 self.proxies.append(this_proxy_option)
 
         self.ydl_opts = {
             'logger': MyLogger(),
-            'progress_hooks': [my_hook],
+            'progress_hooks': [self.my_hook],
             'outtmpl': file_path,
             'forcefilename': 'True'
         }
 
         self.proxy_ydl_opts = {
             'logger': MyLogger(),
-            'progress_hooks': [my_hook],
+            'progress_hooks': [self.my_hook],
             'outtmpl': file_path,
             'forcefilename': 'True',
             'proxy': None
@@ -105,6 +100,7 @@ class YoutubeDownload(threading.Thread):
 
     def run(self):
         logger.debug("Started download thread")
+        self.threading_event.wait()
         # url_list = []
         # for video in self.videos:
         #     url_list.append(video.url_video)
@@ -114,7 +110,8 @@ class YoutubeDownload(threading.Thread):
                                                                          self.video.url_video))
                 ydl.download([self.video.url_video])
         except DownloadError as dl_exc:
-            if str(dl_exc) == "ERROR: The uploader has not made this video available in your country.":
+            if str(dl_exc) == "ERROR: The uploader has not made this video available in your country." or \
+                    ("ERROR:" in str(dl_exc) and "blocked it in your country" in str(dl_exc)):
                 if self.download_with_proxy() is not True:
                     logger.error("All proxies have failed to download geo blocked video '{}'!".format(self.video.title))
                     logger.exception(dl_exc)
@@ -133,6 +130,13 @@ class YoutubeDownload(threading.Thread):
             if self.video.video_id in name:
                 self.video.vid_path = os.path.join(self.youtube_folder, name)
 
-        if self.listener:
-            self.video.date_downloaded = datetime.datetime.utcnow()
-            self.listener.emit(self.video)
+        self.video.date_downloaded = datetime.datetime.utcnow()
+
+        self.download_progress_listener.finishedDownload.emit()
+        if self.listeners:
+            for listener in self.listeners:
+                listener.emit(self.video)
+
+    def my_hook(self, event):
+        self.download_progress_listener.updateProgress.emit(event)
+        self.threading_event.wait()
