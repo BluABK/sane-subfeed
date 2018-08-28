@@ -19,7 +19,3 @@ class SaneToolBarAction(QAction):
             self.sane_action(**self.sane_kwargs)
         else:
             self.sane_action()
-
-
-    def set_qstyle(self, qstyle):
-        self.main_window.set_theme(qstyle, stylesheet=False)
