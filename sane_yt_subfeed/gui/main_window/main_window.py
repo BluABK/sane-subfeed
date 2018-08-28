@@ -125,28 +125,34 @@ class MainWindow(QMainWindow):
         # refresh_list
         # self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
         #                  tooltip='Refresh the subscription feed'
-        refresh_feed = self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
-                                        tooltip='Refresh the subscription feed', icon='refresh.png')
+        refresh_feed = self.add_submenu('&Function', 'Refresh Feed', self.emit_signal_with_set_args, shortcut='Ctrl+R',
+                                        tooltip='Refresh the subscription feed', icon='refresh.png',
+                                        signal=self.main_model.main_window_listener.refreshVideos,
+                                        args=(LISTENER_SIGNAL_DEEP_REFRESH,))
 
-        self.add_submenu('&Function', 'Reload Subscriptions &List', self.refresh_subs, shortcut='Ctrl+L',
+        self.add_submenu('&Function', 'Reload Subscriptions &List',
+                         self.main_model.main_window_listener.refreshSubs.emit, shortcut='Ctrl+L',
                          tooltip='Fetch a new subscriptions list', icon='refresh_subs.png')
 
         # FIXME: icon, shortcut(alt/shift as extra modifier to the normal refresh shortcut?)
-        self.add_submenu('&Function', 'Deep refresh of feed', self.refresh_list_deep, shortcut='Ctrl+T',
-                         tooltip='Deed refresh the subscription feed', icon='refresh.png')
+        self.add_submenu('&Function', 'Deep refresh of feed', self.emit_signal_with_set_args, shortcut='Ctrl+T',
+                         tooltip='Deed refresh the subscription feed', icon='refresh.png',
+                         signal=self.main_model.main_window_listener.refreshVideos,
+                         args=(LISTENER_SIGNAL_DEEP_REFRESH,))
 
-        self.add_submenu('&Function', 'Test Channels', self.test_channels,
+        self.add_submenu('&Function', 'Test Channels', self.main_model.main_window_listener.testChannels.emit,
                          tooltip='Tests the test_pages and miss_limit of channels', icon='rerun_test.png')
 
-        self.add_submenu('&Function', 'Manual dir search', self.dir_search,
+        self.add_submenu('&Function', 'Manual dir search', self.main_model.yt_dir_listener.manualCheck.emit,
                          tooltip='Starts a manual search for new videos in youtube directory',
                          icon='folder_refresh.png')
 
         thumb_tooltip = 'Starts a manual download of thumbnails for videos currently in play view and sub feed'
-        self.add_submenu('&Function', 'Manual thumbnail download', self.thumbnail_download,
+        self.add_submenu('&Function', 'Manual thumbnail download',
+                         self.main_model.grid_view_listener.thumbnailDownload.emit,
                          tooltip=thumb_tooltip, icon='folder_refresh.png')
 
-        self.add_submenu('&Function', 'Manual DB grab', self.db_reload,
+        self.add_submenu('&Function', 'Manual DB grab', self.main_model.grid_view_listener.updateFromDb.emit,
                          tooltip='Starts a manual grab of data for the model', icon='database.png', shortcut='Ctrl+E')
 
         # FIXME: icon, look more related to action
@@ -159,23 +165,25 @@ class MainWindow(QMainWindow):
 
         # View menu
         self.add_menu(menubar, '&View')
-        view_grid_view = self.add_submenu('&View', 'Subscription feed', self.view_grid, shortcut='Ctrl+1',
-                                          tooltip='View subscription feed as a grid', icon='grid.png')
-        view_play_view = self.add_submenu('&View', 'Playback feed', self.view_play, shortcut='Ctrl+2',
-                                          tooltip='View downloaded videos as a grid',
+        view_grid_view = self.add_submenu('&View', 'Subscription feed', self.set_current_widget, shortcut='Ctrl+1',
+                                          tooltip='View subscription feed as a grid', icon='grid.png',
+                                          widget=self.grid_view)
+        view_play_view = self.add_submenu('&View', 'Playback feed', self.set_current_widget, shortcut='Ctrl+2',
+                                          tooltip='View downloaded videos as a grid', widget=self.play_view,
                                           icon='play_view_basic.png')
-        view_list_detailed_view = self.add_submenu('&View', 'Detailed List', self.view_list_detailed, shortcut='Ctrl+3',
+        view_list_detailed_view = self.add_submenu('&View', 'Detailed List', self.set_current_widget, shortcut='Ctrl+3',
                                                    tooltip='View subscription feed as a detailed list',
-                                                   icon='table.png')
+                                                   icon='table.png', widget=self.list_detailed_view)
         # FIXME: icon
-        view_downloads_view = self.add_submenu('&View', 'Downloads', self.view_downloads, shortcut='Ctrl+4',
-                                               tooltip='Shows in progress downloads', icon='download_view.png')
-        view_subs_view = self.add_submenu('&View', 'Subscriptions', self.view_subs, shortcut='Ctrl+5',
-                                          tooltip='View Subscriptions', icon='subs.png')
+        view_downloads_view = self.add_submenu('&View', 'Downloads', self.set_current_widget, shortcut='Ctrl+4',
+                                               tooltip='Shows in progress downloads', icon='download_view.png',
+                                               widget=self.download_view)
+        view_subs_view = self.add_submenu('&View', 'Subscriptions', self.set_current_widget, shortcut='Ctrl+5',
+                                          tooltip='View Subscriptions', icon='subs.png', widget=self.download_view)
         if read_config('Debug', 'show_unimplemented_gui'):
-            view_list_tiled_view = self.add_submenu('&View', 'Tiled List', self.view_list_tiled, shortcut='Ctrl+9',
+            view_list_tiled_view = self.add_submenu('&View', 'Tiled List', self.set_current_widget, shortcut='Ctrl+9',
                                                     tooltip='View subscription feed as a tiled list',
-                                                    icon='tiled_list.png')
+                                                    icon='tiled_list.png', widget=self.list_tiled_view)
 
         # Window menu
         window_menu = self.add_menu(menubar, '&Window')
@@ -200,8 +208,8 @@ class MainWindow(QMainWindow):
         self.add_submenu('&Help', 'Hotkeys', self.view_hotkeys, shortcut='F2',
                          tooltip='View hotkeys')
         if read_config('Debug', 'show_unimplemented_gui'):
-            view_about_view = self.add_submenu('&Help', 'About', self.view_about, shortcut='F1', tooltip='About me',
-                                               icon='about.png')
+            view_about_view = self.add_submenu('&Help', 'About', self.set_current_widget, shortcut='F1',
+                                               tooltip='About me', icon='about.png', widget=self.about_view)
 
         toolbar = Toolbar(self)
         self.addToolBar(toolbar)
@@ -329,39 +337,6 @@ class MainWindow(QMainWindow):
     def set_qstyle(self, qstyle):
         self.set_theme(qstyle, stylesheet=False)
 
-    def set_qstyle_windows(self):
-        self.set_theme('Windows', stylesheet=False)
-
-    def set_qstyle_windowsvista(self):
-        self.set_theme('windowsvista', stylesheet=False)
-
-    def set_qstyle_fusion(self):
-        self.set_theme('Fusion', stylesheet=False)
-
-    def set_qstyle_gtkplus(self):
-        self.set_theme('GTK+', stylesheet=False)
-
-    def set_qstyle_gtk2(self):
-        self.set_theme('gtk2', stylesheet=False)
-
-    def set_qstyle_bb10dark(self):
-        self.set_theme('bb10dark', stylesheet=False)
-
-    def set_qstyle_bb10bright(self):
-        self.set_theme('bb10bright', stylesheet=False)
-
-    def set_qstyle_cleanlooks(self):
-        self.set_theme('cleanlooks', stylesheet=False)
-
-    def set_qstyle_cde(self):
-        self.set_theme('cde', stylesheet=False)
-
-    def set_qstyle_motif(self):
-        self.set_theme('motif', stylesheet=False)
-
-    def set_qstyle_plastique(self):
-        self.set_theme('plastique', stylesheet=False)
-
     def cycle_themes(self):
         if self.current_theme_idx >= len(self.themes_list) - 1:
             self.current_theme_idx = -1
@@ -428,50 +403,8 @@ class MainWindow(QMainWindow):
         """
         widget.setHidden(True)
 
-    def view_grid(self):
-        """
-        Set View variable and CentralWidget to GridView
-        :return:
-        """
-        # FIXME: hotfix for actions using self.grid_view(refresh and copy urls)
-        self.central_widget.setCurrentWidget(self.grid_view)
-
-    def view_play(self):
-        """
-        Set View variable and CentralWidget to GridView
-        :return:
-        """
-        # FIXME: hotfix for actions using self.grid_view(refresh and copy urls)
-        self.central_widget.setCurrentWidget(self.play_view)
-
-    def view_downloads(self):
-        """
-        Set View variable and CentralWidget to GridView
-        :return:
-        """
-        # FIXME: hotfix for actions using self.grid_view(refresh and copy urls)
-        self.central_widget.setCurrentWidget(self.download_view)
-
-    def view_subs(self):
-        """
-        Set View variable and CentralWidget to SubscriptionsView
-        :return:
-        """
-        self.central_widget.setCurrentWidget(self.subs_view)
-
-    def view_list_detailed(self):
-        """
-        Set View variable and CentralWidget to ListDetailedView
-        :return:
-        """
-        self.central_widget.setCurrentWidget(self.list_detailed_view)
-
-    def view_list_tiled(self):
-        """
-        Set View variable and CentralWidget to ListTiledView
-        :return:
-        """
-        self.central_widget.setCurrentWidget(self.list_tiled_view)
+    def set_current_widget(self, widget):
+        self.central_widget.setCurrentWidget(widget)
 
     def view_config(self):
         """
@@ -480,13 +413,6 @@ class MainWindow(QMainWindow):
         """
         self.config_view.show()
         # self.central_widget.setCurrentWidget(self.config_view)
-
-    def view_about(self):
-        """
-        Set View variable and CentralWidget to AboutView
-        :return:
-        """
-        self.central_widget.setCurrentWidget(self.about_view)
 
     def view_hotkeys(self):
         """
@@ -509,49 +435,14 @@ class MainWindow(QMainWindow):
         self.clipboard.setText(urls)
         self.statusBar().showMessage('Copied {} URLs to clipboard'.format(len(urls.splitlines())))
 
-    def refresh_list(self):
+    def emit_signal_with_set_args(self, signal, args):
         """
-        Refresh the subscription feed
+        Takes a signal and emits it with the set args as *args
+        :param signal:
+        :param args:
         :return:
         """
-        self.main_model.main_window_listener.refreshVideos.emit(LISTENER_SIGNAL_NORMAL_REFRESH)
-
-    def refresh_list_deep(self):
-        """
-        Refresh the subscription feed
-        :return:
-        """
-        self.main_model.main_window_listener.refreshVideos.emit(LISTENER_SIGNAL_DEEP_REFRESH)
-
-    def test_channels(self):
-        """
-        Sends a testChannels signal
-        :return:
-        """
-        self.main_model.main_window_listener.testChannels.emit()
-
-    def dir_search(self):
-        """
-        Sends a testChannels signal
-        :return:
-        """
-        self.main_model.yt_dir_listener.manualCheck.emit()
-        # do_walk(os.path.join("d:/", "youtube"))
-
-    def thumbnail_download(self):
-        """
-        Sends a testChannels signal
-        :return:
-        """
-        self.main_model.grid_view_listener.thumbnailDownload.emit()
-        # do_walk(os.path.join("d:/", "youtube"))
-
-    def db_reload(self):
-        """
-        Sends a testChannels signal
-        :return:
-        """
-        self.main_model.grid_view_listener.updateFromDb.emit()
+        signal.emit(*args)
 
     def toggle_ascending_sort(self):
         """
@@ -561,21 +452,6 @@ class MainWindow(QMainWindow):
         toggle = read_config('PlaySort', 'ascending_date')
         set_config('PlaySort', 'ascending_date', format(not toggle))
         self.main_model.grid_view_listener.updateFromDb.emit()
-
-    def refresh_subs(self):
-        """
-        Fetch a new list of subscriptions
-        :return:
-        """
-        self.main_model.main_window_listener.refreshSubs.emit()
-
-    def get_single_video(self, input_text):
-        """
-        Download a single video based on input
-        :param input_text: URL or ID
-        :return:
-        """
-        self.main_model.main_window_listener.getSingleVideo.emit(input_text)
 
     def add_subscription_by_id(self, input_text):
         """
@@ -598,7 +474,8 @@ class MainWindow(QMainWindow):
         Prompts user for downloading a video by URL/ID
         :return:
         """
-        input_dialog = SaneInputDialog(self, self, self.get_single_video, title='Download a video by URL/ID',
+        input_dialog = SaneInputDialog(self, self, self.main_model.main_window_listener.getSingleVideo.emit,
+                                       title='Download a video by URL/ID',
                                        label='URL/ID:', ok_button_text='Download')
         input_dialog.show()
 
