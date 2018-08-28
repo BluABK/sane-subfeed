@@ -73,7 +73,6 @@ Afterwards you can launch it with: `python -m sane_yt_subfeed`
     alembic upgrade head
     ```
 
-## FAQ
-
-Q: What are missed videos (and tests)? <br/>
-A: Wiki: [Internal](https://git.vpn/BluABK/sane-yt-subfeed/wikis/Missed-videos-(and-tests)) / [External](https://git.blucoders.net/BluABK/sane-yt-subfeed/wikis/Missed-videos-(and-tests))
+## Notable Wiki articles
+*  [Missed videos and tests](https://git.blucoders.net/BluABK/sane-yt-subfeed/wikis/Missed-videos-(and-tests))
+*  [Youtube-DL Integration (and overriding the youtube_dl options)](https://git.blucoders.net/BluABK/sane-yt-subfeed/wikis/youtube-dl-integration)
