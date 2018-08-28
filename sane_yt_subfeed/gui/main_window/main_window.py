@@ -6,7 +6,7 @@ from subprocess import check_output
 
 from PyQt5.QtCore import Qt, QFile, QTextStream
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget, QStyle, QStyleFactory
 
 # Project internal libs
 from sane_yt_subfeed.absolute_paths import ICONS_PATH, VERSION_PATH
@@ -19,6 +19,7 @@ from sane_yt_subfeed.gui.dialogs.text_view_dialog import TextViewDialog
 from sane_yt_subfeed.gui.main_window.db_state import DbStateIcon
 from sane_yt_subfeed.gui.main_window.toolbar import Toolbar
 from sane_yt_subfeed.gui.themes import themes
+from sane_yt_subfeed.gui.themes.themes import THEMES_LIST, QSTYLES_AVAILABLE
 from sane_yt_subfeed.gui.views.about_view import AboutView
 from sane_yt_subfeed.gui.views.config_view.config_view_tabs import ConfigViewTabs
 from sane_yt_subfeed.gui.views.config_view.config_window import ConfigWindow
@@ -56,7 +57,7 @@ class MainWindow(QMainWindow):
         self.app = app
         self.main_model = main_model
 
-        self.themes_list = [None, themes.BREEZE_LIGHT, themes.BREEZE_DARK]
+        self.themes_list = THEMES_LIST
         self.current_theme = None
         self.current_theme_idx = 0
 
@@ -175,13 +176,23 @@ class MainWindow(QMainWindow):
                                                     tooltip='View subscription feed as a tiled list',
                                                     icon='tiled_list.png')
 
-        # Theme menu
-        self.add_menu(menubar, '&Theme')
-        self.add_submenu('&Theme', 'Cycle theme', self.cycle_themes, shortcut='F5',
-                         tooltip='Cycle theme')
-        self.add_submenu('&Theme', 'Default', self.set_theme_native, tooltip='Set theme to system default')
-        self.add_submenu('&Theme', 'Breeze Light', self.set_theme_breeze_light, tooltip='Set theme to Breeze Light')
-        self.add_submenu('&Theme', 'Breeze Dark', self.set_theme_breeze_dark, tooltip='Set theme to Breeze Dark')
+        # Window menu
+        window_menu = self.add_menu(menubar, '&Window')
+        #   Theme submenu
+        theme_submenu = self.add_menu(window_menu, 'Theme')
+        self.add_submenu(theme_submenu, 'Cycle theme', self.cycle_themes, shortcut='F5',
+                         tooltip='Cycle theme', subsubmenu=True)
+        self.add_submenu(theme_submenu, 'Default', self.set_theme_native, tooltip='Set theme to system default',
+                         subsubmenu=True)
+        self.add_submenu(theme_submenu, 'Breeze Light', self.set_theme_breeze_light,
+                         tooltip='Set theme to Breeze Light',
+                         subsubmenu=True)
+        self.add_submenu(theme_submenu, 'Breeze Dark', self.set_theme_breeze_dark, tooltip='Set theme to Breeze Dark',
+                         subsubmenu=True)
+        # self.add_submenu_separator('&Theme')
+        #   Style submenu
+        style_submenu = self.add_menu(window_menu, 'Style')
+        self.add_available_qstyles_to_menu(style_submenu, subsubmenu=True)
 
         # Help menu
         self.add_menu(menubar, '&Help')
@@ -282,16 +293,19 @@ class MainWindow(QMainWindow):
         return branchtag
 
     # Theme handling
-    def set_theme(self, theme):
+    def set_theme(self, theme, stylesheet=True):
         """
         Applies a StyleSheet to the QApplication
         :param theme:
         :return:
         """
-        theme_file = QFile(theme)
-        theme_file.open(QFile.ReadOnly | QFile.Text)
-        theme_stream = QTextStream(theme_file)
-        self.app.setStyleSheet(theme_stream.readAll())
+        if stylesheet:
+            theme_file = QFile(theme)
+            theme_file.open(QFile.ReadOnly | QFile.Text)
+            theme_stream = QTextStream(theme_file)
+            self.app.setStyleSheet(theme_stream.readAll())
+        else:
+            self.app.setStyle(QStyleFactory.create(theme))
         self.current_theme = theme
 
     def set_theme_native(self):
@@ -303,6 +317,73 @@ class MainWindow(QMainWindow):
     def set_theme_breeze_light(self):
         self.set_theme(themes.BREEZE_LIGHT)
 
+    def add_available_qstyles_to_menu(self, menu, subsubmenu=False):  # FIXME: Make list more dynamic (somehow)
+        for name, style in QSTYLES_AVAILABLE.items():
+            if name == 'Windows':
+                action = self.set_qstyle_windows
+            elif name == 'windowsvista':
+                action = self.set_qstyle_windowsvista
+            elif name == 'Fusion':
+                action = self.set_qstyle_fusion
+            elif name == 'GTK+':
+                action = self.set_qstyle_gtkplus
+            elif name == 'gtk2':
+                action = self.set_qstyle_gtk2
+            elif name == 'bb10dark':
+                action = self.set_qstyle_bb10dark
+            elif name == 'bb10bright':
+                action = self.set_qstyle_bb10bright
+            elif name == 'cleanlooks':
+                action = self.set_qstyle_cleanlooks
+            elif name == 'cde':
+                action = self.set_qstyle_cde
+            elif name == 'motif':
+                action = self.set_qstyle_motif
+            elif name == 'plastique':
+                action = self.set_qstyle_plastique
+            else:
+                self.logger.warning("QStyle '{}' is available, but not implemented!".format(name))
+                return
+
+            self.logger.info("Adding available QStyle '{}' to '{}' menu.".format(name, menu))
+            self.add_submenu(menu, name, action, tooltip="Apply the '{}' theme.".format(name), subsubmenu=subsubmenu)
+
+    def set_qstyle(self, qstyle):
+        self.set_theme(qstyle, stylesheet=False)
+
+    def set_qstyle_windows(self):
+        self.set_theme('Windows', stylesheet=False)
+
+    def set_qstyle_windowsvista(self):
+        self.set_theme('windowsvista', stylesheet=False)
+
+    def set_qstyle_fusion(self):
+        self.set_theme('Fusion', stylesheet=False)
+
+    def set_qstyle_gtkplus(self):
+        self.set_theme('GTK+', stylesheet=False)
+
+    def set_qstyle_gtk2(self):
+        self.set_theme('gtk2', stylesheet=False)
+
+    def set_qstyle_bb10dark(self):
+        self.set_theme('bb10dark', stylesheet=False)
+
+    def set_qstyle_bb10bright(self):
+        self.set_theme('bb10bright', stylesheet=False)
+
+    def set_qstyle_cleanlooks(self):
+        self.set_theme('cleanlooks', stylesheet=False)
+
+    def set_qstyle_cde(self):
+        self.set_theme('cde', stylesheet=False)
+
+    def set_qstyle_motif(self):
+        self.set_theme('motif', stylesheet=False)
+
+    def set_qstyle_plastique(self):
+        self.set_theme('plastique', stylesheet=False)
+
     def cycle_themes(self):
         if self.current_theme_idx >= len(self.themes_list) - 1:
             self.current_theme_idx = -1
@@ -311,18 +392,22 @@ class MainWindow(QMainWindow):
         self.set_theme(self.themes_list[self.current_theme_idx])
         self.logger.info("Cycled to theme: '{}'".format(self.themes_list[self.current_theme_idx]))
 
-
     # Menu handling
-    def add_menu(self, menubar, name):
+    def add_menu(self, menubar, name, submenu=False):
         """
         Adds a menu and an optional amount of submenus
         :param menubar:
         :param name:
         :return:
         """
-        self.menus[name] = menubar.addMenu(name)
+        if submenu:
+            this_submenu = menubar.addMenu(name)
+            return this_submenu
+        else:
+            self.menus[name] = menubar.addMenu(name)
+            return self.menus[name]
 
-    def add_submenu(self, menu, name, action, shortcut=None, tooltip=None, icon=None):
+    def add_submenu(self, menu, name, action, shortcut=None, tooltip=None, icon=None, subsubmenu=False, dummy=False):
         """
         Adds a submenu with optional properties to a menu
         :param name:
@@ -343,12 +428,19 @@ class MainWindow(QMainWindow):
         if tooltip:
             submenu.setStatusTip(tooltip)
 
-        submenu.triggered.connect(action)
-        if menu in self.menus:
-            self.menus[menu].addAction(submenu)
+        if not dummy:
+            submenu.triggered.connect(action)
+        if subsubmenu:
+            menu.addAction(submenu)
         else:
-            raise ValueError("add_submenu('{}', '{}', ...) ERROR: '{}' not in menus dict!".format(menu, name, menu))
+            if menu in self.menus:
+                self.menus[menu].addAction(submenu)
+            else:
+                raise ValueError("add_submenu('{}', '{}', ...) ERROR: '{}' not in menus dict!".format(menu, name, menu))
         return submenu  # FIXME: Used by toolbar to avoid redefining items
+
+    def add_submenu_separator(self, menu):
+        self.menus[menu].addSeparator()
 
     @staticmethod
     def hide_widget(widget):  # TODO: Deferred usage (Garbage collection issue)
