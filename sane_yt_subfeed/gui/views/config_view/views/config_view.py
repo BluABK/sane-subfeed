@@ -3,7 +3,7 @@ from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox
 
 # Internal
-from sane_yt_subfeed.config_handler import DEFAULTS, get_size, get_options
+from sane_yt_subfeed.config_handler import DEFAULTS, get_size, get_options, read_config, has_section
 # import sane_yt_subfeed.gui.views.config_view.checkbox as checkbox
 from sane_yt_subfeed.gui.views.config_view.config_item_types import THUMBNAIL_QUALITIES, TT_FONT_SIZES
 from sane_yt_subfeed.gui.views.config_view.config_items import checkbox, combobox
@@ -168,6 +168,14 @@ class ConfigViewWidget(InputSuper):
                 self.add_option_line_edit('Geoblock proxy #{}'.format(_counter), 'Youtube-dl_proxies', proxy,
                                           tab_id='Download')
                 _counter += 1
+
+            # Section [Youtube-dl_opts]
+            if has_section('Youtube-dl_opts'):
+                if len(get_options('Youtube-dl_opts')) > 0:
+                    self.add_section('Youtube-DL options overrides (Config file only)')
+                    for option in get_options('Youtube-dl_opts'):
+                        value = read_config('Youtube-dl_opts', option)
+                        self.add_option_info("{}: ".format(option), "{}".format(value))
 
         elif self.tab_id == 'Media player':
             # Section [Player]
