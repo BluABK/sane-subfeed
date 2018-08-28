@@ -1,5 +1,6 @@
 # PyQt5
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox, QScrollArea
 
 # Internal
@@ -17,7 +18,7 @@ class HotkeysViewWidget(InputSuper):
     deco_l = "【"
     deco_r = "】"
 
-    def __init__(self, parent, root):
+    def __init__(self, parent, root, icon: QIcon=None):
         """
         A GUI Widget that shows hotkey bindings
         :param parent:
@@ -25,6 +26,9 @@ class HotkeysViewWidget(InputSuper):
         :param status_bar:
         """
         super().__init__(parent, root)
+        if icon is not None:
+            self.setWindowIcon(icon)  # FIXME: Icon won't set
+        self.parent.setWindowTitle('Hotkey configuration')
         self.init_ui()
         self.populate_options()
 

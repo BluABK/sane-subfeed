@@ -15,6 +15,7 @@ class ConfigViewTabs(QTabWidget):
         self.sane_parent = parent
         if icon is not None:
             self.setWindowIcon(icon)
+        self.setWindowTitle('Preferences')
         self.tabs = {}
         self.add_tabs(TAB_LIST)
 
