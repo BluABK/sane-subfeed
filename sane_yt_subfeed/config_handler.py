@@ -101,6 +101,7 @@ DEFAULTS = {
         'proxy4': "",
         'proxy5': ""
     },
+    'Youtube-dl_opts': {},
     'Player': {
         'default_player': "",
         'alternative_player1': "",
