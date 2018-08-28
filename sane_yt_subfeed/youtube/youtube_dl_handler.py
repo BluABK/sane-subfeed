@@ -13,6 +13,7 @@ from sane_yt_subfeed.config_handler import read_config, get_options
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 logger = create_logger(__name__)
 
+VIDEO_FORMATS = ['mp4', 'flv', 'ogg', 'webm', 'mkv', 'avi', 'ts']
 
 class MyLogger(object):
     def debug(self, msg):
@@ -141,7 +142,7 @@ class YoutubeDownload(threading.Thread):
                                                                 self.video.url_video))
 
         for name in os.listdir(self.youtube_folder):
-            if self.video.video_id in name:
+            if self.video.video_id in name and name.split('.')[-1] in VIDEO_FORMATS:
                 self.video.vid_path = os.path.join(self.youtube_folder, name)
 
         self.video.date_downloaded = datetime.datetime.utcnow()
