@@ -20,6 +20,7 @@ from sane_yt_subfeed.gui.main_window.db_state import DbStateIcon
 from sane_yt_subfeed.gui.main_window.toolbar import Toolbar
 from sane_yt_subfeed.gui.themes import themes
 from sane_yt_subfeed.gui.views.about_view import AboutView
+from sane_yt_subfeed.gui.views.config_view.config_view_tabs import ConfigViewTabs
 from sane_yt_subfeed.gui.views.config_view.config_window import ConfigWindow
 from sane_yt_subfeed.gui.views.config_view.views.config_view import ConfigViewWidget
 from sane_yt_subfeed.gui.views.config_view.views.hotkeys_view import HotkeysViewWidget
@@ -77,10 +78,9 @@ class MainWindow(QMainWindow):
 
         self.download_view = DownloadScrollArea(self, main_model)
 
-        self.config_view = ConfigWindow(self)
         self.hotkeys_view = ConfigWindow(self)
-        self.config_view.setWidget(ConfigViewWidget(self.config_view, self))
         self.hotkeys_view.setWidget(HotkeysViewWidget(self.hotkeys_view, self))
+        self.config_view = ConfigViewTabs(self)
 
         self.list_detailed_view = ListDetailedView(self)
         self.list_tiled_view = ListTiledView(self)
