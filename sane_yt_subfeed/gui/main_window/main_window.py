@@ -320,34 +320,11 @@ class MainWindow(QMainWindow):
 
     def add_available_qstyles_to_menu(self, menu, subsubmenu=False):  # FIXME: Make list more dynamic (somehow)
         for name, _ in QSTYLES_AVAILABLE.items():
-            if name == 'Windows':
-                action = self.set_qstyle_windows
-            elif name == 'windowsvista':
-                action = self.set_qstyle_windowsvista
-            elif name == 'Fusion':
-                action = self.set_qstyle_fusion
-            elif name == 'GTK+':
-                action = self.set_qstyle_gtkplus
-            elif name == 'gtk2':
-                action = self.set_qstyle_gtk2
-            elif name == 'bb10dark':
-                action = self.set_qstyle_bb10dark
-            elif name == 'bb10bright':
-                action = self.set_qstyle_bb10bright
-            elif name == 'cleanlooks':
-                action = self.set_qstyle_cleanlooks
-            elif name == 'cde':
-                action = self.set_qstyle_cde
-            elif name == 'motif':
-                action = self.set_qstyle_motif
-            elif name == 'plastique':
-                action = self.set_qstyle_plastique
-            else:
-                self.logger.warning("QStyle '{}' is available, but not implemented!".format(name))
-                return
+            action = self.set_qstyle
 
             self.logger.info("Adding available QStyle '{}' to '{}' menu.".format(name, menu))
-            self.add_submenu(menu, name, action, tooltip="Apply the '{}' theme.".format(name), subsubmenu=subsubmenu)
+            self.add_submenu(menu, name, action, tooltip="Apply the '{}' theme.".format(name), subsubmenu=subsubmenu,
+                             qstyle=name)
 
     def set_qstyle(self, qstyle):
         self.set_theme(qstyle, stylesheet=False)
