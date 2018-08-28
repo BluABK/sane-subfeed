@@ -56,6 +56,10 @@ DEFAULTS = {
         'keep_thumb_ar': 'False',
         'enable_auto_copy_to_clipboard': 'False'
     },
+    'Theme': {
+        'last_style': "",
+        'last_theme': ""
+    },
     'GridView': {
         'show_watched': 'False',
         'show_dismissed': 'False',
@@ -288,6 +292,8 @@ def set_config(section, option, value, custom_ini=None):
     :param value:
     :return:
     """
+    if value is None:
+        value = ""  # Keep a uniform format in the config
     _parser = default_parser
     if custom_ini is not None:
         if custom_ini == "hotkeys":
