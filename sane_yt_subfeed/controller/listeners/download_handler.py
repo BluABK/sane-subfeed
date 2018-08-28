@@ -68,12 +68,15 @@ class DownloadHandler(QObject):
     def update_download_tile_event(download_tile):
         update_event_download_tile(download_tile)
 
-    @staticmethod
-    def new_download_tile(new_tile):
+    def new_download_tile(self, new_tile):
         result = db_session.query(DBDownloadTile).filter(
             DBDownloadTile.video_id == format(new_tile.video.video_id)).first()
         if not result:
-            db_session.add(DBDownloadTile(new_tile))
+            download_tile = DBDownloadTile(new_tile)
+            if not download_tile.video:
+                self.logger.error("No video in new tile: {}".format(download_tile.__dict__), exc_info=True)
+                return
+            db_session.add(download_tile)
             db_session.commit()
         db_session.remove()
 
