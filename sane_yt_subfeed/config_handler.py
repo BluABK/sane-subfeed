@@ -231,6 +231,18 @@ def read_entire_config(custom_ini=None):
 
     return config
 
+def has_section(section, custom_ini=None)
+    """
+    Checks if a section exists in config
+    :return:
+    """
+    _parser = default_parser
+    if custom_ini is not None:
+        if custom_ini == "hotkeys":
+            _parser = hotkeys_parser
+        else:
+            raise ValueError("Custom config '{}' is not defined in handler!!".format(custom_ini))
+    return _parser.has_section(section)
 
 def get_sections(custom_ini=None):
     """
