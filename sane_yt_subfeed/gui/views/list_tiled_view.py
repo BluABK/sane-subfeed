@@ -9,14 +9,13 @@ import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
+from sane_yt_subfeed.absolute_paths import ICONS_PATH
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.write_operations import UpdateVideo
 from sane_yt_subfeed.log_handler import create_logger
 
 # Constants
-OS_PATH = os.path.dirname(__file__)
-ICO_PATH = os.path.join(OS_PATH, '..', 'icons')
-DUMMY_ICO_PATH = os.path.join(OS_PATH, '..', 'icons', 'dummies')
+DUMMY_ICO_PATH = os.path.join(ICONS_PATH, 'dummies')
 
 
 class ExtendedQLabel(QLabel):

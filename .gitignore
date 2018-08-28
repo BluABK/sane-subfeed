@@ -13,6 +13,7 @@ keys.json
 keys_private.json
 *.pkl
 config.ini
+hotkeys.ini
 *.db
 *.db-journal
 *.db.*
@@ -26,7 +27,7 @@ __pycache__
 *.png
 
 # Whitelist Project images
-!sane_yt_subfeed/gui/icons
+!sane_yt_subfeed/resources/icons/*
 !quality404.jpg
 !thumbnail_na.png
 

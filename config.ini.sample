@@ -13,6 +13,20 @@ tooltip_picture_size = h1
 keep_thumb_ar = False
 enable_auto_copy_to_clipboard = False
 
+[GridView]
+show_watched = False
+show_dismissed = False
+title_tile_pixel_size = 0.40
+
+[SubFeed]
+show_downloaded = False
+
+[DownloadView]
+download_tile_height = 200
+
+[PlaySort]
+ascending_date = False
+
 [Debug]
 debug = False
 cached_subs = True
@@ -36,6 +50,7 @@ miss_limit = 10
 test_pages = 2
 extra_list_pages = 0
 deep_search_quota_k = 20
+filter_videos_days_old = -1
 
 [Thumbnails]
 force_download_best = True
@@ -49,8 +64,10 @@ force_download_best = True
 img_threads = 200
 
 [Play]
-yt_file_path = ""
+yt_file_path =
 disable_dir_listener = False
+use_url_as_path = False
+default_watch_prio = 10
 
 [Youtube-dl]
 use_youtube_dl = True
@@ -63,14 +80,16 @@ proxy4 =
 proxy5 =
 
 [Player]
-default_player = ""
-alternative_player1 = ""
-alternative_player2 = ""
-alternative_player3 = ""
+default_player =
+url_player =
+alternative_player1 =
+alternative_player2 =
+alternative_player3 = 
+
+[DefaultApp]
+Image =
 
 [Logging]
 use_socket_log = False
 log_level = 1
-
-[Toolbar]
-show_download_video_field = False
+logging_port = 19996

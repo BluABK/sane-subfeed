@@ -24,7 +24,9 @@ if read_config('Logging', 'use_socket_log'):
     log = logging.getLogger('r')
     log_level = read_config('Logging', 'log_level')
     log.setLevel(log_level)  # to send all records to cutelog
-    socket_handler = SocketHandler('127.0.0.1', 19996)  # default listening address
+
+    port = read_config('Logging', 'logging_port')
+    socket_handler = SocketHandler('127.0.0.1', port)  # default listening address
     log.addHandler(socket_handler)
 
 SPAM_LEVEL_NUM = 5

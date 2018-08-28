@@ -11,6 +11,7 @@ class PlayView(GridView):
         self.logger = create_logger(__name__ + ".PlayView")
 
         self.main_model.grid_view_listener.downloadedVideosChanged.connect(self.videos_changed)
+        self.main_model.grid_view_listener.downloadedVideosUpdated.connect(self.update_videos)
 
         self.logger.debug("Init grid")
         self.update_grid()
@@ -22,3 +23,9 @@ class PlayView(GridView):
 
     def new_tile(self, counter, video):
         return PlayTile(self, video, counter, self.clipboard, self.status_bar)
+
+    def update_videos(self):
+        for q_label, video in zip(self.q_labels.values(), self.main_model.downloaded_videos):
+            q_label.set_video(video)
+            self.q_labels[video.video_id] = q_label
+        self.update_grid()

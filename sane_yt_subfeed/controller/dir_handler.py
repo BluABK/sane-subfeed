@@ -28,6 +28,9 @@ class VidEventHandler(PatternMatchingEventHandler):
         self.listener = listener
         self.logger = create_logger(__name__ + "VidEventHandler")
 
+    def on_any_event(self, event):
+        self.logger.debug("{}: {}".format(event.event_type, event.__dict__))
+
     # def on_any_event(self, event):
     #     print("change")
     #     if event.event_type == 'created':
@@ -36,24 +39,28 @@ class VidEventHandler(PatternMatchingEventHandler):
     #         # img = Image.open(event.src_path)
     #         time.sleep(1)
 
-    # def on_modified(self, event):
+    def on_moved(self, event):
+        self.check_file(event.dest_path)
     #     print("change")
     #     # self.process(event)
 
     def on_created(self, event):
-        if not event.src_path:
+        self.check_file(event.src_path)
+
+    def check_file(self, path):
+        if not path:
             return
         split_string = "_v-id-"
-        if split_string in event.src_path:
-            name = os.path.basename(event.src_path)
-            self.logger.info("Discovered new file: {}".format(name))
+        if split_string in path:
+            name = os.path.basename(path)
             filename = name.split(".")
-            for s in filename:
-                if split_string in s:
-                    filename = str(s)
-            id = str(filename.split(split_string)[-1])
-            self.listener.newFile.emit(id, event.src_path)
-
+            if split_string in filename[-2]:
+                self.logger.info("Discovered new file: {}".format(name))
+                filename = str(filename[-2])
+                id = str(filename.split(split_string)[-1])
+                self.listener.newFile.emit(id, path)
+            else:
+                self.logger.debug("Found file with invalid extension: {}".format(name))
 
 def manual_youtube_folder_check(input_path):
     # input_path = os.path.join(OS_PATH, input_folder)
@@ -88,7 +95,7 @@ def get_new_and_updated_videos(vid_paths):
 
     return_videos = []
     for video in db_videos:
-        if not video.downloaded:
+        if not video.vid_path or not video.downloaded:
             video_d = Video.to_video_d(video)
             video_d.vid_path = vid_paths[video.video_id]
             video_d.downloaded = True
@@ -101,17 +108,19 @@ def get_new_and_updated_videos(vid_paths):
     new_videos = []
     if len(vid_paths) > 0:
         youtube_keys = load_keys(1)
+        logger.info("Grabbing new video(s) information from youtube for: {}".format(vid_paths.keys()))
         response_videos = list_uploaded_videos_videos(youtube_keys[0], vid_paths.keys(), 30)
         for video in response_videos:
             video.vid_path = vid_paths[video.video_id]
             video.downloaded = True
+            video.watched = False
             video.date_downloaded = datetime.datetime.utcnow()
             logger.info("Found new video: {} - {}".format(video.video_id, video.title))
             new_videos.append(video)
-        logger.info("Grabbing new video(s) information from youtube for {} videos".format(len(new_videos)))
-        download_thumbnails_threaded(new_videos)
 
     return_videos.extend(new_videos)
+    logger.info("Downloading thumbnails for: {}".format(return_videos))
+    download_thumbnails_threaded(return_videos)
     return return_videos
 
 

@@ -1,6 +1,7 @@
 import datetime
 from sqlalchemy import Boolean, DateTime, ForeignKey, Column, Integer, String
 
+from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.decorators import TextPickleType
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
@@ -25,6 +26,7 @@ class Video(PermanentBase):
     search_item = Column(TextPickleType())
     vid_path = Column(String)
     watched = Column(Boolean)
+    watch_prio = Column(Integer)
 
     def __init__(self, search_item):
         """
@@ -44,6 +46,7 @@ class Video(PermanentBase):
         self.thumbnails = search_item['snippet']['thumbnails']
         self.search_item = search_item
         self.watched = False
+        self.watch_prio = read_config('Play', 'default_watch_prio')
 
     def determine_thumbnails(self, thumbnails_item):
         """
@@ -79,6 +82,7 @@ class Video(PermanentBase):
         video_d.discarded = video.discarded
         video_d.vid_path = video.vid_path
         video_d.watched = video.watched
+        video_d.watch_prio = video.watch_prio
         video_d.date_downloaded = video.date_downloaded
         return video_d
 
@@ -95,4 +99,17 @@ class Video(PermanentBase):
         self.discarded = video_d.discarded
         self.vid_path = video_d.vid_path
         self.watched = video_d.watched
+        self.watch_prio = video_d.watch_prio
         self.date_downloaded = video_d.date_downloaded
+
+    @staticmethod
+    def video_d_to_video(video_d):
+        video = Video(video_d.search_item)
+        video.downloaded = video_d.downloaded
+        video.thumbnail_path = video_d.thumbnail_path
+        video.discarded = video_d.discarded
+        video.vid_path = video_d.vid_path
+        video.watched = video_d.watched
+        video.watch_prio = video_d.watch_prio
+        video.date_downloaded = video_d.date_downloaded
+        return video

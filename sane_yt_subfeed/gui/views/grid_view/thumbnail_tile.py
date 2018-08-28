@@ -39,44 +39,23 @@ class ThumbnailTile(QLabel):
             if self.p.isNull():
                 self.logger.warning("QPixmap self.p was NULL, replacing with 'Thumbnail N/A' image!")
                 self.p = QPixmap(THUMBNAIL_NA_PATH)
+
             painter = QPainter(self)
-            # painter.drawPixmap(self.rect(), self.p)
+
             if read_config('Gui', 'keep_thumb_ar'):
                 thumb = self.p.scaled(self.width(), self.height(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
                 painter.drawPixmap(0, 0, thumb)
-
-                if self.parent.video.missed:
-                    overlay = QPixmap(OVERLAY_MISSED_PATH)
-                    resize_ratio = min(thumb.width() * 0.7 / thumb.width(), thumb.height() * 0.3 / thumb.height())
-                    new_size = QSize(thumb.width() * resize_ratio, thumb.height() * resize_ratio)
-                    overlay = overlay.scaled(new_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                    point = QPoint(thumb.width() - overlay.width(), 0)
-                    painter.drawPixmap(point, overlay)
-                elif self.parent.video.new:
-                    overlay = QPixmap(OVERLAY_NEW_PATH)
-                    resize_ratio = min(thumb.width() * 0.7 / thumb.width(), thumb.height() * 0.3 / thumb.height())
-                    new_size = QSize(thumb.width() * resize_ratio, thumb.height() * resize_ratio)
-                    overlay = overlay.scaled(new_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                    point = QPoint(thumb.width() - overlay.width(), 0)
-                    painter.drawPixmap(point, overlay)
             else:
-                painter.drawPixmap(self.rect(), self.p)
+                thumb = self
+                painter.drawPixmap(thumb.rect(), thumb.p)
 
-                if self.parent.video.missed:
-                    overlay = QPixmap(OVERLAY_MISSED_PATH)
-                    resize_ratio = min(self.width() * 0.7 / self.width(), self.height() * 0.3 / self.height())
-                    new_size = QSize(self.width() * resize_ratio, self.height() * resize_ratio)
-                    overlay = overlay.scaled(new_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                    point = QPoint(self.width() - overlay.width(), 0)
-                    painter.drawPixmap(point, overlay)
-                elif self.parent.video.new:
-                    overlay = QPixmap(OVERLAY_NEW_PATH)
-                    resize_ratio = min(self.width() * 0.7 / self.width(), self.height() * 0.3 / self.height())
-                    new_size = QSize(self.width() * resize_ratio, self.height() * resize_ratio)
-                    overlay = overlay.scaled(new_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                    point = QPoint(self.width() - overlay.width(), 0)
-                    painter.drawPixmap(point, overlay)
-    # def resizeEvent(self, *args, **kwargs):
-    #     margins = self.parent.layout.getContentsMargins()
-    #     self.setGeometry(margins[0], margins[1], self.parent.width() - 2 * margins[2],
-    #                      (self.parent.height() - (4 * margins[1] + 4 * margins[3])) * 0.6)
+            self.add_overlay(painter, thumb)
+
+    def add_overlay(self, painter, thumb):
+        """
+        Add an overlay on top of the thumbnail
+        :param painter:
+        :param thumb:
+        :return:
+        """
+        pass
