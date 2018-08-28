@@ -144,7 +144,7 @@ class MainWindow(QMainWindow):
         refresh_feed = self.add_submenu('&Function', 'Refresh Feed', self.emit_signal_with_set_args, shortcut='Ctrl+R',
                                         tooltip='Refresh the subscription feed', icon='refresh.png',
                                         signal=self.main_model.main_window_listener.refreshVideos,
-                                        args=(LISTENER_SIGNAL_DEEP_REFRESH,))
+                                        args=(LISTENER_SIGNAL_NORMAL_REFRESH,))
 
         self.add_submenu('&Function', 'Reload Subscriptions &List',
                          self.main_model.main_window_listener.refreshSubs.emit, shortcut='Ctrl+L',
