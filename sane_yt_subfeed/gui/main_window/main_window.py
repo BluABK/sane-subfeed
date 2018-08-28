@@ -81,7 +81,7 @@ class MainWindow(QMainWindow):
 
         self.hotkeys_view = ConfigWindow(self)
         self.hotkeys_view.setWidget(HotkeysViewWidget(self.hotkeys_view, self))
-        self.config_view = ConfigViewTabs(self)
+        self.config_view = ConfigViewTabs(self, icon=QIcon(os.path.join(ICONS_PATH, 'preferences.png')))
 
         self.list_detailed_view = ListDetailedView(self)
         self.list_tiled_view = ListTiledView(self)
