@@ -12,7 +12,13 @@ class SaneToolBarAction(QAction):
         self.sane_kwargs = kwargs
         self.sane_action = action
 
-        self.triggered.connect(self.sane_action)
+        self.triggered.connect(self.perform_action)
+
+    def perform_action(self):
+        if self.sane_kwargs:
+            self.sane_action(**self.sane_kwargs)
+        else:
+            self.sane_action()
 
 
     def set_qstyle(self, qstyle):
