@@ -18,6 +18,7 @@ from sane_yt_subfeed.gui.dialogs.input_dialog import SaneInputDialog
 from sane_yt_subfeed.gui.dialogs.text_view_dialog import TextViewDialog
 from sane_yt_subfeed.gui.main_window.db_state import DbStateIcon
 from sane_yt_subfeed.gui.main_window.toolbar import Toolbar
+from sane_yt_subfeed.gui.main_window.toolbar_action import SaneToolBarAction
 from sane_yt_subfeed.gui.themes import themes
 from sane_yt_subfeed.gui.themes.themes import THEMES_LIST, QSTYLES_AVAILABLE
 from sane_yt_subfeed.gui.views.about_view import AboutView
@@ -318,7 +319,7 @@ class MainWindow(QMainWindow):
         self.set_theme(themes.BREEZE_LIGHT)
 
     def add_available_qstyles_to_menu(self, menu, subsubmenu=False):  # FIXME: Make list more dynamic (somehow)
-        for name, style in QSTYLES_AVAILABLE.items():
+        for name, _ in QSTYLES_AVAILABLE.items():
             if name == 'Windows':
                 action = self.set_qstyle_windows
             elif name == 'windowsvista':
@@ -407,7 +408,8 @@ class MainWindow(QMainWindow):
             self.menus[name] = menubar.addMenu(name)
             return self.menus[name]
 
-    def add_submenu(self, menu, name, action, shortcut=None, tooltip=None, icon=None, subsubmenu=False, dummy=False):
+    def add_submenu(self, menu, name, action, shortcut=None, tooltip=None, icon=None, subsubmenu=False, dummy=False,
+                    **kwargs):
         """
         Adds a submenu with optional properties to a menu
         :param name:
@@ -420,16 +422,14 @@ class MainWindow(QMainWindow):
         """
         if icon:
             this_icon = QIcon(os.path.join(ICONS_PATH, icon))
-            submenu = QAction(this_icon, name, self)
         else:
-            submenu = QAction(name, self)
+            this_icon = None
+
+        submenu = SaneToolBarAction(self, name, action, icon=this_icon, **kwargs)
         if shortcut:
             submenu.setShortcut(shortcut)
         if tooltip:
             submenu.setStatusTip(tooltip)
-
-        if not dummy:
-            submenu.triggered.connect(action)
         if subsubmenu:
             menu.addAction(submenu)
         else:
