@@ -13,6 +13,7 @@ from sane_yt_subfeed.config_handler import read_config, get_options
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 logger = create_logger(__name__)
 
+VIDEO_FORMATS = ['mp4', 'flv', 'ogg', 'webm', 'mkv', 'avi', 'ts']
 
 class MyLogger(object):
     def debug(self, msg):
@@ -42,7 +43,6 @@ class YoutubeDownload(threading.Thread):
         file_name = "%(uploader)s - {date} - %(title)s - _v-id-{id}.%(ext)s".format(
             date=self.video.date_published.strftime(
                 "%Y-%m-%d"), id=self.video.video_id)
-        # file_name = 'testwsefefewf.fwef'
         self.youtube_folder = read_config('Play', 'yt_file_path', literal_eval=False)
         file_path = os.path.join(self.youtube_folder, file_name)
 
@@ -59,6 +59,7 @@ class YoutubeDownload(threading.Thread):
             'outtmpl': file_path,
             'forcefilename': 'True'
         }
+        self.add_userconfig_opts(self.ydl_opts)
 
         self.proxy_ydl_opts = {
             'logger': MyLogger(),
@@ -67,6 +68,20 @@ class YoutubeDownload(threading.Thread):
             'forcefilename': 'True',
             'proxy': None
         }
+        self.add_userconfig_opts(self.proxy_ydl_opts)
+
+    def add_userconfig_opts(self, ydl_opts):
+        logger.info("Adding custom user youtube-dl opts (if any)")
+
+        for option in get_options('Youtube-dl_opts'):
+            value = read_config('Youtube-dl_opts', option)
+            if value is True or value is False:
+                value = str(value)
+
+            logger.info("Setting option: {} = {}".format(option, value))
+            ydl_opts[option] = value
+
+        logger.debug("Final ydl_opts dict after adding user options: {}".format(ydl_opts))
 
     def download_with_proxy(self):
         """
@@ -127,7 +142,7 @@ class YoutubeDownload(threading.Thread):
                                                                 self.video.url_video))
 
         for name in os.listdir(self.youtube_folder):
-            if self.video.video_id in name:
+            if self.video.video_id in name and name.split('.')[-1] in VIDEO_FORMATS:
                 self.video.vid_path = os.path.join(self.youtube_folder, name)
 
         self.video.date_downloaded = datetime.datetime.utcnow()
