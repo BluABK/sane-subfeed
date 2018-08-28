@@ -80,7 +80,8 @@ class MainWindow(QMainWindow):
         self.download_view = DownloadScrollArea(self, main_model)
 
         self.hotkeys_view = ConfigWindow(self)
-        self.hotkeys_view.setWidget(HotkeysViewWidget(self.hotkeys_view, self))
+        self.hotkeys_view.setWidget(HotkeysViewWidget(self.hotkeys_view, self,
+                                                      icon=QIcon(os.path.join(ICONS_PATH, 'hotkeys.png'))))
         self.config_view = ConfigViewTabs(self, icon=QIcon(os.path.join(ICONS_PATH, 'preferences.png')))
 
         self.list_detailed_view = ListDetailedView(self)
@@ -212,7 +213,7 @@ class MainWindow(QMainWindow):
         # Help menu
         self.add_menu(menubar, '&Help')
         self.add_submenu('&Help', 'Hotkeys', self.view_hotkeys, shortcut='F2',
-                         tooltip='View hotkeys')
+                         tooltip='View hotkeys', icon='hotkeys.png')
         if read_config('Debug', 'show_unimplemented_gui'):
             view_about_view = self.add_submenu('&Help', 'About', self.view_about, shortcut='F1', tooltip='About me',
                                                icon='about.png')
