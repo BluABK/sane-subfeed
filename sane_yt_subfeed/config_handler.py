@@ -231,7 +231,8 @@ def read_entire_config(custom_ini=None):
 
     return config
 
-def has_section(section, custom_ini=None)
+
+def has_section(section, custom_ini=None):
     """
     Checks if a section exists in config
     :return:
@@ -243,6 +244,7 @@ def has_section(section, custom_ini=None)
         else:
             raise ValueError("Custom config '{}' is not defined in handler!!".format(custom_ini))
     return _parser.has_section(section)
+
 
 def get_sections(custom_ini=None):
     """
