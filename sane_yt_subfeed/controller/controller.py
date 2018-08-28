@@ -41,7 +41,7 @@ class Controller:
                                                                                     vid_limit))
 
         self.logger.info("Created QApplication({})".format(sys.argv))
-        window = MainWindow(model)
+        window = MainWindow(app, model)
         window.show()
         self.logger.info("Executing Qt Application")
         app.exec_()
