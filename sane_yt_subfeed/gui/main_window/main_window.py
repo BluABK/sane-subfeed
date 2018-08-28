@@ -81,8 +81,9 @@ class MainWindow(QMainWindow):
         self.download_view = DownloadScrollArea(self, main_model)
 
         self.hotkeys_view = ConfigWindow(self)
-        self.hotkeys_view.setWidget(HotkeysViewWidget(self.hotkeys_view, self))
-        self.config_view = ConfigViewTabs(self)
+        self.hotkeys_view.setWidget(HotkeysViewWidget(self.hotkeys_view, self,
+                                                      icon=QIcon(os.path.join(ICONS_PATH, 'hotkeys.png'))))
+        self.config_view = ConfigViewTabs(self, icon=QIcon(os.path.join(ICONS_PATH, 'preferences.png')))
 
         self.list_detailed_view = ListDetailedView(self)
         self.list_tiled_view = ListTiledView(self)
@@ -94,8 +95,23 @@ class MainWindow(QMainWindow):
     def init_ui(self):
         self.logger.info("Initialized UI")
 
-        # Set the theme
-        # self.setStyleSheet(get_theme_external('breeze', subtheme='dark').readAll())
+        # Set the (last used) theme
+        _last_theme = read_config('Theme', 'last_theme', literal_eval=False)
+        if _last_theme:
+            self.logger.info("Using 'last used' theme: {}".format(_last_theme))
+            try:
+                self.set_theme(_last_theme)
+            except Exception as exc:
+                self.logger.error("Failed setting 'last used' theme: {}".format(_last_theme), exc_info=exc)
+
+        # Set the (last used) style
+        _last_style = read_config('Theme', 'last_style', literal_eval=False)
+        if _last_style:
+            self.logger.info("Using 'last used' style: {}".format(_last_style))
+            try:
+                self.set_theme(_last_style, stylesheet=False)
+            except Exception as exc:
+                self.logger.error("Failed setting 'last used' style: {}".format(_last_style), exc_info=exc)
 
         # Define a menu and status bar
         menubar = self.menuBar()
@@ -206,7 +222,7 @@ class MainWindow(QMainWindow):
         # Help menu
         self.add_menu(menubar, '&Help')
         self.add_submenu('&Help', 'Hotkeys', self.view_hotkeys, shortcut='F2',
-                         tooltip='View hotkeys')
+                         tooltip='View hotkeys', icon='hotkeys.png')
         if read_config('Debug', 'show_unimplemented_gui'):
             view_about_view = self.add_submenu('&Help', 'About', self.set_current_widget, shortcut='F1',
                                                tooltip='About me', icon='about.png', widget=self.about_view)
@@ -304,7 +320,8 @@ class MainWindow(QMainWindow):
     # Theme handling
     def set_theme(self, theme, stylesheet=True):
         """
-        Applies a StyleSheet to the QApplication
+        Applies a QStyle or QStyleSheet to the QApplication
+        :param stylesheet:
         :param theme:
         :return:
         """
@@ -313,8 +330,10 @@ class MainWindow(QMainWindow):
             theme_file.open(QFile.ReadOnly | QFile.Text)
             theme_stream = QTextStream(theme_file)
             self.app.setStyleSheet(theme_stream.readAll())
+            set_config('Theme', 'last_theme', theme)
         else:
             self.app.setStyle(QStyleFactory.create(theme))
+            set_config('Theme', 'last_style', theme)
         self.current_theme = theme
 
     def set_theme_native(self):

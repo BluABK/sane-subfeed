@@ -13,6 +13,10 @@ tooltip_picture_size = h1
 keep_thumb_ar = False
 enable_auto_copy_to_clipboard = False
 
+[Theme]
+last_style =
+last_theme =
+
 [GridView]
 show_watched = False
 show_dismissed = False

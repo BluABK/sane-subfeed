@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QTabWidget
 
 from sane_yt_subfeed.gui.views.config_view.config_scroll_area import ConfigScrollArea
@@ -9,9 +10,12 @@ TAB_LIST = ["GUI", "Model", "Requests", "Thumbnails", "Threading", "Download", "
 
 class ConfigViewTabs(QTabWidget):
 
-    def __init__(self, parent):
+    def __init__(self, parent, icon: QIcon=None):
         super(ConfigViewTabs, self).__init__()
         self.sane_parent = parent
+        if icon is not None:
+            self.setWindowIcon(icon)
+        self.setWindowTitle('Preferences')
         self.tabs = {}
         self.add_tabs(TAB_LIST)
 
