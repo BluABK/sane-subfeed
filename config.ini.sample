@@ -83,6 +83,8 @@ proxy3 =
 proxy4 =
 proxy5 =
 
+[Youtube-dl_opts]
+
 [Player]
 default_player =
 url_player =

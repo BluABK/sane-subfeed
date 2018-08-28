@@ -42,7 +42,6 @@ class YoutubeDownload(threading.Thread):
         file_name = "%(uploader)s - {date} - %(title)s - _v-id-{id}.%(ext)s".format(
             date=self.video.date_published.strftime(
                 "%Y-%m-%d"), id=self.video.video_id)
-        # file_name = 'testwsefefewf.fwef'
         self.youtube_folder = read_config('Play', 'yt_file_path', literal_eval=False)
         file_path = os.path.join(self.youtube_folder, file_name)
 
@@ -59,6 +58,7 @@ class YoutubeDownload(threading.Thread):
             'outtmpl': file_path,
             'forcefilename': 'True'
         }
+        self.add_userconfig_opts(self.ydl_opts)
 
         self.proxy_ydl_opts = {
             'logger': MyLogger(),
@@ -67,6 +67,20 @@ class YoutubeDownload(threading.Thread):
             'forcefilename': 'True',
             'proxy': None
         }
+        self.add_userconfig_opts(self.proxy_ydl_opts)
+
+    def add_userconfig_opts(self, ydl_opts):
+        logger.info("Adding custom user youtube-dl opts (if any)")
+
+        for option in get_options('Youtube-dl_opts'):
+            value = read_config('Youtube-dl_opts', option)
+            if value is True or value is False:
+                value = str(value)
+
+            logger.info("Setting option: {} = {}".format(option, value))
+            ydl_opts[option] = value
+
+        logger.debug("Final ydl_opts dict after adding user options: {}".format(ydl_opts))
 
     def download_with_proxy(self):
         """
