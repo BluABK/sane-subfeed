@@ -88,17 +88,17 @@ proxy5 =
 [Postprocessing]
 embed_metadata = False
 remap_tags = False
-title = title
-date = date
-description = description
-comment = comment
-purl = purl
-track = track
-artist = artist
-genre = genre
-album = album
-album_artist = album_artist
-disc = disc
+map_title = title
+map_date = date
+map_description = description
+map_comment = comment
+map_purl = purl
+map_track = track
+map_artist = artist
+map_genre = genre
+map_album = album
+map_album_artist = album_artist
+map_disc = disc
 
 [Player]
 default_player =
