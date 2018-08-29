@@ -402,7 +402,7 @@ class FFmpegEmbedSubtitlePP(FFmpegPostProcessor):
 
 
 class FFmpegMetadataPP(FFmpegPostProcessor):
-    def run(self, info):
+    def run(self, info, custom_map=None):
         metadata = {}
 
         def add(meta_list, info_list=None):
@@ -417,17 +417,20 @@ class FFmpegMetadataPP(FFmpegPostProcessor):
                     for meta_f in meta_list:
                         metadata[meta_f] = info[info_f]
                     break
-
-        add('title', ('track', 'title'))
-        add('date', 'upload_date')
-        add(('description', 'comment'), 'description')
-        add('purl', 'webpage_url')
-        add('track', 'track_number')
-        add('artist', ('artist', 'creator', 'uploader', 'uploader_id'))
-        add('genre')
-        add('album')
-        add('album_artist')
-        add('disc', 'disc_number')
+        if custom_map is None:
+            add('title', ('track', 'title'))
+            add('date', 'upload_date')
+            add(('description', 'comment'), 'description')
+            add('purl', 'webpage_url')
+            add('track', 'track_number')
+            add('artist', ('artist', 'creator', 'uploader', 'uploader_id'))
+            add('genre')
+            add('album')
+            add('album_artist')
+            add('disc', 'disc_number')
+        else:
+            for entry in custom_map:
+                add(entry)
 
         if not metadata:
             self._downloader.to_screen('[ffmpeg] There isn\'t any metadata to add')
