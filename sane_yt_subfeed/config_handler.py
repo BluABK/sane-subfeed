@@ -103,6 +103,8 @@ DEFAULTS = {
     },
     'Youtube-dl_opts': {},
     'Postprocessing': {
+        'prefer_ffmpeg': 'True',
+        'ffmpeg_location': "",
         'embed_metadata': 'False',
         'remap_tags': 'False',
         'map_title': 'title',
