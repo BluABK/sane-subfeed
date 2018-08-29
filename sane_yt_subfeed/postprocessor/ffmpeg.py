@@ -26,6 +26,7 @@ from youtube_dl.utils import (
     replace_extension,
 )
 
+from sane_yt_subfeed.config_handler import read_config
 
 EXT_TO_OUT_FORMATS = {
     'aac': 'adts',
@@ -89,24 +90,32 @@ class SaneFFmpegPostProcessor(PostProcessor):
         self._paths = None
         self._versions = None
         if self._downloader:
-            prefer_ffmpeg = self._downloader.params.get('prefer_ffmpeg', True)
-            location = self._downloader.params.get('ffmpeg_location')
+            # prefer_ffmpeg = self._downloader.params.get('prefer_ffmpeg', True)
+            prefer_ffmpeg = read_config('Postprocessing', 'prefer_ffmpeg')
+            # location = self._downloader.params.get('ffmpeg_location')
+            location = read_config('Postprocessing', 'ffmpeg_location', literal_eval=False)
             if location is not None:
                 if not os.path.exists(location):
-                    self._downloader.report_warning(
-                        'ffmpeg-location %s does not exist! '
-                        'Continuing without avconv/ffmpeg.' % (location))
-                    self._versions = {}
-                    return
+                    # self._downloader.report_warning(
+                    #     'ffmpeg-location %s does not exist! '
+                    #     'Continuing without avconv/ffmpeg.' % (location))
+                    # self._versions = {}
+                    # return
+                    raise SaneFFmpegPostProcessorError(
+                        "ffmpeg-location '%s' does not exist. Cannot use PostProcessor!".format(location))
                 elif not os.path.isdir(location):
                     basename = os.path.splitext(os.path.basename(location))[0]
                     if basename not in programs:
-                        self._downloader.report_warning(
-                            'Cannot identify executable %s, its basename should be one of %s. '
-                            'Continuing without avconv/ffmpeg.' %
-                            (location, ', '.join(programs)))
-                        self._versions = {}
-                        return None
+                        # self._downloader.report_warning(
+                        #     'Cannot identify executable %s, its basename should be one of %s. '
+                        #     'Continuing without avconv/ffmpeg.' %
+                        #     (location, ', '.join(programs)))
+                        # self._versions = {}
+                        # return None
+                        raise SaneFFmpegPostProcessorError(
+                            "Cannot identify executable %s, its basename "
+                            "should be one of %s. Cannot use PostProcessor!".format(location, ', '.join(programs))
+                        )
                     location = os.path.dirname(os.path.abspath(location))
                     if basename in ('ffmpeg', 'ffprobe'):
                         prefer_ffmpeg = True
