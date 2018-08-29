@@ -63,6 +63,7 @@ class SaneFFmpegPostProcessorError(PostProcessingError):
 class SaneFFmpegPostProcessor(PostProcessor):
     def __init__(self, downloader=None):
         PostProcessor.__init__(self, downloader)
+        self.logger = create_logger(__name__)
         self._determine_executables()
 
     def check_version(self):
@@ -173,9 +174,10 @@ class SaneFFmpegPostProcessor(PostProcessor):
                 encodeFilename(self.probe_executable, True),
                 encodeArgument('-show_streams'),
                 encodeFilename(self._ffmpeg_filename_argument(path), True)]
-            if self._downloader.params.get('verbose', False):
-                self._downloader.to_screen('[debug] %s command line: %s' % (self.basename, shell_quote(cmd)))
-            handle = subprocess.Popen(cmd, stderr=compat_subprocess_get_DEVNULL(), stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+            # if self._downloader.params.get('verbose', False):
+            self.logger.debug('%s command line: %s' % (self.basename, shell_quote(cmd)))
+            handle = subprocess.Popen(cmd, stderr=compat_subprocess_get_DEVNULL(), stdout=subprocess.PIPE,
+                                      stdin=subprocess.PIPE)
             output = handle.communicate()[0]
             if handle.wait() != 0:
                 return None
@@ -195,7 +197,7 @@ class SaneFFmpegPostProcessor(PostProcessor):
         oldest_mtime = min(
             os.stat(encodeFilename(path)).st_mtime for path in input_paths)
 
-        opts += self._configuration_args()
+        # opts += self._configuration_args() -- postprocessor_args
 
         files_cmd = []
         for path in input_paths:
@@ -208,8 +210,8 @@ class SaneFFmpegPostProcessor(PostProcessor):
                [encodeArgument(o) for o in opts] +
                [encodeFilename(self._ffmpeg_filename_argument(out_path), True)])
 
-        if self._downloader.params.get('verbose', False):
-            self._downloader.to_screen('[debug] ffmpeg command line: %s' % shell_quote(cmd))
+        # if self._downloader.params.get('verbose', False):
+        self.logger.debug('[debug] ffmpeg command line: %s' % shell_quote(cmd))
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
         stdout, stderr = p.communicate()
         if p.returncode != 0:
@@ -441,7 +443,8 @@ class SaneFFmpegMetadataPP(SaneFFmpegPostProcessor):
         #     add('disc', 'disc_number')
         # else:
         for entry in info:
-            add(entry)
+            if entry not in info['not_a_tag']:
+                add(entry)
 
         if not metadata:
             self.logger.warning('[ffmpeg] There isn\'t any metadata to add')
