@@ -102,6 +102,21 @@ DEFAULTS = {
         'proxy5': ""
     },
     'Youtube-dl_opts': {},
+    'Postprocessing': {
+        'embed_metadata': 'False',
+        'remap_tags': 'False',
+        'title': 'title',
+        'date': 'date',
+        'description': 'description',
+        'comment': 'comment',
+        'purl': 'purl',
+        'track': 'track',
+        'artist': 'artist',
+        'genre': 'genre',
+        'album': 'album',
+        'album_artist': 'album_artist',
+        'disc': 'disc'
+    },
     'Player': {
         'default_player': "",
         'alternative_player1': "",
