@@ -17,6 +17,7 @@ logger = create_logger(__name__)
 
 VIDEO_FORMATS = ['mp4', 'flv', 'ogg', 'webm', 'mkv', 'avi', 'ts']
 
+
 class MyLogger(object):
     def debug(self, msg):
         pass
@@ -126,28 +127,35 @@ class YoutubeDownload(threading.Thread):
             return
 
         literal_eval = False
-        if read_config('Postprocessing', 'remap_tags', literal_eval=True):
-            logger.info("Embedding metadata with remapped tags")
-            custom_map = [
-                (read_config('Postprocessing', 'map_title', literal_eval=literal_eval), ('track', 'title')),
-                (read_config('Postprocessing', 'map_date', literal_eval=literal_eval), 'upload_date'),
-                # (('description', 'comment'), 'description'),
-                # FIXME Intentionally adding wrong desc so it's distinguishable from the regular youtube_dl embed
-                ((read_config('Postprocessing', 'map_description', literal_eval=literal_eval),
-                  read_config('Postprocessing', 'map_comment', literal_eval=literal_eval)), 'upload_date'),
-                (read_config('Postprocessing', 'map_purl', literal_eval=literal_eval), 'webpage_url'),
-                (read_config('Postprocessing', 'map_track', literal_eval=literal_eval), 'track_number'),
-                (read_config('Postprocessing', 'map_artist', literal_eval=literal_eval),
-                 ('artist', 'creator', 'uploader', 'uploader_id')),
-                (read_config('Postprocessing', 'map_genre', literal_eval=literal_eval)),
-                (read_config('Postprocessing', 'map_album', literal_eval=literal_eval)),
-                (read_config('Postprocessing', 'map_album_artist', literal_eval=literal_eval)),
-                (read_config('Postprocessing', 'map_disc', literal_eval=literal_eval), 'disc_number')]
-        else:
-            logger.info("Embedding metadata with default tags")
-            custom_map = None
+        # if read_config('Postprocessing', 'remap_tags', literal_eval=True):
+        #     logger.info("Embedding metadata with remapped tags")
+        #     custom_map = [
+        #         (read_config('Postprocessing', 'map_title', literal_eval=literal_eval), ('track', 'title')),
+        #         (read_config('Postprocessing', 'map_date', literal_eval=literal_eval), 'upload_date'),
+        #         ((read_config('Postprocessing', 'map_description', literal_eval=literal_eval),
+        #           read_config('Postprocessing', 'map_comment', literal_eval=literal_eval)), 'description'),
+        #         (read_config('Postprocessing', 'map_purl', literal_eval=literal_eval), 'webpage_url'),
+        #         (read_config('Postprocessing', 'map_track', literal_eval=literal_eval), 'track_number'),
+        #         (read_config('Postprocessing', 'map_artist', literal_eval=literal_eval),
+        #          ('artist', 'creator', 'uploader', 'uploader_id')),
+        #         (read_config('Postprocessing', 'map_genre', literal_eval=literal_eval)),
+        #         (read_config('Postprocessing', 'map_album', literal_eval=literal_eval)),
+        #         (read_config('Postprocessing', 'map_album_artist', literal_eval=literal_eval)),
+        #         (read_config('Postprocessing', 'map_disc', literal_eval=literal_eval), 'disc_number')]
+        # else:
 
-        SaneFFmpegMetadataPP(SaneFFmpegPostProcessor()).run(custom_map=custom_map)
+        logger.info("Embedding metadata with default tags")
+        # Keys are media metadata tag names (https://wiki.multimedia.cx/index.php?title=FFmpeg_Metadata)
+        # FIXME: Add other presets like music
+        # Video as TV-series preset
+        info = {'title': self.video.title,
+                'show': self.video.channel_title,
+                'date': self.video.date_published,
+                'purl': self.video.url_video,
+                'network': 'YouTube',
+                ('description', 'comment', 'synopsis'): self.video.description}
+        logger.debug(info)
+        SaneFFmpegMetadataPP(SaneFFmpegPostProcessor()).run(info)
 
     def run(self):
         logger.debug("Started download thread")
