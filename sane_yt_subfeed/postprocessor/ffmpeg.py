@@ -479,7 +479,7 @@ class SaneFFmpegMetadataPP(SaneFFmpegPostProcessor):
                 in_filenames.append(metadata_filename)
                 options.extend(['-map_metadata', '1'])
 
-        self._downloader.to_screen('[ffmpeg] Adding metadata to \'%s\'' % filename)
+        self.logger.info('[ffmpeg] Adding metadata to \'%s\'' % filename)
         self.run_ffmpeg_multiple_files(in_filenames, temp_filename, options)
         if chapters:
             os.remove(metadata_filename)
