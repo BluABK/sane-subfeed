@@ -6,16 +6,18 @@ import threading
 
 from youtube_dl import YoutubeDL
 from youtube_dl.utils import DownloadError
+from youtube_dl.postprocessor.ffmpeg import FFmpegPostProcessorError
 
 from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.config_handler import read_config, get_options
 
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
-from sane_yt_subfeed.postprocessor.ffmpeg import SaneFFmpegPostProcessor, SaneFFmpegMetadataPP
+from sane_yt_subfeed.postprocessor.ffmpeg import SaneFFmpegPostProcessor, SaneFFmpegMetadataPP, SaneFFmpegMergerPP
 
 logger = create_logger(__name__)
 
 VIDEO_FORMATS = ['mp4', 'flv', 'ogg', 'webm', 'mkv', 'avi', 'ts']
+AUDIO_MERGE_FAIL = "ERROR: Could not write header for output file #0 (incorrect codec parameters ?): Invalid argument"
 
 
 class MyLogger(object):
@@ -182,6 +184,24 @@ class YoutubeDownload(threading.Thread):
             else:
                 logger.exception(dl_exc)
                 pass
+        except FFmpegPostProcessorError as horrible_ffmpeg_death:
+            if horrible_ffmpeg_death.msg == AUDIO_MERGE_FAIL:
+                logger.warning("Handling incompatible container audio and video stream muxing")
+                # FIXME: Reacquire filename and formats so they can be sent to SaneFFmpegMergerPP
+                simulated_opts = self.ydl_opts
+                simulated_opts['simulate'] = 'True'
+                # simulated_opts
+                with YoutubeDL(self.ydl_opts) as ydl:
+                    logger.info("Simulating download for: {} - {} [{}]".format(self.video.channel_title,
+                                                                               self.video.title,
+                                                                               self.video.url_video))
+                    ydl.download([self.video.url_video])
+                reconstruct_dataset = None
+                videofile = None
+                audiofile = None
+                info = {'__files_to_merge': [videofile, audiofile]}
+                SaneFFmpegMergerPP(SaneFFmpegPostProcessor()).run(info, encode_audio='libvo_aacenc')
+
         except Exception as e:
             logger.exception(e)
             pass
