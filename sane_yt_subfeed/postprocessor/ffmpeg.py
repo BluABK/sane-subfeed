@@ -26,6 +26,7 @@ from youtube_dl.utils import (
     replace_extension,
 )
 
+from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.config_handler import read_config
 
 EXT_TO_OUT_FORMATS = {
@@ -412,6 +413,7 @@ class SaneFFmpegEmbedSubtitlePP(SaneFFmpegPostProcessor):
 
 class SaneFFmpegMetadataPP(SaneFFmpegPostProcessor):
     def run(self, info, custom_map=None):
+        self.logger = create_logger(__name__)
         metadata = {}
 
         def add(meta_list, info_list=None):
@@ -442,7 +444,7 @@ class SaneFFmpegMetadataPP(SaneFFmpegPostProcessor):
             add(entry)
 
         if not metadata:
-            self._downloader.to_screen('[ffmpeg] There isn\'t any metadata to add')
+            self.logger.warning('[ffmpeg] There isn\'t any metadata to add')
             return [], info
 
         filename = info['filepath']
