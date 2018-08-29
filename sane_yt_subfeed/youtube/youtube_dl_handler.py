@@ -148,9 +148,10 @@ class YoutubeDownload(threading.Thread):
         # Keys are media metadata tag names (https://wiki.multimedia.cx/index.php?title=FFmpeg_Metadata)
         # FIXME: Add other presets like music
         # Video as TV-series preset
-        info = {'title': self.video.title,
+        info = {'filepath': self.video.vid_path,
+                'title': self.video.title,
                 'show': self.video.channel_title,
-                'date': self.video.date_published,
+                'date': self.video.date_published.isoformat(),
                 'purl': self.video.url_video,
                 'network': 'YouTube',
                 ('description', 'comment', 'synopsis'): self.video.description}
