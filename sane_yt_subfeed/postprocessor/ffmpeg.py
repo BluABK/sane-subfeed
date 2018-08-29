@@ -54,18 +54,18 @@ A re-purposed YouTube-DL ffmpeg handler
 """
 
 
-class FFmpegPostProcessorError(PostProcessingError):
+class SaneFFmpegPostProcessorError(PostProcessingError):
     pass
 
 
-class FFmpegPostProcessor(PostProcessor):
+class SaneFFmpegPostProcessor(PostProcessor):
     def __init__(self, downloader=None):
         PostProcessor.__init__(self, downloader)
         self._determine_executables()
 
     def check_version(self):
         if not self.available:
-            raise FFmpegPostProcessorError('ffmpeg or avconv not found. Please install one.')
+            raise SaneFFmpegPostProcessorError('ffmpeg or avconv not found. Please install one.')
 
         required_version = '10-0' if self.basename == 'avconv' else '1.0'
         if is_outdated_version(
@@ -77,7 +77,7 @@ class FFmpegPostProcessor(PostProcessor):
 
     @staticmethod
     def get_versions(downloader=None):
-        return FFmpegPostProcessor(downloader)._versions
+        return SaneFFmpegPostProcessor(downloader)._versions
 
     def _determine_executables(self):
         programs = ['avprobe', 'avconv', 'ffmpeg', 'ffprobe']
@@ -205,7 +205,7 @@ class FFmpegPostProcessor(PostProcessor):
         if p.returncode != 0:
             stderr = stderr.decode('utf-8', 'replace')
             msg = stderr.strip().split('\n')[-1]
-            raise FFmpegPostProcessorError(msg)
+            raise SaneFFmpegPostProcessorError(msg)
         self.try_utime(out_path, oldest_mtime, oldest_mtime)
 
     def run_ffmpeg(self, path, out_path, opts):
@@ -219,9 +219,9 @@ class FFmpegPostProcessor(PostProcessor):
         return 'file:' + fn if fn != '-' else fn
 
 
-class FFmpegExtractAudioPP(FFmpegPostProcessor):
+class SaneFFmpegExtractAudioPP(SaneFFmpegPostProcessor):
     def __init__(self, downloader=None, preferredcodec=None, preferredquality=None, nopostoverwrites=False):
-        FFmpegPostProcessor.__init__(self, downloader)
+        SaneFFmpegPostProcessor.__init__(self, downloader)
         if preferredcodec is None:
             preferredcodec = 'best'
         self._preferredcodec = preferredcodec
@@ -235,8 +235,8 @@ class FFmpegExtractAudioPP(FFmpegPostProcessor):
             acodec_opts = ['-acodec', codec]
         opts = ['-vn'] + acodec_opts + more_opts
         try:
-            FFmpegPostProcessor.run_ffmpeg(self, path, out_path, opts)
-        except FFmpegPostProcessorError as err:
+            SaneFFmpegPostProcessor.run_ffmpeg(self, path, out_path, opts)
+        except SaneFFmpegPostProcessorError as err:
             raise AudioConversionError(err.msg)
 
     def run(self, information):
@@ -322,9 +322,9 @@ class FFmpegExtractAudioPP(FFmpegPostProcessor):
         return [path], information
 
 
-class FFmpegVideoConvertorPP(FFmpegPostProcessor):
+class SaneFFmpegVideoConvertorPP(SaneFFmpegPostProcessor):
     def __init__(self, downloader=None, preferedformat=None):
-        super(FFmpegVideoConvertorPP, self).__init__(downloader)
+        super(SaneFFmpegVideoConvertorPP, self).__init__(downloader)
         self._preferedformat = preferedformat
 
     def run(self, information):
@@ -345,7 +345,7 @@ class FFmpegVideoConvertorPP(FFmpegPostProcessor):
         return [path], information
 
 
-class FFmpegEmbedSubtitlePP(FFmpegPostProcessor):
+class SaneFFmpegEmbedSubtitlePP(SaneFFmpegPostProcessor):
     def run(self, information):
         if information['ext'] not in ('mp4', 'webm', 'mkv'):
             self._downloader.to_screen('[ffmpeg] Subtitles can only be embedded in mp4, webm or mkv files')
@@ -401,7 +401,7 @@ class FFmpegEmbedSubtitlePP(FFmpegPostProcessor):
         return sub_filenames, information
 
 
-class FFmpegMetadataPP(FFmpegPostProcessor):
+class SaneFFmpegMetadataPP(SaneFFmpegPostProcessor):
     def run(self, info, custom_map=None):
         metadata = {}
 
@@ -477,7 +477,7 @@ class FFmpegMetadataPP(FFmpegPostProcessor):
         return [], info
 
 
-class FFmpegMergerPP(FFmpegPostProcessor):
+class SaneFFmpegMergerPP(SaneFFmpegPostProcessor):
     def run(self, info):
         filename = info['filepath']
         temp_filename = prepend_extension(filename, 'temp')
@@ -505,7 +505,7 @@ class FFmpegMergerPP(FFmpegPostProcessor):
         return True
 
 
-class FFmpegFixupStretchedPP(FFmpegPostProcessor):
+class SaneFFmpegFixupStretchedPP(SaneFFmpegPostProcessor):
     def run(self, info):
         stretched_ratio = info.get('stretched_ratio')
         if stretched_ratio is None or stretched_ratio == 1:
@@ -524,7 +524,7 @@ class FFmpegFixupStretchedPP(FFmpegPostProcessor):
         return [], info
 
 
-class FFmpegFixupM4aPP(FFmpegPostProcessor):
+class SaneFFmpegFixupM4aPP(SaneFFmpegPostProcessor):
     def run(self, info):
         if info.get('container') != 'm4a_dash':
             return [], info
@@ -542,7 +542,7 @@ class FFmpegFixupM4aPP(FFmpegPostProcessor):
         return [], info
 
 
-class FFmpegFixupM3u8PP(FFmpegPostProcessor):
+class SaneFFmpegFixupM3u8PP(SaneFFmpegPostProcessor):
     def run(self, info):
         filename = info['filepath']
         if self.get_audio_codec(filename) == 'aac':
@@ -557,9 +557,9 @@ class FFmpegFixupM3u8PP(FFmpegPostProcessor):
         return [], info
 
 
-class FFmpegSubtitlesConvertorPP(FFmpegPostProcessor):
+class SaneFFmpegSubtitlesConvertorPP(SaneFFmpegPostProcessor):
     def __init__(self, downloader=None, format=None):
-        super(FFmpegSubtitlesConvertorPP, self).__init__(downloader)
+        super(SaneFFmpegSubtitlesConvertorPP, self).__init__(downloader)
         self.format = format
 
     def run(self, info):
