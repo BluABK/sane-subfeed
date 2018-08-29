@@ -113,6 +113,41 @@ class YoutubeDownload(threading.Thread):
 
         return False
 
+    def embed_metadata(self, video):
+        """
+        Embeds metadata tags (and optionally remaps them) to media files
+        :param video: object
+        :return:
+        """
+
+        if read_config('Postprocessing', 'embed_metadata', literal_eval=True) is not True:
+            logger.debug("Skipping disabled metadata embedding operation")
+            return
+
+        literal_eval = False
+        if read_config('Postprocessing', 'remap_tags', literal_eval=True):
+            logger.debug("Embedding metadata with remapped tags")
+            custom_map = [
+                (read_config('Postprocessing', 'title', literal_eval=literal_eval), ('track', 'title')),
+                (read_config('Postprocessing', 'date', literal_eval=literal_eval), 'upload_date'),
+                # (('description', 'comment'), 'description'),
+                # FIXME Intentionally adding wrong desc so it's distinguishable from the regular youtube_dl embed
+                ((read_config('Postprocessing', 'description', literal_eval=literal_eval),
+                  read_config('Postprocessing', 'comment', literal_eval=literal_eval)), 'upload_date'),
+                (read_config('Postprocessing', 'purl', literal_eval=literal_eval), 'webpage_url'),
+                (read_config('Postprocessing', 'track', literal_eval=literal_eval), 'track_number'),
+                (read_config('Postprocessing', 'artist', literal_eval=literal_eval),
+                 ('artist', 'creator', 'uploader', 'uploader_id')),
+                (read_config('Postprocessing', 'genre', literal_eval=literal_eval)),
+                (read_config('Postprocessing', 'album', literal_eval=literal_eval)),
+                (read_config('Postprocessing', 'album_artist', literal_eval=literal_eval)),
+                (read_config('Postprocessing', 'disc', literal_eval=literal_eval), 'disc_number')]
+        else:
+            logger.debug("Embedding metadata with default tags")
+            custom_map = None
+
+        # FIXME: Add code to call forked FFmpegMetadataPP
+
     def run(self):
         logger.debug("Started download thread")
         self.threading_event.wait()
@@ -146,6 +181,9 @@ class YoutubeDownload(threading.Thread):
                 self.video.vid_path = os.path.join(self.youtube_folder, name)
 
         self.video.date_downloaded = datetime.datetime.utcnow()
+
+        # Embed metadata (optional)
+        self.embed_metadata(self.video)
 
         self.download_progress_listener.finishedDownload.emit()
         if self.listeners:
