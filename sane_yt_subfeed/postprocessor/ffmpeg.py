@@ -6,7 +6,6 @@ import subprocess
 import time
 import re
 
-
 from youtube_dl.postprocessor.common import AudioConversionError, PostProcessor
 
 from youtube_dl.compat import (
@@ -259,7 +258,8 @@ class SaneFFmpegExtractAudioPP(SaneFFmpegPostProcessor):
             raise PostProcessingError('WARNING: unable to obtain file audio codec with ffprobe')
 
         more_opts = []
-        if self._preferredcodec == 'best' or self._preferredcodec == filecodec or (self._preferredcodec == 'm4a' and filecodec == 'aac'):
+        if self._preferredcodec == 'best' or self._preferredcodec == filecodec or (
+                self._preferredcodec == 'm4a' and filecodec == 'aac'):
             if filecodec == 'aac' and self._preferredcodec in ['m4a', 'best']:
                 # Lossless, but in another container
                 acodec = 'copy'
@@ -304,7 +304,8 @@ class SaneFFmpegExtractAudioPP(SaneFFmpegPostProcessor):
                 extension = 'wav'
                 more_opts += ['-f', 'wav']
 
-        prefix, sep, ext = path.rpartition('.')  # not os.path.splitext, since the latter does not work on unicode in all setups
+        prefix, sep, ext = path.rpartition(
+            '.')  # not os.path.splitext, since the latter does not work on unicode in all setups
         new_path = prefix + sep + extension
 
         information['filepath'] = new_path
@@ -342,14 +343,16 @@ class SaneFFmpegVideoConvertorPP(SaneFFmpegPostProcessor):
     def run(self, information):
         path = information['filepath']
         if information['ext'] == self._preferedformat:
-            self._downloader.to_screen('[ffmpeg] Not converting video file %s - already is in target format %s' % (path, self._preferedformat))
+            self._downloader.to_screen(
+                '[ffmpeg] Not converting video file %s - already is in target format %s' % (path, self._preferedformat))
             return [], information
         options = []
         if self._preferedformat == 'avi':
             options.extend(['-c:v', 'libxvid', '-vtag', 'XVID'])
         prefix, sep, ext = path.rpartition('.')
         outpath = prefix + sep + self._preferedformat
-        self._downloader.to_screen('[' + 'ffmpeg' + '] Converting video from %s to %s, Destination: ' % (information['ext'], self._preferedformat) + outpath)
+        self._downloader.to_screen('[' + 'ffmpeg' + '] Converting video from %s to %s, Destination: ' % (
+        information['ext'], self._preferedformat) + outpath)
         self.run_ffmpeg(path, outpath, options)
         information['filepath'] = outpath
         information['format'] = self._preferedformat
@@ -430,6 +433,7 @@ class SaneFFmpegMetadataPP(SaneFFmpegPostProcessor):
                     for meta_f in meta_list:
                         metadata[meta_f] = info[info_f]
                     break
+
         # if custom_map is None:
         #     add('title', ('track', 'title'))
         #     add('date', 'upload_date')
@@ -492,17 +496,25 @@ class SaneFFmpegMetadataPP(SaneFFmpegPostProcessor):
 
 
 class SaneFFmpegMergerPP(SaneFFmpegPostProcessor):
-    def run(self, info, audio_codec=None, video_codec=None, no_remux=False):
+    def run(self, info):
         self.logger = create_logger(__name__)
         filename = info['filepath']
         temp_filename = prepend_extension(filename, 'sanetemp')
         remux = ['-c', 'copy', '-map', '0:v:0', '-map', '1:a:0']
-        encode_audio = ['-c', 'copy', '-map', '0:v:0', '-map', '1:a:0', '-c:1:a:0', audio_codec]
-        encode_video = ['-c', 'copy', '-c:0:v:0', video_codec, '-map', '0:v:0', '-map', '1:a:0', '-c:1:a:0']
-        encode_both = ['-c', 'copy', '-c:0:v:0', video_codec, '-map', '0:v:0', '-map', '1:a:0', '-c:1:a:0', audio_codec]
-        args = [remux, encode_audio, encode_video, encode_both]
+        args = [remux]
+        if info.get('audio_codec') is not None:
+            encode_audio = ['-c', 'copy', '-map', '0:v:0', '-map', '1:a:0', '-c:1:a:0', info.get('audio_codec')]
+            args.append(encode_audio)
+        if info.get('video_codec') is not None:
+            encode_video = ['-c', 'copy', '-c:0:v:0', info.get('video_codec'), '-map', '0:v:0', '-map', '1:a:0',
+                            '-c:1:a:0']
+            args.append(encode_video)
+        if info.get('video_codec') is not None and info.get('audio_codec') is not None:
+            encode_both = ['-c', 'copy', '-c:0:v:0', info.get('video_codec'), '-map', '0:v:0', '-map', '1:a:0',
+                           '-c:1:a:0', info.get('audio_codec')]
+            args.append(encode_both)
 
-        if no_remux:
+        if info.get('no_remux') is not None:
             args.pop(0)
 
         self.logger.info('[ffmpeg] Merging formats into "%s"' % filename)
@@ -533,7 +545,7 @@ class SaneFFmpegMergerPP(SaneFFmpegPostProcessor):
             warning = ('Your copy of %s is outdated and unable to properly mux separate video and audio files, '
                        'youtube-dl will download single file media. '
                        'Update %s to version %s or newer to fix this.') % (
-                           self.basename, self.basename, required_version)
+                          self.basename, self.basename, required_version)
             if self._downloader:
                 self._downloader.report_warning(warning)
             return False
