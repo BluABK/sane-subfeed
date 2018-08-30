@@ -137,8 +137,8 @@ class YoutubeDownload(threading.Thread):
         return candidates
 
     def determine_filepath(self):
-        return self.guesstimate_filepath_by_id()  # FIXME: Replace with info grabbed from youtube_dl (hook?)
-        # self.video.vid_path = os.path.join(self.youtube_folder, name)
+        # FIXME: Replace with info grabbed from youtube_dl (hook?)
+        return self.guesstimate_filepath_by_id()
 
     def determine_incomplete_filenames(self, delete_tempfile=False):
         # FIXME: Replace with info grabbed from youtube_dl (hook?)
@@ -148,6 +148,11 @@ class YoutubeDownload(threading.Thread):
         else:
             logger.error("Unable to determine incomplete filenames, need 2 or more for a merge (got: {})".format(names))
             return None
+
+    def delete_filepaths(self, filepaths):
+        for filepath in filepaths:
+            logger.info("Deleting format from earlier failed ffmpeg merge: '{}'".format(filepath))
+            os.remove(filepath)
 
     def embed_metadata(self):
         """
@@ -208,7 +213,12 @@ class YoutubeDownload(threading.Thread):
                             'video_codec': 'h264',
                             'no_remux': 'True'}
 
+                    # Merge formats
                     SaneFFmpegMergerPP(SaneFFmpegPostProcessor()).run(info)
+
+                    # Cleanup remnant formats
+                    self.delete_filepaths(incomplete_filepaths)
+
                 else:
                     logger.error("Can't handle incompatible container "
                                  "audio and video stream muxing, insufficent files. | {}".format(incomplete_filenames))
