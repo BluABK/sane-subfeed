@@ -492,19 +492,35 @@ class SaneFFmpegMetadataPP(SaneFFmpegPostProcessor):
 
 
 class SaneFFmpegMergerPP(SaneFFmpegPostProcessor):
-    def run(self, info, encode_audio=None):
+    def run(self, info, audio_codec=None, video_codec=None, no_remux=False):
         self.logger = create_logger(__name__)
         filename = info['filepath']
-        temp_filename = prepend_extension(filename, 'temp')
-        if encode_audio is None:
-            args = ['-c', 'copy', '-map', '0:v:0', '-map', '1:a:0']
-        else:
-            args = ['-c', 'copy', '-map', '0:v:0', '-map', '1:a:0', '-c:1:a:0', encode_audio]
+        temp_filename = prepend_extension(filename, 'sanetemp')
+        remux = ['-c', 'copy', '-map', '0:v:0', '-map', '1:a:0']
+        encode_audio = ['-c', 'copy', '-map', '0:v:0', '-map', '1:a:0', '-c:1:a:0', audio_codec]
+        encode_video = ['-c', 'copy', '-c:0:v:0', video_codec, '-map', '0:v:0', '-map', '1:a:0', '-c:1:a:0']
+        encode_both = ['-c', 'copy', '-c:0:v:0', video_codec, '-map', '0:v:0', '-map', '1:a:0', '-c:1:a:0', audio_codec]
+        args = [remux, encode_audio, encode_video, encode_both]
+
+        if no_remux:
+            args.pop(0)
 
         self.logger.info('[ffmpeg] Merging formats into "%s"' % filename)
-        self.run_ffmpeg_multiple_files(info['__files_to_merge'], temp_filename, args)
+        self.attempt_ffmpeg(info, temp_filename, args)
+
         os.rename(encodeFilename(temp_filename), encodeFilename(filename))
         return info['__files_to_merge'], info
+
+    def attempt_ffmpeg(self, info, temp_filename, args):
+        for a in args:
+            try:
+                self.run_ffmpeg_multiple_files(info['__files_to_merge'], temp_filename, a)
+                self.logger.info("Merge successful using: '{}'".format(a))
+                return
+            except SaneFFmpegPostProcessorError as ffmpeg_exc:
+                self.logger.warning("Failed to merge using: '{}'".format(a), exc_info=ffmpeg_exc)
+
+        raise SaneFFmpegPostProcessorError("All methods failed!")
 
     def can_merge(self):
         # TODO: figure out merge-capable ffmpeg version
