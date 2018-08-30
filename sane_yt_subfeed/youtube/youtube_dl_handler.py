@@ -120,10 +120,10 @@ class YoutubeDownload(threading.Thread):
 
         return False
 
-    def guesstimate_filename_by_id(self):
+    def guesstimate_filepath_by_id(self):
         for name in os.listdir(self.youtube_folder):
             if self.video.video_id in name and name.split('.')[-1] in VIDEO_FORMATS:
-                return name
+                return os.path.join(self.youtube_folder, name)
 
     def guesstimate_incomplete_filenames_by_id(self, delete_tempfile=False):
         candidates = []
@@ -136,9 +136,9 @@ class YoutubeDownload(threading.Thread):
                 candidates.append(name)
         return candidates
 
-    def determine_filename(self):
-        name = self.guesstimate_filename_by_id()  # FIXME: Replace with info grabbed from youtube_dl (hook?)
-        self.video.vid_path = os.path.join(self.youtube_folder, name)
+    def determine_filepath(self):
+        return self.guesstimate_filepath_by_id()  # FIXME: Replace with info grabbed from youtube_dl (hook?)
+        # self.video.vid_path = os.path.join(self.youtube_folder, name)
 
     def determine_incomplete_filenames(self, delete_tempfile=False):
         # FIXME: Replace with info grabbed from youtube_dl (hook?)
@@ -175,9 +175,6 @@ class YoutubeDownload(threading.Thread):
     def run(self):
         logger.debug("Started download thread")
         self.threading_event.wait()
-        # url_list = []
-        # for video in self.videos:
-        #     url_list.append(video.url_video)
         try:
             with YoutubeDL(self.ydl_opts) as ydl:
                 logger.info("Starting download for: {} - {} [{}]".format(self.video.channel_title, self.video.title,
@@ -189,18 +186,30 @@ class YoutubeDownload(threading.Thread):
                 if self.download_with_proxy() is not True:
                     logger.error("All proxies have failed to download geo blocked video '{}'!".format(self.video.title))
                     logger.exception(dl_exc)
-            logger.warning("Caught Exception during download!", exc_info=dl_exc)
+
             if str(dl_exc) in AUDIO_MERGE_FAILS:
                 logger.warning("Handling incompatible container audio and video stream muxing",
                                exc_info=dl_exc)
                 incomplete_filenames = self.determine_incomplete_filenames(delete_tempfile=True)
                 if incomplete_filenames is not None:
                     logger.debug(incomplete_filenames)
-                    info = {'__files_to_merge': incomplete_filenames}
+                    # Strip the .f** format from the string to reproduce intended output filename
+                    output_filename = '{}.{}'.format(incomplete_filenames[0].split('.')[0],
+                                                     read_config('Youtube-dl_opts', 'merge_output_format',
+                                                                 literal_eval=False))
+                    output_filepath = os.path.join(self.youtube_folder, output_filename)
+                    incomplete_filepaths = []
+                    for filename in incomplete_filenames:
+                        incomplete_filepaths.append(os.path.join(self.youtube_folder, filename))
+
+                    info = {'filepath': output_filepath,
+                            '__files_to_merge': incomplete_filepaths}
+
                     SaneFFmpegMergerPP(SaneFFmpegPostProcessor()).run(info, encode_audio='libvo_aacenc')
                 else:
                     logger.error("Can't handle incompatible container "
                                  "audio and video stream muxing, insufficent files. | {}".format(incomplete_filenames))
+
             else:
                 logger.exception("Caught unhandled DownloadError exception!", exc_info=dl_exc)
         except Exception as e:
@@ -210,9 +219,8 @@ class YoutubeDownload(threading.Thread):
         logger.info("Finished downloading: {} - {} [{}]".format(self.video.channel_title, self.video.title,
                                                                 self.video.url_video))
 
-        for name in os.listdir(self.youtube_folder):
-            if self.video.video_id in name and name.split('.')[-1] in VIDEO_FORMATS:
-                self.video.vid_path = os.path.join(self.youtube_folder, name)
+        # self.video.vid_path = os.path.join(self.youtube_folder, self.determine_filename())
+        self.video.vid_path = self.determine_filepath()
 
         self.video.date_downloaded = datetime.datetime.utcnow()
 
