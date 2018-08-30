@@ -205,7 +205,8 @@ class YoutubeDownload(threading.Thread):
                     info = {'filepath': output_filepath,
                             '__files_to_merge': incomplete_filepaths}
 
-                    SaneFFmpegMergerPP(SaneFFmpegPostProcessor()).run(info, encode_audio='libvo_aacenc')
+                    SaneFFmpegMergerPP(SaneFFmpegPostProcessor()).run(info, audio_codec='libvo_aacenc',
+                                                                      video_codec='h264', no_remux=True)
                 else:
                     logger.error("Can't handle incompatible container "
                                  "audio and video stream muxing, insufficent files. | {}".format(incomplete_filenames))
