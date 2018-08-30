@@ -118,33 +118,39 @@ class YoutubeDownload(threading.Thread):
 
         return False
 
+    def guesstimate_filename_by_id(self):
+        for name in os.listdir(self.youtube_folder):
+            if self.video.video_id in name and name.split('.')[-1] in VIDEO_FORMATS:
+                return name
+
+    def guesstimate_incomplete_filenames_by_id(self, delete_tempfile=False):
+        candidates = []
+        for name in os.listdir(self.youtube_folder):
+            if self.video.video_id in name and name.split('.')[-1] in VIDEO_FORMATS:
+                if delete_tempfile and name.split('.')[-2] == 'temp':
+                    logger.info("Deleting 0-byte temp file '{}' from earlier failed ffmpeg merge".format(name))
+                    os.remove(name)
+                candidates.append(name)
+        return candidates
+
+    def determine_filename(self):
+        name = self.guesstimate_filename_by_id()   # FIXME: Replace with info grabbed from youtube_dl (hook?)
+        self.video.vid_path = os.path.join(self.youtube_folder, name)
+
+    def determine_incomplete_filenames(self, delete_tempfile=False):
+        # FIXME: Replace with info grabbed from youtube_dl (hook?)
+        names = self.guesstimate_incomplete_filenames_by_id(delete_tempfile=delete_tempfile)
+        if len(names) > 1:
+            return names
+        else:
+            logger.error("Unable to determine incomplete filenames, need 2 or more for a merge (got: {})".format(names))
+            return None
+
     def embed_metadata(self):
         """
         Embeds metadata tags (and optionally remaps them) to media files
         :return:
         """
-
-        if read_config('Postprocessing', 'embed_metadata', literal_eval=True) is not True:
-            logger.debug("Skipping disabled metadata embedding operation")
-            return
-
-        literal_eval = False
-        # if read_config('Postprocessing', 'remap_tags', literal_eval=True):
-        #     logger.info("Embedding metadata with remapped tags")
-        #     custom_map = [
-        #         (read_config('Postprocessing', 'map_title', literal_eval=literal_eval), ('track', 'title')),
-        #         (read_config('Postprocessing', 'map_date', literal_eval=literal_eval), 'upload_date'),
-        #         ((read_config('Postprocessing', 'map_description', literal_eval=literal_eval),
-        #           read_config('Postprocessing', 'map_comment', literal_eval=literal_eval)), 'description'),
-        #         (read_config('Postprocessing', 'map_purl', literal_eval=literal_eval), 'webpage_url'),
-        #         (read_config('Postprocessing', 'map_track', literal_eval=literal_eval), 'track_number'),
-        #         (read_config('Postprocessing', 'map_artist', literal_eval=literal_eval),
-        #          ('artist', 'creator', 'uploader', 'uploader_id')),
-        #         (read_config('Postprocessing', 'map_genre', literal_eval=literal_eval)),
-        #         (read_config('Postprocessing', 'map_album', literal_eval=literal_eval)),
-        #         (read_config('Postprocessing', 'map_album_artist', literal_eval=literal_eval)),
-        #         (read_config('Postprocessing', 'map_disc', literal_eval=literal_eval), 'disc_number')]
-        # else:
 
         logger.info("Embedding metadata with default tags")
         # Keys are media metadata tag names (https://wiki.multimedia.cx/index.php?title=FFmpeg_Metadata)
@@ -187,20 +193,14 @@ class YoutubeDownload(threading.Thread):
         except FFmpegPostProcessorError as horrible_ffmpeg_death:
             if horrible_ffmpeg_death.msg == AUDIO_MERGE_FAIL:
                 logger.warning("Handling incompatible container audio and video stream muxing")
-                # FIXME: Reacquire filename and formats so they can be sent to SaneFFmpegMergerPP
-                simulated_opts = self.ydl_opts
-                simulated_opts['simulate'] = 'True'
-                # simulated_opts
-                with YoutubeDL(self.ydl_opts) as ydl:
-                    logger.info("Simulating download for: {} - {} [{}]".format(self.video.channel_title,
-                                                                               self.video.title,
-                                                                               self.video.url_video))
-                    ydl.download([self.video.url_video])
-                reconstruct_dataset = None
-                videofile = None
-                audiofile = None
-                info = {'__files_to_merge': [videofile, audiofile]}
-                SaneFFmpegMergerPP(SaneFFmpegPostProcessor()).run(info, encode_audio='libvo_aacenc')
+                incomplete_filenames = self.determine_incomplete_filenames(delete_tempfile=True)
+                if incomplete_filenames is not None:
+                    logger.debug(incomplete_filenames)
+                    info = {'__files_to_merge': incomplete_filenames}
+                    SaneFFmpegMergerPP(SaneFFmpegPostProcessor()).run(info, encode_audio='libvo_aacenc')
+                else:
+                    logger.error("Can't handle incompatible container "
+                                 "audio and video stream muxing, insufficent files. | {}".format(incomplete_filenames))
 
         except Exception as e:
             logger.exception(e)
@@ -216,7 +216,10 @@ class YoutubeDownload(threading.Thread):
         self.video.date_downloaded = datetime.datetime.utcnow()
 
         # Embed metadata (optional)
-        self.embed_metadata()
+        if read_config('Postprocessing', 'embed_metadata', literal_eval=True):
+            self.embed_metadata()
+        else:
+            logger.debug("Skipping disabled metadata embedding operation")
 
         self.download_progress_listener.finishedDownload.emit()
         if self.listeners:
