@@ -272,8 +272,16 @@ def get_options(section, custom_ini=None):
             _parser = hotkeys_parser
         else:
             raise ValueError("Custom config '{}' is not defined in handler!!".format(custom_ini))
+    if _parser.has_section(section):
+        return_options = _parser.options(section)
+    else:
+        # FIXME: check for correct custom_ini
+        if custom_ini:
+            return_options = DEFAULTS_HOTKEYS[section].keys()
+        else:
+            return_options = DEFAULTS[section].keys()
 
-    return _parser.options(section)
+    return return_options
 
 
 def get_size(custom_ini=None, incl_sections=False):
