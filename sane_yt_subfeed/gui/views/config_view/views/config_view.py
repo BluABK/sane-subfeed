@@ -177,6 +177,11 @@ class ConfigViewWidget(InputSuper):
                         value = read_config('Youtube-dl_opts', option)
                         self.add_option_info("{}: ".format(option), "{}".format(value))
 
+            self.add_section('Postprocessing')
+            self.add_option_checkbox('Prefer ffmpeg?', 'Postprocessing', 'prefer_ffmpeg')
+            self.add_option_line_edit('ffmpeg location', 'Postprocessing', 'ffmpeg_location')
+            self.add_option_checkbox('Embed metadata?', 'Postprocessing', 'embed_metadata')
+
         elif self.tab_id == 'Media player':
             # Section [Player]
             self.add_option_line_edit('Default Player', 'Player', 'default_player', tab_id='Media player')
