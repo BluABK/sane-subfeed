@@ -1,3 +1,12 @@
+current
+- Renamed functions from *filename to *filepath where applicable, and made filepath function os.path.join its return value and send paths - not names - to SaneFFmpegMergerPP
+- Split output filename detection into functions and created a new one for finding incomplete downloads
+- Made SaneFFmpegMergerPP attempt merge as follows: 1. Attempt to encode audio to aac, 2. Attempt to encode video to h264 or  3. Encode both audio and video to above formats (worst case scenario)
+- Added handling of incompatible container audio and video stream muxing (mostly MP4) where youtube_dl would just die to an unhandled Exception
+- Made SaneFFmpegPostProcessor use config.ini options instead of youtube_dl's _downloader.params
+- Added postprocessing section and options to config files and gui
+- Forked own version of youtube_dl's ffmpeg.py to override some hardcoded stuff
+
 v0.4.0
 - Added has_section function that returns ConfigParser.has_section response
 - Add whitelisting for video extensions on the resulting file from youtube_dl
