@@ -17,7 +17,9 @@ from sane_yt_subfeed.postprocessor.ffmpeg import SaneFFmpegPostProcessor, SaneFF
 logger = create_logger(__name__)
 
 VIDEO_FORMATS = ['mp4', 'flv', 'ogg', 'webm', 'mkv', 'avi', 'ts']
-AUDIO_MERGE_FAIL = "ERROR: Could not write header for output file #0 (incorrect codec parameters ?): Invalid argument"
+AUDIO_MERGE_FAILS = ["Could not write header for output file #0 (incorrect codec parameters ?): Invalid argument",
+                     "ERROR: Could not write header for output file #0 (incorrect codec parameters ?): Invalid argument"
+                     ]
 
 
 class MyLogger(object):
@@ -129,12 +131,13 @@ class YoutubeDownload(threading.Thread):
             if self.video.video_id in name and name.split('.')[-1] in VIDEO_FORMATS:
                 if delete_tempfile and name.split('.')[-2] == 'temp':
                     logger.info("Deleting 0-byte temp file '{}' from earlier failed ffmpeg merge".format(name))
-                    os.remove(name)
+                    os.remove(os.path.join(self.youtube_folder, name))
+                    continue
                 candidates.append(name)
         return candidates
 
     def determine_filename(self):
-        name = self.guesstimate_filename_by_id()   # FIXME: Replace with info grabbed from youtube_dl (hook?)
+        name = self.guesstimate_filename_by_id()  # FIXME: Replace with info grabbed from youtube_dl (hook?)
         self.video.vid_path = os.path.join(self.youtube_folder, name)
 
     def determine_incomplete_filenames(self, delete_tempfile=False):
@@ -186,13 +189,10 @@ class YoutubeDownload(threading.Thread):
                 if self.download_with_proxy() is not True:
                     logger.error("All proxies have failed to download geo blocked video '{}'!".format(self.video.title))
                     logger.exception(dl_exc)
-                pass
-            else:
-                logger.exception(dl_exc)
-                pass
-        except FFmpegPostProcessorError as horrible_ffmpeg_death:
-            if horrible_ffmpeg_death.msg == AUDIO_MERGE_FAIL:
-                logger.warning("Handling incompatible container audio and video stream muxing")
+            logger.warning("Caught Exception during download!", exc_info=dl_exc)
+            if str(dl_exc) in AUDIO_MERGE_FAILS:
+                logger.warning("Handling incompatible container audio and video stream muxing",
+                               exc_info=dl_exc)
                 incomplete_filenames = self.determine_incomplete_filenames(delete_tempfile=True)
                 if incomplete_filenames is not None:
                     logger.debug(incomplete_filenames)
@@ -201,7 +201,8 @@ class YoutubeDownload(threading.Thread):
                 else:
                     logger.error("Can't handle incompatible container "
                                  "audio and video stream muxing, insufficent files. | {}".format(incomplete_filenames))
-
+            else:
+                logger.exception("Caught unhandled DownloadError exception!", exc_info=dl_exc)
         except Exception as e:
             logger.exception(e)
             pass
