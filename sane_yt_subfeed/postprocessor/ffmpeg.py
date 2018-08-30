@@ -500,16 +500,18 @@ class SaneFFmpegMergerPP(SaneFFmpegPostProcessor):
         self.logger = create_logger(__name__)
         filename = info['filepath']
         temp_filename = prepend_extension(filename, 'sanetemp')
-        remux = ['-c', 'copy', '-c:v', '-c:a']
+        remux = ['-c', 'copy', '-map', '0:v:0', '-map', '1:a:0']
         args = [remux]
         if info.get('audio_codec') is not None:
-            encode_audio = ['-c', 'copy', '-c:v', '-c:a', info.get('audio_codec')]
+            encode_audio = ['-c', 'copy', '-map', '0:v:0', '-map', '1:a:0', '-c:1:a:0', info.get('audio_codec')]
             args.append(encode_audio)
         if info.get('video_codec') is not None:
-            encode_video = ['-c', 'copy', '-c:v', info.get('video_codec'), '-c:a']
+            encode_video = ['-c', 'copy', '-c:0:v:0', info.get('video_codec'), '-map', '0:v:0', '-map', '1:a:0',
+                            '-c:1:a:0']
             args.append(encode_video)
         if info.get('video_codec') is not None and info.get('audio_codec') is not None:
-            encode_both = ['-c', 'copy', '-c:v', info.get('video_codec'), '-c:v', info.get('audio_codec')]
+            encode_both = ['-c', 'copy', '-c:0:v:0', info.get('video_codec'), '-map', '0:v:0', '-map', '1:a:0',
+                           '-c:1:a:0', info.get('audio_codec')]
             args.append(encode_both)
 
         if info.get('no_remux') is not None:
