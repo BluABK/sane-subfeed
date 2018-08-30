@@ -168,7 +168,6 @@ class YoutubeDownload(threading.Thread):
         info = {'not_a_tag': ['not_a_tag', 'filepath', 'ext'],
                 'filepath': self.video.vid_path,
                 'ext': self.video.vid_path.split('.')[-1],
-                # 'ext': read_config('Youtube-dl_opts', 'merge_output_format', literal_eval=False),
                 'title': self.video.title,
                 'show': self.video.channel_title,
                 'date': self.video.date_published.isoformat(),

@@ -105,19 +105,7 @@ DEFAULTS = {
     'Postprocessing': {
         'prefer_ffmpeg': 'True',
         'ffmpeg_location': "",
-        'embed_metadata': 'False',
-        'remap_tags': 'False',
-        'map_title': 'title',
-        'map_date': 'date',
-        'map_description': 'description',
-        'map_comment': 'comment',
-        'map_purl': 'purl',
-        'map_track': 'track',
-        'map_artist': 'artist',
-        'map_genre': 'genre',
-        'map_album': 'album',
-        'map_album_artist': 'album_artist',
-        'map_disc': 'disc'
+        'embed_metadata': 'False'
     },
     'Player': {
         'default_player': "",
@@ -238,7 +226,6 @@ def read_entire_config(custom_ini=None):
 
     config = {}
     for section in _parser.sections():
-        # print("[{}]".format(section))
         config[section] = []
         section_option = {}
         for option in _parser.options(section):
