@@ -12,7 +12,8 @@ from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.config_handler import read_config, get_options
 
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
-from sane_yt_subfeed.postprocessor.ffmpeg import SaneFFmpegPostProcessor, SaneFFmpegMetadataPP, SaneFFmpegMergerPP
+from sane_yt_subfeed.postprocessor.ffmpeg import SaneFFmpegPostProcessor, SaneFFmpegMetadataPP, SaneFFmpegMergerPP, \
+    SaneFFmpegPostProcessorError
 
 logger = create_logger(__name__)
 
@@ -214,7 +215,10 @@ class YoutubeDownload(threading.Thread):
                             'no_remux': 'True'}
 
                     # Merge formats
-                    SaneFFmpegMergerPP(SaneFFmpegPostProcessor()).run(info)
+                    try:
+                        SaneFFmpegMergerPP(SaneFFmpegPostProcessor()).run(info)
+                    except SaneFFmpegPostProcessorError as merge_exc:
+                        logger.exception("Failed to merge formats", exc_info=merge_exc)
 
                     # Cleanup remnant formats
                     self.delete_filepaths(incomplete_filepaths)
