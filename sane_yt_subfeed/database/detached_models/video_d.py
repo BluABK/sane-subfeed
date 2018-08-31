@@ -25,6 +25,10 @@ class VideoD:
         """
         self.grab_methods = []
         self.vid_path = ""
+        self.date_downloaded = None
+        self.duration = None
+        self.has_caption = False
+
         if grab_methods is None:
             grab_methods = []
 
@@ -37,7 +41,6 @@ class VideoD:
             self.channel_title = ""
             self.title = ""
             self.date_published = datetime.datetime.utcnow()
-            self.date_downloaded = None
             self.description = ""
             self.channel_id = ""
 
@@ -45,6 +48,7 @@ class VideoD:
             self.thumbnails = ""
             self.search_item = ""
             self.watched = False
+            self.duration = None
             return
 
         self.video_id = search_item['id']['videoId']
@@ -59,7 +63,6 @@ class VideoD:
         self.thumbnails = search_item['snippet']['thumbnails']
         self.search_item = search_item
         self.watched = False
-        self.date_downloaded = None
 
 
     def determine_thumbnails(self, thumbnails_item):
