@@ -145,7 +145,11 @@ def get_extra_videos_information(videos):
     youtube_keys = load_keys(1)
     video_ids = list(vid.video_id for vid in videos)
     logger.info("Grabbing extra video(s) information from youtube for: {}".format(videos))
-    response_videos = get_videos_result(youtube_keys[0], video_ids[:50], 30, part="contentDetails")
+    response_videos = []
+    chunk_size = 50
+    for i in range(0, len(videos), max(chunk_size, 1)):
+        response_videos.extend(
+            get_videos_result(youtube_keys[0], video_ids[i:i + chunk_size], 30, part="contentDetails"))
     for response in response_videos:
         for video in videos:
             if str(response['id']) == video.video_id:
@@ -169,4 +173,3 @@ def deep_search_calc(quota_k, subscriptions):
     list_pages = int((quota - max_search_quota + search_mod[1]) / (subscriptions_len * 3))
 
     return [list_pages, search_pages]
-
