@@ -211,6 +211,34 @@ def list_uploaded_videos_videos(youtube_key, video_ids, req_limit, part='snippet
                                                                            playlistitems_list_response)
     return videos
 
+def get_videos_result(youtube_key, video_ids, req_limit, part='snippet'):
+    """
+    Get a list of videos through the API videos()
+    Quota cost: 2-3 units / part / request
+    :param part:
+    :param video_ids: a list of ids to request video from
+    :param req_limit:
+    :param youtube_key:
+    :return: [list(dict): videos, dict: statistics]
+    """
+    # Retrieve the list of videos uploaded to the authenticated user's channel.
+    results = []
+    string_video_ids = ','.join(map(str, video_ids))
+
+    playlistitems_list_request = youtube_key.videos().list(
+        maxResults=50, part=part, id=string_video_ids)
+    search_pages = 0
+    while playlistitems_list_request:
+        search_pages += 1
+        playlistitems_list_response = playlistitems_list_request.execute()
+        results.extend(playlistitems_list_response['items'])
+        # Grab information about each video.
+        if search_pages >= req_limit:
+            break
+        playlistitems_list_request = youtube_key.playlistItems().list_next(playlistitems_list_request,
+                                                                           playlistitems_list_response)
+    return results
+
 
 def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit, live_videos=True):
     """

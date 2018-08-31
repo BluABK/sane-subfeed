@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import Boolean, DateTime, ForeignKey, Column, Integer, String
+from sqlalchemy import Boolean, DateTime, ForeignKey, Column, Integer, String, Interval
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.decorators import TextPickleType
@@ -27,6 +27,7 @@ class Video(PermanentBase):
     vid_path = Column(String)
     watched = Column(Boolean)
     watch_prio = Column(Integer)
+    duration = Column(Interval)
 
     def __init__(self, search_item):
         """
