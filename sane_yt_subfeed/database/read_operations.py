@@ -9,11 +9,11 @@ from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NO
     LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.database.engine_statements import get_video_by_vidd_stmt, get_video_by_id_stmt
 from sane_yt_subfeed.database.orm import db_session, engine
-from sane_yt_subfeed.database.write_operations import UpdateVideosThread, UpdateVideosThumbnailsThreaded
 from sane_yt_subfeed.database.video import Video
+from sane_yt_subfeed.database.write_operations import UpdateVideosThread, UpdateVideosExtraInfoThreaded
+from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
 from sane_yt_subfeed.youtube.update_videos import refresh_uploads, get_extra_videos_information
-from sane_yt_subfeed.log_handler import create_logger
 
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 logger = create_logger(__name__)
@@ -147,13 +147,10 @@ def refresh_and_get_newest_videos(limit, filter_downloaded=True, filter_discarde
     UpdateVideosThread(videos).start()
     if len(return_list) > 0:
         download_thumbnails_threaded(return_list, progress_listener=progress_listener)
-        UpdateVideosThumbnailsThreaded(return_list).start()
+        return_list = get_extra_videos_information(return_list)
+        UpdateVideosExtraInfoThreaded(return_list).start()
     else:
         logger.info("Skipping thumbnails download and db update as return list is empty")
-
-    return_list = get_extra_videos_information(return_list)
-    # FIXME: less generic, and or combine with Thumbnails update
-    UpdateVideosThread(return_list, update_existing=True).start()
 
     if progress_listener:
         progress_listener.progress_bar.setVisible(False)

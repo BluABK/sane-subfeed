@@ -32,9 +32,10 @@ def update_video_statement_selective(db_video, values):
     return Video.__table__.update().where(Video.video_id == format(db_video.video_id)).values(*values)
 
 
-def update_thumbnails_path_stmt():
+def update_extra_information_stmt():
     return Video.__table__.update().where(Video.video_id == bindparam('_video_id')).values({
-        'thumbnail_path': bindparam('thumbnail_path')})
+        'thumbnail_path': bindparam('thumbnail_path'),
+        'duration': bindparam('duration')})
 
 
 #         'playlist_pos': bindparam('playlist_pos'),

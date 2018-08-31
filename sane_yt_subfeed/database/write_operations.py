@@ -4,7 +4,7 @@ from sane_yt_subfeed.controller.listeners.database_listener import DatabaseListe
 from sane_yt_subfeed.database.db_download_tile import DBDownloadTile
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.engine_statements import update_video_statement_full, get_video_by_vidd_stmt, insert_item, \
-    get_video_ids_by_video_ids_stmt, update_thumbnails_path_stmt, update_video_stmt, update_channel_from_remote
+    get_video_ids_by_video_ids_stmt, update_extra_information_stmt, update_video_stmt, update_channel_from_remote
 from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import engine, db_session
 from sane_yt_subfeed.database.video import Video
@@ -91,7 +91,7 @@ class UpdateVideosThread(threading.Thread):
                 listener.emit()
 
 
-class UpdateVideosThumbnailsThreaded(threading.Thread):
+class UpdateVideosExtraInfoThreaded(threading.Thread):
 
     def __init__(self, video_list, finished_listeners=None):
         """
@@ -122,12 +122,15 @@ class UpdateVideosThumbnailsThreaded(threading.Thread):
             for item in self.video_list:
                 if not item.thumbnail_path:
                     self.logger.warning("Video missing thumbnail for update: {}".format(item))
+                elif not item.duration:
+                    self.logger.warning("Video missing duration for update: {}".format(item))
                 else:
-                    update_list.append({"thumbnail_path": item.thumbnail_path, "_video_id": item.video_id})
+                    update_list.append(
+                        {"thumbnail_path": item.thumbnail_path, "_video_id": item.video_id, "duration": item.duration})
             try:
-                engine.execute(update_thumbnails_path_stmt(), update_list)
+                engine.execute(update_extra_information_stmt(), update_list)
             except Exception as e:
-                self.logger.critical("Failed to update thumbnails: {} - {}".format(e, update_list), exc_info=1)
+                self.logger.critical("Failed to update extra information: {} - {}".format(e, update_list), exc_info=1)
         else:
             self.logger.info("Skipping update as self.video_list is empty")
         DatabaseListener.static_instance.finishWrite.emit(self.db_id)
