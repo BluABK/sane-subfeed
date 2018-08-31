@@ -11,7 +11,7 @@ from sane_yt_subfeed.controller.listeners import static_listeners
 from sane_yt_subfeed.database.db_download_tile import DBDownloadTile
 from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
 from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.database.write_operations import UpdateVideo, update_event_download_tile
+from sane_yt_subfeed.database.write_operations import UpdateVideo, update_event_download_tile, lock
 from sane_yt_subfeed.youtube.youtube_dl_handler import YoutubeDownload
 
 
@@ -68,14 +68,19 @@ class DownloadHandler(QObject):
     def update_download_tile_event(download_tile):
         update_event_download_tile(download_tile)
 
-    @staticmethod
-    def new_download_tile(new_tile):
+    def new_download_tile(self, new_tile):
+        lock.acquire()
         result = db_session.query(DBDownloadTile).filter(
             DBDownloadTile.video_id == format(new_tile.video.video_id)).first()
         if not result:
-            db_session.add(DBDownloadTile(new_tile))
+            download_tile = DBDownloadTile(new_tile)
+            if not download_tile.video:
+                self.logger.error("No video in new tile: {}".format(download_tile.__dict__), exc_info=True)
+                return
+            db_session.add(download_tile)
             db_session.commit()
         db_session.remove()
+        lock.release()
 
     def load_db_download_tiles(self):
         db_result = db_session.query(DBDownloadTile).filter(DBDownloadTile.cleared == false()).all()

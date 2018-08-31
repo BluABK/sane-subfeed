@@ -1,7 +1,7 @@
 import os
 
-from PyQt5.QtCore import Qt, QSize, QPoint
-from PyQt5.QtGui import QPainter, QImage, QPixmap
+from PyQt5.QtCore import Qt, QSize, QPoint, QRect
+from PyQt5.QtGui import QPainter, QImage, QPixmap, QBrush, QColor, QPen
 from PyQt5.QtWidgets import QLabel, QSizePolicy
 
 from sane_yt_subfeed.config_handler import read_config
@@ -48,6 +48,13 @@ class ThumbnailTile(QLabel):
             else:
                 thumb = self
                 painter.drawPixmap(thumb.rect(), thumb.p)
+
+            pen = QPen(Qt.white)
+            painter.setPen(pen)
+            point = QPoint(thumb.width()*0.65, thumb.height()*0.85)
+            rect = QRect(point, QSize(thumb.width()*0.28, thumb.height()*0.12))
+            painter.fillRect(rect, QBrush(QColor(0, 0, 0, 180)))
+            painter.drawText(rect, Qt.AlignCenter, format(self.parent.video.duration))
 
             self.add_overlay(painter, thumb)
 

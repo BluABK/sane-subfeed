@@ -1,13 +1,17 @@
+import re
+from datetime import timedelta
+
 from googleapiclient.errors import HttpError
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.generate_keys import GenerateKeys
 from sane_yt_subfeed.pickle_handler import load_batch_build_key, dump_batch_build_key
 from sane_yt_subfeed.youtube.uploads_thread import GetUploadsThread
-from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
+from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NORMAL_REFRESH, \
+    LISTENER_SIGNAL_DEEP_REFRESH
 from tqdm import tqdm
 
-from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
+from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions, list_uploaded_videos_videos, get_videos_result
 from sane_yt_subfeed.log_handler import create_logger
 
 YOUTUBE_URL = "https://www.youtube.com/"
@@ -73,7 +77,7 @@ def refresh_uploads(progress_bar_listener=None, add_to_max=0,
         try:
             t.join()
         # Store exceptions to lists, because raise breaks joining process and return
-        except HttpError as exc_gapi_http_error:    # FIXME: Handle HttpError exceptions
+        except HttpError as exc_gapi_http_error:  # FIXME: Handle HttpError exceptions
             logger.error("A Google API HttpError exception occurred in thread {}! -- !!IMPLEMENT HANDLING!!".format(
                 t.thread_id), exc_info=exc_gapi_http_error)
             refresh_ul_thread_exc_http.append(exc_gapi_http_error)
@@ -82,7 +86,6 @@ def refresh_uploads(progress_bar_listener=None, add_to_max=0,
             logger.critical("An *UNEXPECTED* exception occurred in thread {}!".format(t.thread_id), exc_info=exc_other)
             refresh_ul_thread_exc_other.append(exc_other)
             pass
-
 
     return sorted(videos, key=lambda video: video.date_published, reverse=True)
 
@@ -121,6 +124,42 @@ def generate_keys(key_number):
     for t in tqdm(threads, desc="Waiting for key generation threads", disable=read_config('Debug', 'disable_tqdm')):
         t.join()
     return keys
+
+
+def yt_duration_to_timedeltat(time_str):
+    # regex = re.compile(r'((?P<hours>\d+?)T)?((?P<minutes>\d+?)M)?((?P<seconds>\d+?)S)?')
+    regex = re.compile(r'((?P<days>\d*)P)?((?P<hours>\d*)T)?((?P<minutes>\d*)M)?((?P<seconds>\d*)S)?')
+
+    parts = regex.match(time_str)
+    if not parts:
+        return
+    parts = parts.groupdict()
+    time_params = {}
+    for (name, param) in parts.items():
+        if param:
+            time_params[name] = int(param)
+    return timedelta(**time_params)
+
+
+def get_extra_videos_information(videos):
+    youtube_keys = load_keys(1)
+    video_ids = list(vid.video_id for vid in videos)
+    logger.info("Grabbing extra video(s) information from youtube for: {}".format(videos))
+    response_videos = []
+    chunk_size = 50
+    for i in range(0, len(videos), max(chunk_size, 1)):
+        response_videos.extend(
+            get_videos_result(youtube_keys[0], video_ids[i:i + chunk_size], 30, part="contentDetails"))
+    for response in response_videos:
+        for video in videos:
+            if str(response['id']) == video.video_id:
+                duration = yt_duration_to_timedeltat(response['contentDetails']['duration'])
+                video.duration = duration
+                if str(response['contentDetails']['duration']) == 'true':
+                    video.has_caption = True
+                else:
+                    video.has_caption = False
+    return videos
 
 
 def deep_search_calc(quota_k, subscriptions):

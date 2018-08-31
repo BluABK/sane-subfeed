@@ -23,6 +23,7 @@ def update_video_statement_full(db_video):
         vid_path=db_video.vid_path,
         watched=db_video.watched,
         watch_prio=db_video.watch_prio,
+        duration=db_video.duration,
         date_downloaded=db_video.date_downloaded)
 
 
@@ -31,9 +32,10 @@ def update_video_statement_selective(db_video, values):
     return Video.__table__.update().where(Video.video_id == format(db_video.video_id)).values(*values)
 
 
-def update_thumbnails_path_stmt():
+def update_extra_information_stmt():
     return Video.__table__.update().where(Video.video_id == bindparam('_video_id')).values({
-        'thumbnail_path': bindparam('thumbnail_path')})
+        'thumbnail_path': bindparam('thumbnail_path'),
+        'duration': bindparam('duration')})
 
 
 #         'playlist_pos': bindparam('playlist_pos'),
@@ -59,6 +61,7 @@ def update_video_stmt():
         'vid_path': bindparam('vid_path'),
         'watched': bindparam('watched'),
         'watch_prio': bindparam('watch_prio'),
+        'duration': bindparam('duration'),
     })
 
 

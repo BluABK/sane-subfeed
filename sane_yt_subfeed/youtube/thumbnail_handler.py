@@ -2,22 +2,16 @@ import math
 import os
 import shutil
 import threading
-import time
 from collections import defaultdict
-from PIL import Image  # Image cropping (black barred thumbs, issue #11)
-from PIL import ImageChops
-
-from tqdm import tqdm
 
 import certifi
 import urllib3
+from PIL import Image  # Image cropping (black barred thumbs, issue #11)
+from PIL import ImageChops
+from tqdm import tqdm
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.database.write_operations import UpdateVideosThread
 from sane_yt_subfeed.log_handler import create_logger
-from sane_yt_subfeed.pickle_handler import load_pickle, PICKLE_PATH
-from sane_yt_subfeed.database.video import Video
 
 OS_PATH = os.path.dirname(__file__)
 THUMBNAILS_PATH = os.path.join(OS_PATH, '..', 'resources', 'thumbnails')
