@@ -31,6 +31,9 @@ __pycache__
 !quality404.jpg
 !thumbnail_na.png
 
+# Whitelist docs and related assets
+!docs/readme_assets/app_preview.png
+
 # logs
 logs/
 
