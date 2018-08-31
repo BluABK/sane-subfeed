@@ -17,7 +17,7 @@ hotkeys_parser.read(CONFIG_PATH)
 
 DEFAULTS = {
     'Model': {
-        'loaded_videos': '200'
+        'loaded_videos': '90'
     },
     'Requests': {
         'miss_limit': '10',
@@ -46,14 +46,14 @@ DEFAULTS = {
         'hide_downloaded': 'True',
         'grid_view_x': '5',
         'grid_view_y': '4',
-        'grey_old_videos': 'True',
-        'tile_pref_height': '150',
-        'tile_pref_width': '180',
+        'grey_old_videos': 'False',
+        'tile_pref_height': '209',
+        'tile_pref_width': '209',
         'tooltip_pictures': 'False',
         'tooltip_picture_width': '512',
         'tooltip_picture_height': '256',
         'tooltip_picture_size': 'h1',
-        'keep_thumb_ar': 'False',
+        'keep_thumb_ar': 'True',
         'enable_auto_copy_to_clipboard': 'False'
     },
     'Theme': {

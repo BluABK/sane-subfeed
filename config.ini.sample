@@ -3,9 +3,9 @@ launch_gui = True
 hide_downloaded = True
 grid_view_x = 5
 grid_view_y = 4
-grey_old_videos = True
-tile_pref_height = 150
-tile_pref_width = 180
+grey_old_videos = False
+tile_pref_height = 209
+tile_pref_width = 209
 tooltip_pictures = False
 tooltip_picture_width = 512
 tooltip_picture_height = 256
@@ -46,7 +46,7 @@ log_needle = unset
 show_unimplemented_gui = False
 
 [Model]
-loaded_videos = 200
+loaded_videos = 90
 
 [Requests]
 use_tests = False
