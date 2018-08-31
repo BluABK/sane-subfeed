@@ -13,7 +13,6 @@ class VideoD:
     playlist_pos = None
     url_playlist_video = None
     discarded = False
-    downloaded = False
     new = False
     missed = False
     watch_prio = read_config('Play', 'default_watch_prio')
@@ -28,6 +27,7 @@ class VideoD:
         self.date_downloaded = None
         self.duration = None
         self.has_caption = False
+        self.downloaded = False
 
         if grab_methods is None:
             grab_methods = []
