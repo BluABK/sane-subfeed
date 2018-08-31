@@ -152,6 +152,8 @@ def refresh_and_get_newest_videos(limit, filter_downloaded=True, filter_discarde
         logger.info("Skipping thumbnails download and db update as return list is empty")
 
     return_list = get_extra_videos_information(return_list)
+    # FIXME: less generic, and or combine with Thumbnails update
+    UpdateVideosThread(return_list, update_existing=True).start()
 
     if progress_listener:
         progress_listener.progress_bar.setVisible(False)

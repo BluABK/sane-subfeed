@@ -23,6 +23,7 @@ def update_video_statement_full(db_video):
         vid_path=db_video.vid_path,
         watched=db_video.watched,
         watch_prio=db_video.watch_prio,
+        duration=db_video.duration,
         date_downloaded=db_video.date_downloaded)
 
 
@@ -59,6 +60,7 @@ def update_video_stmt():
         'vid_path': bindparam('vid_path'),
         'watched': bindparam('watched'),
         'watch_prio': bindparam('watch_prio'),
+        'duration': bindparam('duration'),
     })
 
 
