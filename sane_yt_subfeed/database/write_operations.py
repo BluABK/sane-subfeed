@@ -66,7 +66,7 @@ class UpdateVideosThread(threading.Thread):
             db_videos_ids = set(video.video_id for video in db_videos)
             items_to_add.extend(insert_item(video) for video in videos_bulk if video.video_id not in db_videos_ids)
             if self.update_existing:
-                items_to_update.extend(db_videos)
+                items_to_update.extend(video for video in videos_bulk if video.video_id in db_videos_ids)
 
         DatabaseListener.static_instance.finishRead.emit(self.db_id)
         DatabaseListener.static_instance.startWrite.emit(self.db_id)

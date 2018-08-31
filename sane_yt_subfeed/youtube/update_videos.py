@@ -150,12 +150,12 @@ def get_extra_videos_information(videos):
         for video in videos:
             if str(response['id']) == video.video_id:
                 duration = yt_duration_to_timedeltat(response['contentDetails']['duration'])
-                print(format(duration))
+                video.duration = duration
                 if str(response['contentDetails']['duration']) == 'true':
-                    print("true")
+                    video.has_caption = True
                 else:
-                    print("false")
-    return response_videos
+                    video.has_caption = False
+    return videos
 
 
 def deep_search_calc(quota_k, subscriptions):
