@@ -102,6 +102,11 @@ DEFAULTS = {
         'proxy5': ""
     },
     'Youtube-dl_opts': {},
+    'Postprocessing': {
+        'prefer_ffmpeg': 'True',
+        'ffmpeg_location': "",
+        'embed_metadata': 'False'
+    },
     'Player': {
         'default_player': "",
         'alternative_player1': "",
@@ -221,7 +226,6 @@ def read_entire_config(custom_ini=None):
 
     config = {}
     for section in _parser.sections():
-        # print("[{}]".format(section))
         config[section] = []
         section_option = {}
         for option in _parser.options(section):

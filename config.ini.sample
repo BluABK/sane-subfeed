@@ -85,6 +85,11 @@ proxy5 =
 
 [Youtube-dl_opts]
 
+[Postprocessing]
+prefer_ffmpeg = True
+ffmpeg_location =
+embed_metadata = False
+
 [Player]
 default_player =
 url_player =
