@@ -1,4 +1,4 @@
-<img src="https://img.bluabk.net/python_2018-07-28_19-10-08.png" alt="drawing" width="800px"/>
+<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/app_preview.png" alt="drawing" width="800px"/>
 
 ## Compatibility
 This code has mainly been tested on the following platforms:
@@ -37,18 +37,20 @@ Caution: This option is prone to daily API quota limit issues, option B is highl
 #### Option B: Set up your own
 Useful ref: https://developers.google.com/youtube/v3/getting-started
 
-1. https://console.developers.google.com/apis/dashboard
-2. Click the drop-down next to the "Google APIs" logo in the banner area.
-3. Click "New Project".
-4. Fill in forms and create.
-5. Click the (presumably blue) "Enable APIs and services" text.
-6. Search for, select and enable "YouTube Data API v3"
-7. Go to "Credentials" and create credentials
-8a. Create API Key
-8b. Copy the key into `sane_yt_subfeed/resources/keys.json.sample` and rename it `keys.json`
-9a. Create OAuth Client ID
-9b. Configure consent screen, usage type is "other".
-9c. Download json and save it as `sane_yt_subfeed/resources/client_secret.json` 
+  1. https://console.developers.google.com/apis/dashboard
+  2. Click the drop-down next to the "Google APIs" logo in the banner area.
+  3. Click "New Project".
+  4. Fill in forms and create.
+  5. Click the (presumably blue) "Enable APIs and services" text.
+  6. Search for, select and enable "YouTube Data API v3"
+  7. Go to "Credentials" and create credentials
+  8. API Key
+     1. Create API Key 
+     2. Copy the key into `sane_yt_subfeed/resources/keys.json.sample` and rename it `keys.json`
+  9. OAuth Client ID
+     1. Create OAuth Client ID
+     2. Configure consent screen, usage type is "other".
+     3. Download json and save it as `sane_yt_subfeed/resources/client_secret.json` 
 
 ### Running the application
 If it's the first time run: `pip install -e .` (required for non-Windows OS due to a pesky python path bug) <br/>
