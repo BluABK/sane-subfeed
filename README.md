@@ -74,5 +74,5 @@ Afterwards you can launch it with: `python -m sane_yt_subfeed`
     ```
 
 ## Notable Wiki articles
-*  [Missed videos and tests](https://git.blucoders.net/BluABK/sane-yt-subfeed/wikis/Missed-videos-(and-tests))
-*  [Youtube-DL Integration (and overriding the youtube_dl options)](https://git.blucoders.net/BluABK/sane-yt-subfeed/wikis/youtube-dl-integration)
+*  [Missed videos and tests](https://github.com/BluABK/sane-subfeed/wiki/Missed-videos-(and-tests))
+*  [Youtube-DL Integration (and overriding the youtube_dl options)](https://github.com/BluABK/sane-subfeed/wiki/youtube-dl-integration)

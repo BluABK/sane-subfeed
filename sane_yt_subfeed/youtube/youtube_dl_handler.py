@@ -6,14 +6,22 @@ import threading
 
 from youtube_dl import YoutubeDL
 from youtube_dl.utils import DownloadError
+from youtube_dl.postprocessor.ffmpeg import FFmpegPostProcessorError
 
 from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.config_handler import read_config, get_options
 
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+from sane_yt_subfeed.postprocessor.ffmpeg import SaneFFmpegPostProcessor, SaneFFmpegMetadataPP, SaneFFmpegMergerPP, \
+    SaneFFmpegPostProcessorError
+
 logger = create_logger(__name__)
 
 VIDEO_FORMATS = ['mp4', 'flv', 'ogg', 'webm', 'mkv', 'avi', 'ts']
+AUDIO_MERGE_FAILS = ["Could not write header for output file #0 (incorrect codec parameters ?): Invalid argument",
+                     "ERROR: Could not write header for output file #0 (incorrect codec parameters ?): Invalid argument"
+                     ]
+
 
 class MyLogger(object):
     def debug(self, msg):
@@ -113,12 +121,65 @@ class YoutubeDownload(threading.Thread):
 
         return False
 
+    def guesstimate_filepath_by_id(self):
+        for name in os.listdir(self.youtube_folder):
+            if self.video.video_id in name and name.split('.')[-1] in VIDEO_FORMATS:
+                return os.path.join(self.youtube_folder, name)
+
+    def guesstimate_incomplete_filenames_by_id(self, delete_tempfile=False):
+        candidates = []
+        for name in os.listdir(self.youtube_folder):
+            if self.video.video_id in name and name.split('.')[-1] in VIDEO_FORMATS:
+                if delete_tempfile and name.split('.')[-2] == 'temp':
+                    logger.info("Deleting 0-byte temp file '{}' from earlier failed ffmpeg merge".format(name))
+                    os.remove(os.path.join(self.youtube_folder, name))
+                    continue
+                candidates.append(name)
+        return candidates
+
+    def determine_filepath(self):
+        # FIXME: Replace with info grabbed from youtube_dl (hook?)
+        return self.guesstimate_filepath_by_id()
+
+    def determine_incomplete_filenames(self, delete_tempfile=False):
+        # FIXME: Replace with info grabbed from youtube_dl (hook?)
+        names = self.guesstimate_incomplete_filenames_by_id(delete_tempfile=delete_tempfile)
+        if len(names) > 1:
+            return names
+        else:
+            logger.error("Unable to determine incomplete filenames, need 2 or more for a merge (got: {})".format(names))
+            return None
+
+    def delete_filepaths(self, filepaths):
+        for filepath in filepaths:
+            logger.info("Deleting format from earlier failed ffmpeg merge: '{}'".format(filepath))
+            os.remove(filepath)
+
+    def embed_metadata(self):
+        """
+        Embeds metadata tags (and optionally remaps them) to media files
+        :return:
+        """
+
+        logger.info("Embedding metadata with default tags")
+        # Keys are media metadata tag names (https://wiki.multimedia.cx/index.php?title=FFmpeg_Metadata)
+        # FIXME: Add other presets like music
+        # Video as TV-series preset
+        info = {'not_a_tag': ['not_a_tag', 'filepath', 'ext'],
+                'filepath': self.video.vid_path,
+                'ext': self.video.vid_path.split('.')[-1],
+                'title': self.video.title,
+                'show': self.video.channel_title,
+                'date': self.video.date_published.isoformat(),
+                'purl': self.video.url_video,
+                'network': 'YouTube',
+                ('description', 'comment', 'synopsis'): self.video.description}
+        logger.debug(info)
+        SaneFFmpegMetadataPP(SaneFFmpegPostProcessor()).run(info)
+
     def run(self):
         logger.debug("Started download thread")
         self.threading_event.wait()
-        # url_list = []
-        # for video in self.videos:
-        #     url_list.append(video.url_video)
         try:
             with YoutubeDL(self.ydl_opts) as ydl:
                 logger.info("Starting download for: {} - {} [{}]".format(self.video.channel_title, self.video.title,
@@ -130,10 +191,43 @@ class YoutubeDownload(threading.Thread):
                 if self.download_with_proxy() is not True:
                     logger.error("All proxies have failed to download geo blocked video '{}'!".format(self.video.title))
                     logger.exception(dl_exc)
-                pass
+
+            if str(dl_exc) in AUDIO_MERGE_FAILS:
+                logger.warning("Handling incompatible container audio and video stream muxing",
+                               exc_info=dl_exc)
+                incomplete_filenames = self.determine_incomplete_filenames(delete_tempfile=True)
+                if incomplete_filenames is not None:
+                    logger.debug(incomplete_filenames)
+                    # Strip the .f** format from the string to reproduce intended output filename
+                    output_filename = '{}.{}'.format(incomplete_filenames[0].split('.')[0],
+                                                     read_config('Youtube-dl_opts', 'merge_output_format',
+                                                                 literal_eval=False))
+                    output_filepath = os.path.join(self.youtube_folder, output_filename)
+                    incomplete_filepaths = []
+                    for filename in incomplete_filenames:
+                        incomplete_filepaths.append(os.path.join(self.youtube_folder, filename))
+
+                    info = {'filepath': output_filepath,
+                            '__files_to_merge': incomplete_filepaths,
+                            'audio_codec': 'libvo_aacenc',
+                            'video_codec': 'h264',
+                            'no_remux': 'True'}
+
+                    # Merge formats
+                    try:
+                        SaneFFmpegMergerPP(SaneFFmpegPostProcessor()).run(info)
+                    except SaneFFmpegPostProcessorError as merge_exc:
+                        logger.exception("Failed to merge formats", exc_info=merge_exc)
+
+                    # Cleanup remnant formats
+                    self.delete_filepaths(incomplete_filepaths)
+
+                else:
+                    logger.error("Can't handle incompatible container "
+                                 "audio and video stream muxing, insufficent files. | {}".format(incomplete_filenames))
+
             else:
-                logger.exception(dl_exc)
-                pass
+                logger.exception("Caught unhandled DownloadError exception!", exc_info=dl_exc)
         except Exception as e:
             logger.exception(e)
             pass
@@ -141,11 +235,16 @@ class YoutubeDownload(threading.Thread):
         logger.info("Finished downloading: {} - {} [{}]".format(self.video.channel_title, self.video.title,
                                                                 self.video.url_video))
 
-        for name in os.listdir(self.youtube_folder):
-            if self.video.video_id in name and name.split('.')[-1] in VIDEO_FORMATS:
-                self.video.vid_path = os.path.join(self.youtube_folder, name)
+        # self.video.vid_path = os.path.join(self.youtube_folder, self.determine_filename())
+        self.video.vid_path = self.determine_filepath()
 
         self.video.date_downloaded = datetime.datetime.utcnow()
+
+        # Embed metadata (optional)
+        if read_config('Postprocessing', 'embed_metadata', literal_eval=True):
+            self.embed_metadata()
+        else:
+            logger.debug("Skipping disabled metadata embedding operation")
 
         self.download_progress_listener.finishedDownload.emit()
         if self.listeners:

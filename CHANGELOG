@@ -1,8 +1,61 @@
-Current:
+current
+- Renamed functions from *filename to *filepath where applicable, and made filepath function os.path.join its return value and send paths - not names - to SaneFFmpegMergerPP
+- Split output filename detection into functions and created a new one for finding incomplete downloads
+- Made SaneFFmpegMergerPP attempt merge as follows: 1. Attempt to encode audio to aac, 2. Attempt to encode video to h264 or  3. Encode both audio and video to above formats (worst case scenario)
+- Added handling of incompatible container audio and video stream muxing (mostly MP4) where youtube_dl would just die to an unhandled Exception
+- Made SaneFFmpegPostProcessor use config.ini options instead of youtube_dl's _downloader.params
+- Added postprocessing section and options to config files and gui
+- Forked own version of youtube_dl's ffmpeg.py to override some hardcoded stuff
+
+v0.4.0
+- Added has_section function that returns ConfigParser.has_section response
+- Add whitelisting for video extensions on the resulting file from youtube_dl
+- Added optional user override for youtube_dl opts (read-only/info in ConfigView)
+- Add hotkeys icon asset
+- Set window titles and icons for various ConfigViews
+- Added the possibility of kwargs for add_submenu
+- Application now remembers and sets last theme and style that was use
+- Added support for QStyles that can be used in addition to or instead of Themes/StyleSheets
+- Sending QApplication reference into MainWindow constructor and apply themes on it rather that MainWindow
+- Centered progress bar text in breeze themes
+- Fixed overlapping submenu icon padding issue in breeze themes
+- Implemented themes (bundling in breeze light/dark theme)
+- Added missing config options/handling for DefaultApp and its members and finalised implementation of custom image viewer, for both linux and windows
+- Hotfixed issue #82 by changing t_font.PixelSize from 0.45 to 0.40 (resulting in *slightly* smaller font) and add TitleTile PixelSize as a config option (default: 0.40, old oob-issue value was 0.45)
+- Align ConfigView items to top of window frame (Fixes wonky (default centered) alignment)
+- Added SPAM log level to ConfigView/Logging description
+- Added Log level description to Logging ConfigView section
+- Added function add_option_info for adding flavour text to left and/or right ConfigView grid columns
+- Made SaneInputDialog take an action as argument instead of using hardcoded calls
+- Added support for checking if YouTube says you are subscribed to a channel, and add an override/disable feature instead of deleting the subscription.
+- Added add_subscription function and dialog to MainWindow and tied it to File menu (manually add a local-only subscription)
+- Added subscribed and subscribed_override to SubscriptionsView
+- Added DB Statement function to get channel by title
+- Fixed issue where continuing a download would not redraw video, or update db
+- Made .watched be handled properly for NULL
+- Fixed QEventLoop: Cannot be used without QApplication
+- Fixed issue where GridView widgets weren't properly deleted in Linux/Python3.5/PyQt5.10
+- Changed db update to happen for each int percentage, drastically reducing db write
+- Added event updates to db
+- Added requirements-py35.txt for python3.5 and below (later versions use the normal one)
+- DownloadTile now receives db_download_til
+- Continue/Pause implemented for contextMenu
+- Downloads now loads from db, and waits
+- Db videos are now sent to download view
+- New downloads are now added to db
+- Added a default_application_handler (static) and refactored play and sub tiles to use it.
+- Removed quotes from config.ini.sample
+- Moved function from video_d to video so that video_d don't need to import Video
+- Fixed download tiles not clearing with clear finished button
+- Added download video functionality for videos that are missing vid_path
+- Implemented new and improved way of detecting finished downloads
+- Fixed QProgressBar overflow issue, and centered percentage text
+- Fixed single video download, and added decimal point to percentage during download
+- Assigned icon to Downloads View
+- Fixed timedelta for video tiles
 - Added downloads view
 - Added continue/pause for downloads view
 - Added db storage for downloads view
-v0.4.0
 - Added priority to downloaded videos
 - Added option to filter videos based on age
 - Made views exclusive checkable
