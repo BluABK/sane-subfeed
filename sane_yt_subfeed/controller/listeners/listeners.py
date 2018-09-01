@@ -205,12 +205,10 @@ class MainWindowListener(QObject):
         :return:
         """
         self.logger.info("Fetching video: {}".format(video_url))
-        video_id = video_url.split('v=')[-1]  # FIXME: Make a proper input sanitizer
+        video_id = video_url.split('&')[0].split('v=')[-1]  # FIXME: Make a proper input sanitizer that handles YT IDs
         self.logger.debug("{} --> ID: {}".format(video_url, video_id))
         video_d = list_uploaded_videos_videos(load_keys(1)[0], [video_id], 50)[0]
         download_thumbnails_threaded([video_d])
-        # self.logger.debug(video_d.__dict__)
-        # DownloadHandler.download_video(video_d)
         DownloadHandler.download_video(video_d,
                                        youtube_dl_finished_listener=[GridViewListener.static_self.downloadFinished],
                                        db_update_listeners=[GridViewListener.static_self.downloadedVideosChangedinDB])
