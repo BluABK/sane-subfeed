@@ -36,6 +36,8 @@ from sane_yt_subfeed.history_handler import get_history
 from sane_yt_subfeed.log_handler import create_logger
 
 # Constants
+HOTKEYS_EVAL = False
+HOTKEYS_INI = 'hotkeys'
 YOUTUBE_URL_REGEX = QRegExp('(http[s]?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/[^ ]+')
 YOUTUBE_URL_REGEX.setCaseSensitivity(False)
 
@@ -118,39 +120,52 @@ class MainWindow(QMainWindow):
 
         # File menu
         self.add_menu(menubar, '&File')
-        self.add_submenu('&File', 'Download by URL/ID', self.download_single_url_dialog, shortcut='Ctrl+O',
-                         tooltip='Download a video by URL/ID')
+        self.add_submenu('&File', 'Download by URL/ID', self.download_single_url_dialog,
+                         shortcut=read_config('Global', 'download_video_by_url', custom_ini=HOTKEYS_INI,
+                                              literal_eval=HOTKEYS_EVAL), tooltip='Download a video by URL/ID')
         self.add_submenu('&File', 'Subscribe to a channel: ID', self.add_subscription_by_id_dialog,
                          tooltip='Local override: Subscribe to a channel by ID (Will *NOT* affect YouTube!)')
         self.add_submenu('&File', 'Subscribe to a channel: Username', self.add_subscription_by_username_dialog,
                          tooltip='Local override: Subscribe to a channel by Username (Will *NOT* affect YouTube!)')
-        self.add_submenu('&File', 'View history', self.usage_history_dialog, shortcut='Ctrl+H',
+        self.add_submenu('&File', 'View history', self.usage_history_dialog,
+                         shortcut=read_config('Global', 'show_usage_history',
+                                              custom_ini=HOTKEYS_INI, literal_eval=HOTKEYS_EVAL),
                          tooltip='Show usage history in a dialog box')
-        self.add_submenu('&File', 'Preferences', self.view_config, shortcut='Ctrl+P',
+        self.add_submenu('&File', 'Preferences', self.view_config,
+                         shortcut=read_config('Global', 'preferences', custom_ini=HOTKEYS_INI,
+                                              literal_eval=HOTKEYS_EVAL),
                          tooltip='Change application settings', icon='preferences.png')
-        self.add_submenu('&File', 'Exit', qApp.quit, shortcut='Ctrl+Q', tooltip='Exit application')
+        self.add_submenu('&File', 'Exit', qApp.quit, shortcut=read_config('Global', 'quit', custom_ini=HOTKEYS_INI,
+                                                                          literal_eval=HOTKEYS_EVAL),
+                         tooltip='Exit application')
 
         # Function menu
         self.add_menu(menubar, '&Function')
 
         # Set function menu triggers
-        self.add_submenu('&Function', 'Copy all URLs', self.clipboard_copy_urls, shortcut='Ctrl+D',
+        self.add_submenu('&Function', 'Copy all URLs', self.clipboard_copy_urls,
+                         shortcut=read_config('Global', 'copy_all_urls', custom_ini=HOTKEYS_INI,
+                                              literal_eval=HOTKEYS_EVAL),
                          tooltip='Copy URLs of all currently visible videos to clipboard', icon='copy.png')
 
         # refresh_list
-        # self.add_submenu('&Function', 'Refresh Feed', self.refresh_list, shortcut='Ctrl+R',
-        #                  tooltip='Refresh the subscription feed'
-        refresh_feed = self.add_submenu('&Function', 'Refresh Feed', self.emit_signal_with_set_args, shortcut='Ctrl+R',
+        refresh_feed = self.add_submenu('&Function', 'Refresh Feed', self.emit_signal_with_set_args,
+                                        shortcut=read_config('Global', 'refresh_feed', custom_ini=HOTKEYS_INI,
+                                                             literal_eval=HOTKEYS_EVAL),
                                         tooltip='Refresh the subscription feed', icon='refresh.png',
                                         signal=self.main_model.main_window_listener.refreshVideos,
                                         args=(LISTENER_SIGNAL_NORMAL_REFRESH,))
 
         self.add_submenu('&Function', 'Reload Subscriptions &List',
-                         self.main_model.main_window_listener.refreshSubs.emit, shortcut='Ctrl+L',
+                         self.main_model.main_window_listener.refreshSubs.emit,
+                         shortcut=read_config('Global', 'reload_subslist', custom_ini=HOTKEYS_INI,
+                                              literal_eval=HOTKEYS_EVAL),
                          tooltip='Fetch a new subscriptions list', icon='refresh_subs.png')
 
         # FIXME: icon, shortcut(alt/shift as extra modifier to the normal refresh shortcut?)
-        self.add_submenu('&Function', 'Deep refresh of feed', self.emit_signal_with_set_args, shortcut='Ctrl+T',
+        self.add_submenu('&Function', 'Deep refresh of feed', self.emit_signal_with_set_args,
+                         shortcut=read_config('Global', 'refresh_feed_deep', custom_ini=HOTKEYS_INI,
+                                              literal_eval=HOTKEYS_EVAL),
                          tooltip='Deed refresh the subscription feed', icon='refresh.png',
                          signal=self.main_model.main_window_listener.refreshVideos,
                          args=(LISTENER_SIGNAL_DEEP_REFRESH,))
@@ -168,35 +183,49 @@ class MainWindow(QMainWindow):
                          tooltip=thumb_tooltip, icon='folder_refresh.png')
 
         self.add_submenu('&Function', 'Manual DB grab', self.main_model.grid_view_listener.updateFromDb.emit,
-                         tooltip='Starts a manual grab of data for the model', icon='database.png', shortcut='Ctrl+E')
+                         tooltip='Starts a manual grab of data for the model', icon='database.png',
+                         shortcut=read_config('Global', 'manual_db_grab', custom_ini=HOTKEYS_INI,
+                                              literal_eval=HOTKEYS_EVAL))
 
         # FIXME: icon, look more related to action
         self.add_submenu('&Function', 'Toggle ascending date', self.toggle_ascending_sort,
                          tooltip='Toggles the ascending date config option, and does a manual re-grab',
-                         icon='database.png', shortcut='Ctrl+A')
+                         icon='database.png', shortcut=read_config('Playback', 'ascending_sort_toggle',
+                                                                   custom_ini=HOTKEYS_INI, literal_eval=HOTKEYS_EVAL))
 
         # get_single_video = self.add_submenu('&Function', 'Get video', self.get_single_video,
         #                                     tooltip='Fetch video by URL')
 
         # View menu
         self.add_menu(menubar, '&View')
-        view_grid_view = self.add_submenu('&View', 'Subscription feed', self.set_current_widget, shortcut='Ctrl+1',
+        view_grid_view = self.add_submenu('&View', 'Subscription feed', self.set_current_widget,
+                                          shortcut=read_config('View', 'subfeed', custom_ini=HOTKEYS_INI,
+                                                               literal_eval=HOTKEYS_EVAL),
                                           tooltip='View subscription feed as a grid', icon='grid.png',
                                           widget=self.grid_view)
-        view_play_view = self.add_submenu('&View', 'Playback feed', self.set_current_widget, shortcut='Ctrl+2',
+        view_play_view = self.add_submenu('&View', 'Playback feed', self.set_current_widget,
+                                          shortcut=read_config('View', 'playback', custom_ini=HOTKEYS_INI,
+                                                               literal_eval=HOTKEYS_EVAL),
                                           tooltip='View downloaded videos as a grid', widget=self.play_view,
                                           icon='play_view_basic.png')
-        view_list_detailed_view = self.add_submenu('&View', 'Detailed List', self.set_current_widget, shortcut='Ctrl+3',
+        view_list_detailed_view = self.add_submenu('&View', 'Detailed List', self.set_current_widget,
+                                                   shortcut=read_config('View', 'detailed_list', custom_ini=HOTKEYS_INI,
+                                                                        literal_eval=HOTKEYS_EVAL),
                                                    tooltip='View subscription feed as a detailed list',
                                                    icon='table.png', widget=self.list_detailed_view)
-        # FIXME: icon
-        view_downloads_view = self.add_submenu('&View', 'Downloads', self.set_current_widget, shortcut='Ctrl+4',
+        view_downloads_view = self.add_submenu('&View', 'Downloads', self.set_current_widget,
+                                               shortcut=read_config('View', 'download', custom_ini=HOTKEYS_INI,
+                                                                    literal_eval=HOTKEYS_EVAL),
                                                tooltip='Shows in progress downloads', icon='download_view.png',
                                                widget=self.download_view)
-        view_subs_view = self.add_submenu('&View', 'Subscriptions', self.set_current_widget, shortcut='Ctrl+5',
+        view_subs_view = self.add_submenu('&View', 'Subscriptions', self.set_current_widget,
+                                          shortcut=read_config('View', 'subscriptions', custom_ini=HOTKEYS_INI,
+                                                               literal_eval=HOTKEYS_EVAL),
                                           tooltip='View Subscriptions', icon='subs.png', widget=self.download_view)
         if read_config('Debug', 'show_unimplemented_gui'):
-            view_list_tiled_view = self.add_submenu('&View', 'Tiled List', self.set_current_widget, shortcut='Ctrl+9',
+            view_list_tiled_view = self.add_submenu('&View', 'Tiled List', self.set_current_widget,
+                                                    shortcut=read_config('View', 'tiled_list', custom_ini=HOTKEYS_INI,
+                                                                         literal_eval=HOTKEYS_EVAL),
                                                     tooltip='View subscription feed as a tiled list',
                                                     icon='tiled_list.png', widget=self.list_tiled_view)
 
@@ -204,8 +233,7 @@ class MainWindow(QMainWindow):
         window_menu = self.add_menu(menubar, '&Window')
         #   Theme submenu
         theme_submenu = self.add_menu(window_menu, 'Theme')
-        self.add_submenu(theme_submenu, 'Cycle theme', self.cycle_themes, shortcut='F5',
-                         tooltip='Cycle theme', subsubmenu=True)
+        self.add_submenu(theme_submenu, 'Cycle theme', self.cycle_themes, tooltip='Cycle theme', subsubmenu=True)
         self.add_submenu(theme_submenu, 'Default', self.set_theme_native, tooltip='Set theme to system default',
                          subsubmenu=True)
         self.add_submenu(theme_submenu, 'Breeze Light', self.set_theme_breeze_light,
@@ -220,11 +248,12 @@ class MainWindow(QMainWindow):
 
         # Help menu
         self.add_menu(menubar, '&Help')
-        self.add_submenu('&Help', 'Hotkeys', self.view_hotkeys, shortcut='F2',
+        self.add_submenu('&Help', 'Hotkeys', self.view_hotkeys,
+                         shortcut=read_config('Global', 'hotkeys', custom_ini=HOTKEYS_INI, literal_eval=HOTKEYS_EVAL),
                          tooltip='View hotkeys', icon='hotkeys.png')
         if read_config('Debug', 'show_unimplemented_gui'):
-            view_about_view = self.add_submenu('&Help', 'About', self.set_current_widget, shortcut='F1',
-                                               tooltip='About me', icon='about.png', widget=self.about_view)
+            view_about_view = self.add_submenu('&Help', 'About', self.set_current_widget, tooltip='About me',
+                                               icon='about.png', widget=self.about_view)
 
         toolbar = Toolbar(self)
         self.addToolBar(toolbar)
@@ -378,10 +407,11 @@ class MainWindow(QMainWindow):
             self.menus[name] = menubar.addMenu(name)
             return self.menus[name]
 
-    def add_submenu(self, menu, name, action, shortcut=None, tooltip=None, icon=None, subsubmenu=False, dummy=False,
-                    **kwargs):
+    def add_submenu(self, menu, name, action, shortcut=None, shortcuts=None,
+                    tooltip=None, icon=None, subsubmenu=False, dummy=False, **kwargs):
         """
         Adds a submenu with optional properties to a menu
+        :param subsubmenu:
         :param name:
         :param icon: icon filename (with relative path)
         :param tooltip: String
@@ -398,6 +428,8 @@ class MainWindow(QMainWindow):
         submenu = SaneToolBarAction(self, name, action, icon=this_icon, **kwargs)
         if shortcut:
             submenu.setShortcut(shortcut)
+        elif shortcuts:
+            submenu.setShortcuts(shortcuts)
         if tooltip:
             submenu.setStatusTip(tooltip)
         if subsubmenu:

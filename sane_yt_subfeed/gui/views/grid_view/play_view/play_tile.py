@@ -22,14 +22,12 @@ class PlayTile(VideoTile):
     def init_thumbnailtile(self):
         return PlayThumbnailTile(self)
 
-    def mousePressEvent(self, QMouseEvent):
+    def mousePressEvent(self, QMouseEvent):  # FIXME: Make mouse hotkeys based on hotkeys.ini
         """
         Override mousePressEvent to support mouse button actions
         :param QMouseEvent:
         :return:
         """
-        # if QMouseEvent.button() == Qt.MidButton:
-        #     self.parent.play_vid(self.video.vid_path)
         if QMouseEvent.button() == Qt.MidButton:
             self.decrease_prio()
         elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
