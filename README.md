@@ -1,9 +1,10 @@
 <img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/app_preview.png" alt="drawing" width="800px"/>
 
 ## Compatibility
-This code has mainly been tested on the following platforms:
-*   Windows 10, Python 3.7.0 with PyQt 5.11 (x64)
+This code is primarily tested on the following platforms:
+*   Windows 10,     Python 3.7.0 with PyQt 5.11 (x64)
 *   Linux/Debian 9, Python 3.5.3 with PyQt 5.10 (x64)
+*   Arch,           Python 3.7.0 with PyQt 5.11 (x64)
 
 ### Known incompatibilities
 #### x86 versions of Python
