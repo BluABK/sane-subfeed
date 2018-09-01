@@ -30,6 +30,5 @@ class SaneDialog(QDialog):
         # Apply the layout
         self.setLayout(layout)
 
-        # FIXME: Resize width to len of info text string
-        self.resize(360, 120)
+        self.resize(self.text.frameWidth(), 120)
 
