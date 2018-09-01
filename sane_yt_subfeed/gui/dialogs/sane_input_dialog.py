@@ -1,28 +1,33 @@
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QValidator
 from PyQt5.QtWidgets import QPushButton, QHBoxLayout, QLabel, QLineEdit, QVBoxLayout, QDialog
 
 from sane_yt_subfeed import create_logger
 
 TITLE = 'Unnamed SaneInputDialog'
 TEXT = 'This is a SaneInputDialog'
+PLACEHOLDER = 'Enter text here..'
 OK = 'OK'
 CANCEL = 'Cancel'
 WIDTH = 360
-HEIGHT = 120
+HEIGHT = 80
 
 
 class SaneInputDialog(QDialog):
     def __init__(self, parent, action, title=TITLE, text=TEXT, ok_text=OK, cancel_text=CANCEL, validator=None,
-                 flags=Qt.WindowFlags):
+                 flags=Qt.WindowFlags, placeholder=PLACEHOLDER, use_placeholder=True):
         super(SaneInputDialog, self).__init__(parent, flags())
         self.logger = create_logger(__name__)
         self.sane_parent = parent
         self.text = text
+        self.placeholder = placeholder
+        self.use_placeholder = use_placeholder
         self.ok_text = ok_text
         self.cancel_text = cancel_text
         self.action = action
         self.title = title
         self.input_box = QLineEdit()
+        self.validator = validator
         self.cancel_button = QPushButton(self)
         self.ok_button = QPushButton(self)
 
@@ -32,8 +37,13 @@ class SaneInputDialog(QDialog):
         self.setWindowTitle(self.title)
 
         # Define contents
-        self.input_box.setPlaceholderText('Enter a YouTube URL here')
+        if self.use_placeholder:
+            self.input_box.setPlaceholderText(self.placeholder)
         self.input_box.setMinimumWidth(WIDTH)
+        if self.validator:
+            self.input_box.setValidator(self.validator)
+            self.input_box.textChanged.connect(self.check_validator_state)
+            self.input_box.textChanged.emit(self.input_box.text())
         self.cancel_button.setText(self.cancel_text)
         self.cancel_button.clicked.connect(self.reject)
         self.ok_button.setText(self.ok_text)
@@ -57,6 +67,33 @@ class SaneInputDialog(QDialog):
         # self.resize(self.text.frameWidth(), 120)
         self.resize(WIDTH, HEIGHT)
 
+    def reset_values(self):
+        self.input_box.setText('')
+        if self.use_placeholder:
+            self.input_box.setPlaceholderText(self.placeholder)
+
     def do_action(self):
-        print(self.input_box.text())
-        self.action(self.input_box.text())
+        if self.validator:
+            if self.validator.validate(self.input_box.text(), 0)[0] == QValidator.Acceptable:
+                self.action(self.input_box.text())
+                self.reset_values()
+            else:
+                self.logger.debug("User attempted action but QValidator did not deem input acceptable: {}".format(
+                    self.input_box.text()))
+        else:
+            self.action(self.input_box.text())
+            self.reset_values()
+
+    def check_validator_state(self, *args, **kwargs):
+        sender = self.sender()
+        validator = sender.validator()
+        state = validator.validate(sender.text(), 0)[0]
+        if state == QValidator.Acceptable:
+            color = '#c4df9b'  # green
+        elif state == QValidator.Intermediate:
+            # color = '#fff79a' # yellow
+            color = '#ffffff'
+        else:
+            color = '#f6989d'  # red
+
+        sender.setStyleSheet('QLineEdit { background-color: %s }' % color)

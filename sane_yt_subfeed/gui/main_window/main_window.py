@@ -4,9 +4,9 @@
 import os
 from subprocess import check_output
 
-from PyQt5.QtCore import Qt, QFile, QTextStream
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QMenu, QStackedWidget, QStyle, QStyleFactory
+from PyQt5.QtCore import QFile, QTextStream, QRegExp
+from PyQt5.QtGui import QIcon, QRegExpValidator
+from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QMenu, QStackedWidget, QStyleFactory
 
 # Project internal libs
 from sane_yt_subfeed.absolute_paths import ICONS_PATH, VERSION_PATH
@@ -14,7 +14,7 @@ from sane_yt_subfeed.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import GRID_VIEW_ID, PLAY_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
-from sane_yt_subfeed.gui.dialogs.input_dialog import SaneInputDialog
+from sane_yt_subfeed.gui.dialogs.sane_input_dialog import SaneInputDialog
 from sane_yt_subfeed.gui.dialogs.text_view_dialog import TextViewDialog
 from sane_yt_subfeed.gui.main_window.db_state import DbStateIcon
 from sane_yt_subfeed.gui.main_window.toolbar import Toolbar
@@ -24,10 +24,8 @@ from sane_yt_subfeed.gui.themes.themes import THEMES_LIST, QSTYLES_AVAILABLE
 from sane_yt_subfeed.gui.views.about_view import AboutView
 from sane_yt_subfeed.gui.views.config_view.config_view_tabs import ConfigViewTabs
 from sane_yt_subfeed.gui.views.config_view.config_window import ConfigWindow
-from sane_yt_subfeed.gui.views.config_view.views.config_view import ConfigViewWidget
 from sane_yt_subfeed.gui.views.config_view.views.hotkeys_view import HotkeysViewWidget
 from sane_yt_subfeed.gui.views.download_view.dl_scroll_area import DownloadScrollArea
-from sane_yt_subfeed.gui.views.download_view.download_view import DownloadView
 from sane_yt_subfeed.gui.views.grid_view.grid_scroll_area import GridScrollArea
 from sane_yt_subfeed.gui.views.grid_view.play_view.play_view import PlayView
 from sane_yt_subfeed.gui.views.grid_view.sub_feed.sub_feed_view import SubFeedView
@@ -37,8 +35,9 @@ from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
 from sane_yt_subfeed.history_handler import get_history
 from sane_yt_subfeed.log_handler import create_logger
 
-
 # Constants
+YOUTUBE_URL_REGEX = QRegExp('(http[s]?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/[^ ]+')
+YOUTUBE_URL_REGEX.setCaseSensitivity(False)
 
 
 class MainWindow(QMainWindow):
@@ -493,9 +492,10 @@ class MainWindow(QMainWindow):
         Prompts user for downloading a video by URL/ID
         :return:
         """
-        input_dialog = SaneInputDialog(self, self, self.main_model.main_window_listener.getSingleVideo.emit,
+        input_dialog = SaneInputDialog(self, self.main_model.main_window_listener.getSingleVideo.emit,
                                        title='Download a video by URL/ID',
-                                       label='URL/ID:', ok_button_text='Download')
+                                       text='Enter a YouTube URL or ID', ok_text='Download',
+                                       validator=QRegExpValidator(YOUTUBE_URL_REGEX))
         input_dialog.show()
 
     def add_subscription_by_id_dialog(self):
@@ -503,9 +503,9 @@ class MainWindow(QMainWindow):
         Prompts user for a channel ID to add a YouTube subscription to.
         :return:
         """
-        input_dialog = SaneInputDialog(self, self, self.add_subscription_by_id,
+        input_dialog = SaneInputDialog(self, self.add_subscription_by_id,
                                        title='[Local] Subscribe to channel: ID',
-                                       label='[Local] Subscribe to channel by ID:', ok_button_text='Subscribe')
+                                       text='[Local] Subscribe to channel by ID:', ok_text='Subscribe')
         input_dialog.show()
 
     def add_subscription_by_username_dialog(self):
@@ -513,9 +513,9 @@ class MainWindow(QMainWindow):
         Prompts user for a username to add a YouTube subscription to.
         :return:
         """
-        input_dialog = SaneInputDialog(self, self, self.add_subscription_by_username,
+        input_dialog = SaneInputDialog(self, self.add_subscription_by_username,
                                        title='[Local] Subscribe to channel: Username',
-                                       label='[Local] Subscribe to channel by username:', ok_button_text='Subscribe')
+                                       text='[Local] Subscribe to channel by username:', ok_text='Subscribe')
         input_dialog.show()
 
     def usage_history_dialog(self):
