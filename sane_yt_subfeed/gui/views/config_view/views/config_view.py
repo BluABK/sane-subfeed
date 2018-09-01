@@ -45,9 +45,6 @@ class ConfigViewWidget(InputSuper):
         :return:
         """
         self.logger.info("Initializing UI")
-        mismatch = get_size() - (self.offset - self.section_count)
-        if mismatch != 0:
-            self.logger.warning("ConfigView is missing {} options!".format(mismatch))
 
     def populate_options(self):
         """
@@ -210,6 +207,7 @@ class ConfigViewWidget(InputSuper):
             self.add_option_info('20\t INFO', None, tab_id='Logging')
             self.add_option_info('10\t DEBUG', None, tab_id='Logging')
             self.add_option_info('5\t SPAM (Custom level)', None, tab_id='Logging')
+            self.add_option_info('1\t All of the above', None, tab_id='Logging')
             self.add_option_info('0\t NOT SET', None, tab_id='Logging')
             self.add_option_line_edit('Log level', 'Logging', 'log_level', cfg_validator=QIntValidator(),
                                       tab_id='Logging')
