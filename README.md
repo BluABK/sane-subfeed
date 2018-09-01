@@ -37,21 +37,28 @@ Caution: This option is prone to daily API quota limit issues, option B is highl
 #### Option B: Set up your own
 Useful ref: https://developers.google.com/youtube/v3/getting-started
 
-  1. https://console.developers.google.com/apis/dashboard
-  2. Click the drop-down next to the "Google APIs" logo in the banner area.
-  3. Click "New Project".
-  4. Fill in forms and create.
-  5. Click the (presumably blue) "Enable APIs and services" text.
-  6. Search for, select and enable "YouTube Data API v3"
-  7. Go to "Credentials" and create credentials
-  8. API Key
-     1. Create API Key 
-     2. Copy the key into `sane_yt_subfeed/resources/keys.json.sample` and rename it `keys.json`
-  9. OAuth Client ID
-     1. Create OAuth Client ID
-     2. Configure consent screen, usage type is "other".
-     3. Download json and save it as `sane_yt_subfeed/resources/client_secret.json` 
-
+  Go to https://console.developers.google.com/apis/dashboard and follow these steps:
+  1. Click the drop-down next to the "Google APIs" logo in the banner area (upper left corner).
+  2. Click "New Project".
+  3. Fill in forms and create.
+  4. Click the (presumably blue) "Enable APIs and services" text.
+  5. Search for, and select "YouTube Data API v3"
+  6. Enable "YouTube Data API v3"
+  7. Go to "Credentials" screen
+  
+  1<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/01_open_project_dialog.png" alt="drawing" width="100px"/> 2<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/02_create_new_project.png" alt="drawing" width="100px"/> 3<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/03_name_and_create_project.png" alt="drawing" width="100px"/> 4<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/04_enable_api.png" alt="drawing" width="100px"/> 5<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/05_select_youtube_data_v3_api.png" alt="drawing" width="100px"/> 6<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/06_enable_youtube_data_v3_api.png" alt="drawing" width="100px"/> 7<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/07_go_to_credentials_screen.png" alt="drawing" width="100px"/>
+  
+  
+  8. Create an API Key and copy the key into `sane_yt_subfeed/resources/keys.json.sample` and rename it `keys.json`
+     
+     8<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/08_create_api_key.png" alt="drawing" width="100px"/>
+     
+  9. Create an OAuth Client ID
+     1. Configure consent screen, usage type is "other".
+     2. Download json and save it as `sane_yt_subfeed/resources/client_secret.json` 
+     
+     9<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/09a_create_oauth_client.png" alt="drawing" width="100px"/> i<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/09b_configure_oauth_consent.png" alt="drawing" width="100px"/> ii<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/09c_create_oauth_client.png" alt="drawing" width="100px"/>
+     
 ### Running the application
 If it's the first time run: `pip install -e .` (required for non-Windows OS due to a pesky python path bug) <br/>
 
