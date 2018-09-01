@@ -1,8 +1,10 @@
 [Global]
 preferences = Ctrl+P
+hotkeys = F2
 quit = Ctrl+Q
 copy_all_urls = Ctrl+D
 refresh_feed = Ctrl+R
+refresh_feed_deep = Ctrl+T
 reload_subslist = Ctrl+L
 test_channels =
 manual_dir_search =
@@ -15,7 +17,9 @@ show_usage_history = Ctrl+H
 subfeed = Ctrl+1
 playback = Ctrl+2
 detailed_list = Ctrl+3
-subscriptions = Ctrl+4
+download = Ctrl+4
+subscriptions = Ctrl+5
+tiled_list = Ctrl+9
 
 [Subfeed]
 download = LeftButton

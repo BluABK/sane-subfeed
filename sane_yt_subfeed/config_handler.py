@@ -5,7 +5,7 @@ from configparser import ConfigParser, NoSectionError, NoOptionError
 
 OS_PATH = os.path.dirname(__file__)
 CONFIG_PATH = os.path.join(OS_PATH, '..', 'config.ini')
-CONFIG__HOTKEYS_PATH = os.path.join(OS_PATH, '..', 'hotkeys.ini')
+CONFIG_HOTKEYS_PATH = os.path.join(OS_PATH, '..', 'hotkeys.ini')
 SAMPLE_HOTKEYS_PATH = os.path.join(OS_PATH, '..', 'hotkeys.ini.sample')
 SAMPLE_PATH = os.path.join(OS_PATH, '..', 'config.ini.sample')
 
@@ -13,7 +13,7 @@ parser = None
 default_parser = ConfigParser()
 default_parser.read(CONFIG_PATH)
 hotkeys_parser = ConfigParser()
-hotkeys_parser.read(CONFIG_PATH)
+hotkeys_parser.read(CONFIG_HOTKEYS_PATH)
 
 DEFAULTS = {
     'Model': {
@@ -127,9 +127,11 @@ DEFAULTS = {
 DEFAULTS_HOTKEYS = {
     'Global': {
         'preferences': 'Ctrl+P',
+        'hotkeys': 'F2',
         'quit': 'Ctrl+Q',
         'copy_all_urls': 'Ctrl+D',
         'refresh_feed': 'Ctrl+R',
+        'refresh_feed_deep': 'Ctrl+T',
         'reload_subslist': 'Ctrl+L',
         'test_channels': "",
         'manual_dir_search': "",
@@ -142,7 +144,9 @@ DEFAULTS_HOTKEYS = {
         'subfeed': 'Ctrl+1',
         'playback': 'Ctrl+2',
         'detailed_list': 'Ctrl+3',
-        'subscriptions': 'Ctrl+5'
+        'download': 'Ctrl+4',
+        'subscriptions': 'Ctrl+5',
+        'tiled_list': 'Ctrl+9'
     },
     'Subfeed': {
         'download': 'LeftButton',
@@ -174,7 +178,7 @@ def read_config(section, option, literal_eval=True, custom_ini=None):
     if custom_ini is not None:
         # logger.debug("Reading custom config: {}".format(custom_ini))
         if custom_ini == "hotkeys":
-            config_path = CONFIG__HOTKEYS_PATH
+            config_path = CONFIG_HOTKEYS_PATH
             sample_path = SAMPLE_HOTKEYS_PATH
             defaults = DEFAULTS_HOTKEYS
             parser = hotkeys_parser
