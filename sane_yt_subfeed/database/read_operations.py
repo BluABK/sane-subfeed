@@ -129,6 +129,18 @@ def check_for_new(videos, deep_refresh=False):
 
 def refresh_and_get_newest_videos(limit, filter_downloaded=True, filter_discarded=True, progress_listener=None,
                                   refresh_type=LISTENER_SIGNAL_NORMAL_REFRESH):
+    """
+    Refresh subscription feed and get newest videos from local DB
+
+    FIX DESCRIPTIONS: To retroactively fix all descriptions add: update_existing=True to UpdateVideosThread call
+                      and see other FIX DESCRIPTIONS in engine_statements.py
+    :param limit:
+    :param filter_downloaded:
+    :param filter_discarded:
+    :param progress_listener:
+    :param refresh_type:
+    :return:
+    """
     logger.info("Refreshing and getting newest videos")
     if progress_listener:
         progress_listener.progress_bar.setVisible(True)

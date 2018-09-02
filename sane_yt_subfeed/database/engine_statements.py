@@ -38,19 +38,15 @@ def update_extra_information_stmt():
         'duration': bindparam('duration')})
 
 
-#         'playlist_pos': bindparam('playlist_pos'),
-#         'url_video': bindparam('url_video'),
-#         'url_playlist_video': bindparam('url_playlist_video'),
-#         'thumbnails': bindparam('thumbnails'),
-#         'downloaded': bindparam('downloaded'),
-#         'search_item': bindparam('search_item'),
-#         'discarded': bindparam('discarded'),
-#         'vid_path': bindparam('vid_path'),
-#         'watched': bindparam('watched'),
-#         'watch_prio': bindparam('watch_prio'),
-#     })
-
 def update_video_stmt():
+    """
+    Updates a video DB statement with a Video object
+
+    FIX DESCRIPTIONS: To retroactively fix all descriptions add: 'description': bindparam('description')
+                      and see other FIX DESCRIPTIONS in read_operations.py
+    :return:
+    """
+
     return Video.__table__.update().where(Video.video_id == bindparam('_video_id')).values({
         'thumbnail_path': bindparam('thumbnail_path'),
         'url_video': bindparam('url_video'),
