@@ -1,7 +1,16 @@
-current
+v0.4.1
+- Made MainWindow read hotkeys from ini file instead of using hardcoded ones
+- Fixed bug where hotkeys parser read the wrong ini file
+- "Download video by URL/ID" now handles URLs with '&' params
+- Changed SaneInputDialog from QInputDialog to QDialog and added support for QValidator
+- Added info about log level 1 (Enable all) in ConfigView
+- Removed deprecated config.ini file/gui mismatch check
+- Fixed white text on white background tooltip issue in breeze light theme
+- Changed various config defaults for GUI
+- Video duration is now displayed on thumbnail tiles
 - Renamed functions from *filename to *filepath where applicable, and made filepath function os.path.join its return value and send paths - not names - to SaneFFmpegMergerPP
 - Split output filename detection into functions and created a new one for finding incomplete downloads
-- Made SaneFFmpegMergerPP attempt merge as follows: 1. Attempt to encode audio to aac, 2. Attempt to encode video to h264 or  3. Encode both audio and video to above formats (worst case scenario)
+- Made SaneFFmpegMergerPP attempt merge as follows: 1. Attempt to encode audio to aac, 2. Attempt to encode video to h264 or 3. Encode both audio and video to above formats (worst case scenario)
 - Added handling of incompatible container audio and video stream muxing (mostly MP4) where youtube_dl would just die to an unhandled Exception
 - Made SaneFFmpegPostProcessor use config.ini options instead of youtube_dl's _downloader.params
 - Added postprocessing section and options to config files and gui
