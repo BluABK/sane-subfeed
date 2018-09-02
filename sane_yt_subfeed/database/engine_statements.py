@@ -41,9 +41,6 @@ def update_extra_information_stmt():
 def update_video_stmt():
     """
     Updates a video DB statement with a Video object
-
-    FIX DESCRIPTIONS: To retroactively fix all descriptions add: 'description': bindparam('description')
-                      and see other FIX DESCRIPTIONS in read_operations.py
     :return:
     """
 

@@ -131,9 +131,6 @@ def refresh_and_get_newest_videos(limit, filter_downloaded=True, filter_discarde
                                   refresh_type=LISTENER_SIGNAL_NORMAL_REFRESH):
     """
     Refresh subscription feed and get newest videos from local DB
-
-    FIX DESCRIPTIONS: To retroactively fix all descriptions add: update_existing=True to UpdateVideosThread call
-                      and see other FIX DESCRIPTIONS in engine_statements.py
     :param limit:
     :param filter_downloaded:
     :param filter_discarded:
