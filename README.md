@@ -1,10 +1,13 @@
-<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/app_preview.png" alt="drawing" width="800px"/>
+![app_preview](docs/readme_assets/app_preview.png)
 
 ## Compatibility
 This code is primarily tested on the following platforms:
-*   Windows 10,     Python 3.7.0 with PyQt 5.11 (x64)
-*   Linux/Debian 9, Python 3.5.3 with PyQt 5.10 (x64)
-*   Arch,           Python 3.7.0 with PyQt 5.11 (x64)
+
+| Operating System          | Python | PyQt | Arch  | Tester(s)                                |
+|:-------------------------:|:------:|:----:|:-----:|:----------------------------------------:| 
+| Windows 10                | 3.7.0  | 5.11 | x64   | [BluABK][user_bluabk], [Acca][user_acca] |
+| Linux/Debian 9 (stable)   | 3.5.3  | 5.10 | x64   | [BluABK][user_bluabk]                    |
+| Linux/Arch                | 3.7.0  | 5.11 | x64   | [Kitsuna][user_kitsuna]                  |
 
 ### Known incompatibilities
 #### x86 versions of Python
@@ -12,19 +15,13 @@ There's currently issues with memory leaks that leads to memory use above x86 py
 
 ## Prerequisites
 
-*   Python 3 (3.5+ is recommended)
-*   The pip package management tool
+*   Python 3 (3.5+ is recommended, 3.7+ is encouraged)
+*   The pip package management tool (usually bundled with python installation)
 
-Other requirements:
+### Other requirements:
 
-Python 3.6 and above:
-
-    pip install -r requirements.txt
-    
-Python 3.5 and below: 
-
-    pip install -r requirements-py35.txt
-
+*   Python 3.6 and above: `pip install -r requirements.txt`
+*   Python 3.5 and below: `pip install -r requirements-py35.txt`
 
 ### Set up OAuth and API keys (pick _one_ option)
 OAuth is required for access to your own youtube account (like retrieving subscriptions list). 
@@ -32,8 +29,8 @@ For anything else API keys is usually what gets used.
 
 #### Option A: Use public/pre-made
 Caution: This option is prone to daily API quota limit issues, option B is highly encouraged.
-1. Rename `sane_yt_subfeed/resources/keys_public.json` to `keys.json`
-2. Rename `sane_yt_subfeed/resources/client_secret_public.json` to `client_secret.json`
+  1. Rename `sane_yt_subfeed/resources/keys_public.json` to `keys.json`
+  2. Rename `sane_yt_subfeed/resources/client_secret_public.json` to `client_secret.json`
 
 #### Option B: Set up your own
 Useful ref: https://developers.google.com/youtube/v3/getting-started
@@ -46,20 +43,31 @@ Useful ref: https://developers.google.com/youtube/v3/getting-started
   5. Search for, and select "YouTube Data API v3"
   6. Enable "YouTube Data API v3"
   7. Go to "Credentials" screen
-  
-  1<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/01_open_project_dialog.png" alt="drawing" width="100px"/> 2<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/02_create_new_project.png" alt="drawing" width="100px"/> 3<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/03_name_and_create_project.png" alt="drawing" width="100px"/> 4<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/04_enable_api.png" alt="drawing" width="100px"/> 5<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/05_select_youtube_data_v3_api.png" alt="drawing" width="100px"/> 6<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/06_enable_youtube_data_v3_api.png" alt="drawing" width="100px"/> 7<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/07_go_to_credentials_screen.png" alt="drawing" width="100px"/>
-  
-  
   8. Create an API Key and copy the key into `sane_yt_subfeed/resources/keys.json.sample` and rename it `keys.json`
-     
-     8<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/08_create_api_key.png" alt="drawing" width="100px"/>
-     
-  9. Create an OAuth Client ID
-     1. Configure consent screen, usage type is "other".
-     2. Download json and save it as `sane_yt_subfeed/resources/client_secret.json` 
-     
-     9<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/09a_create_oauth_client.png" alt="drawing" width="100px"/> i<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/09b_configure_oauth_consent.png" alt="drawing" width="100px"/> ii<img src="https://github.com/BluABK/sane-subfeed/raw/master/docs/readme_assets/09c_create_oauth_client.png" alt="drawing" width="100px"/>
-     
+  9. 
+     1. a) Create an OAuth Client ID
+     2. b) Configure consent screen, usage type is "other".
+     3. c) Download json and save it as `sane_yt_subfeed/resources/client_secret.json` 
+
+
+<details><summary>Option B Step by Step in pictures</summary>
+    <p>
+
+| Step 1 | Step 2 | Step 3 | Step 4 |
+|--------|--------|--------|--------|
+| ![step1](docs/readme_assets/01_open_project_dialog.png) | ![step2](docs/readme_assets/02_create_new_project.png) | ![step3](docs/readme_assets/03_name_and_create_project.png) | ![step4](docs/readme_assets/04_enable_api.png) |
+
+| Step 5 | Step 6 | Step 7 | Step 8 |
+|--------|--------|--------|--------|
+| ![step5](docs/readme_assets/05_select_youtube_data_v3_api.png) | ![step6](docs/readme_assets/06_enable_youtube_data_v3_api.png) | ![step7](docs/readme_assets//07_go_to_credentials_screen.png) | ![step8](docs/readme_assets/08_create_api_key.png) |
+
+| Step 9a | Step 9b | Step 9c |
+|---------|---------|---------|
+| ![step9a](docs/readme_assets/09a_create_oauth_client.png) | ![step9b](docs/readme_assets/09b_configure_oauth_consent.png) | ![step9c](docs/readme_assets/09c_create_oauth_client.png) |
+
+</p></details>
+
+
 ### Running the application
 If it's the first time run: `pip install -e .` (required for non-Windows OS due to a pesky python path bug) <br/>
 
@@ -86,3 +94,10 @@ Afterwards you can launch it with: `python -m sane_yt_subfeed`
 ## Notable Wiki articles
 *  [Missed videos and tests](https://github.com/BluABK/sane-subfeed/wiki/Missed-videos-(and-tests))
 *  [Youtube-DL Integration (and overriding the youtube_dl options)](https://github.com/BluABK/sane-subfeed/wiki/YouTube-DL-integration)
+
+
+[//]: #  (Link references, variables and other black magic goes below this line.) 
+[user_bluabk]: https://github.com/BluABK
+[user_acca]: https://github.com/acccentor
+[user_kitsuna]: https://github.com/lordkitsuna
+[user_hawken]: https://github.com/hawken93
