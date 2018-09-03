@@ -37,7 +37,10 @@ class ThumbnailTile(QLabel):
     def paintEvent(self, event):
         if self.p:
             if self.p.isNull():
-                self.logger.warning("QPixmap self.p was NULL, replacing with 'Thumbnail N/A' image!")
+                vid_info = "{} - {} [{}]".format(self.parent.video.channel_title, self.parent.video.title,
+                                                 self.parent.video.url_video)
+                self.logger.warning("QPixmap self.p was NULL, replacing with 'Thumbnail N/A' image! Video: {}".format(
+                    vid_info))
                 self.p = QPixmap(THUMBNAIL_NA_PATH)
 
             painter = QPainter(self)
