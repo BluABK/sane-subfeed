@@ -1,4 +1,4 @@
-# Sane Subscription feed
+# Sane Subscription Feed
 
 ![app_preview](docs/readme_assets/app_preview.png)
 
