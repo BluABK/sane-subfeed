@@ -1,3 +1,6 @@
+Current
+- Bug fix: Subscriptions list API retrieval now handles strange cases where channels are missing title in backend.
+
 v0.4.1
 - Made MainWindow read hotkeys from ini file instead of using hardcoded ones
 - Fixed bug where hotkeys parser read the wrong ini file
