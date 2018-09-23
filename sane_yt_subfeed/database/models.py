@@ -1,6 +1,7 @@
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 
+from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.database.decorators import TextPickleType
 from sane_yt_subfeed.database.orm import PermanentBase
 
@@ -21,15 +22,31 @@ class Channel(PermanentBase):
     costs = relationship('RunCost', back_populates='channel')
 
     def __init__(self, youtube_response, playlist_id, channel_list_response=False):
+        self.logger = create_logger(__name__)
         if channel_list_response:
             self.id = youtube_response['id']    # channelList response id is outside of snippet section
             youtube_response = youtube_response['snippet']  # Readjust to same level as subscriptionList response
         else:
             self.id = youtube_response['resourceId']['channelId']
 
-        self.title = youtube_response['title']
-        self.description = youtube_response['description']
-        self.thumbnails = youtube_response['thumbnails']
+        try:
+            self.title = youtube_response['title']
+        except KeyError as ke_exc_title:
+            self.logger.error("Database failed getting title key!", exc=ke_exc_title)
+            self.logger.debug(youtube_response)
+            raise ke_exc_title
+        try:
+            self.description = youtube_response['description']
+        except KeyError as ke_exc_desc:
+            self.logger.error("Database failed getting title key!", exc=ke_exc_desc)
+            self.logger.debug(youtube_response)
+            raise ke_exc_desc
+        try:
+            self.thumbnails = youtube_response['thumbnails']
+        except KeyError as ke_exc_thumbs:
+            self.logger.error("Database failed getting title key!", exc=ke_exc_thumbs)
+            self.logger.debug(youtube_response)
+            raise ke_exc_thumbs
         self.snippet = youtube_response
         self.playlist_id = playlist_id
         self.subscribed = True
