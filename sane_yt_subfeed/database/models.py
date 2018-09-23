@@ -32,19 +32,19 @@ class Channel(PermanentBase):
         try:
             self.title = youtube_response['title']
         except KeyError as ke_exc_title:
-            self.logger.error("Database failed getting title key!", exc=ke_exc_title)
+            self.logger.error("Database failed getting title key!", exc_info=ke_exc_title)
             self.logger.debug(youtube_response)
             raise ke_exc_title
         try:
             self.description = youtube_response['description']
         except KeyError as ke_exc_desc:
-            self.logger.error("Database failed getting title key!", exc=ke_exc_desc)
+            self.logger.error("Database failed getting description key!", exc_info=ke_exc_desc)
             self.logger.debug(youtube_response)
             raise ke_exc_desc
         try:
             self.thumbnails = youtube_response['thumbnails']
         except KeyError as ke_exc_thumbs:
-            self.logger.error("Database failed getting title key!", exc=ke_exc_thumbs)
+            self.logger.error("Database failed getting thumbnails key!", exc_info=ke_exc_thumbs)
             self.logger.debug(youtube_response)
             raise ke_exc_thumbs
         self.snippet = youtube_response
