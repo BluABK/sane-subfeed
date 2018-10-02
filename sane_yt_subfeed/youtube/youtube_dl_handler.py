@@ -186,8 +186,9 @@ class YoutubeDownload(threading.Thread):
                                                                          self.video.url_video))
                 ydl.download([self.video.url_video])
         except DownloadError as dl_exc:
-            if str(dl_exc) == "ERROR: The uploader has not made this video available in your country." or \
+            if "The uploader has not made this video available in your country." in str(dl_exc) or \
                     ("ERROR:" in str(dl_exc) and "blocked it in your country" in str(dl_exc)):
+                # logger.error("ERROR: The uploader has not made this video available in your country") # -- used for debug
                 if self.download_with_proxy() is not True:
                     logger.error("All proxies have failed to download geo blocked video '{}'!".format(self.video.title))
                     logger.exception(dl_exc)
