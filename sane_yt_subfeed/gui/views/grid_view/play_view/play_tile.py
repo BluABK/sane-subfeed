@@ -53,7 +53,7 @@ class PlayTile(VideoTile):
         self.play_vid(file_path, player, mark_watched=mark_watched)
 
     def play_vid(self, file_path, player, mark_watched=True):
-        # player = player.strip()
+        player.append(file_path)
 
         if mark_watched:
             self.mark_watched()
@@ -61,7 +61,8 @@ class PlayTile(VideoTile):
         if not os.path.isfile(file_path):
             self.logger.warning('os.path.isfile returns False for File: {}'.format(file_path))
         if player:
-            subprocess.Popen([player, file_path])
+            popen_args = player + [file_path]
+            subprocess.Popen(popen_args)
         else:
             subprocess.Popen([file_path], shell=True)
 
@@ -73,9 +74,9 @@ class PlayTile(VideoTile):
         """
         menu = QMenu(self)
 
-        alternative_player1 = read_config('Player', 'alternative_player1', literal_eval=False)
-        alternative_player2 = read_config('Player', 'alternative_player2', literal_eval=False)
-        alternative_player3 = read_config('Player', 'alternative_player3', literal_eval=False)
+        alternative_player1 = read_config('Player', 'alternative_player1', literal_eval=False).split(' ')
+        alternative_player2 = read_config('Player', 'alternative_player2', literal_eval=False).split(' ')
+        alternative_player3 = read_config('Player', 'alternative_player3', literal_eval=False).split(' ')
         url_player = read_config('Player', 'url_player', literal_eval=False)
         alternative_player1_action = None
         alternative_player2_action = None
