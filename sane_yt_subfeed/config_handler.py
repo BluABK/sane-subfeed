@@ -112,6 +112,13 @@ DEFAULTS = {
         'alternative_player1': "",
         'alternative_player2': "",
         'alternative_player3': "",
+        'alternative_player4': "",
+        'alternative_player5': "",
+        'alternative_player6': "",
+        'alternative_player7': "",
+        'alternative_player8': "",
+        'alternative_player9': "",
+        'alternative_player10': "",
         'url_player': ""
     },
     'DefaultApp': {
