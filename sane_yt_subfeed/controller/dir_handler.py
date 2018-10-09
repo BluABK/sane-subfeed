@@ -12,10 +12,9 @@ from sane_yt_subfeed.youtube.update_videos import load_keys
 from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_videos
 
 
-
-def get_yt_file(search_path, id):
+def get_yt_file(search_path, fid):
     for name in os.listdir(search_path):
-        if id in name:
+        if fid in name:
             return name
     return None
 
@@ -26,7 +25,7 @@ class VidEventHandler(PatternMatchingEventHandler):
     def __init__(self, listener):
         super().__init__()
         self.listener = listener
-        self.logger = create_logger(__name__ + "VidEventHandler")
+        self.logger = create_logger(__name__ + ".VidEventHandler")
 
     def on_any_event(self, event):
         self.logger.debug("{}: {}".format(event.event_type, event.__dict__))
@@ -61,6 +60,7 @@ class VidEventHandler(PatternMatchingEventHandler):
                 self.listener.newFile.emit(id, path)
             else:
                 self.logger.debug("Found file with invalid extension: {}".format(name))
+
 
 def manual_youtube_folder_check(input_path):
     # input_path = os.path.join(OS_PATH, input_folder)
