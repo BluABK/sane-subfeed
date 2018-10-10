@@ -31,7 +31,6 @@ def open_with_default_application(file_path):
     # Determine file type
     if is_image(file_path):
         custom_app = read_config('DefaultApp', 'Image', literal_eval=False)
-        print(custom_app)
     else:
         logger.error("No default application extensions specified for {}".format(file_path))
         return
@@ -39,7 +38,7 @@ def open_with_default_application(file_path):
         if sys.platform.startswith('linux'):
             if custom_app:
                 try:
-                    subprocess.call(custom_app, file_path)
+                    subprocess.Popen([custom_app, file_path])
                 except Exception as e:
                     logger.error("{} (custom)".format(FAIL_LOG_MSG.format(file_path, custom_app)), exc_info=e)
                     pass
