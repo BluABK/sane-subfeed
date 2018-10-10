@@ -62,6 +62,7 @@ class MainWindow(QMainWindow):
         self.themes_list = THEMES_LIST
         self.current_theme = None
         self.current_theme_idx = 0
+        self.bgcolor = read_config('Gui', 'bgcolor', literal_eval=False)
 
         self.clipboard = QApplication.clipboard()
         self.status_bar = self.statusBar()

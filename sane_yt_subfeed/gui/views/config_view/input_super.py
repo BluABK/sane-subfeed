@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QTabWidget, QVBoxLayout
 
+from sane_yt_subfeed.gui.views.config_view.config_items.button import GenericConfigPushButton
 from sane_yt_subfeed.gui.views.config_view.config_items.checkbox import GenericConfigCheckBox
 from sane_yt_subfeed.gui.views.config_view.config_items.combobox import GenericConfigComboBox
 from sane_yt_subfeed.gui.views.config_view.config_items.line_edit import GenericLineEdit
@@ -148,6 +149,27 @@ class InputSuper(QWidget):
 
         option = QLabel(description)
         value = GenericConfigComboBox(self, description, cfg_section, cfg_option, formated_items)
+        self.layout.addWidget(option, self.offset, 0)
+        self.layout.addWidget(value, self.offset, 1)
+        self.offset += 1
+
+        return value  # Needed for connected listeners etc
+
+    def add_option_button(self, name, description, cfg_section, cfg_option, tooltip=None, clear=False, tab_id=None):
+        """
+        Add an option w/ value to the ConfigView layout and increment the grid offset.
+        :param name:
+        :param clear:
+        :param tab_id:
+        :param items:
+        :param cfg_option:
+        :param cfg_section:
+        :param description:
+        :return:
+        """
+
+        option = QLabel(description)
+        value = GenericConfigPushButton(self, name, description, cfg_section, cfg_option, clear=clear, tooltip=tooltip)
         self.layout.addWidget(option, self.offset, 0)
         self.layout.addWidget(value, self.offset, 1)
         self.offset += 1

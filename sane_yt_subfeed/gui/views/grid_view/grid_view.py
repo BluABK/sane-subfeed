@@ -2,7 +2,7 @@ import math
 
 from PyQt5 import sip
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QColor
 from PyQt5.QtWidgets import QWidget, QGridLayout, QSizePolicy
 
 from sane_yt_subfeed.config_handler import read_config
@@ -38,7 +38,8 @@ class GridView(QWidget):
         self.setLayout(self.grid)
 
         self.setAutoFillBackground(True)
-        self.set_bgcolor()
+        if root.bgcolor:
+            self.set_bgcolor(root.bgcolor)
 
         self.main_model.grid_view_listener.redrawVideos.connect(self.redraw_videos)
 
@@ -101,10 +102,13 @@ class GridView(QWidget):
             "Updated view: currently {} widgets and {} items_x".format(video_counter, self.items_x))
         self.resize_event()
 
-    def set_bgcolor(self, color="default", darkmode=False):
+    def set_bgcolor(self, color):
+        """
+        Sets a background color based on a hexadecimal string.
+        :param color:
+        :return:
+        """
         palette = self.palette()
-        if darkmode:
-            palette.setColor(self.backgroundRole(), Qt.black)
-        else:
-            palette.setColor(self.backgroundRole(), Qt.white)
+        bgcolor = QColor(color)
+        palette.setColor(self.backgroundRole(), bgcolor)
         self.setPalette(palette)

@@ -54,7 +54,8 @@ DEFAULTS = {
         'tooltip_picture_height': '256',
         'tooltip_picture_size': 'h1',
         'keep_thumb_ar': 'True',
-        'enable_auto_copy_to_clipboard': 'False'
+        'enable_auto_copy_to_clipboard': 'False',
+        'bgcolor': ""
     },
     'Theme': {
         'last_style': "",

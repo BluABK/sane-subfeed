@@ -1,5 +1,6 @@
 # PyQt5
-from PyQt5.QtGui import QIntValidator, QDoubleValidator
+from PyQt5.QtCore import QRegExp
+from PyQt5.QtGui import QIntValidator, QDoubleValidator, QRegExpValidator
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox
 
 # Internal
@@ -13,6 +14,7 @@ from sane_yt_subfeed.gui.views.config_view.config_items.line_edit import Generic
 from sane_yt_subfeed.gui.views.config_view.input_super import InputSuper
 from sane_yt_subfeed.log_handler import create_logger
 
+HEXADECIMAL_COLOR_REGEX = '^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$'
 
 class ConfigViewWidget(InputSuper):
     """
@@ -73,6 +75,12 @@ class ConfigViewWidget(InputSuper):
                                      tab_id='GUI')
             self.add_option_checkbox('Keep Aspect Ratop on resized thumbnails', 'Gui', 'keep_thumb_ar', tab_id='GUI')
             self.add_option_checkbox('Auto copy to clipboard', 'Gui', 'enable_auto_copy_to_clipboard', tab_id='GUI')
+            self.add_option_line_edit('Set custom background color hexadecimal <br/>'
+                                      '(only works in default theme. Ex: #ffffff for white bg)',
+                                      'Gui', 'bgcolor',
+                                      cfg_validator=QRegExpValidator(QRegExp(HEXADECIMAL_COLOR_REGEX)), tab_id='GUI')
+            self.add_option_button('Clear bgcolor', 'Clears the background color setting ', 'Gui', 'bgcolor',
+                                   tooltip='(required due to validator shenanigans)', clear=True, tab_id='GUI')
 
             # Section [GridView]
             self.add_section('{}Grid Views{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
