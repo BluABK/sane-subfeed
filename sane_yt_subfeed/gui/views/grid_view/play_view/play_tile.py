@@ -86,6 +86,12 @@ class PlayTile(VideoTile):
         if s:
             s = s.split(' ')
 
+    @staticmethod
+    def determine_name(name, failover_name):
+        if name:
+            return name
+        else:
+            return failover_name
 
     def contextMenuEvent(self, event):
         """
@@ -124,27 +130,49 @@ class PlayTile(VideoTile):
         play_wo_action = menu.addAction("Play w/o mark watched")
 
         if alternative_player1:
-            alternative_player1_action = menu.addAction("Play with alternative player 1")
+            alternative_player1_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player1_name', literal_eval=False),
+                                    "Play with alternative player 1"))
         if alternative_player2:
-            alternative_player2_action = menu.addAction("Play with alternative player 2")
+            alternative_player2_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player2_name', literal_eval=False),
+                                    "Play with alternative player 2"))
         if alternative_player3:
-            alternative_player3_action = menu.addAction("Play with alternative player 3")
+            alternative_player3_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player3_name', literal_eval=False),
+                                    "Play with alternative player 3"))
         if alternative_player4:
-            alternative_player4_action = menu.addAction("Play with alternative player 4")
+            alternative_player4_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player4_name', literal_eval=False),
+                                    "Play with alternative player 4"))
         if alternative_player5:
-            alternative_player5_action = menu.addAction("Play with alternative player 5")
+            alternative_player5_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player5_name', literal_eval=False),
+                                    "Play with alternative player 5"))
         if alternative_player6:
-            alternative_player6_action = menu.addAction("Play with alternative player 6")
+            alternative_player6_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player6_name', literal_eval=False),
+                                    "Play with alternative player 6"))
         if alternative_player7:
-            alternative_player7_action = menu.addAction("Play with alternative player 7")
+            alternative_player7_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player7_name', literal_eval=False),
+                                    "Play with alternative player 7"))
         if alternative_player8:
-            alternative_player8_action = menu.addAction("Play with alternative player 8")
+            alternative_player8_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player8_name', literal_eval=False),
+                                    "Play with alternative player 8"))
         if alternative_player9:
-            alternative_player9_action = menu.addAction("Play with alternative player 9")
+            alternative_player9_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player9_name', literal_eval=False),
+                                    "Play with alternative player 9"))
         if alternative_player10:
-            alternative_player10_action = menu.addAction("Play with alternative player 10")
+            alternative_player10_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player10_name', literal_eval=False),
+                                    "Play with alternative player 10"))
 
-        url_player_action = menu.addAction("Play with url player")
+        url_player_action = menu.addAction(
+            self.determine_name(read_config('PlayerFriendlyName', 'url_player_name', literal_eval=False),
+                                "Play with url player"))
 
         if not self.video.vid_path:
             download_video = menu.addAction("Download video")

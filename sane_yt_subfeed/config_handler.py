@@ -121,6 +121,20 @@ DEFAULTS = {
         'alternative_player10': "",
         'url_player': ""
     },
+    'PlayerFriendlyName': {
+        'default_player_name': "",
+        'alternative_player1_name': "",
+        'alternative_player2_name': "",
+        'alternative_player3_name': "",
+        'alternative_player4_name': "",
+        'alternative_player5_name': "",
+        'alternative_player6_name': "",
+        'alternative_player7_name': "",
+        'alternative_player8_name': "",
+        'alternative_player9_name': "",
+        'alternative_player10_name': "",
+        'url_player_name': ""
+    },
     'DefaultApp': {
       'Image': ""
     },
