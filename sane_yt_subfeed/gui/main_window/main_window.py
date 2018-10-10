@@ -221,7 +221,7 @@ class MainWindow(QMainWindow):
         view_subs_view = self.add_submenu('&View', 'Subscriptions', self.set_current_widget,
                                           shortcut=read_config('View', 'subscriptions', custom_ini=HOTKEYS_INI,
                                                                literal_eval=HOTKEYS_EVAL),
-                                          tooltip='View Subscriptions', icon='subs.png', widget=self.download_view)
+                                          tooltip='View Subscriptions', icon='subs.png', widget=self.subs_view)
         if read_config('Debug', 'show_unimplemented_gui'):
             view_list_tiled_view = self.add_submenu('&View', 'Tiled List', self.set_current_widget,
                                                     shortcut=read_config('View', 'tiled_list', custom_ini=HOTKEYS_INI,
