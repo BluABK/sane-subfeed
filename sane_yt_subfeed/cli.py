@@ -3,6 +3,7 @@ import sys
 
 import click
 from sqlalchemy import or_
+from subprocess import check_output
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.video import Video
@@ -65,6 +66,12 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day):
 
         # Set the exception hook to our wrapping function
         sys.excepthook = my_exception_hook
+
+        # Log the current ulimit
+        if sys.platform.startswith('linux'):
+            ulimit_data = check_output("ulimit -a", shell=True)
+            logger.info("=== ulimit info on next line ===")
+            logger.info(ulimit_data.decode('utf8'))
 
         run_with_gui()
 
