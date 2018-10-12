@@ -1,4 +1,6 @@
 # FIXME: imp*
+import gc
+
 import datetime
 import os
 import time
@@ -179,6 +181,9 @@ class MainWindowListener(QObject):
         else:
             self.model.remote_update_videos(refresh_type=refresh_type)
             self.logger.error('NOT IMPLEMENTED: disabled hide_downloaded')
+
+        # Attempt to force garbage collection to close unnecessary sockets
+        gc.collect()
 
     @pyqtSlot()
     def refresh_subs(self):
