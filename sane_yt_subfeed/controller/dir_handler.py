@@ -27,8 +27,8 @@ class VidEventHandler(PatternMatchingEventHandler):
         self.listener = listener
         self.logger = create_logger(__name__ + ".VidEventHandler")
 
-    def on_any_event(self, event):
-        self.logger.debug("{}: {}".format(event.event_type, event.__dict__))
+    # def on_any_event(self, event):
+    #     self.logger.debug("{}: {}".format(event.event_type, event.__dict__))
 
     # def on_any_event(self, event):
     #     print("change")
@@ -39,11 +39,13 @@ class VidEventHandler(PatternMatchingEventHandler):
     #         time.sleep(1)
 
     def on_moved(self, event):
+        self.logger.info("{}: {}".format(event.event_type, event.__dict__))
         self.check_file(event.dest_path)
     #     print("change")
     #     # self.process(event)
 
     def on_created(self, event):
+        self.logger.info("{}: {}".format(event.event_type, event.__dict__))
         self.check_file(event.src_path)
 
     def check_file(self, path):
