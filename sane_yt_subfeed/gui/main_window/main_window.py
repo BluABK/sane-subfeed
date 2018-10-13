@@ -174,9 +174,10 @@ class MainWindow(QMainWindow):
         self.add_submenu('&Function', 'Test Channels', self.main_model.main_window_listener.testChannels.emit,
                          tooltip='Tests the test_pages and miss_limit of channels', icon='rerun_test.png')
 
-        self.add_submenu('&Function', 'Manual dir search', self.main_model.yt_dir_listener.manualCheck.emit,
-                         tooltip='Starts a manual search for new videos in youtube directory',
-                         icon='folder_refresh.png')
+        if self.main_model.yt_dir_listener is not None:
+            self.add_submenu('&Function', 'Manual dir search', self.main_model.yt_dir_listener.manualCheck.emit,
+                             tooltip='Starts a manual search for new videos in youtube directory',
+                             icon='folder_refresh.png')
 
         thumb_tooltip = 'Starts a manual download of thumbnails for videos currently in play view and sub feed'
         self.add_submenu('&Function', 'Manual thumbnail download',
@@ -409,7 +410,7 @@ class MainWindow(QMainWindow):
             return self.menus[name]
 
     def add_submenu(self, menu, name, action, shortcut=None, shortcuts=None,
-                    tooltip=None, icon=None, subsubmenu=False, dummy=False, **kwargs):
+                    tooltip=None, icon=None, subsubmenu=False, dummy=False, disabled=False, **kwargs):
         """
         Adds a submenu with optional properties to a menu
         :param subsubmenu:
