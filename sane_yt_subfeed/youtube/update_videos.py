@@ -179,8 +179,12 @@ def get_extra_videos_information(videos):
                 video.dimension = response['contentDetails']['dimension']
                 video.definition = response['contentDetails']['definition']
                 video.projection = response['contentDetails']['projection']
-                video.region_restriction_allowed = response['contentDetails']['regionRestriction']['allowed']
-                video.region_restriction_blocked = response['contentDetails']['regionRestriction']['blocked']
+                # regionRestriction and its sub-items seems to only exist if explicitly set
+                if 'regionRestriction' in response['contentDetails']:
+                    if 'allowed' in response['contentDetails']['regionRestriction']:
+                        video.region_restriction_allowed = response['contentDetails']['regionRestriction']['allowed']
+                    if 'blocked' in response['contentDetails']['regionRestriction']:
+                        video.region_restriction_blocked = response['contentDetails']['regionRestriction']['blocked']
     return videos
 
 
