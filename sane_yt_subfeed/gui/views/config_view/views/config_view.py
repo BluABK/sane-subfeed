@@ -16,6 +16,7 @@ from sane_yt_subfeed.log_handler import create_logger
 
 HEXADECIMAL_COLOR_REGEX = '^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$'
 
+
 class ConfigViewWidget(InputSuper):
     """
     Configuration widget
@@ -46,7 +47,7 @@ class ConfigViewWidget(InputSuper):
         Initialize UI
         :return:
         """
-        self.logger.info("Initializing UI")
+        self.logger.info("Initializing UI: ConfigViewWidget")
 
     def populate_options(self):
         """

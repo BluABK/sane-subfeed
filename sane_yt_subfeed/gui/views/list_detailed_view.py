@@ -40,7 +40,7 @@ class ListDetailedView(QWidget):
         Initialize the UI
         :return:
         """
-        self.logger.info("Initialized UI")
+        self.logger.info("Initializing UI: ListDetailedView")
         layout = QVBoxLayout()
         self.setLayout(layout)
         self.get_videos()

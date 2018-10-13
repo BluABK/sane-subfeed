@@ -95,7 +95,7 @@ class MainWindow(QMainWindow):
         self.init_ui()
 
     def init_ui(self):
-        self.logger.info("Initialized UI")
+        self.logger.info("Initializing UI: MainWindow")
 
         # Set the (last used) theme
         _last_theme = read_config('Theme', 'last_theme', literal_eval=False)

@@ -37,7 +37,7 @@ class HotkeysViewWidget(InputSuper):
         Initialize UI
         :return:
         """
-        self.logger.info("Initializing UI")
+        self.logger.info("Initializing UI: HotkeysViewWidget")
 
     def add_option_line_edit(self, description, cfg_section, cfg_option, cfg_validator=None):
         """

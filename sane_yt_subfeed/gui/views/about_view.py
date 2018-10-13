@@ -52,7 +52,7 @@ class AboutView(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        self.logger.info("Initialized UI")
+        self.logger.info("Initializing UI: AboutView")
         # textbox = QTextEdit()
         layout = QVBoxLayout()
         self.setLayout(layout)

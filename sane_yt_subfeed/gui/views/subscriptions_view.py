@@ -38,7 +38,7 @@ class SubscriptionsView(QWidget):
         Initialize the UI
         :return:
         """
-        self.logger.info("Initialized UI")
+        self.logger.info("Initializing UI: SubscriptionsView")
         layout = QVBoxLayout()
         self.setLayout(layout)
         self.get_subs()

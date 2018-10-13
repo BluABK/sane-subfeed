@@ -145,7 +145,6 @@ class UpdateVideosExtraInfoThreaded(threading.Thread):
                     self.logger.warning("Video missing region_restriction_blocked for update: {}".format(vid_info))
                     self.logger.error(self.obj_attrs_to_dict(item))
                 else:
-                    self.logger.info("Adding video to update list: {}".format(vid_info))
                     update_list.append(
                         {"thumbnail_path": item.thumbnail_path, "_video_id": item.video_id, "duration": item.duration,
                          "has_caption": item.has_caption, "dimension": item.dimension, "definition": item.definition,
