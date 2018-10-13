@@ -24,6 +24,12 @@ def update_video_statement_full(db_video):
         watched=db_video.watched,
         watch_prio=db_video.watch_prio,
         duration=db_video.duration,
+        has_caption=db_video.has_caption,
+        dimension=db_video.dimension,
+        definition=db_video.definition,
+        projection=db_video.projection,
+        region_restriction_allowed=db_video.region_restriction_allowed,
+        region_restriction_blocked=db_video.region_restriction_blocked,
         date_downloaded=db_video.date_downloaded)
 
 
@@ -55,6 +61,12 @@ def update_video_stmt():
         'watched': bindparam('watched'),
         'watch_prio': bindparam('watch_prio'),
         'duration': bindparam('duration'),
+        'has_caption': bindparam('has_caption'),
+        'dimension': bindparam('dimension'),
+        'definition': bindparam('definition'),
+        'projection': bindparam('projection'),
+        'region_restriction_allowed': bindparam('region_restriction_allowed'),
+        'region_restriction_blocked': bindparam('region_restriction_blocked'),
     })
 
 

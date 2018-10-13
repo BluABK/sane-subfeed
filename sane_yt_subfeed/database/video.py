@@ -8,7 +8,12 @@ from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 from sane_yt_subfeed.database.orm import PermanentBase
 
 
-class Video(PermanentBase):
+class Video(PermanentBase):     # FIXME: PickleTypes should probably be replaced by actual tables
+    """
+    Video SQLAlchemy Database table object
+
+    For info on various columns see https://developers.google.com/youtube/v3/docs/videos
+    """
     __tablename__ = 'video'
     video_id = Column('video_id', String, primary_key=True)
     channel_title = Column(String)
@@ -28,6 +33,12 @@ class Video(PermanentBase):
     watched = Column(Boolean)
     watch_prio = Column(Integer)
     duration = Column(Interval)
+    has_caption = Column(Boolean)
+    dimension = Column(String)
+    definition = Column(String)
+    projection = Column(String)
+    region_restriction_allowed = Column(TextPickleType())
+    region_restriction_blocked = Column(TextPickleType())
 
     def __init__(self, search_item):
         """
@@ -86,6 +97,12 @@ class Video(PermanentBase):
         video_d.watch_prio = video.watch_prio
         video_d.date_downloaded = video.date_downloaded
         video_d.duration = video.duration
+        video_d.has_caption = video.has_caption
+        video_d.dimension = video.dimension
+        video_d.definition = video.definition
+        video_d.projection = video.projection
+        video_d.region_restriction_allowed = video.region_restriction_allowed
+        video_d.region_restriction_blocked = video.region_restriction_blocked
         return video_d
 
     @staticmethod
@@ -104,6 +121,12 @@ class Video(PermanentBase):
         self.watch_prio = video_d.watch_prio
         self.date_downloaded = video_d.date_downloaded
         self.duration = video_d.duration
+        self.has_caption = video_d.has_caption
+        self.dimension = video_d.dimension
+        self.definition = video_d.definition
+        self.projection = video_d.projection
+        self.region_restriction_allowed = video_d.region_restriction_allowed
+        self.region_restriction_blocked = video_d.region_restriction_blocked
 
     @staticmethod
     def video_d_to_video(video_d):
@@ -116,4 +139,10 @@ class Video(PermanentBase):
         video.watch_prio = video_d.watch_prio
         video.date_downloaded = video_d.date_downloaded
         video.duration = video_d.duration
+        video.has_caption = video_d.has_caption
+        video.dimension = video_d.dimension
+        video.definition = video_d.definition
+        video.projection = video_d.projection
+        video.region_restriction_allowed = video_d.region_restriction_allowed
+        video.region_restriction_blocked = video_d.region_restriction_blocked
         return video

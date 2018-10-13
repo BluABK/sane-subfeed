@@ -28,6 +28,11 @@ class VideoD:
         self.duration = None
         self.has_caption = False
         self.downloaded = False
+        self.dimension = ""
+        self.definition = ""
+        self.projection = ""
+        self.region_restriction_allowed = []
+        self.region_restriction_blocked = []
 
         if grab_methods is None:
             grab_methods = []

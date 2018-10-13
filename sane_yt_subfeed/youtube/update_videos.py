@@ -141,7 +141,25 @@ def yt_duration_to_timedeltat(time_str):
     return timedelta(**time_params)
 
 
+def boolify_string(s):
+    """
+    Uppercase first letter and eval a 'false'/'true' string to a Python boolean
+    :param s: case-insensitive string value that is either 'false' or 'true'
+    :return: A Boolean or None (if invalid)
+    """
+    if 'false' not in s.lower() or 'true' not in s.lower():
+        logger.error("Attempted to boolify invalid string: '{}'".format(s))
+        return
+
+    return eval(s.lower()[0].upper() + s.lower()[1:])
+
+
 def get_extra_videos_information(videos):
+    """
+    Retrieves and sets additional information for videos that is only available through the 'videos' API call
+    :param videos: A list of video objects
+    :return:
+    """
     youtube_keys = load_keys(1)
     video_ids = list(vid.video_id for vid in videos)
     logger.info("Grabbing extra video(s) information from youtube for: {}".format(videos))
@@ -157,18 +175,12 @@ def get_extra_videos_information(videos):
                 logger.info(response)
                 duration = yt_duration_to_timedeltat(response['contentDetails']['duration'])
                 video.duration = duration
-                # Uppercase and eval the 'false'/'true' string to a Python boolean
-                video.has_caption = eval(response['contentDetails']['caption'][0].upper() +
-                                         response['contentDetails']['caption'][1:])
-
-                # FIXME: Gibberish code
-                # if str(response['contentDetails']['duration']) == 'true':
-                #     logger.debug("video.has_duration = True for video: {} - {}".format(video.channel_title, video.title))
-                #     video.has_duration = True
-                # else:
-                #     logger.debug("video.has_duration = False for video: {} - {}".format(video.channel_title, video.title))
-                #     logger.info(response)
-                #     video.has_duration = False
+                video.has_caption = boolify_string(response['contentDetails']['caption'])
+                video.dimension = response['contentDetails']['dimension']
+                video.definition = response['contentDetails']['definition']
+                video.projection = response['contentDetails']['projection']
+                video.region_restriction_allowed = response['contentDetails']['regionRestriction']['allowed']
+                video.region_restriction_blocked = response['contentDetails']['regionRestriction']['blocked']
     return videos
 
 
