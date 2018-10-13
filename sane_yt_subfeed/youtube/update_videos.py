@@ -128,10 +128,12 @@ def generate_keys(key_number):
 
 def yt_duration_to_timedeltat(time_str):
     # regex = re.compile(r'((?P<hours>\d+?)T)?((?P<minutes>\d+?)M)?((?P<seconds>\d+?)S)?')
-    regex = re.compile(r'((?P<days>\d*)P)?((?P<hours>\d*)T)?((?P<minutes>\d*)M)?((?P<seconds>\d*)S)?')
+    # regex = re.compile(r'((?P<days>\d*)P)?((?P<hours>\d*)T)?((?P<minutes>\d*)M)?((?P<seconds>\d*)S)?')
+    regex = re.compile(r'((?P<days>\d*)PT)?((?P<hours>\d*)H)?((?P<minutes>\d*)M)?((?P<seconds>\d*)S)?')
 
     parts = regex.match(time_str)
     if not parts:
+        logger.error("YT Duration failed timedelta conversion (parts=None): {}".format(time_str))
         return
     parts = parts.groupdict()
     time_params = {}
