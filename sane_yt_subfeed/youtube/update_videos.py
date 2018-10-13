@@ -174,8 +174,8 @@ def get_extra_videos_information(videos):
     for response in response_videos:
         for video in videos:
             if str(response['id']) == video.video_id:
-                logger.info("video (response): {} - {}".format(video.channel_title, video.title))
-                logger.info(response)
+                # logger.info("video (response): {} - {}".format(video.channel_title, video.title))
+                # logger.info(response)
                 duration = yt_duration_to_timedeltat(response['contentDetails']['duration'])
                 video.duration = duration
                 video.has_caption = boolify_string(response['contentDetails']['caption'])
