@@ -153,12 +153,22 @@ def get_extra_videos_information(videos):
     for response in response_videos:
         for video in videos:
             if str(response['id']) == video.video_id:
+                logger.info("video (response): {} - {}".format(video.channel_title, video.title))
+                logger.info(response)
                 duration = yt_duration_to_timedeltat(response['contentDetails']['duration'])
                 video.duration = duration
-                if str(response['contentDetails']['duration']) == 'true':
-                    video.has_caption = True
-                else:
-                    video.has_caption = False
+                # Uppercase and eval the 'false'/'true' string to a Python boolean
+                video.has_caption = eval(response['contentDetails']['caption'][0].upper() +
+                                         response['contentDetails']['caption'][1:])
+
+                # FIXME: Gibberish code
+                # if str(response['contentDetails']['duration']) == 'true':
+                #     logger.debug("video.has_duration = True for video: {} - {}".format(video.channel_title, video.title))
+                #     video.has_duration = True
+                # else:
+                #     logger.debug("video.has_duration = False for video: {} - {}".format(video.channel_title, video.title))
+                #     logger.info(response)
+                #     video.has_duration = False
     return videos
 
 
