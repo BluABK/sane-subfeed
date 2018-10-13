@@ -147,7 +147,8 @@ def boolify_string(s):
     :param s: case-insensitive string value that is either 'false' or 'true'
     :return: A Boolean or None (if invalid)
     """
-    if 'false' not in s.lower() or 'true' not in s.lower():
+    valid_bools = ['true', 'false']
+    if s.lower() not in valid_bools:
         logger.error("Attempted to boolify invalid string: '{}'".format(s))
         return
 
