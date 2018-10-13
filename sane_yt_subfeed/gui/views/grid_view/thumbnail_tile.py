@@ -52,14 +52,25 @@ class ThumbnailTile(QLabel):
                 thumb = self
                 painter.drawPixmap(thumb.rect(), thumb.p)
 
+            # Overlay video duration on thumbnail
             pen = QPen(Qt.white)
             painter.setPen(pen)
-            point = QPoint(thumb.width()*0.65, thumb.height()*0.85)
+            point = QPoint(thumb.width()*0.70, thumb.height()*0.85)
             rect = QRect(point, QSize(thumb.width()*0.28, thumb.height()*0.12))
             painter.fillRect(rect, QBrush(QColor(0, 0, 0, 180)))
             painter.drawText(rect, Qt.AlignCenter, format(self.parent.video.duration))
 
+            # Overlay captions (if any) on thumbnail    # FIXME: Replace with something better like a small icon
+            if self.parent.video.has_caption:
+                pen = QPen(Qt.white)
+                painter.setPen(pen)
+                point = QPoint(thumb.width() * 0.03, thumb.height() * 0.85)
+                rect = QRect(point, QSize(thumb.width() * 0.28, thumb.height() * 0.12))
+                painter.fillRect(rect, QBrush(QColor(0, 0, 0, 180)))
+                painter.drawText(rect, Qt.AlignCenter, "captions")
+
             self.add_overlay(painter, thumb)
+
 
     def add_overlay(self, painter, thumb):
         """
