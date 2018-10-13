@@ -124,6 +124,18 @@ class UpdateVideosExtraInfoThreaded(threading.Thread):
                     self.logger.warning("Video missing thumbnail for update: {}".format(vid_info))
                 elif not item.duration:
                     self.logger.warning("Video missing duration for update: {}".format(vid_info))
+                elif not item.has_caption:
+                    self.logger.warning("Video missing has_caption for update: {}".format(vid_info))
+                elif not item.dimension:
+                    self.logger.warning("Video missing dimension for update: {}".format(vid_info))
+                elif not item.definition:
+                    self.logger.warning("Video missing definition for update: {}".format(vid_info))
+                elif not item.projection:
+                    self.logger.warning("Video missing projection for update: {}".format(vid_info))
+                elif not item.region_restriction_allowed:
+                    self.logger.warning("Video missing region_restriction_allowed for update: {}".format(vid_info))
+                elif not item.region_restriction_blocked:
+                    self.logger.warning("Video missing region_restriction_blocked for update: {}".format(vid_info))
                 else:
                     update_list.append(
                         {"thumbnail_path": item.thumbnail_path, "_video_id": item.video_id, "duration": item.duration})
