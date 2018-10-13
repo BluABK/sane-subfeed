@@ -73,6 +73,7 @@ class MainModel:
             self.yt_dir_thread.start()
         else:
             self.logger.warning("No youtube file path provided, directory listener is disabled")
+            self.yt_dir_listener = None
 
     def hide_video_item(self, video):
         self.logger.debug("Hiding video item: {}".format(video))
