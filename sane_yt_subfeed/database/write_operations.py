@@ -120,29 +120,39 @@ class UpdateVideosExtraInfoThreaded(threading.Thread):
         if len(self.video_list):
             for item in self.video_list:
                 vid_info = "{} - {} [{}]".format(item.channel_title, item.title, item.url_video)
-                if not item.thumbnail_path:
+                if item.thumbnail_path is None:
                     self.logger.warning("Video missing thumbnail for update: {}".format(vid_info))
-                elif not item.duration:
+                    self.logger.error(self.obj_attrs_to_dict(item))
+                elif item.duration is None:
                     self.logger.warning("Video missing duration for update: {}".format(vid_info))
-                elif not item.has_caption:
+                    self.logger.error(self.obj_attrs_to_dict(item))
+                elif item.has_caption is None:
                     self.logger.warning("Video missing has_caption for update: {}".format(vid_info))
-                elif not item.dimension:
+                    self.logger.error(self.obj_attrs_to_dict(item))
+                elif item.dimension is None:
                     self.logger.warning("Video missing dimension for update: {}".format(vid_info))
-                elif not item.definition:
+                    self.logger.error(self.obj_attrs_to_dict(item))
+                elif item.definition is None:
                     self.logger.warning("Video missing definition for update: {}".format(vid_info))
-                elif not item.projection:
+                    self.logger.error(self.obj_attrs_to_dict(item))
+                elif item.projection is None:
                     self.logger.warning("Video missing projection for update: {}".format(vid_info))
-                elif not item.region_restriction_allowed:
+                    self.logger.error(self.obj_attrs_to_dict(item))
+                elif item.region_restriction_allowed is None:
                     self.logger.warning("Video missing region_restriction_allowed for update: {}".format(vid_info))
-                elif not item.region_restriction_blocked:
+                    self.logger.error(self.obj_attrs_to_dict(item))
+                elif item.region_restriction_blocked is None:
                     self.logger.warning("Video missing region_restriction_blocked for update: {}".format(vid_info))
+                    self.logger.error(self.obj_attrs_to_dict(item))
                 else:
+                    self.logger.info("Adding video to update list: {}".format(vid_info))
                     update_list.append(
                         {"thumbnail_path": item.thumbnail_path, "_video_id": item.video_id, "duration": item.duration,
                          "has_caption": item.has_caption, "dimension": item.dimension, "definition": item.definition,
                          "projection": item.projection, "region_restriction_allowed": item.region_restriction_allowed,
                          "region_restriction_blocked": item.region_restriction_blocked})
             try:
+                self.logger.debug(update_list)
                 engine.execute(update_extra_information_stmt(), update_list)
             except Exception as e:
                 self.logger.critical("Failed to update extra information: {} - {}".format(e, update_list), exc_info=1)
@@ -153,6 +163,18 @@ class UpdateVideosExtraInfoThreaded(threading.Thread):
         if self.finished_listeners:
             for listener in self.finished_listeners:
                 listener.emit()
+
+    def obj_attrs_to_dict(self, obj):
+        """
+        Finds all non-builtin attributes of an object and puts attrib: value in a dict
+        :param obj:
+        :return:
+        """
+        attrs = {}
+        for attr in dir(obj):
+            if not attr.startswith('__'):
+                attrs.update({attr: getattr(obj, attr)})
+        return attrs
 
 
 class UpdateVideo(threading.Thread):
