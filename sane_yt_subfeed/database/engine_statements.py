@@ -72,7 +72,7 @@ def update_video_stmt():
         'definition': bindparam('definition'),
         'projection': bindparam('projection'),
         'region_restriction_allowed': bindparam('region_restriction_allowed'),
-        'region_restriction_blocked': bindparam('region_restriction_blocked'),
+        'region_restriction_blocked': bindparam('region_restriction_blocked')
     })
 
 
