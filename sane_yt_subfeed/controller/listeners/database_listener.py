@@ -41,8 +41,8 @@ class DatabaseListener(QObject):
         DatabaseListener.static_instance = self
 
     def update_db_stat(self):
-        self.logger.debug("Currently {} writing threads and {} reading threads".format(len(self.writing_threads),
-                                                                                       len(self.reading_threads)))
+        self.logger.debug4("Currently {} writing threads and {} reading threads".format(len(self.writing_threads),
+                                                                                        len(self.reading_threads)))
         if len(self.reading_threads) > 0 and len(self.writing_threads) > 0:
             if self.db_state == self.DB_STATE_READ_WRITE:
                 return
@@ -63,14 +63,14 @@ class DatabaseListener(QObject):
                 return
             else:
                 self.db_state = self.DB_STATE_IDLE
-        self.logger.debug("Updated db state to {}".format(self.db_state))
+        self.logger.debug5("Updated db state to {}".format(self.db_state))
         self.dbStateChanged.emit(self.db_state)
 
     def start_write(self, db_id):
         try:
             self.writing_threads.append(db_id)
             self.update_db_stat()
-            self.logger.debug("Added db_id {} to writing_threads".format(db_id))
+            self.logger.debug4("Added db_id {} to writing_threads".format(db_id))
         except Exception as e:
             self.logger.warning("Failed to add {} to writing_threads - {}".format(db_id, e), exc_info=1)
 
@@ -78,7 +78,7 @@ class DatabaseListener(QObject):
         try:
             self.writing_threads.remove(db_id)
             self.update_db_stat()
-            self.logger.debug("Removed db_id {} from writing_threads".format(db_id))
+            self.logger.debug4("Removed db_id {} from writing_threads".format(db_id))
         except Exception as e:
             self.logger.warning("Failed to remove {} from writing threads - {}".format(db_id, e), exc_info=1)
 
@@ -86,7 +86,7 @@ class DatabaseListener(QObject):
         try:
             self.reading_threads.append(db_id)
             self.update_db_stat()
-            self.logger.debug("Added db_id {} to reading_threads".format(db_id))
+            self.logger.debug4("Added db_id {} to reading_threads".format(db_id))
         except Exception as e:
             self.logger.warning("Failed to add {} to reading_threads - {}".format(db_id, e), exc_info=1)
 
@@ -94,7 +94,7 @@ class DatabaseListener(QObject):
         try:
             self.reading_threads.remove(db_id)
             self.update_db_stat()
-            self.logger.debug("Removed db_id {} from reading_threads".format(db_id))
+            self.logger.debug4("Removed db_id {} from reading_threads".format(db_id))
         except Exception as e:
             self.logger.warning("Failed to remove {} from reading_threads - {}".format(db_id, e), exc_info=1)
 
