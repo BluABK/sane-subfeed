@@ -151,7 +151,6 @@ class UpdateVideosExtraInfoThreaded(threading.Thread):
                          "projection": item.projection, "region_restriction_allowed": item.region_restriction_allowed,
                          "region_restriction_blocked": item.region_restriction_blocked})
             try:
-                self.logger.debug(update_list)
                 engine.execute(update_extra_information_stmt(), update_list)
             except Exception as e:
                 self.logger.critical("Failed to update extra information: {} - {}".format(e, update_list), exc_info=1)
