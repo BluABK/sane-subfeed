@@ -47,10 +47,10 @@ class DownloadThumbnail(threading.Thread):
                     if 'standard' in quality['quality'] or 'high' in quality['quality'] or 'default' in quality[
                         'quality']:
                         crop = True
-                    download_file(thumbnail_dict['url'], vid_path, crop=crop, quality=quality['quality'])
+                    download_thumb_file(thumbnail_dict['url'], vid_path, crop=crop, quality=quality['quality'])
                     if not os.path.exists(vid_path):
                         self.logger.warning(
-                            "download_file failed to download thumbnail for: {}".format(video.__dict__))
+                            "download_thumb_file failed to download thumbnail for: {}".format(video.__dict__))
             if self.progress_listener:
                 self.progress_listener.updateProgress.emit()
 
@@ -101,7 +101,7 @@ def set_thumbnail(video):
             if 'standard' in thumbnail_dict['quality'] or 'high' in thumbnail_dict['quality'] or 'default' in \
                     thumbnail_dict['quality']:
                 crop = True
-            download_file(thumbnail_dict['url'], vid_path, quality=thumbnail_dict['quality'], crop=crop)
+            download_thumb_file(thumbnail_dict['url'], vid_path, quality=thumbnail_dict['quality'], crop=crop)
     video.thumbnail_path = vid_path
 
 
@@ -113,12 +113,22 @@ def thumbnails_dl_and_paths(vid_list):
     return path_list
 
 
-def download_file(url, path, crop=False, quality=None):
+def download_thumb_file(url, path, crop=False, quality=None, check_404=False):
+    """
+    Downloads a thumbnail image file
+    :param url:         Thumbnail image direct download url
+    :param path:        Thumbnail image file save/disk location
+    :param crop:        Whether or not to crop black barred thumbnails to their intended size
+    :param quality:     Thumbnail quality (maxres, standard, high, medium, default)
+    :param check_404:   Whether or not to check if downloaded image file is the YouTube 404 image
+    :return:
+    """
     http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
     with http.request('GET', url, preload_content=False) as r, open(path, 'wb') as out_file:
         shutil.copyfileobj(r, out_file)
-    if quality_404_check(path):
-        return False
+    if check_404:
+        if quality_404_check(path):
+            return False
     if crop:
         crop_blackbars(path, quality)
     return True
@@ -141,27 +151,27 @@ def force_download_best(video):
         quality = read_config('Thumbnails', '{}'.format(i))
         if quality == 'maxres':
             temp_url = url + '{url_quality}.jpg'.format_map(defaultdict(url_quality='maxresdefault'))
-            if download_file(temp_url, vid_path, crop=False, quality=quality):
+            if download_thumb_file(temp_url, vid_path, crop=False, quality=quality, check_404=True):
                 # Got 404 image, try lower quality
                 break
         if quality == 'standard':
             temp_url = url + '{url_quality}.jpg'.format_map(defaultdict(url_quality='sddefault'))
-            if download_file(temp_url, vid_path, crop=True, quality=quality):
+            if download_thumb_file(temp_url, vid_path, crop=True, quality=quality, check_404=True):
                 # Got 404 image, try lower quality
                 break
         if quality == 'high':
             temp_url = url + '{url_quality}.jpg'.format_map(defaultdict(url_quality='hqdefault'))
-            if download_file(temp_url, vid_path, crop=True, quality=quality):
+            if download_thumb_file(temp_url, vid_path, crop=True, quality=quality, check_404=True):
                 # Got 404 image, try lower quality
                 break
         if quality == 'medium':
             temp_url = url + '{url_quality}.jpg'.format_map(defaultdict(url_quality='mqdefault'))
-            if download_file(temp_url, vid_path, crop=False, quality=quality):
+            if download_thumb_file(temp_url, vid_path, crop=False, quality=quality, check_404=True):
                 # Got 404 image, try lower quality
                 break
         if quality == 'default':
             temp_url = url + '{url_quality}.jpg'.format_map(defaultdict(url_quality='default'))
-            if download_file(temp_url, vid_path, crop=True, quality=quality):
+            if download_thumb_file(temp_url, vid_path, crop=True, quality=quality, check_404=True):
                 # Got 404 image, try lower quality... Oh wait there is none! uh-oh....
                 logger.error("ERROR: force_download_best() tried to go lower than 'default' quality!")
                 break
