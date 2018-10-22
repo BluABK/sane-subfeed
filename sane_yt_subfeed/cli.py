@@ -11,14 +11,16 @@ from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.main import run_with_gui, run_print, run_channels_test
 from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
 
 
 @click.option(u'--no_gui', is_flag=True)
 @click.option(u'--test-channels', is_flag=True)
 @click.option(u'--update-watch-prio', is_flag=True)
 @click.option(u'--set-watched-day')
+@click.option(u'--print_subscriptions', is_flag=True)
 @click.command()
-def cli(no_gui, test_channels, update_watch_prio, set_watched_day):
+def cli(no_gui, test_channels, update_watch_prio, set_watched_day, print_subscriptions):
     logger = create_logger(__name__)
     if no_gui:
         run_print()
@@ -42,6 +44,14 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day):
         return
     if test_channels:
         run_channels_test()
+    if print_subscriptions:
+        cached_subs = True
+        subs = get_subscriptions(cached_subs)
+        for channel in subs:
+            if channel.subscribed_override:
+                print(("[{}]    {} [Subscription override]".format(channel.id, channel.title)))
+            else:
+                print(("[{}]    {}".format(channel.id, channel.title)))
     else:
         """
         PyQT raises and catches exceptions, but doesn't pass them along. 
