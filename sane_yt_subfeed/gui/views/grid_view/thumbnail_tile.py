@@ -1,7 +1,7 @@
 import os
 
 from PyQt5.QtCore import Qt, QSize, QPoint, QRect
-from PyQt5.QtGui import QPainter, QImage, QPixmap, QBrush, QColor, QPen
+from PyQt5.QtGui import QPainter, QImage, QPixmap, QBrush, QColor, QPen, QFont
 from PyQt5.QtWidgets import QLabel, QSizePolicy
 
 from sane_yt_subfeed.config_handler import read_config
@@ -69,8 +69,21 @@ class ThumbnailTile(QLabel):
                 painter.fillRect(rect, QBrush(QColor(0, 0, 0, 180)))
                 painter.drawText(rect, Qt.AlignCenter, "captions")
 
-            self.add_overlay(painter, thumb)
+            if self.parent.video.definition == "sd":
+                pen = QPen(Qt.red)
+                painter.setPen(pen)
+                point = QPoint(thumb.width() * 0.02, thumb.height() * 0.02)
+                rect = QRect(point, QSize(thumb.width() * 0.16, thumb.height() * 0.20))
+                painter.fillRect(rect, QBrush(QColor(0, 0, 0, 180)))
+                self.logger.critical(painter.font())
+                self.logger.critical(painter.fontInfo())
+                self.logger.critical(painter)
+                enlarged_font = QFont(painter.font())
+                enlarged_font.setPointSize(14)
+                painter.setFont(enlarged_font)
+                painter.drawText(rect, Qt.AlignCenter, "SD")
 
+            self.add_overlay(painter, thumb)
 
     def add_overlay(self, painter, thumb):
         """
