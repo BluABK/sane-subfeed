@@ -29,9 +29,10 @@ class MainModel:
     status_bar_thread = None
     status_bar_listener = None
 
-    def __init__(self, videos, videos_limit):
+    def __init__(self, videos, videos_limit, exceptions):
         super().__init__()
         self.logger = create_logger(__name__)
+        self.exceptions = exceptions
         self.videos_limit = videos_limit
         self.downloaded_videos_limit = videos_limit
         self.videos = videos
@@ -74,6 +75,12 @@ class MainModel:
         else:
             self.logger.warning("No youtube file path provided, directory listener is disabled")
             self.yt_dir_listener = None
+
+    def get_exceptions(self):
+        return self.exceptions
+
+    def clear_exceptions(self):
+        self.exceptions = []
 
     def hide_video_item(self, video):
         self.logger.debug("Hiding video item: {}".format(video))

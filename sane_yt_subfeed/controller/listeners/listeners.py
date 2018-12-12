@@ -193,7 +193,6 @@ class MainWindowListener(QObject):
         self.addYouTubeChannelSubscriptionById.connect(self.add_youtube_channel_subscription_by_id)
         self.addYouTubeChannelSubscriptionByUsername.connect(self.add_youtube_channel_subscription_by_username)
         self.raiseGenericException.connect(self.raise_generic_exception)
-        self.raiseException.connect(self.raise_exception)
         self.logger = create_logger(__name__ + '.MainWindowListener')
 
     def run(self):
@@ -269,22 +268,12 @@ class MainWindowListener(QObject):
         self.logger.info("Adding subscription to channel: '{}'".format(username))
         add_subscription(load_keys(1)[0], username, by_username=True)
 
-    @exception_pyqt_slot()
-    def raise_exception(self, exc):
-        """
-        Subscribes to a channel based on username
-        :return:
-        """
-        self.logger.info("Raising Exception from backend to frontend: '{}'".format(exc), exc_info=exc)
-        raise exc
-
     def raise_generic_exception(self):
         """
-        Raises a generic Exception.
+        Raises a generic Exception. (Used for debug)
         :return:
         """
-        #raise Exception("Generic Exception (backend)")
-        self.raise_exception(Exception("Generic Exception (backend)"))
+        raise Exception("Generic Exception (backend)")
 
 
 class ProgressBar(QObject):

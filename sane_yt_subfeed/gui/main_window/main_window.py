@@ -1,5 +1,6 @@
 # !/usr/bin/python3
 # -*- coding: utf-8 -*-
+import copy
 
 import os
 from subprocess import check_output
@@ -264,6 +265,8 @@ class MainWindow(QMainWindow):
                              tooltip='Oh dear..')
             self.add_submenu('&Debug', 'Raise a generic Exception (Backend)', self.debug_throw_exception_backend,
                              tooltip='Oh dear..')
+            self.add_submenu('&Debug', 'Poll Exceptions', self.poll_exceptions,
+                             tooltip='Oh dear..')
 
         toolbar = Toolbar(self)
         self.addToolBar(toolbar)
@@ -334,6 +337,22 @@ class MainWindow(QMainWindow):
             self.main_model.main_window_listener.raiseGenericException.emit()
         except Exception as e:
             self.logger.info("Handled generic backend Exception in frontend", exc_info=e)
+
+    # Exception handling
+    def poll_exceptions(self, auto_clear=True):
+        """
+        Polls the exceptions list from MainModel
+        :param auto_clear: Clears the list unless False
+        :return:
+        """
+        # Make a proper copy instead of just referencing the list (that may get auto cleared)
+        retv = copy.copy(self.main_model.get_exceptions())
+        self.logger.info("Polled exceptions")
+        self.logger.info(retv)
+        if auto_clear:
+            self.main_model.clear_exceptions()
+            self.logger.debug("(Auto) Cleared exception list")
+        return retv
 
     # Internal
     def determine_version(self):

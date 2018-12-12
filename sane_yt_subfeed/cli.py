@@ -13,6 +13,7 @@ from sane_yt_subfeed.main import run_with_gui, run_print, run_channels_test
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
 
+exceptions = []
 
 @click.option(u'--no_gui', is_flag=True)
 @click.option(u'--test-channels', is_flag=True)
@@ -69,6 +70,10 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day, print_subscri
             # Log the exception with the logger
             logger.critical("Intercepted Exception", exc_info=(exctype, value, traceback))
 
+            # Store intercepted exceptions in a reference list of lists
+            exceptions.append([exctype, value, traceback])
+
+
             # Call the normal Exception hook after
             sys._excepthook(exctype, value, traceback)
 
@@ -83,7 +88,7 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day, print_subscri
             logger.info("=== ulimit info on next line ===")
             logger.info(ulimit_data.decode('utf8'))
 
-        run_with_gui()
+        run_with_gui(exceptions)
 
 
 if __name__ == '__main__':  # FIXME: Dead code, since __main__.py?
