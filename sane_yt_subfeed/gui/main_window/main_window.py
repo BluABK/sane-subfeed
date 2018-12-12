@@ -257,6 +257,14 @@ class MainWindow(QMainWindow):
             view_about_view = self.add_submenu('&Help', 'About', self.set_current_widget, tooltip='About me',
                                                icon='about.png', widget=self.about_view)
 
+        if read_config('Debug', 'debug'):
+            # Debug menu
+            self.add_menu(menubar, '&Debug')
+            self.add_submenu('&Debug', 'Raise a generic Exception (GUI)', self.debug_throw_exception,
+                             tooltip='Oh dear..')
+            self.add_submenu('&Debug', 'Raise a generic Exception (Backend)', self.debug_throw_exception_backend,
+                             tooltip='Oh dear..')
+
         toolbar = Toolbar(self)
         self.addToolBar(toolbar)
         toolbar.addAction(view_grid_view)
@@ -308,6 +316,24 @@ class MainWindow(QMainWindow):
 
         # if self.dimensions:
         #     self.resize(self.dimensions[0], self.dimensions[1])
+
+    # Debug
+    def debug_throw_exception(self):
+        """
+        Raises a generic Exception.
+        :return:
+        """
+        raise Exception("Generic Exception (frontend)")
+
+    def debug_throw_exception_backend(self):
+        """
+        Raises a generic Exception in the backend.
+        :return:
+        """
+        try:
+            self.main_model.main_window_listener.raiseGenericException.emit()
+        except Exception as e:
+            self.logger.info("Handled generic backend Exception in frontend", exc_info=e)
 
     # Internal
     def determine_version(self):
