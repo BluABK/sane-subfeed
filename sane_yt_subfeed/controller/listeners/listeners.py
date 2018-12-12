@@ -5,8 +5,11 @@ import datetime
 import os
 import time
 
+import traceback
+import types
 from PyQt5.QtCore import *
 from watchdog.observers import Observer
+from functools import wraps
 
 from sane_yt_subfeed import main
 from sane_yt_subfeed.config_handler import read_config
@@ -27,6 +30,8 @@ from sane_yt_subfeed.database.engine_statements import get_channel_by_id_stmt, g
 
 LISTENER_SIGNAL_NORMAL_REFRESH = 0
 LISTENER_SIGNAL_DEEP_REFRESH = 1
+
+logger = create_logger(__name__ + '.listeners')
 
 
 class GridViewListener(QObject):
@@ -144,6 +149,30 @@ class GridViewListener(QObject):
             time.sleep(2)
 
 
+def exception_pyqt_slot(*args):
+    """
+    Create a decorator that wraps PyQt' new signal/slot decorators and provides exception handling for all slots.
+    :param args:
+    :return:
+    """
+    if len(args) == 0 or isinstance(args[0], types.FunctionType):
+        args = []
+
+    @pyqtSlot(*args)
+    def slotdecorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                func(*args)
+            except Exception as e:
+                logger.critical("Uncaught Exception in slot", exc_info=e)
+                #traceback.print_exc()
+
+        return wrapper
+
+    return slotdecorator
+
+
 class MainWindowListener(QObject):
     testChannels = pyqtSignal()
     refreshVideos = pyqtSignal(int)
@@ -151,6 +180,8 @@ class MainWindowListener(QObject):
     getSingleVideo = pyqtSignal(str)
     addYouTubeChannelSubscriptionById = pyqtSignal(str)
     addYouTubeChannelSubscriptionByUsername = pyqtSignal(str)
+    raiseGenericException = pyqtSignal()
+    raiseException = pyqtSignal(Exception)
 
     def __init__(self, model):
         super().__init__()
@@ -161,6 +192,8 @@ class MainWindowListener(QObject):
         self.getSingleVideo.connect(self.get_single_video)
         self.addYouTubeChannelSubscriptionById.connect(self.add_youtube_channel_subscription_by_id)
         self.addYouTubeChannelSubscriptionByUsername.connect(self.add_youtube_channel_subscription_by_username)
+        self.raiseGenericException.connect(self.raise_generic_exception)
+        self.raiseException.connect(self.raise_exception)
         self.logger = create_logger(__name__ + '.MainWindowListener')
 
     def run(self):
@@ -235,6 +268,23 @@ class MainWindowListener(QObject):
         """
         self.logger.info("Adding subscription to channel: '{}'".format(username))
         add_subscription(load_keys(1)[0], username, by_username=True)
+
+    @exception_pyqt_slot()
+    def raise_exception(self, exc):
+        """
+        Subscribes to a channel based on username
+        :return:
+        """
+        self.logger.info("Raising Exception from backend to frontend: '{}'".format(exc), exc_info=exc)
+        raise exc
+
+    def raise_generic_exception(self):
+        """
+        Raises a generic Exception.
+        :return:
+        """
+        #raise Exception("Generic Exception (backend)")
+        self.raise_exception(Exception("Generic Exception (backend)"))
 
 
 class ProgressBar(QObject):
