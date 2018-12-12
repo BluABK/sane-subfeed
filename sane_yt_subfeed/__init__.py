@@ -1,4 +1,5 @@
 import os
+import shutil  # For file copying
 
 from PyQt5 import QtCore
 
@@ -11,6 +12,9 @@ logger = create_logger(__name__)
 logger.info("Initializing...")
 
 OS_PATH = os.path.dirname(__file__)
+
+CLIENT_SECRET_FILE = os.path.join(OS_PATH, 'resources', 'client_secret.json')
+KEYS_FILE = os.path.join(OS_PATH, 'resources', 'keys.json')
 
 PICKLE_PATH = os.path.join(OS_PATH, 'resources', 'pickles')
 THUMBNAIL_PATH = os.path.join(OS_PATH, 'resources', 'thumbnails')
@@ -33,3 +37,13 @@ if not os.path.isdir(THUMBNAIL_PATH):
 # Make sure files exists on startup
 if not os.path.isfile(HISTORY_FILEPATH):
     open(HISTORY_FILEPATH, 'a').close()
+
+if not os.path.isfile(KEYS_FILE):
+    logger.warning("keys.json file was not found: Installing public version.")
+    shutil.copyfile(os.path.join(OS_PATH, "resources", "keys_public.json"),
+                    KEYS_FILE)
+
+if not os.path.isfile(CLIENT_SECRET_FILE):
+    logger.warning("client_secret.json file was not found: Installing public version.")
+    shutil.copyfile(os.path.join(OS_PATH, "resources", "client_secret_public.json"),
+                    CLIENT_SECRET_FILE)

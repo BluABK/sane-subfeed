@@ -23,8 +23,8 @@ DEFAULTS = {
         'miss_limit': '10',
         'test_pages': '2',
         'use_tests': 'True',
-        'extra_list_pages': '0',
-        'deep_search_quota_k': '20',
+        'extra_list_pages': '3',
+        'deep_search_quota_k': '100',
         'filter_videos_days_old': '-1'
     },
     'Debug': {
@@ -44,8 +44,8 @@ DEFAULTS = {
     'Gui': {
         'launch_gui': 'True',
         'hide_downloaded': 'True',
-        'grid_view_x': '5',
-        'grid_view_y': '4',
+        'grid_view_x': '6',
+        'grid_view_y': '5',
         'grey_old_videos': 'False',
         'tile_pref_height': '209',
         'tile_pref_width': '209',
