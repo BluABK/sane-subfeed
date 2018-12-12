@@ -8,31 +8,31 @@ Instead of directly accessing YouTube's unreliable subscription feed  (which alr
 ### Compatibility
 This code is primarily tested on the following platforms:
 
-| Operating System          | Python | PyQt | Arch  | Tester(s)                                |
-|:-------------------------:|:------:|:----:|:-----:|:----------------------------------------:| 
-| Windows 10                | 3.7.0  | 5.11 | x64   | [BluABK][user_bluabk], [Acca][user_acca] |
-| Linux/Debian 9 (stable)   | 3.5.3  | 5.10 | x64   | [BluABK][user_bluabk]                    |
-| Linux/Arch                | 3.7.0  | 5.11 | x64   | [Kitsuna][user_kitsuna]                  |
+| Operating System          | Python | PyQt | Arch  | Tester(s)                                     | Last confirmed test |
+|:-------------------------:|:------:|:----:|:-----:|:---------------------------------------------:|:--------------------| 
+| Windows 10                | 3.7.0  | 5.11 | x64   | [BluABK][user_bluabk], [Acca][user_acca]      | v0.4.0              |
+| Linux/Debian 9 (stable)   | 3.5.3  | 5.10 | x64   | [BluABK][user_bluabk]                         | c7e988d             |
+| Linux/Arch                | 3.7.0  | 5.11 | x64   | [Kitsuna][user_kitsuna], [BluABK][user_bluabk]| **Current**         |
 
 ## Installation and setup
-### 1. Prerequisites
-*   Python 3 (3.5+ is recommended, 3.7+ is encouraged)
+### 1. Prerequisites:
+*   Python 3 (3.5+ is _recommended_, 3.7+ is **encouraged**)
 *   The pip package management tool (usually bundled with python installation)
 
 ### 2. Requirements:
 *   Python 3.6 and above: `pip install -r requirements.txt`
-*   Python 3.5 and below: `pip install -r requirements-py35.txt`
+*   Python 3.5 and below: `pip install -r requirements-py35.txt` _(NB: Will likely be deprecated in near future)_
 
-### 3. Set up OAuth and API keys (pick _one_ option)
+### 3. Set up OAuth and API keys (pick _one_ option).
 OAuth is required for access to your own youtube account (like retrieving subscriptions list). 
 For anything else API keys is usually what gets used.
 
-#### Option A: Use public/pre-made
+#### Option A: Use public/pre-made.
 Caution: This option is prone to daily API quota limit issues, option B is highly encouraged.
-  1. Rename `sane_yt_subfeed/resources/keys_public.json` to `keys.json`
-  2. Rename `sane_yt_subfeed/resources/client_secret_public.json` to `client_secret.json`
 
-#### Option B: Set up your own
+Sane will automatically use the public set if no other is added. No further action required.
+
+#### Option B: Set up your own.
 Useful ref: https://developers.google.com/youtube/v3/getting-started
 
   Go to https://console.developers.google.com/apis/dashboard and follow these steps:
@@ -67,13 +67,21 @@ Useful ref: https://developers.google.com/youtube/v3/getting-started
 
 </p></details>
 
-## Running the application
-If it's the first time run: `pip install -e .` (required for non-Windows OS due to a pesky python path bug) <br/>
+## Running the application.
+### First time?
+If it's the first time run: `pip install -e .`
+<details><summary>Why is this necesarry?</summary>
+It's required for non-Windows OS due to a pesky python path bug, and even if you're on Windows just run it anyway, 
+it fixes some first-run issues.
+</p></details>
 
+### How to run it.
 Afterwards you can launch it with: `python -m sane_yt_subfeed`
 
-## Fixes and workarounds
-### Migrate Database (if required to)
+If you're using pipenv you can create a shortcut using a one-liner like `pipenv run python -m sane_yt_subfeed`
+
+## Fixes and workarounds.
+### Migrate Database (if required to).
 1.   Add application to path (run it again, even if you've run it in the past): </br>
 `pip install -e .`
 2.   Generate migration script: </br>
@@ -81,7 +89,7 @@ Afterwards you can launch it with: `python -m sane_yt_subfeed`
 3.   Migrate database: </br>
 `alembic upgrade head`
 
-### Notable Wiki articles
+### Notable Wiki articles.
 *  [Missed videos and tests](https://github.com/BluABK/sane-subfeed/wiki/Missed-videos-(and-tests))
 *  [Youtube-DL Integration (and overriding the youtube_dl options)](https://github.com/BluABK/sane-subfeed/wiki/YouTube-DL-integration)
 
