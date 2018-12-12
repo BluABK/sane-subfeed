@@ -14,6 +14,7 @@ from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
 
 exceptions = []
+exc_id = 0
 
 @click.option(u'--no_gui', is_flag=True)
 @click.option(u'--test-channels', is_flag=True)
@@ -62,18 +63,20 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day, print_subscri
         sys._excepthook = sys.excepthook
 
         def my_exception_hook(exctype, value, traceback):
+            global exc_id, exceptions
             # Ignore KeyboardInterrupt so a console python program can exit with Ctrl + C.
             if issubclass(exctype, KeyboardInterrupt):
                 sys.__excepthook__(exctype, value, traceback)
                 return
 
             # Log the exception with the logger
-            logger.critical("Intercepted Exception", exc_info=(exctype, value, traceback))
+            logger.exception("Intercepted Exception #{}".format(exc_id), exc_info=(exctype, value, traceback))
 
             # Store intercepted exceptions in a reference list of lists
-            exceptions.append([exctype, value, traceback])
+            exceptions.append([exctype, value, traceback, exc_id])
 
-
+            # Increment Exception Identifier
+            exc_id += 1
             # Call the normal Exception hook after
             sys._excepthook(exctype, value, traceback)
 
