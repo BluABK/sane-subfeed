@@ -16,6 +16,7 @@ from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
 exceptions = []
 exc_id = 0
 
+
 @click.option(u'--no_gui', is_flag=True)
 @click.option(u'--test-channels', is_flag=True)
 @click.option(u'--update-watch-prio', is_flag=True)
@@ -77,6 +78,7 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day, print_subscri
 
             # Increment Exception Identifier
             exc_id += 1
+
             # Call the normal Exception hook after
             sys._excepthook(exctype, value, traceback)
 
@@ -94,5 +96,5 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day, print_subscri
         run_with_gui(exceptions)
 
 
-if __name__ == '__main__':  # FIXME: Dead code, since __main__.py?
+if __name__ == '__main__':
     cli()
