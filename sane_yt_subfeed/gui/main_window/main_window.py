@@ -338,7 +338,7 @@ class MainWindow(QMainWindow):
         except Exception as e:
             self.logger.info("Handled generic backend Exception in frontend", exc_info=e)
 
-    # Exception handling
+    # Exception handling FIXME: LEGACY
     def poll_exceptions(self, auto_clear=True):
         """
         Polls the exceptions list from MainModel

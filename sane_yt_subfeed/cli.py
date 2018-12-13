@@ -15,6 +15,7 @@ from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
 
 exceptions = []
 exc_id = 0
+LEGACY_EXCEPTION_HANDLER = False
 
 
 @click.option(u'--no_gui', is_flag=True)
@@ -56,36 +57,37 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day, print_subscri
             else:
                 print(("[{}]    {}".format(channel.id, channel.title)))
     else:
-        """
-        PyQT raises and catches exceptions, but doesn't pass them along. 
-        Instead it just exits with a status of 1 to show an exception was caught. 
-        """
-        # Back up the reference to the exceptionhook
-        sys._excepthook = sys.excepthook
+        if LEGACY_EXCEPTION_HANDLER:
+            """
+            PyQT raises and catches exceptions, but doesn't pass them along. 
+            Instead it just exits with a status of 1 to show an exception was caught. 
+            """
+            # Back up the reference to the exceptionhook
+            sys._excepthook = sys.excepthook
 
-        def my_exception_hook(exctype, value, traceback):
-            global exc_id, exceptions
-            # Ignore KeyboardInterrupt so a console python program can exit with Ctrl + C.
-            if issubclass(exctype, KeyboardInterrupt):
-                sys.__excepthook__(exctype, value, traceback)
-                return
+            def my_exception_hook(exctype, value, traceback):
+                global exc_id, exceptions
+                # Ignore KeyboardInterrupt so a console python program can exit with Ctrl + C.
+                if issubclass(exctype, KeyboardInterrupt):
+                    sys.__excepthook__(exctype, value, traceback)
+                    return
 
-            # Log the exception with the logger
-            logger.exception("Intercepted Exception #{}".format(exc_id), exc_info=(exctype, value, traceback))
+                # Log the exception with the logger
+                logger.exception("Intercepted Exception #{}".format(exc_id), exc_info=(exctype, value, traceback))
 
-            # Store intercepted exceptions in a reference list of lists
-            exceptions.append([exctype, value, traceback, exc_id])
+                # Store intercepted exceptions in a reference list of lists
+                exceptions.append([exctype, value, traceback, exc_id])
 
-            # Increment Exception Identifier
-            exc_id += 1
+                # Increment Exception Identifier
+                exc_id += 1
 
-            # Call the normal Exception hook after
-            sys._excepthook(exctype, value, traceback)
+                # Call the normal Exception hook after
+                sys._excepthook(exctype, value, traceback)
 
-            # sys.exit(1)       # Alternatively, exit
+                # sys.exit(1)       # Alternatively, exit
 
-        # Set the exception hook to our wrapping function
-        sys.excepthook = my_exception_hook
+            # Set the exception hook to our wrapping function
+            sys.excepthook = my_exception_hook
 
         # Log the current ulimit
         if sys.platform.startswith('linux'):
