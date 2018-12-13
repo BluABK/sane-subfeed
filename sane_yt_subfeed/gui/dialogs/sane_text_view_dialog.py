@@ -4,13 +4,20 @@ from PyQt5.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLayout,
                             QSpacerItem, QVBoxLayout)
 
 
-class TextViewDialog(QDialog):
+class SaneTextViewDialog(QDialog):
     def __init__(self, parent, text):
         super().__init__(parent)
-        self.text = text
-        self.setupUi()
+        if type(text) is tuple or type(text) is list:
+            combined_text = ""
+            for item in text:
+                combined_text += item + '\n'
+            self.text = combined_text
+        else:
+            self.text = text
 
-    def setupUi(self):
+        self.init_ui()
+
+    def init_ui(self):
         self.resize(640, 480)
         self.verticalLayout = QVBoxLayout(self)
         self.textEdit = QPlainTextEdit(self)

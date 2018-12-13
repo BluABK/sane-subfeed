@@ -25,7 +25,7 @@ class SaneExceptionHandler(QObject):
     errorSignal = pyqtSignal()
     silentSignal = pyqtSignal()
 
-    def __init__(self, app_ref=None, use_list=True):
+    def __init__(self, app_ref=None, use_list=True, display=True):
         super(SaneExceptionHandler, self).__init__()
         self.app_ref = app_ref
         self.use_list = use_list
@@ -50,10 +50,14 @@ class SaneExceptionHandler(QObject):
         # Increment the exception identifier
         self.exc_id += 1
 
+        # Call the original Exception hook
+        self.original_excepthook(exctype, value, traceback)
+
         # Finally call an exception hook
         if self.app_ref is None:
             # Call the original Exception hook
-            self.original_excepthook(exctype, value, traceback)
+            #self.original_excepthook(exctype, value, traceback)
+            return
         else:
             if self.use_list:
                 # Add exception to a list to be handled later

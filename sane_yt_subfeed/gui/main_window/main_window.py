@@ -6,6 +6,7 @@ import copy
 
 import os
 from subprocess import check_output
+import traceback
 
 from PyQt5.QtCore import QFile, QTextStream, QRegExp
 from PyQt5.QtGui import QIcon, QRegExpValidator
@@ -17,8 +18,9 @@ from sane_yt_subfeed.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import GRID_VIEW_ID, PLAY_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
+from sane_yt_subfeed.gui.dialogs.sane_exception_dialog import SaneExceptionDialog
 from sane_yt_subfeed.gui.dialogs.sane_input_dialog import SaneInputDialog
-from sane_yt_subfeed.gui.dialogs.text_view_dialog import TextViewDialog
+from sane_yt_subfeed.gui.dialogs.sane_text_view_dialog import SaneTextViewDialog
 from sane_yt_subfeed.gui.exception_handler.sane_exception_handler import SaneExceptionHandler
 from sane_yt_subfeed.gui.main_window.db_state import DbStateIcon
 from sane_yt_subfeed.gui.main_window.toolbar import Toolbar
@@ -104,37 +106,6 @@ class MainWindow(QMainWindow):
         self.about_view = AboutView(self)
 
         self.init_ui()
-
-    def raise_exception(self, exctype, value, traceback):
-        """
-        Raises an exception (usually called by the Exception Handler)
-        :param exctype:
-        :param value:
-        :param traceback:
-        :return:
-        """
-        raise exctype(exctype, value, traceback)
-
-    def check_for_backend_exceptions(self):
-        """
-        Returns backend exceptions list (if any)
-        :return:
-        """
-        return self.exceptionHandler.exceptions
-
-    def sane_try(self, *args, **kwargs):
-        """
-        Reinventing the try/except wheel in order to raise exceptions in the right places.
-        :param args:
-        :param kwargs:
-        :return:
-        """
-        for arg in args:
-            arg()
-            backend_exceptions = self.check_for_backend_exceptions()
-            if len(backend_exceptions) is not 0:
-                current_exception = self.exceptionHandler.pop_exception()
-                raise current_exception[0](current_exception[0], current_exception[1], current_exception[2])
 
     def init_ui(self):
         self.logger.info("Initializing UI: MainWindow")
@@ -383,6 +354,37 @@ class MainWindow(QMainWindow):
             self.logger.info("Handled generic backend Exception in frontend", exc_info=e)
 
     # Exception handling
+    def raise_exception(self, exctype, value, this_traceback):
+        """
+        Raises an exception (usually called by the Exception Handler)
+        :param exctype:
+        :param value:
+        :param this_traceback:
+        :return:
+        """
+        raise exctype(exctype, value, this_traceback)
+
+    def check_for_backend_exceptions(self):
+        """
+        Returns backend exceptions list (if any)
+        :return:
+        """
+        return self.exceptionHandler.exceptions
+
+    def sane_try(self, *args, **kwargs):
+        """
+        Reinventing the try/except wheel in order to raise exceptions in the right places.
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        for arg in args:
+            arg()
+            backend_exceptions = self.check_for_backend_exceptions()
+            if len(backend_exceptions) is not 0:
+                exctype, value, this_traceback = self.exceptionHandler.pop_exception()
+                raise exctype(exctype, value, this_traceback)
+
     def poll_exceptions(self, auto_clear=False):
         """
         Polls the exceptions list from Exception Handler
@@ -397,6 +399,37 @@ class MainWindow(QMainWindow):
             self.main_model.clear_exceptions()
             self.logger.debug("(Auto) Cleared exception list")
         return retv
+
+    @staticmethod
+    def rebuild_traceback(exc_info):
+        """
+        Reshuffles the traceback bits into a more sensible order, making it look like the actual thing.
+        :param exc_info:
+        :return:
+        """
+        exctype, value, this_traceback = exc_info
+        tb_str = traceback.format_stack()
+        exc_str = traceback.format_exception(exctype, value, this_traceback)
+
+        # Pop the Traceback info header from exception and put it at the top of string list
+        tb_str[0:0] = exc_str.pop(0)
+        tb_str.extend(exc_str)
+
+        return ''.join(tb_str)
+
+    def exception_dialog(self, exc_info):
+        """
+        Pop-up a SaneTextViewDialog with Exception information.
+        :return:
+        """
+        # if exc_info:
+        exctype, value, this_traceback = exc_info
+        print(dir(exctype))
+        window_title = "An unexpected {} has occurred!".format(exctype)
+
+        exception_dialog = SaneTextViewDialog(self, self.rebuild_traceback(exc_info))
+        exception_dialog.setWindowTitle(window_title)
+        exception_dialog.show()
 
     # Internal
     def determine_version(self):
@@ -414,6 +447,7 @@ class MainWindow(QMainWindow):
                     version_str = str(version)
         except Exception as e:
             self.logger.critical("An unhandled exception occurred!", exc_info=e)
+            self.exception_dialog(copy.copy(sys.exc_info()))
             return "N/A"
 
         return version_str
@@ -432,6 +466,7 @@ class MainWindow(QMainWindow):
             branchtag += check_output("git log -n 1 --pretty=format:%h", shell=True).decode("UTF-8").strip('\n')
         except Exception as e2:
             self.logger.critical("An unhandled exception occurred!", exc_info=e2)
+            self.exception_dialog(copy.copy(sys.exc_info()))
             return "N/A"
 
         return branchtag
@@ -643,11 +678,11 @@ class MainWindow(QMainWindow):
 
     def usage_history_dialog(self):
         """
-        Pop-up a TextViewDialog with usage history
+        Pop-up a SaneTextViewDialog with usage history
         :return:
         """
         history = get_history()
-        history_dialog = TextViewDialog(self, history)
+        history_dialog = SaneTextViewDialog(self, history)
         history_dialog.setWindowTitle("Usage history")
         history_dialog.show()
 

@@ -11,7 +11,7 @@ from sane_yt_subfeed.gui.views.grid_view.sub_feed.sub_thumbnail_tile import SubT
 from sane_yt_subfeed.log_handler import create_logger
 
 from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
-from sane_yt_subfeed.gui.dialogs.text_view_dialog import TextViewDialog
+from sane_yt_subfeed.gui.dialogs.sane_text_view_dialog import SaneTextViewDialog
 
 
 class SubFeedTile(VideoTile):
@@ -51,7 +51,7 @@ class SubFeedTile(VideoTile):
         elif action == open_thumbnail_file:
             open_with_default_application(self.video.thumbnail_path)
         elif action == show_description_dialog:
-            description_dialog = TextViewDialog(self.parent, self.video.description)
+            description_dialog = SaneTextViewDialog(self.parent, self.video.description)
             description_dialog.setWindowTitle("Video description for: {} - {}".format(self.video.channel_title,
                                                                                       self.video.title))
             description_dialog.show()
