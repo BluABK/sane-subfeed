@@ -1,5 +1,7 @@
 # !/usr/bin/python3
 # -*- coding: utf-8 -*-
+import sys
+
 import copy
 
 import os
@@ -17,6 +19,7 @@ from sane_yt_subfeed.controller.static_controller_vars import GRID_VIEW_ID, PLAY
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.gui.dialogs.sane_input_dialog import SaneInputDialog
 from sane_yt_subfeed.gui.dialogs.text_view_dialog import TextViewDialog
+from sane_yt_subfeed.gui.exception_handler.sane_exception_handler import SaneExceptionHandler
 from sane_yt_subfeed.gui.main_window.db_state import DbStateIcon
 from sane_yt_subfeed.gui.main_window.toolbar import Toolbar
 from sane_yt_subfeed.gui.main_window.toolbar_action import SaneToolBarAction
@@ -60,6 +63,13 @@ class MainWindow(QMainWindow):
         self.app = app
         self.main_model = main_model
 
+        # Create the Exception Handler
+        self.exceptionHandler = SaneExceptionHandler(self)
+        # Back up the reference to the exceptionhook
+        #sys._excepthook = sys.excepthook
+        # Set the exception hook to be wrapped by the Exception Handler
+        sys.excepthook = self.exceptionHandler.handler
+
         self.themes_list = THEMES_LIST
         self.current_theme = None
         self.current_theme_idx = 0
@@ -94,6 +104,37 @@ class MainWindow(QMainWindow):
         self.about_view = AboutView(self)
 
         self.init_ui()
+
+    def raise_exception(self, exctype, value, traceback):
+        """
+        Raises an exception (usually called by the Exception Handler)
+        :param exctype:
+        :param value:
+        :param traceback:
+        :return:
+        """
+        raise exctype(exctype, value, traceback)
+
+    def check_for_backend_exceptions(self):
+        """
+        Returns backend exceptions list (if any)
+        :return:
+        """
+        return self.exceptionHandler.exceptions
+
+    def sane_try(self, *args, **kwargs):
+        """
+        Reinventing the try/except wheel in order to raise exceptions in the right places.
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        for arg in args:
+            arg()
+            backend_exceptions = self.check_for_backend_exceptions()
+            if len(backend_exceptions) is not 0:
+                current_exception = self.exceptionHandler.pop_exception()
+                raise current_exception[0](current_exception[0], current_exception[1], current_exception[2])
 
     def init_ui(self):
         self.logger.info("Initializing UI: MainWindow")
@@ -326,7 +367,10 @@ class MainWindow(QMainWindow):
         Raises a generic Exception.
         :return:
         """
-        raise Exception("Generic Exception (frontend)")
+        try:
+            raise Exception("Generic Exception (frontend)")
+        except Exception as e:
+            self.logger.info("Handled generic Exception in frontend", exc_info=e)
 
     def debug_throw_exception_backend(self):
         """
@@ -334,19 +378,19 @@ class MainWindow(QMainWindow):
         :return:
         """
         try:
-            self.main_model.main_window_listener.raiseGenericException.emit()
+            self.sane_try(self.main_model.main_window_listener.raiseGenericException.emit)
         except Exception as e:
             self.logger.info("Handled generic backend Exception in frontend", exc_info=e)
 
-    # Exception handling FIXME: LEGACY
-    def poll_exceptions(self, auto_clear=True):
+    # Exception handling
+    def poll_exceptions(self, auto_clear=False):
         """
-        Polls the exceptions list from MainModel
+        Polls the exceptions list from Exception Handler
         :param auto_clear: Clears the list unless False
         :return:
         """
         # Make a proper copy instead of just referencing the list (that may get auto cleared)
-        retv = copy.copy(self.main_model.get_exceptions())
+        retv = copy.copy(self.exceptionHandler.exceptions)
         self.logger.info("Polled exceptions")
         self.logger.info(retv)
         if auto_clear:
