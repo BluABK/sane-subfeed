@@ -18,7 +18,6 @@ from sane_yt_subfeed.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import GRID_VIEW_ID, PLAY_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
-from sane_yt_subfeed.gui.dialogs.sane_exception_dialog import SaneExceptionDialog
 from sane_yt_subfeed.gui.dialogs.sane_input_dialog import SaneInputDialog
 from sane_yt_subfeed.gui.dialogs.sane_text_view_dialog import SaneTextViewDialog
 from sane_yt_subfeed.gui.exception_handler.sane_exception_handler import SaneExceptionHandler
@@ -275,6 +274,8 @@ class MainWindow(QMainWindow):
             self.add_menu(menubar, '&Debug')
             self.add_submenu('&Debug', 'Raise a generic Exception (GUI)', self.debug_throw_exception,
                              tooltip='Oh dear..')
+            self.add_submenu('&Debug', 'Raise (and don\'t catch) a generic Exception (GUI)',
+                             self.debug_throw_and_dont_catch_exception, tooltip='Oh dear..')
             self.add_submenu('&Debug', 'Raise a generic Exception (Backend)', self.debug_throw_exception_backend,
                              tooltip='Oh dear..')
             self.add_submenu('&Debug', 'Poll Exceptions', self.poll_exceptions,
@@ -343,6 +344,13 @@ class MainWindow(QMainWindow):
         except Exception as e:
             self.logger.info("Handled generic Exception in frontend", exc_info=e)
 
+    def debug_throw_and_dont_catch_exception(self):
+        """
+        Raises a generic Exception.
+        :return:
+        """
+        raise Exception("Generic Uncaught Exception (frontend)")
+
     def debug_throw_exception_backend(self):
         """
         Raises a generic Exception in the backend.
@@ -362,7 +370,11 @@ class MainWindow(QMainWindow):
         :param this_traceback:
         :return:
         """
-        raise exctype(exctype, value, this_traceback)
+        if read_config('Debug', 'display_all_exceptions'):
+            exc_info = copy.copy((exctype, value, this_traceback))
+            self.exception_dialog(exc_info)
+        else:
+            raise exctype(exctype, value, this_traceback)
 
     def check_for_backend_exceptions(self):
         """
@@ -422,9 +434,7 @@ class MainWindow(QMainWindow):
         Pop-up a SaneTextViewDialog with Exception information.
         :return:
         """
-        # if exc_info:
         exctype, value, this_traceback = exc_info
-        print(dir(exctype))
         window_title = "An unexpected {} has occurred!".format(exctype)
 
         exception_dialog = SaneTextViewDialog(self, self.rebuild_traceback(exc_info))

@@ -45,6 +45,7 @@ log_search = False
 log_list = False
 log_needle = unset
 show_unimplemented_gui = False
+display_all_exceptions = False
 
 [Model]
 loaded_videos = 90

@@ -39,7 +39,8 @@ DEFAULTS = {
         'log_search': 'False',
         'log_list': 'False',
         'log_needle': 'unset',
-        'show_unimplemented_gui': 'False'
+        'show_unimplemented_gui': 'False',
+        'display_all_exceptions': 'False'
     },
     'Gui': {
         'launch_gui': 'True',

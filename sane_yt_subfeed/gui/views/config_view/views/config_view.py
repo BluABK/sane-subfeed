@@ -127,6 +127,7 @@ class ConfigViewWidget(InputSuper):
             self.add_option_line_edit('\t Haystack needle ', 'Debug', 'log_needle', tab_id='Debug')
             self.add_option_checkbox('Show unimplemented GUI elements', 'Debug', 'show_unimplemented_gui',
                                      tab_id='Debug')
+            self.add_option_checkbox('Display all Exceptions', 'Debug', 'display_all_exceptions', tab_id='Debug')
 
         elif self.tab_id == 'Model':
             # Section [Model]

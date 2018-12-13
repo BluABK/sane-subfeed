@@ -62,9 +62,13 @@ class SaneExceptionHandler(QObject):
             if self.use_list:
                 # Add exception to a list to be handled later
                 self.add_exception(exctype, value, traceback)
-            else:
-                # Call custom raise_exception function in QApplication parent
-                self.app_ref.raise_exception(exctype, value, traceback)
+
+        # Call custom raise_exception function in QApplication parent
+        try:
+            self.app_ref.raise_exception(exctype, value, traceback)
+        except AttributeError as ae_exc:
+            self.logger.error("Exception IGNORED: Please implement raise_exception function in your app_ref")
+            pass
 
     def add_exception(self, exctype, value, traceback):
         """
