@@ -22,13 +22,13 @@ class DownloadProgressBar(QProgressBar):
         self.setPalette(self.default_palette)
 
     def pause(self):
-        self.set_color(Qt.yellow)
+        self.set_color(Qt.darkYellow)
 
     def resume(self):
         self.reset_palette()
 
     def finish(self):
-        self.set_color(Qt.green)
+        self.set_color(Qt.darkGreen)
 
     def fail(self):
-        self.set_color(Qt.red)
+        self.set_color(Qt.darkRed)
