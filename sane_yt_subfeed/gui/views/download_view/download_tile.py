@@ -29,6 +29,8 @@ class DownloadTile(QWidget):
             self.video = db_download_tile.video
 
         self.total_bytes = None
+        self.total_bytes_video = None
+        self.total_bytes_audio = None
         self.video_downloaded = False
         self.finished = False
         self.paused = False
@@ -106,10 +108,13 @@ class DownloadTile(QWidget):
 
         if self.finished:
             self.status_value.setText("Finished")
+            self.progress_bar.finish()
         if self.paused:
             self.status_value.setText("Paused")
+            self.progress_bar.pause()
         if self.failed:
             self.status_value.setText("FAILED")
+            self.progress_bar.fail()
         self.speed_value.setText("N/A")
         self.eta_value.setText("N/A")
 
@@ -135,11 +140,31 @@ class DownloadTile(QWidget):
         self.progress_bar.fail()
         DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
 
+    def determine_si_unit(self, byte_value):
+        """
+        Walks a size of bytes through SI Units until it finds the appropriate one to use.
+        :param byte_value:
+        :return:
+        """
+        si_units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+        for unit in si_units:
+            if byte_value < 1024:
+                # Cannot switch from manual field specification to automatic field numbering, thus separate variable.
+                byte_value_formatted = "{0:.2f}".format(byte_value)
+                return "{}{}".format(byte_value_formatted, unit)
+            byte_value = byte_value/1024
+
+        # You should never reach this point
+        self.logger.error("BUG in determine_si_unit: Bytes received larger than YiB unit!!!")
+        return "Uh oh... (see log)"
+
     def finished_download(self):
         self.finished = True
         self.progress_bar.setValue(1000)
         self.progress_bar.setFormat("100.0%")
         self.status_value.setText("Finished")
+        combined_size = self.total_bytes_video + self.total_bytes_audio
+        self.total_size_value.setText(self.determine_si_unit(combined_size))
         self.progress_bar.finish()
         DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
 
@@ -152,7 +177,8 @@ class DownloadTile(QWidget):
                     self.video_downloaded = True
                     self.status_value.setText("Finished downloading video")
                 else:
-                    self.status_value.setText("Finished")
+                    # It's not really finished until it calls finished_download()
+                    self.status_value.setText("Postprocessing...")
             elif "downloading" == event["status"]:
                 if self.paused:
                     self.status_value.setText("Download paused")
@@ -179,6 +205,10 @@ class DownloadTile(QWidget):
             else:
                 self.logger.debug("Downloading new item: {}".format(event))
                 self.total_bytes = int(event["total_bytes"])
+                # Store total bytes for video and audio track in a safe place
+                if not self.video_downloaded:
+                    self.total_bytes_video = self.total_bytes
+                self.total_bytes_audio = self.total_bytes
                 # self.progress_bar.setMaximum(int(event["total_bytes"]))
         else:
             self.logger.warning("total_bytes not in: {}".format(event))
@@ -215,11 +245,8 @@ class DownloadTile(QWidget):
 
             action = menu.exec_(self.mapToGlobal(event.pos()))
 
-            if action == pause_action and pause_action:
-                self.paused_download()
-                # self.download_progress_listener.threading_event.clear()
-                # self.speed_value.setText("n/a")
-                # self.eta_value.setText("n/a")
-            elif action == continue_dl_action and continue_dl_action:
-                self.resumed_download()
-                # self.download_progress_listener.threading_event.set()
+            if not self.finished:
+                if action == pause_action and pause_action:
+                    self.paused_download()
+                elif action == continue_dl_action and continue_dl_action:
+                    self.resumed_download()
