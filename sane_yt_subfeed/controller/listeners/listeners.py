@@ -113,7 +113,7 @@ class GridViewListener(QObject):
     def tile_downloaded(self, video: VideoD):
         self.model.hide_video_item(video)
         self.logger.info(
-            "Video hidden from grid view(downloaded): {} - {} [{}]".format(video.channel_title, video.title,
+            "Video hidden from grid view(downloading): {} - {} [{}]".format(video.channel_title, video.title,
                                                                            video.url_video))
         self.hiddenVideosChanged.emit()
         DownloadHandler.download_video(video,

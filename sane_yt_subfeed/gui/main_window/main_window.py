@@ -383,19 +383,29 @@ class MainWindow(QMainWindow):
         """
         return self.exceptionHandler.exceptions
 
-    def sane_try(self, *args, **kwargs):
+    def sane_try(self, func, *args, **kwargs):
         """
         Reinventing the try/except wheel in order to raise exceptions in the right places.
-        :param args:
-        :param kwargs:
+        :param func: function to call
+        :param args: args to pass
+        :param kwargs: kwargs to pass
         :return:
         """
-        for arg in args:
-            arg()
-            backend_exceptions = self.check_for_backend_exceptions()
-            if len(backend_exceptions) is not 0:
-                exctype, value, this_traceback = self.exceptionHandler.pop_exception()
-                raise exctype(exctype, value, this_traceback)
+        if args and kwargs:
+            func(args, kwargs)
+        elif args and not kwargs:
+            if len(args) is 1:
+                func(args[0])
+            else:
+                func(args)
+        elif kwargs and not args:
+            func(kwargs)
+        else:
+            func()
+        backend_exceptions = self.check_for_backend_exceptions()
+        if len(backend_exceptions) is not 0:
+            exctype, value, this_traceback = self.exceptionHandler.pop_exception()
+            raise exctype(exctype, value, this_traceback)
 
     def poll_exceptions(self, auto_clear=False):
         """
