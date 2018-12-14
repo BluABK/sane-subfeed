@@ -31,6 +31,8 @@ class DownloadTile(QWidget):
         self.total_bytes = None
         self.video_downloaded = False
         self.finished = False
+        self.paused = False
+        self.failed = False  # FIXME: Implement handling of failed downloads
         self.finished_date = None
         self.started_date = None
         self.last_event = None
@@ -104,14 +106,41 @@ class DownloadTile(QWidget):
 
         if self.finished:
             self.status_value.setText("Finished")
-        self.speed_value.setText("n/a")
-        self.eta_value.setText("n/a")
+        if self.paused:
+            self.status_value.setText("Paused")
+        if self.failed:
+            self.status_value.setText("FAILED")
+        self.speed_value.setText("N/A")
+        self.eta_value.setText("N/A")
+
+    def paused_download(self):
+        self.logger.debug5("Paused download")
+        self.paused = True
+        self.download_progress_listener.threading_event.clear()
+        self.progress_bar.pause()
+        # self.status_value.setText("Paused")
+        # self.speed_value.setText("N/A")
+        # self.eta_value.setText("Paused")
+
+    def resumed_download(self):
+        self.logger.debug5("Resumed download")
+        self.paused = False
+        self.download_progress_listener.threading_event.set()
+        self.progress_bar.resume()
+
+    def failed_download(self):
+        self.logger.debug5("Failed download")
+        self.failed = True
+        self.download_progress_listener.threading_event.clear()
+        self.progress_bar.fail()
+        DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
 
     def finished_download(self):
         self.finished = True
         self.progress_bar.setValue(1000)
         self.progress_bar.setFormat("100.0%")
         self.status_value.setText("Finished")
+        self.progress_bar.finish()
         DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
 
     def update_progress(self, event):
@@ -182,8 +211,10 @@ class DownloadTile(QWidget):
             action = menu.exec_(self.mapToGlobal(event.pos()))
 
             if action == pause_action and pause_action:
-                self.download_progress_listener.threading_event.clear()
-                self.speed_value.setText("n/a")
-                self.eta_value.setText("n/a")
+                self.paused_download()
+                # self.download_progress_listener.threading_event.clear()
+                # self.speed_value.setText("n/a")
+                # self.eta_value.setText("n/a")
             elif action == continue_dl_action and continue_dl_action:
-                self.download_progress_listener.threading_event.set()
+                self.resumed_download()
+                # self.download_progress_listener.threading_event.set()

@@ -1,4 +1,5 @@
 from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtGui import QPalette
 from PyQt5.QtWidgets import QProgressBar, QSizePolicy
 
 
@@ -10,4 +11,24 @@ class DownloadProgressBar(QProgressBar):
         self.setMaximum(1000)
         # self.setTextVisible(True)
         self.setAlignment(Qt.AlignCenter)
+        self.default_palette = QPalette(self.palette())
 
+    def set_color(self, color):
+        palette = QPalette(self.palette())
+        palette.setColor(QPalette.Highlight, color)
+        self.setPalette(palette)
+
+    def reset_palette(self):
+        self.setPalette(self.default_palette)
+
+    def pause(self):
+        self.set_color(Qt.yellow)
+
+    def resume(self):
+        self.reset_palette()
+
+    def finish(self):
+        self.set_color(Qt.green)
+
+    def fail(self):
+        self.set_color(Qt.red)
