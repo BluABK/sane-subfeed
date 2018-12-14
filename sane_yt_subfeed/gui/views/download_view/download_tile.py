@@ -154,10 +154,15 @@ class DownloadTile(QWidget):
                 else:
                     self.status_value.setText("Finished")
             elif "downloading" == event["status"]:
-                if self.video_downloaded:
-                    self.status_value.setText("Downloading audio")
+                if self.paused:
+                    self.status_value.setText("Download paused")
+                elif self.failed:
+                    self.status_value.setText("Download FAILED!")
                 else:
-                    self.status_value.setText("Downloading video")
+                    if self.video_downloaded:
+                        self.status_value.setText("Downloading audio")
+                    else:
+                        self.status_value.setText("Downloading video")
             else:
                 self.status_value.setText(event["status"])
         if "_eta_str" in event:
@@ -184,7 +189,7 @@ class DownloadTile(QWidget):
                 self.percentage_downloaded = percentage_downloaded
                 DownloadHandler.static_self.updateDownloadTileEvent.emit(DDBDownloadTile(self))
         else:
-            if not "downloaded_bytes" in event:
+            if "downloaded_bytes" not in event:
                 self.logger.warning("downloaded_bytes not in: {}".format(event))
         if "_percent_str" in event:
             self.progress_bar.setFormat(event["_percent_str"])
