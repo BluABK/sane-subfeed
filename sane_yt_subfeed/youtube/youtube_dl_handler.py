@@ -6,21 +6,26 @@ import threading
 
 from youtube_dl import YoutubeDL
 from youtube_dl.utils import DownloadError
-from youtube_dl.postprocessor.ffmpeg import FFmpegPostProcessorError
 
 from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.config_handler import read_config, get_options
-
-# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 from sane_yt_subfeed.postprocessor.ffmpeg import SaneFFmpegPostProcessor, SaneFFmpegMetadataPP, SaneFFmpegMergerPP, \
     SaneFFmpegPostProcessorError
 
+# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 logger = create_logger(__name__)
 
 VIDEO_FORMATS = ['mp4', 'flv', 'ogg', 'webm', 'mkv', 'avi', 'ts']
 AUDIO_MERGE_FAILS = ["Could not write header for output file #0 (incorrect codec parameters ?): Invalid argument",
                      "ERROR: Could not write header for output file #0 (incorrect codec parameters ?): Invalid argument"
                      ]
+IO_ERROR = ["ERROR: unable to write data: [Errno 5] Input/output error"]
+WRITE_DENIED_ERROR = ["ERROR: unable to open for writing: [Errno 13] Permission denied"]
+
+DOWNLOAD_RUNNING = 0
+DOWNLOAD_FINISHED = 1
+DOWNLOAD_PAUSED = 2
+DOWNLOAD_FAILED = 3
 
 
 class MyLogger(object):
@@ -43,6 +48,7 @@ class YoutubeDownload(threading.Thread):
         logger.debug("Created thread")
         self.video = video
         self.listeners = finished_listeners
+        self.download_status = None
         self.download_progress_listener = download_progress_listener
         self.threading_event = threading_event
         # FIXME: faux filename, as the application is currently not able to get final filname from youtube-dl
@@ -111,7 +117,9 @@ class YoutubeDownload(threading.Thread):
                         "Starting download (proxy: {}) for: {} - {} [{}]".format(proxy, self.video.channel_title,
                                                                                  self.video.title,
                                                                                  self.video.url_video))
+                    self.download_status = DOWNLOAD_RUNNING
                     ydl.download([self.video.url_video])
+                    self.download_status = DOWNLOAD_FINISHED
                     return True
             except DownloadError as dl_exc:
                 logger.warning(
@@ -184,12 +192,16 @@ class YoutubeDownload(threading.Thread):
             with YoutubeDL(self.ydl_opts) as ydl:
                 logger.info("Starting download for: {} - {} [{}]".format(self.video.channel_title, self.video.title,
                                                                          self.video.url_video))
+                self.download_status = DOWNLOAD_RUNNING
                 ydl.download([self.video.url_video])
+                self.download_status = DOWNLOAD_FINISHED
         except DownloadError as dl_exc:
             if "The uploader has not made this video available in your country." in str(dl_exc) or \
                     ("ERROR:" in str(dl_exc) and "blocked it in your country" in str(dl_exc)):
-                # logger.error("ERROR: The uploader has not made this video available in your country") # -- used for debug
+                # -- used for debug
+                # logger.error("ERROR: The uploader has not made this video available in your country")
                 if self.download_with_proxy() is not True:
+                    self.download_status = DOWNLOAD_FAILED
                     logger.error("All proxies have failed to download geo blocked video '{}'!".format(self.video.title))
                     logger.exception(dl_exc)
 
@@ -217,40 +229,68 @@ class YoutubeDownload(threading.Thread):
                     # Merge formats
                     try:
                         SaneFFmpegMergerPP(SaneFFmpegPostProcessor()).run(info)
+                        self.download_status = DOWNLOAD_FINISHED
                     except SaneFFmpegPostProcessorError as merge_exc:
                         logger.exception("Failed to merge formats", exc_info=merge_exc)
+                        self.download_status = DOWNLOAD_FAILED
 
                     # Cleanup remnant formats
                     self.delete_filepaths(incomplete_filepaths)
 
                 else:
+                    self.download_status = DOWNLOAD_FAILED
                     logger.error("Can't handle incompatible container "
                                  "audio and video stream muxing, insufficent files. | {}".format(incomplete_filenames))
-
+                if str(dl_exc) in IO_ERROR:
+                    self.download_status = DOWNLOAD_FAILED
+                    logger.exception("Failing download due to DownloadError exception (I/O ERROR)!", exc_info=dl_exc)
+                if str(dl_exc) in WRITE_DENIED_ERROR:
+                    self.download_status = DOWNLOAD_FAILED
+                    logger.exception("Failing download due to DownloadError exception (PermissionError)!",
+                                     exc_info=dl_exc)
             else:
+                self.download_status = DOWNLOAD_FAILED
                 logger.exception("Caught unhandled DownloadError exception!", exc_info=dl_exc)
+
+        except PermissionError as pe_exc:
+            self.download_status = DOWNLOAD_FAILED
+            logger.exception("Failing download due to PermissionError exception!", exc_info=pe_exc)
+
         except Exception as e:
+            self.download_status = DOWNLOAD_FAILED
             logger.exception(e)
             pass
 
-        logger.info("Finished downloading: {} - {} [{}]".format(self.video.channel_title, self.video.title,
-                                                                self.video.url_video))
+        # self.download_status_listener = self.download_status  # TODO: IMPLEMENT failed download handling (listener)
+        if self.download_status is DOWNLOAD_FINISHED:
+            logger.info("Finished downloading: {} - {} [{}]".format(self.video.channel_title, self.video.title,
+                                                                    self.video.url_video))
+            # self.video.vid_path = os.path.join(self.youtube_folder, self.determine_filename())
+            self.video.vid_path = self.determine_filepath()
 
-        # self.video.vid_path = os.path.join(self.youtube_folder, self.determine_filename())
-        self.video.vid_path = self.determine_filepath()
+            # self.video.vid_path = os.path.join(self.youtube_folder, self.determine_filename())
+            self.video.vid_path = self.determine_filepath()
 
-        self.video.date_downloaded = datetime.datetime.utcnow()
+            self.video.date_downloaded = datetime.datetime.utcnow()
 
-        # Embed metadata (optional)
-        if read_config('Postprocessing', 'embed_metadata', literal_eval=True):
-            self.embed_metadata()
+            # Embed metadata (optional)
+            if read_config('Postprocessing', 'embed_metadata', literal_eval=True):
+                self.embed_metadata()
+            else:
+                logger.debug("Skipping disabled metadata embedding operation")
+
+            self.download_progress_listener.finishedDownload.emit()  # FIXME: Needs to emit failed status as well
+            if self.listeners:
+                for listener in self.listeners:
+                    listener.emit(self.video)
+        elif self.download_status is DOWNLOAD_FAILED:
+            logger.error("FAILED downloading: {} - {} [{}]".format(self.video.channel_title, self.video.title,
+                                                                   self.video.url_video))
         else:
-            logger.debug("Skipping disabled metadata embedding operation")
-
-        self.download_progress_listener.finishedDownload.emit()
-        if self.listeners:
-            for listener in self.listeners:
-                listener.emit(self.video)
+            logger.critical("BUG: WRONG DOWNLOAD STATUS ({}) : {} - {} [{}]".format(self.download_status,
+                                                                                    self.video.channel_title,
+                                                                                    self.video.title,
+                                                                                    self.video.url_video))
 
     def my_hook(self, event):
         self.download_progress_listener.updateProgress.emit(event)
