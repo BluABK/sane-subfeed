@@ -123,9 +123,6 @@ class DownloadTile(QWidget):
         self.paused = True
         self.download_progress_listener.threading_event.clear()
         self.progress_bar.pause()
-        # self.status_value.setText("Paused")
-        # self.speed_value.setText("N/A")
-        # self.eta_value.setText("Paused")
 
     def resumed_download(self):
         self.logger.debug5("Resumed download")
@@ -163,8 +160,12 @@ class DownloadTile(QWidget):
         self.progress_bar.setValue(1000)
         self.progress_bar.setFormat("100.0%")
         self.status_value.setText("Finished")
-        combined_size = self.total_bytes_video + self.total_bytes_audio
-        self.total_size_value.setText(self.determine_si_unit(combined_size))
+        try:
+            combined_size = self.total_bytes_video + self.total_bytes_audio
+            self.total_size_value.setText(self.determine_si_unit(combined_size))
+        except TypeError as te_exc:
+            self.logger.error("A TypeError exception occurred while combining video+audio track sizes", exc_info=te_exc)
+            self.total_size_value.setText("BUG: GitHub Issue #28")
         self.progress_bar.finish()
         DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
 
