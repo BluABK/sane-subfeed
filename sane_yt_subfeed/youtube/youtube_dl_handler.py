@@ -38,8 +38,6 @@ class MyLogger(object):
     def error(self, msg):
         pass
 
-        # logger.info("DL status == 'finished")
-
 
 # FIXME: because of formating string, for channel, it can't do batch dl
 class YoutubeDownload(threading.Thread):
@@ -84,7 +82,8 @@ class YoutubeDownload(threading.Thread):
         }
         self.add_userconfig_opts(self.proxy_ydl_opts)
 
-    def add_userconfig_opts(self, ydl_opts):
+    @staticmethod
+    def add_userconfig_opts(ydl_opts):
         logger.info("Adding custom user youtube-dl opts (if any)")
 
         for option in get_options('Youtube-dl_opts'):
@@ -110,7 +109,7 @@ class YoutubeDownload(threading.Thread):
             try:
                 self.proxy_ydl_opts['proxy'] = proxy
                 logger.info(
-                    "Video '{}' is geo blocked, retrying with proxy: {}.".format(self.video.title, proxy))
+                    "Video is geo blocked, retrying with proxy '{}': {}".format(proxy, self.video.title))
 
                 with YoutubeDL(self.proxy_ydl_opts) as ydl:
                     logger.info(
@@ -125,6 +124,8 @@ class YoutubeDownload(threading.Thread):
                 logger.warning(
                     "Proxy {} download of geo blocked video '{}' failed.".format(proxy, self.video.title))
                 logger.exception(dl_exc)
+                # FIXME: Probably overkill, should maybe only flag as failed from parent caller
+                self.download_status = DOWNLOAD_FAILED
                 pass
 
         return False
@@ -158,7 +159,8 @@ class YoutubeDownload(threading.Thread):
             logger.error("Unable to determine incomplete filenames, need 2 or more for a merge (got: {})".format(names))
             return None
 
-    def delete_filepaths(self, filepaths):
+    @staticmethod
+    def delete_filepaths(filepaths):
         for filepath in filepaths:
             logger.info("Deleting format from earlier failed ffmpeg merge: '{}'".format(filepath))
             os.remove(filepath)
@@ -168,7 +170,6 @@ class YoutubeDownload(threading.Thread):
         Embeds metadata tags (and optionally remaps them) to media files
         :return:
         """
-
         logger.info("Embedding metadata with default tags")
         # Keys are media metadata tag names (https://wiki.multimedia.cx/index.php?title=FFmpeg_Metadata)
         # FIXME: Add other presets like music
@@ -204,6 +205,8 @@ class YoutubeDownload(threading.Thread):
                     self.download_status = DOWNLOAD_FAILED
                     logger.error("All proxies have failed to download geo blocked video '{}'!".format(self.video.title))
                     logger.exception(dl_exc)
+                else:
+                    self.download_status = DOWNLOAD_FINISHED
 
             if str(dl_exc) in AUDIO_MERGE_FAILS:
                 logger.warning("Handling incompatible container audio and video stream muxing",
@@ -248,9 +251,6 @@ class YoutubeDownload(threading.Thread):
                     self.download_status = DOWNLOAD_FAILED
                     logger.exception("Failing download due to DownloadError exception (PermissionError)!",
                                      exc_info=dl_exc)
-            else:
-                self.download_status = DOWNLOAD_FAILED
-                logger.exception("Caught unhandled DownloadError exception!", exc_info=dl_exc)
 
         except PermissionError as pe_exc:
             self.download_status = DOWNLOAD_FAILED
