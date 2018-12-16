@@ -68,6 +68,9 @@ class DownloadTile(QWidget):
         self.upload_value = SmallLabel(self.video.date_published.strftime("%Y-%m-%d %H:%M:%S"), parent=self)
         self.eta_value = SmallLabel("No update", parent=self)
         self.speed_value = SmallLabel("No update:", parent=self)
+        self.avg_speed_str = "N/A"
+        self.avg_speed_calc_tick = 0
+        self.speeds = []
         self.total_size_value = SmallLabel("No update:", parent=self)
 
         self.sane_layout.addWidget(self.title_bar, 0, 0, 1, 4)
@@ -189,6 +192,40 @@ class DownloadTile(QWidget):
         self.logger.error("BUG in determine_si_unit: Bytes received larger than YiB unit!!!")
         return "Uh oh... (see log)"
 
+    @staticmethod
+    def determine_bytes(speed_str):
+        """
+        Determines how many actual bytes there is in a youtube_dl formatted speed rate string.
+        :param speed_str: youtube_dl formatted speed rate string
+        :return:
+        """
+        si_units_speed = {'B/s': 1, 'KiB/s': 1024, 'MiB/s': 1048576, 'GiB/s': 1073741824, 'TiB/s': 1099511627776,
+                          'PiB/s': 1125899906842624, 'EiB/s': 1152921504606846976, 'ZiB/s': 1180591620717411303424,
+                          'YiB/s': 1208925819614629174706176}
+        speed_unit = speed_str[-5:].strip()
+        speed = float(speed_str[:-5].strip())
+
+        return speed*si_units_speed[speed_unit]
+
+    def calc_avg_speed(self, speed_str, ticks=50):
+        if 'Unknown' not in speed_str:
+            # Enough ticks to reach a verdict on avg rate
+            if self.avg_speed_calc_tick >= ticks:
+                try:
+                    # Get average speed (float)
+                    avg_speed = sum(self.speeds) / float(len(self.speeds))
+                    # Determine human readable SI unit for speed given in bytes
+                    self.avg_speed_str = self.determine_si_unit(avg_speed)
+                    self.speeds.clear()
+                    self.avg_speed_calc_tick = 0
+                except Exception as exc:
+                    # Log warning and skip until it gets a good speed value
+                    self.logger.warning("Bad input to determine_bytes('{}')".format(speed_str), exc_info=exc)
+            else:
+                # Add speed in bytes to list of speeds
+                self.speeds.append(self.determine_bytes(speed_str))
+                self.avg_speed_calc_tick += 1
+
     def finished_download(self):
         self.finished = True
         self.progress_bar.setValue(1000)
@@ -246,7 +283,8 @@ class DownloadTile(QWidget):
         if "_eta_str" in event:
             self.eta_value.setText(event["_eta_str"])
         if "_speed_str" in event:
-            self.speed_value.setText(event["_speed_str"])
+            self.calc_avg_speed(event["_speed_str"])
+            self.speed_value.setText("{} (avg: {}/s)".format(event["_speed_str"], self.avg_speed_str))
         if "_total_bytes_str" in event:
             self.total_size_value.setText(event["_total_bytes_str"])
         if "total_bytes" in event or "total_bytes_estimate" in event:
