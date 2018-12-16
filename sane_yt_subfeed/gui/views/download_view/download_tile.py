@@ -1,3 +1,4 @@
+from collections import Counter
 from datetime import datetime
 from PyQt5.QtWidgets import QGridLayout, QWidget, QMenu
 from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
@@ -67,10 +68,14 @@ class DownloadTile(QWidget):
         self.duration_value = SmallLabel(format(self.video.duration), parent=self)
         self.upload_value = SmallLabel(self.video.date_published.strftime("%Y-%m-%d %H:%M:%S"), parent=self)
         self.eta_value = SmallLabel("No update", parent=self)
+        self.common_eta_str = "N/A"
+        self.common_eta_calc_tick = 0
+        self.etas = []
         self.speed_value = SmallLabel("No update:", parent=self)
         self.avg_speed_str = "N/A"
         self.avg_speed_calc_tick = 0
         self.speeds = []
+        self.avg_calc_ticks = 50
         self.total_size_value = SmallLabel("No update:", parent=self)
 
         self.sane_layout.addWidget(self.title_bar, 0, 0, 1, 4)
@@ -207,7 +212,15 @@ class DownloadTile(QWidget):
 
         return speed*si_units_speed[speed_unit]
 
-    def calc_avg_speed(self, speed_str, ticks=50):
+    def calc_avg_speed(self, speed_str, ticks=None):
+        """
+        Calculates the average speed during n amount of ticks
+        :param speed_str:
+        :param ticks: if not given self.avg_calc_ticks is used
+        :return:
+        """
+        if not ticks:
+            ticks = self.avg_calc_ticks
         if 'Unknown' not in speed_str:
             # Enough ticks to reach a verdict on avg rate
             if self.avg_speed_calc_tick >= ticks:
@@ -225,6 +238,27 @@ class DownloadTile(QWidget):
                 # Add speed in bytes to list of speeds
                 self.speeds.append(self.determine_bytes(speed_str))
                 self.avg_speed_calc_tick += 1
+
+    def most_common_eta(self, time_str, ticks=None):
+        """
+        Calculates the most common ETA during n amount of ticks in order to give a more stable statistic.
+        :param time_str:
+        :param ticks: if not given self.avg_calc_ticks is used
+        :return:
+        """
+        if not ticks:
+            ticks = self.avg_calc_ticks
+        if 'Unknown' not in time_str:
+            # Enough ticks to reach a verdict on avg rate
+            if self.avg_speed_calc_tick >= ticks:
+                # Get most common ETA
+                self.common_eta_str = Counter(self.etas).most_common(1)[0][0]
+                self.etas.clear()
+                self.common_eta_calc_tick = 0
+            else:
+                # Add ETA str to a list
+                self.etas.append(time_str)
+                self.common_eta_calc_tick += 1
 
     def finished_download(self):
         self.finished = True
@@ -281,7 +315,8 @@ class DownloadTile(QWidget):
         # Started/Finished on info
         self.set_started_finished_on_label()
         if "_eta_str" in event:
-            self.eta_value.setText(event["_eta_str"])
+            self.most_common_eta(event["_eta_str"])
+            self.eta_value.setText("{} (avg: {})".format(event["_eta_str"], self.common_eta_str))
         if "_speed_str" in event:
             self.calc_avg_speed(event["_speed_str"])
             self.speed_value.setText("{} (avg: {}/s)".format(event["_speed_str"], self.avg_speed_str))
