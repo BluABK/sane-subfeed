@@ -1,7 +1,5 @@
-from PyQt5 import sip
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPalette
-from PyQt5.QtWidgets import QGridLayout, QProgressBar, QWidget, QSizePolicy, QMenu
+from datetime import datetime
+from PyQt5.QtWidgets import QGridLayout, QWidget, QMenu
 from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
 from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
 
@@ -57,6 +55,7 @@ class DownloadTile(QWidget):
         # self.progress_bar.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
         self.status = SmallLabel("Status:", parent=self)
+        self.start_finish_dates = SmallLabel("Started/Finished on:", parent=self)
         self.duration = SmallLabel("Duration:", parent=self)
         self.upload = SmallLabel("Uploaded:", parent=self)
         self.eta = SmallLabel("ETA:", parent=self)
@@ -64,6 +63,7 @@ class DownloadTile(QWidget):
         self.total_size = SmallLabel("Total size:", parent=self)
 
         self.status_value = SmallLabel("No update", parent=self)
+        self.start_finish_dates_value = SmallLabel("No update", parent=self)
         self.duration_value = SmallLabel(format(self.video.duration), parent=self)
         self.upload_value = SmallLabel(self.video.date_published.strftime("%Y-%m-%d %H:%M:%S"), parent=self)
         self.eta_value = SmallLabel("No update", parent=self)
@@ -72,7 +72,7 @@ class DownloadTile(QWidget):
 
         self.sane_layout.addWidget(self.title_bar, 0, 0, 1, 4)
         self.sane_layout.addWidget(self.thumbnail, 1, 0, 6, 1)
-        self.sane_layout.addWidget(self.progress_bar, 7, 0, 1, 4)
+        self.sane_layout.addWidget(self.progress_bar, 8, 0, 1, 4)
 
         self.sane_layout.addWidget(self.status, 1, 1)
         self.sane_layout.addWidget(self.duration, 2, 1)
@@ -80,6 +80,7 @@ class DownloadTile(QWidget):
         self.sane_layout.addWidget(self.eta, 4, 1)
         self.sane_layout.addWidget(self.speed, 5, 1)
         self.sane_layout.addWidget(self.total_size, 6, 1)
+        self.sane_layout.addWidget(self.start_finish_dates, 7, 1)
 
         self.sane_layout.addWidget(self.status_value, 1, 2)
         self.sane_layout.addWidget(self.duration_value, 2, 2)
@@ -87,6 +88,7 @@ class DownloadTile(QWidget):
         self.sane_layout.addWidget(self.eta_value, 4, 2)
         self.sane_layout.addWidget(self.speed_value, 5, 2)
         self.sane_layout.addWidget(self.total_size_value, 6, 2)
+        self.sane_layout.addWidget(self.start_finish_dates_value, 7, 2)
 
         self.setLayout(self.sane_layout)
 
@@ -95,6 +97,32 @@ class DownloadTile(QWidget):
         else:
             pass
         self.logger.debug("Init done")
+
+    def set_started_finished_on_label(self):
+        if not self.started_date:
+            started_date_str = "-"
+        else:
+            try:
+                started_date_str = self.started_date.strftime("%Y-%m-%d %H:%M:%S")
+            except NameError as ne_exc:
+                self.logger.error("A NameError exception occurred: started_date_str.strftime", exc_info=ne_exc)
+                started_date_str = "ERROR"
+            except Exception as exc:
+                self.logger.error("An unexpected exception occurred: started_date_str.strftime", exc_info=exc)
+                started_date_str = "ERROR"
+        if not self.finished_date:
+            finished_date_str = "-"
+        else:
+            try:
+                finished_date_str = self.finished_date.strftime("%Y-%m-%d %H:%M:%S")
+            except NameError as ne_exc:
+                self.logger.error("A NameError exception occurred: finished_date_str.strftime", exc_info=ne_exc)
+                finished_date_str = "ERROR"
+            except Exception as exc:
+                self.logger.error("An unexpected exception occurred: finished_date_str.strftime", exc_info=exc)
+                finished_date_str = "ERROR"
+
+        self.start_finish_dates_value.setText(("{} / {}".format(started_date_str, finished_date_str)))
 
     def update_from_db_tile(self, db_download_tile):
         self.finished = db_download_tile.finished
@@ -117,8 +145,12 @@ class DownloadTile(QWidget):
         if self.failed:
             self.status_value.setText("FAILED")
             self.progress_bar.fail()
-        self.speed_value.setText("N/A")
-        self.eta_value.setText("N/A")
+
+        # Started/Finished on info
+        self.set_started_finished_on_label()
+
+        self.speed_value.setText("")
+        self.eta_value.setText("")
 
     def paused_download(self):
         self.logger.debug5("Paused download")
@@ -162,6 +194,8 @@ class DownloadTile(QWidget):
         self.progress_bar.setValue(1000)
         self.progress_bar.setFormat("100.0%")
         self.status_value.setText("Finished")
+        self.finished_date = datetime.utcnow()
+        self.set_started_finished_on_label()
         try:
             combined_size = self.total_bytes_video + self.total_bytes_audio
             self.total_size_value.setText(self.determine_si_unit(combined_size))
@@ -183,7 +217,8 @@ class DownloadTile(QWidget):
 
     def update_progress(self, event):
         self.last_event = event
-        # print(format(event))
+        if not self.started_date:
+            self.started_date = datetime.utcnow()
         if "status" in event:
             if event["status"] == "finished":
                 if not self.video_downloaded:
@@ -204,6 +239,8 @@ class DownloadTile(QWidget):
                         self.status_value.setText("Downloading video")
             else:
                 self.status_value.setText(event["status"])
+        # Started/Finished on info
+        self.set_started_finished_on_label()
         if "_eta_str" in event:
             self.eta_value.setText(event["_eta_str"])
         if "_speed_str" in event:
