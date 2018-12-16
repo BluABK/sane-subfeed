@@ -194,6 +194,8 @@ class DownloadTile(QWidget):
         self.progress_bar.setValue(1000)
         self.progress_bar.setFormat("100.0%")
         self.status_value.setText("Finished")
+        self.eta_value.setText("")
+        self.speed_value.setText("Was {}".format(self.speed_value.text()))
         self.finished_date = datetime.utcnow()
         self.set_started_finished_on_label()
         try:
@@ -291,7 +293,8 @@ class DownloadTile(QWidget):
             if is_paused:
                 continue_dl_action = menu.addAction("Continue download")
             else:
-                pause_action = menu.addAction("Pause download")
+                if not self.finished:
+                    pause_action = menu.addAction("Pause download")
             if not self.finished:
                 delete_incomplete_entry = menu.addAction("Delete incomplete entry")
 
