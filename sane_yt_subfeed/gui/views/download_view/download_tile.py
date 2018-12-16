@@ -1,3 +1,4 @@
+from PyQt5 import sip
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette
 from PyQt5.QtWidgets import QGridLayout, QProgressBar, QWidget, QSizePolicy, QMenu
@@ -17,7 +18,8 @@ class DownloadTile(QWidget):
         super(DownloadTile, self).__init__(parent, *args, **kwargs)
         self.logger = create_logger(__name__)
         self.logger.debug("Starting init")
-        self.sane_paret = parent
+        self.root = parent.root
+        self.parent = parent
 
         if download_progress_listener:
             self.download_progress_listener = download_progress_listener
@@ -169,6 +171,16 @@ class DownloadTile(QWidget):
         self.progress_bar.finish()
         DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
 
+    def delete_incomplete_entry(self):
+        """
+        Deletes an incomplete entry from the parent (DownloadView).
+        :return:
+        """
+        message = "Are you sure you want to remove '{}' from Downloads?".format(self.video.title)
+        actions = self.parent.clear_download_forced
+        # Prompt user for a confirmation dialog which applies actions to caller if confirmed.
+        self.root.confirmation_dialog(message, actions, caller=self)
+
     def update_progress(self, event):
         self.last_event = event
         # print(format(event))
@@ -243,6 +255,8 @@ class DownloadTile(QWidget):
                 continue_dl_action = menu.addAction("Continue download")
             else:
                 pause_action = menu.addAction("Pause download")
+            if not self.finished:
+                delete_incomplete_entry = menu.addAction("Delete incomplete entry")
 
             action = menu.exec_(self.mapToGlobal(event.pos()))
 
@@ -251,3 +265,6 @@ class DownloadTile(QWidget):
                     self.paused_download()
                 elif action == continue_dl_action and continue_dl_action:
                     self.resumed_download()
+                elif action == delete_incomplete_entry:
+                    self.delete_incomplete_entry()
+

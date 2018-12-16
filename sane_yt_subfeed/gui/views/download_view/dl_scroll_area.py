@@ -11,6 +11,7 @@ class DownloadScrollArea(QScrollArea):
     def __init__(self, parent, model: MainModel):
         super(DownloadScrollArea, self).__init__(parent)
 
+        self.root = parent
         self.parent = parent
         self.model = model
         self.widget = None

@@ -18,6 +18,7 @@ from sane_yt_subfeed.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import GRID_VIEW_ID, PLAY_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
+from sane_yt_subfeed.gui.dialogs.sane_confirmation_dialog import SaneConfirmationDialog
 from sane_yt_subfeed.gui.dialogs.sane_input_dialog import SaneInputDialog
 from sane_yt_subfeed.gui.dialogs.sane_text_view_dialog import SaneTextViewDialog
 from sane_yt_subfeed.gui.exception_handler.sane_exception_handler import SaneExceptionHandler
@@ -664,6 +665,23 @@ class MainWindow(QMainWindow):
         :return:
         """
         self.main_model.main_window_listener.addYouTubeChannelSubscriptionByUsername.emit(input_text)
+
+    def confirmation_dialog(self, message, actions, caller=None, title=None, ok_text='Yes', cancel_text='No'):
+        """
+        Prompts user for a Yes/No Confirmation where Yes results in a call for each action in actions
+        :param message: Text to display in dialog body.
+        :param actions: A function, or a list of functions to be called
+        :param caller: (If given) applies action to the caller function e.g. action(caller)
+        :param title: Title of dialog window.
+        :param ok_text: Text to display on OK button.
+        :param cancel_text: Text to display on Cancel button.
+        :return:
+        """
+        if not title:
+            title = "Are you sure?"
+        dialog = SaneConfirmationDialog(self, actions, caller=caller, title=title, text=message,
+                                        ok_text=ok_text, cancel_text=cancel_text)
+        dialog.show()
 
     def download_single_url_dialog(self):
         """

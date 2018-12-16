@@ -9,6 +9,6 @@ class ClearFinishedDownloads(QPushButton):
         self.sane_parent = parent
         self.download_view = download_view
 
-        self.clicked.connect(download_view.clear_downloads)
+        self.clicked.connect(download_view.clear_finished_downloads)
 
 

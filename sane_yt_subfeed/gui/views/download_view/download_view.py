@@ -17,7 +17,8 @@ class DownloadView(QWidget):
 
     def __init__(self, parent, *args, **kwargs):
         super(DownloadView, self).__init__(parent, *args, **kwargs)
-        self.sane_paret = parent
+        self.root = parent.root
+        self.parent = parent
         self.logger = create_logger(__name__)
 
         self.sane_layout = QVBoxLayout()
@@ -41,14 +42,17 @@ class DownloadView(QWidget):
         #     self.new_download(download, emit_signal=False)
 
     def new_download(self, download_progress_listener):
-
         self.logger.info("New download signal received: {}".format(download_progress_listener.__dict__))
         widget = DownloadTile(self, download_progress_listener)
         DownloadHandler.static_self.newDownloadTile.emit(DDBDownloadTile(widget))
         self.widgets.append(widget)
         self.sane_layout.addWidget(widget)
 
-    def clear_downloads(self):
+    def clear_finished_downloads(self):
+        """
+        Clears all finished downloads from the list and updated DB.
+        :return:
+        """
         widgets_to_delete = []
         for widget in self.widgets:
             if widget.finished:
@@ -62,6 +66,18 @@ class DownloadView(QWidget):
             self.logger.info("Removing widget for video: {} - {}".format(widget.video.title, widget.__dict__))
             sip.delete(widget)
             self.widgets.remove(widget)
+
+    def clear_download_forced(self, widget):
+        """
+        Clears a download regardless of its status, and updates DB.
+        :param widget:
+        :return:
+        """
+        widget.cleared = True
+        DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(widget))
+        self.logger.info("Forcibly removing widget for video: {} - {}".format(widget.video.title, widget.__dict__))
+        sip.delete(widget)
+        self.widgets.remove(widget)
 
     @pyqtSlot(list)
     def update_widgets(self, d_db_download_til_list):
