@@ -64,7 +64,7 @@ class DownloadTile(QWidget):
         self.total_size = SmallLabel("Total size:", parent=self)
 
         self.status_value = SmallLabel("No update", parent=self)
-        self.duration_value = SmallLabel("Not Implemented", parent=self)
+        self.duration_value = SmallLabel(format(self.video.duration), parent=self)
         self.upload_value = SmallLabel(self.video.date_published.strftime("%Y-%m-%d %H:%M:%S"), parent=self)
         self.eta_value = SmallLabel("No update", parent=self)
         self.speed_value = SmallLabel("No update:", parent=self)
