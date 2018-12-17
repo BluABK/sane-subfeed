@@ -18,6 +18,8 @@ class PlayTile(VideoTile):
     def __init__(self, parent, video, vid_id, clipboard, status_bar):
         super().__init__(parent, video, vid_id, clipboard, status_bar)
         self.logger = create_logger(__name__)
+        self.root = parent.root
+        self.parent = parent
 
     def init_thumbnailtile(self):
         return PlayThumbnailTile(self)

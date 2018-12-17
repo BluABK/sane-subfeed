@@ -11,7 +11,7 @@ HISTORY_FILEPATH = os.path.join(LOGDIR, HISTORY_FILENAME)
 logger = create_logger(__name__)
 
 
-def get_history():
+def get_plaintext_history():
     """
     Read the history file and return the entire thing as a string
     :return:
@@ -26,7 +26,7 @@ def get_history():
     return history_str
 
 
-def update_history(entry_str):
+def update_plaintext_history(entry_str):
     """
     Add an entry to the history file
     :param entry_str:

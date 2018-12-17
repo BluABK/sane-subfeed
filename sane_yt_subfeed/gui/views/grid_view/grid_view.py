@@ -1,14 +1,11 @@
 import math
 
-from PyQt5 import sip
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap, QColor
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QWidget, QGridLayout, QSizePolicy
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.view_models import MainModel
-from sane_yt_subfeed.database.detached_models.video_d import VideoD
-from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
 from sane_yt_subfeed.log_handler import create_logger
 
 

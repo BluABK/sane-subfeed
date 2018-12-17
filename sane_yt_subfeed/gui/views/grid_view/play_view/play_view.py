@@ -9,6 +9,8 @@ class PlayView(GridView):
     def __init__(self, parent, root, main_model: MainModel):
         super().__init__(parent, root, main_model)
         self.logger = create_logger(__name__ + ".PlayView")
+        self.root = root
+        self.parent = parent
 
         self.main_model.grid_view_listener.downloadedVideosChanged.connect(self.videos_changed)
         self.main_model.grid_view_listener.downloadedVideosUpdated.connect(self.update_videos)
@@ -29,3 +31,5 @@ class PlayView(GridView):
             q_label.set_video(video)
             self.q_labels[video.video_id] = q_label
         self.update_grid()
+
+
