@@ -21,7 +21,7 @@ class PlayTile(VideoTile):
         self.root = parent.root
         self.parent = parent
 
-    def init_thumbnailtile(self):
+    def init_thumbnail_tile(self):
         return PlayThumbnailTile(self)
 
     def mousePressEvent(self, QMouseEvent):  # FIXME: Make mouse hotkeys based on hotkeys.ini

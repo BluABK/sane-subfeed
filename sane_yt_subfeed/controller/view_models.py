@@ -20,9 +20,28 @@ from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_thread
 
 
 def remove_video(test_list, video):
+    """
+    Removes a video from list and returns the index it had
+    :param test_list:
+    :param video:
+    :return:
+    """
     for vid in test_list:
         if vid.video_id == video.video_id:
+            index = test_list.index(vid)
             test_list.remove(vid)
+            return index
+
+
+def add_video(test_list, video, index):
+    """
+    Inserts a video into list at the given index
+    :param test_list:
+    :param video:
+    :param index:
+    :return:
+    """
+    test_list.insert(index, video)
 
 
 class MainModel:
@@ -39,6 +58,7 @@ class MainModel:
         self.videos = videos
         self.filtered_videos = []
         self.downloaded_videos = []
+        self.removed_videos = {'filtered': {}, 'downloaded': {}}
 
         self.download_progress_signals = []
 
@@ -85,11 +105,23 @@ class MainModel:
 
     def hide_video_item(self, video):
         self.logger.debug("Hiding video item: {}".format(video))
-        remove_video(self.filtered_videos, video)
-        remove_video(self.downloaded_videos, video)
+        self.removed_videos['filtered'].update({video: remove_video(self.filtered_videos, video)})
+        self.removed_videos['downloaded'].update({video: remove_video(self.downloaded_videos, video)})
 
-    def hide_downloaded_video_item(self, video):
-        remove_video(self.downloaded_videos, video)
+    def unhide_video_item(self, video):
+        self.logger.debug("Hiding video item: {}".format(video))
+        add_video(self.filtered_videos, video, self.removed_videos['filtered'][video])
+        self.removed_videos['filtered'].pop(video)
+        add_video(self.downloaded_videos, video, self.removed_videos['downloaded'][video])
+        self.removed_videos['downloaded'].pop(video)
+
+    def hide_downloaded_video_item(self, video):  # FIXME: Redundant?
+        self.logger.debug("Hiding downloaded video item: {}".format(video))
+        self.removed_videos['downloaded'].update({video: remove_video(self.downloaded_videos, video)})
+
+    def unhide_downloaded_video_item(self, video):  # FIXME: Redundant?
+        add_video(self.downloaded_videos, video, self.removed_videos['downloaded'][video])
+        self.removed_videos['downloaded'].pop(video)
 
     def db_update_videos(self, filtered=True):
         self.logger.info("Getting newest stored videos from DB")

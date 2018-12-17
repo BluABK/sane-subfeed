@@ -39,7 +39,9 @@ class GridViewListener(QObject):
 
     tileDownloaded = pyqtSignal(VideoD)
     tileDiscarded = pyqtSignal(VideoD)
+    tileUndiscarded = pyqtSignal(VideoD)
     tileWatched = pyqtSignal(VideoD)
+    tileUnwatched = pyqtSignal(VideoD)
     hiddenVideosChanged = pyqtSignal()
     hiddenVideosUpdated = pyqtSignal()
     downloadedVideosChanged = pyqtSignal()
@@ -50,6 +52,7 @@ class GridViewListener(QObject):
     scrollReachedEndPlay = pyqtSignal()
     thumbnailDownload = pyqtSignal()
     decreaseWatchPrio = pyqtSignal(VideoD)
+    increaseWatchPrio = pyqtSignal(VideoD)
     redrawVideos = pyqtSignal(list)
 
     # FIXME: move youtube-dl listener to its own listener?
@@ -66,7 +69,9 @@ class GridViewListener(QObject):
 
         self.tileDownloaded.connect(self.tile_downloaded)
         self.tileWatched.connect(self.tile_watched)
+        self.tileUnwatched.connect(self.tile_unwatched)
         self.tileDiscarded.connect(self.tile_discarded)
+        self.tileUndiscarded.connect(self.tile_undiscarded)
         self.downloadFinished.connect(self.download_finished)
         self.downloadedVideosChangedinDB.connect(self.download_finished_in_db)
         self.updateGridViewFromDb.connect(self.update_grid_view_from_db)
@@ -75,11 +80,18 @@ class GridViewListener(QObject):
         self.scrollReachedEndPlay.connect(self.scroll_reached_end_play)
         self.thumbnailDownload.connect(self.thumbnail_download)
         self.decreaseWatchPrio.connect(self.decrease_watch_prio)
+        self.increaseWatchPrio.connect(self.increase_watch_prio)
 
     @pyqtSlot(VideoD)
     def decrease_watch_prio(self, video):
         self.logger.info("Decreasing watch prio for: {}".format(video.__dict__))
         video.watch_prio += 1
+        UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
+
+    @pyqtSlot(VideoD)
+    def increase_watch_prio(self, video):
+        self.logger.info("Increasing watch prio for: {}".format(video.__dict__))
+        video.watch_prio -= 1
         UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
 
     def thumbnail_download(self):
@@ -136,10 +148,27 @@ class GridViewListener(QObject):
         UpdateVideo(video, update_existing=True).start()
 
     @pyqtSlot(VideoD)
+    def tile_unwatched(self, video: Video):
+        self.logger.info("Mark unwatched: {} - {}".format(video.title, video.__dict__))
+        self.model.unhide_downloaded_video_item(video)
+        self.downloadedVideosChanged.emit()
+        UpdateVideo(video, update_existing=True).start()
+
+    @pyqtSlot(VideoD)
     def tile_discarded(self, video: Video):
         self.model.hide_video_item(video)
         self.logger.info("Video hidden from grid view(Discarded): {} - {} [{}]".format(video.channel_title, video.title,
                                                                                        video.url_video))
+        self.hiddenVideosChanged.emit()
+        self.downloadedVideosChanged.emit()
+        UpdateVideo(video, update_existing=True).start()
+
+    @pyqtSlot(VideoD)
+    def tile_undiscarded(self, video: Video):
+        self.model.unhide_video_item(video)
+        self.logger.info("Video unhidden from GridView(Un-discarded): {} - {} [{}]".format(video.channel_title,
+                                                                                           video.title,
+                                                                                           video.url_video))
         self.hiddenVideosChanged.emit()
         self.downloadedVideosChanged.emit()
         UpdateVideo(video, update_existing=True).start()

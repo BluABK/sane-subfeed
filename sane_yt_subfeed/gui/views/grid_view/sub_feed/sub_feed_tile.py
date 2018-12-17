@@ -20,7 +20,7 @@ class SubFeedTile(VideoTile):
         super().__init__(parent, video, vid_id, clipboard, status_bar)
         self.logger = create_logger(__name__)
 
-    def init_thumbnailtile(self):
+    def init_thumbnail_tile(self):
         return SubThumbnailTile(self)
 
     def contextMenuEvent(self, event):
