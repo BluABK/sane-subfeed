@@ -22,6 +22,7 @@ from sane_yt_subfeed.gui.dialogs.sane_confirmation_dialog import SaneConfirmatio
 from sane_yt_subfeed.gui.dialogs.sane_input_dialog import SaneInputDialog
 from sane_yt_subfeed.gui.dialogs.sane_text_view_dialog import SaneTextViewDialog
 from sane_yt_subfeed.gui.exception_handler.sane_exception_handler import SaneExceptionHandler
+from sane_yt_subfeed.gui.history.sane_history import SaneHistory
 from sane_yt_subfeed.gui.main_window.db_state import DbStateIcon
 from sane_yt_subfeed.gui.main_window.toolbar import Toolbar
 from sane_yt_subfeed.gui.main_window.toolbar_action import SaneToolBarAction
@@ -38,7 +39,7 @@ from sane_yt_subfeed.gui.views.grid_view.sub_feed.sub_feed_view import SubFeedVi
 from sane_yt_subfeed.gui.views.list_detailed_view import ListDetailedView
 from sane_yt_subfeed.gui.views.list_tiled_view import ListTiledView
 from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
-from sane_yt_subfeed.history_handler import get_history
+from sane_yt_subfeed.history_handler import get_plaintext_history
 from sane_yt_subfeed.log_handler import create_logger
 
 # Constants
@@ -104,6 +105,8 @@ class MainWindow(QMainWindow):
         self.list_tiled_view = ListTiledView(self)
         self.subs_view = SubscriptionsView(self)
         self.about_view = AboutView(self)
+
+        self.history = SaneHistory(self)
 
         self.init_ui()
 
@@ -732,7 +735,7 @@ class MainWindow(QMainWindow):
         Pop-up a SaneTextViewDialog with usage history
         :return:
         """
-        history = get_history()
+        history = get_plaintext_history()
         history_dialog = SaneTextViewDialog(self, history)
         history_dialog.setWindowTitle("Usage history")
         history_dialog.show()

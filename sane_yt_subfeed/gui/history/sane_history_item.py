@@ -3,7 +3,7 @@ from PyQt5.QtCore import QObject
 from sane_yt_subfeed import create_logger
 
 
-class SaneGridViewHistoryItem(QObject):
+class SaneHistoryItem(QObject):
     def __init__(self, parent, video, action=None, anti_action=None):
         QObject.__init__(self, parent=parent)
         self.logger = create_logger(__name__)

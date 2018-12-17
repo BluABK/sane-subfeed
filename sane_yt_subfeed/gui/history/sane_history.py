@@ -1,10 +1,10 @@
 from PyQt5.QtCore import QObject
 
 from sane_yt_subfeed import create_logger
-from sane_yt_subfeed.gui.views.grid_view.history.sane_grid_view_history_item import SaneGridViewHistoryItem
+from sane_yt_subfeed.gui.history.sane_history_item import SaneGridViewHistoryItem
 
 
-class SaneGridViewHistory(QObject):
+class SaneHistory(QObject):
     def __init__(self, parent):
         QObject.__init__(self, parent=parent)
         self.logger = create_logger(__name__)
