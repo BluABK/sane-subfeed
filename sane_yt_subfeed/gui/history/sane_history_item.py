@@ -19,8 +19,9 @@ class SaneHistoryItem(QObject):
         Print
         :return:
         """
-        return "{} - {} ({}) {} {}".format(self.video.channel_title, self.video.title,
-                                           self.video.url_video, self.action, self.anti_action)
+        return "{} - {} ({}) | action: '{}', anti-action: '{}'".format(self.video.channel_title, self.video.title,
+                                                                       self.video.url_video, self.action,
+                                                                       self.anti_action)
 
     def __log__(self):
         """

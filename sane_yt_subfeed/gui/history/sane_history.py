@@ -8,7 +8,7 @@ class SaneHistory(QObject):
     def __init__(self, parent):
         QObject.__init__(self, parent=parent)
         self.logger = create_logger(__name__)
-        self.root = parent.root
+        self.root = parent
         self.parent = parent
         self.items = []
 
@@ -18,7 +18,11 @@ class SaneHistory(QObject):
         :return:
         """
         if len(self.items) > 0:
-            '\n'.join(self.items.__str__())
+            ret_list = []
+            for item in self.items:
+                ret_list.append(item.__str__())
+
+            return '\n'.join(ret_list)
 
     def __log__(self):
         """
@@ -26,7 +30,7 @@ class SaneHistory(QObject):
         :return:
         """
         if len(self.items) > 0:
-            self.logger.info('\n'.join(self.items.__str__()))
+            self.logger.info(self.__str__())
 
     def log(self):
         """
@@ -43,7 +47,7 @@ class SaneHistory(QObject):
         :param anti_action: Used for undo()
         :return:
         """
-        self.items.append(SaneHistoryItem(self.parent, video, action=action, anti_action=anti_action))
+        self.items.append(SaneHistoryItem(self, video, action=action, anti_action=anti_action))
         self.logger.debug("Added History Item: {}".format(self.items[-1]))
 
     def pop(self, index=-1):
@@ -72,11 +76,11 @@ class SaneHistory(QObject):
                 self.logger.info("Undoing action with anti-action '{}' for video: '{}'".format(item.anti_action,
                                                                                                item.video))
                 item.anti_action()
+                # Undo successful, remove entry from history
+                self.pop(index)
             except Exception as exc:
                 self.logger.error("Undo FAILED: {}".format(item), exc_info=exc)
                 return
-            # Undo successful, remove entry from history
-            self.pop(index)
         else:
             self.logger.warning("Was told to undo an action with no corresponding anti-action: {}".format(item))
 
