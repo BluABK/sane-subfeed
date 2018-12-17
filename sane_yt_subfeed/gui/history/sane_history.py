@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QObject
 
 from sane_yt_subfeed import create_logger
-from sane_yt_subfeed.gui.history.sane_history_item import SaneGridViewHistoryItem
+from sane_yt_subfeed.gui.history.sane_history_item import SaneHistoryItem
 
 
 class SaneHistory(QObject):
@@ -43,7 +43,7 @@ class SaneHistory(QObject):
         :param anti_action: Used for undo()
         :return:
         """
-        self.items.append(SaneGridViewHistoryItem(self.parent, video, action=action, anti_action=anti_action))
+        self.items.append(SaneHistoryItem(self.parent, video, action=action, anti_action=anti_action))
         self.logger.debug("Added History Item: {}".format(self.items[-1]))
 
     def pop(self, index=-1):
