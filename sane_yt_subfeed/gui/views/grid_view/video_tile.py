@@ -167,6 +167,8 @@ class VideoTile(QWidget):
                                                                      self.video.channel_title,
                                                                      self.video.title))
 
+        self.history.add(self.video, self.mark_discarded, self.unmark_discarded)
+
     def unmark_discarded(self):
         """
         Mark the video as un-discarded
@@ -183,6 +185,8 @@ class VideoTile(QWidget):
                                                                     self.video.channel_title,
                                                                     self.video.title))
 
+        self.history.add(self.video, self.unmark_discarded, self.mark_discarded)
+
     def mark_watched(self):
         """
         Mark the video as watched
@@ -194,6 +198,8 @@ class VideoTile(QWidget):
                                                                  self.video.title))
         self.video.watched = True
         self.parent.main_model.grid_view_listener.tileWatched.emit(self.video)
+
+        self.history.add(self.video, self.mark_watched, self.unmark_watched)
 
     def unmark_watched(self):
         """
@@ -207,6 +213,8 @@ class VideoTile(QWidget):
         self.video.watched = True
         self.parent.main_model.grid_view_listener.tileUnwatched.emit(self.video)
 
+        self.history.add(self.video, self.unmark_watched, self.mark_watched)
+
     # Get the system clipboard contents
     def clipboard_changed(self):
         text = self.clipboard().text()
@@ -216,6 +224,8 @@ class VideoTile(QWidget):
 
     def decrease_prio(self):
         self.parent.main_model.grid_view_listener.decreaseWatchPrio.emit(self.video)
+        self.history.add(self.video, self.decrease_prio, self.increase_prio)
 
     def increase_prio(self):
         self.parent.main_model.grid_view_listener.increaseWatchPrio.emit(self.video)
+        self.history.add(self.video, self.increase_prio, self.decrease_prio)

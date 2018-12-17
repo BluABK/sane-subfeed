@@ -65,6 +65,8 @@ class MainWindow(QMainWindow):
         self.logger = create_logger(__name__)
         self.app = app
         self.main_model = main_model
+        #self.history = main_model.history
+        self.history = SaneHistory(self)
 
         # Create the Exception Handler
         self.exceptionHandler = SaneExceptionHandler(self)
@@ -105,8 +107,6 @@ class MainWindow(QMainWindow):
         self.list_tiled_view = ListTiledView(self)
         self.subs_view = SubscriptionsView(self)
         self.about_view = AboutView(self)
-
-        self.history = SaneHistory(self)
 
         self.init_ui()
 
@@ -214,6 +214,12 @@ class MainWindow(QMainWindow):
                          tooltip='Toggles the ascending date config option, and does a manual re-grab',
                          icon='database.png', shortcut=read_config('Playback', 'by_channel_sort_toggle',
                                                                    custom_ini=HOTKEYS_INI, literal_eval=HOTKEYS_EVAL))
+
+        self.add_submenu('&Function', 'Log History 2.0', self.history_log,
+                         tooltip='Send entire history to logger')
+        self.add_submenu('&Function', 'Undo', self.history_undo,
+                         tooltip='Undo previous action (if possible)',
+                         icon='refresh.png')
 
         # get_single_video = self.add_submenu('&Function', 'Get video', self.get_single_video,
         #                                     tooltip='Fetch video by URL')
@@ -665,6 +671,26 @@ class MainWindow(QMainWindow):
         toggle = read_config('PlaySort', 'by_channel')
         set_config('PlaySort', 'by_channel', format(not toggle))
         self.main_model.grid_view_listener.updateFromDb.emit()
+
+    def history_log(self):
+        """
+        Sends entire SaneHistory to logger
+        :return:
+        """
+        self.history.log()
+
+    def history_undo(self, index=None):
+        """
+        Undoes the last action logged by SaneHistory (if possible)
+        :param index:
+        :return:
+        """
+        if index:
+            self.history.undo(index)
+        else:
+            self.history.undo()
+
+    # File menu functions
 
     def add_subscription_by_id(self, input_text):
         """
