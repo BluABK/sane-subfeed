@@ -203,9 +203,13 @@ class MainWindow(QMainWindow):
                                               literal_eval=HOTKEYS_EVAL))
 
         # FIXME: icon, look more related to action
-        self.add_submenu('&Function', 'Toggle ascending date', self.toggle_ascending_sort,
+        self.add_submenu('&Function', 'Toggle sort-by: ascending date', self.toggle_sort_by_ascending,
                          tooltip='Toggles the ascending date config option, and does a manual re-grab',
                          icon='database.png', shortcut=read_config('Playback', 'ascending_sort_toggle',
+                                                                   custom_ini=HOTKEYS_INI, literal_eval=HOTKEYS_EVAL))
+        self.add_submenu('&Function', 'Toggle sort-by: channel', self.toggle_sort_by_channel,
+                         tooltip='Toggles the ascending date config option, and does a manual re-grab',
+                         icon='database.png', shortcut=read_config('Playback', 'by_channel_sort_toggle',
                                                                    custom_ini=HOTKEYS_INI, literal_eval=HOTKEYS_EVAL))
 
         # get_single_video = self.add_submenu('&Function', 'Get video', self.get_single_video,
@@ -641,13 +645,22 @@ class MainWindow(QMainWindow):
         """
         signal.emit(*args)
 
-    def toggle_ascending_sort(self):
+    def toggle_sort_by_ascending(self):
         """
         Sends a testChannels signal
         :return:
         """
         toggle = read_config('PlaySort', 'ascending_date')
         set_config('PlaySort', 'ascending_date', format(not toggle))
+        self.main_model.grid_view_listener.updateFromDb.emit()
+
+    def toggle_sort_by_channel(self):
+        """
+        Sends a testChannels signal
+        :return:
+        """
+        toggle = read_config('PlaySort', 'by_channel')
+        set_config('PlaySort', 'by_channel', format(not toggle))
         self.main_model.grid_view_listener.updateFromDb.emit()
 
     def add_subscription_by_id(self, input_text):

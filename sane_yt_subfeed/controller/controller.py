@@ -35,7 +35,7 @@ class Controller:
         else:
             model.remote_update_videos()
 
-        model.db_update_downloaded_videos()
+        model.db_update_play_view_videos()
 
         self.logger.info(
             "Created MainModel: len(subscription_feed) = {}, vid_limit = {}".format(len(model.filtered_videos),

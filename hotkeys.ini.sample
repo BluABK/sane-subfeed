@@ -30,3 +30,4 @@ prio_decrease = MidButton, Ctrl+LeftButton
 mark_watched = Alt+LeftButton
 play = MouseLeftButton
 ascending_sort_toggle = Ctrl+A
+by_channel_sort_toggle = Ctrl+B

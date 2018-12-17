@@ -74,7 +74,8 @@ DEFAULTS = {
         'download_tile_height': '200'
     },
     'PlaySort': {
-        'ascending_date': 'False'
+        'ascending_date': 'False',
+        'by_channel': 'False'
     },
     'Thumbnails': {
         'force_download_best': 'True',
@@ -179,7 +180,8 @@ DEFAULTS_HOTKEYS = {
         'prio_decrease': 'MidButton, Ctrl+LeftButton',
         'mark_watched': 'Alt+LeftButton',
         'play': 'MouseLeftButton',
-        'ascending_sort_toggle': 'Ctrl+A'
+        'ascending_sort_toggle': 'Ctrl+A',
+        'by_channel_sort_toggle': 'Ctrl+B'
     }
 }
 

@@ -4,8 +4,9 @@ from PyQt5.QtCore import QThread
 # FIXME: imp*
 from PyQt5.QtWidgets import QProgressBar
 from sqlalchemy import asc, desc, false, or_
+from sqlalchemy.dialects import postgresql
 
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.database_listener import DatabaseListener
 from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
 from sane_yt_subfeed.controller.listeners.listeners import GridViewListener, MainWindowListener, YtDirListener, \
@@ -132,10 +133,10 @@ class MainModel:
         self.status_bar_thread.start()
         return self.status_bar_progress
 
-    def db_update_downloaded_videos(self):
+    def db_update_play_view_videos(self):
 
-        update_filter = self.config_get_filter_downloaded()
-        update_sort = self.config_get_sort_downloaded()
+        update_filter = self.config_get_filter_play_view()
+        update_sort = self.config_get_sort_play_view()
         self.downloaded_videos = get_best_downloaded_videos(self.downloaded_videos_limit, filters=update_filter,
                                                             sort_method=update_sort)
         self.grid_view_listener.downloadedVideosChanged.emit()
@@ -148,7 +149,12 @@ class MainModel:
         download_thumbnails_threaded(videos)
         UpdateVideosThread(videos, update_existing=True).start()
 
-    def config_get_filter_downloaded(self):
+    @staticmethod
+    def config_get_filter_play_view():
+        """
+        Applies a filter to the PlayView Videos list.
+        :return:
+        """
         show_watched = read_config('GridView', 'show_watched')
         show_dismissed = read_config('GridView', 'show_dismissed')
         update_filter = (Video.downloaded,)
@@ -158,12 +164,41 @@ class MainModel:
             update_filter += (~Video.discarded,)
         return update_filter
 
-    def config_get_sort_downloaded(self):
-        ascending_date = read_config('PlaySort', 'ascending_date')
+    def config_get_sort_play_view(self):
+        """
+        Applies a sort-by rule to the PlayView videos list.
+
+        update_sort is a tuple of priority sort categories, first element is highest, last is lowest.
+        update_sort += operations requires at least two items on rhs.
+        :return:
+        """
+        sort_by_ascending_date = read_config('PlaySort', 'ascending_date')
+        sort_by_channel = read_config('PlaySort', 'by_channel')
+        self.logger.info("Sorting PlayView Videos: date = {} | channel = {}".format(sort_by_ascending_date,
+                                                                                    sort_by_channel))
         update_sort = (asc(Video.watch_prio),)
-        if ascending_date:
+        # Sort-by ascending date
+        if sort_by_ascending_date:
             update_sort += (asc(Video.date_downloaded), asc(Video.date_published))
+        # Sort-by channel name (implied by default: then descending date)
+        if sort_by_channel:
+            update_sort += (desc(Video.channel_title),)
+        # Sort-by channel name then ascending date  # FIXME: Implement handling both sorts toggled
+        if sort_by_channel and sort_by_ascending_date:
+            #update_sort += (asc(Video.channel_title),)
+            self.logger.debug5("By-Channel|By-date update_sort: {}".format(str(update_sort)))
+            for t in update_sort:
+                self.logger.debug5(t.compile(dialect=postgresql.dialect()))
+
+            # FIXME: workaround for not handling both: disable channel sort if both toggled, and run date sort
+            set_config('PlaySort', 'by_channel', format(not read_config('PlaySort', 'by_channel')))
+            sort_by_channel = read_config('PlaySort', 'by_channel')
+            update_sort += (asc(Video.date_downloaded), asc(Video.date_published))
+        # DEFAULT: Sort-by descending date
         else:
             update_sort += (desc(Video.date_downloaded), desc(Video.date_published))
+
+        self.logger.info("Sorted PlayView Videos: date = {} | channel = {}".format(sort_by_ascending_date,
+                                                                                   sort_by_channel))
         return update_sort
 

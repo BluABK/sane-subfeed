@@ -31,6 +31,7 @@ download_tile_height = 200
 
 [PlaySort]
 ascending_date = False
+by_channel = False
 
 [Debug]
 debug = False

@@ -95,7 +95,6 @@ def compare_db_filtered(videos, limit, discarded=False, downloaded=False):
     return return_list
 
 
-
 def check_for_new(videos, deep_refresh=False):
     logger.info("Checking for new videos{}".format((" (deep refresh)" if deep_refresh else "")))
     # FIXME: add to progress bar

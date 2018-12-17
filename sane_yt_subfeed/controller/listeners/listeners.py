@@ -100,11 +100,11 @@ class GridViewListener(QObject):
         self.model.downloaded_videos_limit = self.model.downloaded_videos_limit + add_value
         self.logger.info(
             "Scroll for Play View reached end, updating videos limit to {}".format(self.model.downloaded_videos_limit))
-        self.model.db_update_downloaded_videos()
+        self.model.db_update_play_view_videos()
 
     def update_from_db(self):
         self.model.db_update_videos()
-        self.model.db_update_downloaded_videos()
+        self.model.db_update_play_view_videos()
 
     def update_grid_view_from_db(self):
         self.model.db_update_videos()
@@ -126,7 +126,7 @@ class GridViewListener(QObject):
         UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
 
     def download_finished_in_db(self):
-        self.model.db_update_downloaded_videos()
+        self.model.db_update_play_view_videos()
 
     @pyqtSlot(VideoD)
     def tile_watched(self, video: Video):
@@ -371,7 +371,7 @@ class YtDirListener(QObject):
                 self.logger.info("Updating existing record in db: {} - {}".format(vid.title, vid.__dict__))
                 db_session.commit()
                 self.model.db_update_videos()
-                self.model.db_update_downloaded_videos()
+                self.model.db_update_play_view_videos()
             else:
                 self.logger.info("File already downloaded by this system: {} - {}".format(vid.title, vid.__dict__))
             db_session.remove()
