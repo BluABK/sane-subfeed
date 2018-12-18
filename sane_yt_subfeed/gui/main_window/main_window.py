@@ -65,7 +65,6 @@ class MainWindow(QMainWindow):
         self.logger = create_logger(__name__)
         self.app = app
         self.main_model = main_model
-        #self.history = main_model.history
         self.history = SaneHistory(self)
 
         # Create the Exception Handler
@@ -219,7 +218,8 @@ class MainWindow(QMainWindow):
                          tooltip='Send entire history to logger')
         self.add_submenu('&Function', 'Undo', self.history_undo,
                          tooltip='Undo previous action (if possible)',
-                         icon='refresh.png')
+                         icon='refresh.png', shortcut=read_config('Global', 'history_undo_action',
+                                                                  custom_ini=HOTKEYS_INI, literal_eval=HOTKEYS_EVAL))
 
         # get_single_video = self.add_submenu('&Function', 'Get video', self.get_single_video,
         #                                     tooltip='Fetch video by URL')
