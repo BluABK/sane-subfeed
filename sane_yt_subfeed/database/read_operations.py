@@ -41,8 +41,8 @@ def get_newest_stored_videos(limit, filters=(~Video.downloaded, ~Video.discarded
     return videos
 
 
-def get_best_downloaded_videos(limit,
-                               filters=(~Video.watched, Video.downloaded, ~Video.discarded), sort_method=(
+def get_best_playview_videos(limit,
+                             filters=(~Video.watched, Video.downloaded, ~Video.discarded), sort_method=(
         asc(Video.watch_prio), desc(Video.date_downloaded), desc(Video.date_published))):
     """
 

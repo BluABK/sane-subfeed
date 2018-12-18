@@ -109,9 +109,9 @@ class GridViewListener(QObject):
 
     def scroll_reached_end_play(self):
         add_value = read_config("Model", "loaded_videos")
-        self.model.downloaded_videos_limit = self.model.downloaded_videos_limit + add_value
+        self.model.playview_videos_limit = self.model.playview_videos_limit + add_value
         self.logger.info(
-            "Scroll for Play View reached end, updating videos limit to {}".format(self.model.downloaded_videos_limit))
+            "Scroll for Play View reached end, updating videos limit to {}".format(self.model.playview_videos_limit))
         self.model.db_update_play_view_videos()
 
     def update_from_db(self):
@@ -143,14 +143,14 @@ class GridViewListener(QObject):
     @pyqtSlot(VideoD)
     def tile_watched(self, video: Video):
         self.logger.info("Mark watched: {} - {}".format(video.title, video.__dict__))
-        self.model.hide_downloaded_video_item(video)
+        self.model.hide_video_item(video)
         self.downloadedVideosChanged.emit()
         UpdateVideo(video, update_existing=True).start()
 
     @pyqtSlot(VideoD)
     def tile_unwatched(self, video: Video):
         self.logger.info("Mark unwatched: {} - {}".format(video.title, video.__dict__))
-        self.model.unhide_downloaded_video_item(video)
+        self.model.unhide_video_item(video)
         self.downloadedVideosChanged.emit()
         UpdateVideo(video, update_existing=True).start()
 

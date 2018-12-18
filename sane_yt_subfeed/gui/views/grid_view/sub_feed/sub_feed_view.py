@@ -21,11 +21,11 @@ class SubFeedView(GridView):
         return SubFeedTile(self, video, counter, self.clipboard, self.status_bar)
 
     def get_feed(self):
-        subscription_feed = self.main_model.filtered_videos
+        subscription_feed = self.main_model.subfeed_videos
         return subscription_feed
 
     def update_videos(self):
-        for q_label, video in zip(self.q_labels.values(), self.main_model.filtered_videos):
+        for q_label, video in zip(self.q_labels.values(), self.main_model.subfeed_videos):
             q_label.set_video(video)
             self.q_labels[video.video_id] = q_label
         self.update_grid()

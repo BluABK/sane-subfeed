@@ -5,6 +5,13 @@ from sane_yt_subfeed import create_logger
 
 class SaneHistoryItem(QObject):
     def __init__(self, parent, video, action=None, anti_action=None):
+        """
+        Sane History Item
+        :param parent: SaneHistory
+        :param video:
+        :param action:
+        :param anti_action:
+        """
         QObject.__init__(self, parent=parent)
         self.logger = create_logger(__name__)
         self.root = parent.root

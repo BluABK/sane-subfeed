@@ -5,12 +5,18 @@ from sane_yt_subfeed.gui.history.sane_history_item import SaneHistoryItem
 
 
 class SaneHistory(QObject):
-    def __init__(self, parent):
+    def __init__(self, parent, skip_failed=True):
+        """
+        Sane History
+        :param parent: MainWindow
+        :param skip_failed: Skip failed entries (remove from history regardless action succeeds or not)
+        """
         QObject.__init__(self, parent=parent)
         self.logger = create_logger(__name__)
         self.root = parent
         self.parent = parent
         self.items = []
+        self.skip_failed = skip_failed
 
     def __str__(self):
         """
@@ -77,10 +83,17 @@ class SaneHistory(QObject):
                                                                                                item.video))
                 item.anti_action()
                 # Undo successful, remove entry from history
-                self.pop(index)
             except Exception as exc:
                 self.logger.error("Undo FAILED: {}".format(item), exc_info=exc)
+                if self.skip_failed:
+                    self.logger.info("Skipping failed entry (skip_failed=True)")
+                    self.pop(index)
                 return
+
+            # If try is successful do the following
+            self.pop(index)
+            # FIXME: Handle redo / filter anti_action? Former pop pops the anti-action and this one pops the action
+            self.pop(index)
         else:
-            self.logger.warning("Was told to undo an action with no corresponding anti-action: {}".format(item))
+            self.logger.error("Was told to undo an action with no corresponding anti-action: {}".format(item))
 

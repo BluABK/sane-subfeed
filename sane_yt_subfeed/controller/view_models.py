@@ -12,9 +12,10 @@ from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandle
 from sane_yt_subfeed.controller.listeners.listeners import GridViewListener, MainWindowListener, YtDirListener, \
     LISTENER_SIGNAL_NORMAL_REFRESH, ProgressBar
 from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, refresh_and_get_newest_videos, \
-    get_best_downloaded_videos
+    get_best_playview_videos
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread
+from sane_yt_subfeed.gui.history.sane_history import SaneHistory
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
 
@@ -54,11 +55,11 @@ class MainModel:
         self.logger = create_logger(__name__)
         self.exceptions = exceptions
         self.videos_limit = videos_limit
-        self.downloaded_videos_limit = videos_limit
+        self.playview_videos_limit = videos_limit
         self.videos = videos
-        self.filtered_videos = []
-        self.downloaded_videos = []
-        self.removed_videos = {'filtered': {}, 'downloaded': {}}
+        self.subfeed_videos = []
+        self.playview_videos = []
+        self.removed_videos = {'subfeed': {}, 'playview': {}}
 
         self.download_progress_signals = []
 
@@ -103,25 +104,78 @@ class MainModel:
     def clear_exceptions(self):
         self.exceptions = []
 
+    def determine_video_view(self, video):
+        """
+        Figures out which view/feed list the video belongs in.
+        :param video:
+        :return: list(key, the corresponding list the video belongs in).
+        """
+        if video in self.subfeed_videos:
+            return ['subfeed', self.subfeed_videos]
+        elif video in self.playview_videos:
+            return ['playview', self.playview_videos]
+        else:
+            self.logger.error("Unable to determine which view video belongs to: {}".format(video.title))
+            return None
+
+    def determine_removed_video_view(self, video):
+        """
+        Figures out which view/feed list the removed video belongs in.
+        :param video:
+        :return: list(key, the corresponding list the video belongs in).
+        """
+        if video in self.removed_videos['subfeed']:
+            return ['subfeed', self.subfeed_videos]
+        elif video in self.removed_videos['playview']:
+            return ['playview', self.playview_videos]
+        else:
+            self.logger.error("Unable to determine which view removed video belongs to: {}".format(video.title))
+            return None
+
     def hide_video_item(self, video):
-        self.logger.debug("Hiding video item: {}".format(video))
-        self.removed_videos['filtered'].update({video: remove_video(self.filtered_videos, video)})
-        self.removed_videos['downloaded'].update({video: remove_video(self.downloaded_videos, video)})
+        """
+        Hides a video from view.
+        :param video:
+        :return:
+        """
+        match = self.determine_video_view(video)
+        if match:
+            key, video_list = match
+            self.logger.debug("Hiding video item: {}".format(video.title))
+            self.removed_videos[key].update({video: remove_video(video_list, video)})
+        else:
+            # Even if we were unable to determine the view we should still remove the video (using the old method)
+            self.logger.warning("Using failover method to determine view for video: {}".format(video.title))
+            index_subfeed = remove_video(self.subfeed_videos, video)
+            if index_subfeed:
+                self.logger.warning("Failover method determined view to be '{}' for video: {}".format('subfeed',
+                                                                                                      video.title))
+                self.removed_videos['subfeed'].update({video: index_subfeed})
+                return
+
+            index_playview = remove_video(self.playview_videos, video)
+            if index_playview:
+                self.logger.warning("Failover method determined view to be '{}' for video: {}".format('playview',
+                                                                                                      video.title))
+                self.removed_videos['playview'].update({video: index_playview})
+                return
+
+            # All methods of determination has failed us
+            self.logger.critical("ALL METHODS FAILED for determining which view video belongs to: {}".format(
+                video.title))
 
     def unhide_video_item(self, video):
-        self.logger.debug("Hiding video item: {}".format(video))
-        add_video(self.filtered_videos, video, self.removed_videos['filtered'][video])
-        self.removed_videos['filtered'].pop(video)
-        add_video(self.downloaded_videos, video, self.removed_videos['downloaded'][video])
-        self.removed_videos['downloaded'].pop(video)
-
-    def hide_downloaded_video_item(self, video):  # FIXME: Redundant?
-        self.logger.debug("Hiding downloaded video item: {}".format(video))
-        self.removed_videos['downloaded'].update({video: remove_video(self.downloaded_videos, video)})
-
-    def unhide_downloaded_video_item(self, video):  # FIXME: Redundant?
-        add_video(self.downloaded_videos, video, self.removed_videos['downloaded'][video])
-        self.removed_videos['downloaded'].pop(video)
+        """
+        Shows a video previously hidden from view.
+        :param video:
+        :return:
+        """
+        match = self.determine_removed_video_view(video)
+        if match:
+            key, video_list = match
+            self.logger.debug("Unhiding video item: {}".format(video.title))
+            add_video(video_list, video, self.removed_videos[key][video])
+            self.removed_videos[key].pop(video)
 
     def db_update_videos(self, filtered=True):
         self.logger.info("Getting newest stored videos from DB")
@@ -135,7 +189,7 @@ class MainModel:
             if not show_dismissed:
                 update_filter += (~Video.discarded,)
 
-            self.filtered_videos = get_newest_stored_videos(self.videos_limit, filters=update_filter)
+            self.subfeed_videos = get_newest_stored_videos(self.videos_limit, filters=update_filter)
             self.grid_view_listener.hiddenVideosChanged.emit()
         else:
             self.videos = get_newest_stored_videos(self.videos_limit, filtered)
@@ -146,11 +200,11 @@ class MainModel:
         if filtered:
             show_downloaded = not read_config('SubFeed', 'show_downloaded')
             show_dismissed = not read_config('GridView', 'show_dismissed')
-            self.filtered_videos = refresh_and_get_newest_videos(self.videos_limit,
-                                                                 progress_listener=self.status_bar_listener,
-                                                                 refresh_type=refresh_type,
-                                                                 filter_discarded=show_dismissed,
-                                                                 filter_downloaded=show_downloaded)
+            self.subfeed_videos = refresh_and_get_newest_videos(self.videos_limit,
+                                                                progress_listener=self.status_bar_listener,
+                                                                refresh_type=refresh_type,
+                                                                filter_discarded=show_dismissed,
+                                                                filter_downloaded=show_downloaded)
             self.grid_view_listener.hiddenVideosChanged.emit()
         else:
             self.videos = refresh_and_get_newest_videos(self.videos_limit, filtered, self.status_bar_listener,
@@ -169,14 +223,14 @@ class MainModel:
 
         update_filter = self.config_get_filter_play_view()
         update_sort = self.config_get_sort_play_view()
-        self.downloaded_videos = get_best_downloaded_videos(self.downloaded_videos_limit, filters=update_filter,
-                                                            sort_method=update_sort)
+        self.playview_videos = get_best_playview_videos(self.playview_videos_limit, filters=update_filter,
+                                                        sort_method=update_sort)
         self.grid_view_listener.downloadedVideosChanged.emit()
 
     def update_thumbnails(self):
         videos = []
-        videos.extend(self.downloaded_videos)
-        videos.extend(self.filtered_videos)
+        videos.extend(self.playview_videos)
+        videos.extend(self.subfeed_videos)
         self.logger.info("Updating thumbnails for downloaded and filtered videos")
         download_thumbnails_threaded(videos)
         UpdateVideosThread(videos, update_existing=True).start()
