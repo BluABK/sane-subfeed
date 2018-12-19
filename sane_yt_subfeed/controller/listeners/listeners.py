@@ -1,15 +1,13 @@
 # FIXME: imp*
 import gc
+import time
 
 import datetime
 import os
-import time
-
-import traceback
 import types
 from PyQt5.QtCore import *
-from watchdog.observers import Observer
 from functools import wraps
+from watchdog.observers import Observer
 
 from sane_yt_subfeed import main
 from sane_yt_subfeed.config_handler import read_config
@@ -21,12 +19,10 @@ from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideo
 from sane_yt_subfeed.log_handler import create_logger
-from sane_yt_subfeed.pickle_handler import load_youtube
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded, THUMBNAILS_PATH
 from sane_yt_subfeed.youtube.update_videos import load_keys
 from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_cached_oauth, list_uploaded_videos_videos, \
-    get_subscriptions, add_subscription
-from sane_yt_subfeed.database.engine_statements import get_channel_by_id_stmt, get_channel_by_title_stmt
+    add_subscription
 
 LISTENER_SIGNAL_NORMAL_REFRESH = 0
 LISTENER_SIGNAL_DEEP_REFRESH = 1
@@ -126,7 +122,7 @@ class GridViewListener(QObject):
         self.model.hide_video_item(video)
         self.logger.info(
             "Video hidden from grid view(downloading): {} - {} [{}]".format(video.channel_title, video.title,
-                                                                           video.url_video))
+                                                                            video.url_video))
         self.hiddenVideosChanged.emit()
         DownloadHandler.download_video(video,
                                        youtube_dl_finished_listener=[self.downloadFinished],
@@ -195,7 +191,7 @@ def exception_pyqt_slot(*args):
                 func(*args)
             except Exception as e:
                 logger.critical("Uncaught Exception in slot", exc_info=e)
-                #traceback.print_exc()
+                # traceback.print_exc()
 
         return wrapper
 
