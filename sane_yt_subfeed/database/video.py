@@ -1,14 +1,14 @@
 import datetime
-from sqlalchemy import Boolean, DateTime, ForeignKey, Column, Integer, String, Interval
+from sqlalchemy import Boolean, DateTime, Column, Integer, String, Interval
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.decorators import TextPickleType
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
-from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 from sane_yt_subfeed.database.orm import PermanentBase
+from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 
 
-class Video(PermanentBase):     # FIXME: PickleTypes should probably be replaced by actual tables
+class Video(PermanentBase):  # FIXME: PickleTypes should probably be replaced by actual tables
     """
     Video SQLAlchemy Database table object
 

@@ -1,6 +1,5 @@
 import datetime
 import threading
-
 from sqlalchemy import desc, asc
 
 from sane_yt_subfeed.config_handler import read_config
@@ -43,7 +42,7 @@ def get_newest_stored_videos(limit, filters=(~Video.downloaded, ~Video.discarded
 
 def get_best_playview_videos(limit,
                              filters=(~Video.watched, Video.downloaded, ~Video.discarded), sort_method=(
-        asc(Video.watch_prio), desc(Video.date_downloaded), desc(Video.date_published))):
+                asc(Video.watch_prio), desc(Video.date_downloaded), desc(Video.date_published))):
     """
 
     :param filters: Tuple of filters

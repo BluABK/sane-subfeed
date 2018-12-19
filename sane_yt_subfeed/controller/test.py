@@ -21,12 +21,12 @@ class MainWindowListener(QObject):
 
 if __name__ == '__main__':
     subscriptions_len = 217
-    quota = 30*1000
-    max_search_quota = int(0.9*quota)
+    quota = 30 * 1000
+    max_search_quota = int(0.9 * quota)
 
-    search_mod = divmod(max_search_quota, subscriptions_len*100)
+    search_mod = divmod(max_search_quota, subscriptions_len * 100)
 
     search_pages = search_mod[0]
-    list_pages = int((quota-max_search_quota+search_mod[1])/(subscriptions_len*3))
+    list_pages = int((quota - max_search_quota + search_mod[1]) / (subscriptions_len * 3))
     print(list_pages)
     print(search_pages)

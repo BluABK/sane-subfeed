@@ -1,7 +1,7 @@
-import datetime
-import threading
 import time
 
+import datetime
+import threading
 from PyQt5.QtCore import QObject, pyqtSignal
 from sqlalchemy import false
 

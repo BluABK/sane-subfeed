@@ -1,21 +1,15 @@
 import datetime
-
-from PyQt5.QtCore import Qt, QEvent
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette, QPixmap
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QApplication, QMenu, qApp, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QVBoxLayout
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.gui.views.grid_view.thumbnail_tile import ThumbnailTile
-from sane_yt_subfeed.gui.views.grid_view.title_tile import TitleTile
 from sane_yt_subfeed.gui.views.grid_view.channel_tile import ChannelTile
 from sane_yt_subfeed.gui.views.grid_view.date_tile import DateTile
+from sane_yt_subfeed.gui.views.grid_view.title_tile import TitleTile
 from sane_yt_subfeed.history_handler import update_plaintext_history
 from sane_yt_subfeed.log_handler import logger
-from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.youtube.thumbnail_handler import resize_thumbnail
-from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_search, get_channel_uploads, \
-    list_uploaded_videos
 
 
 class VideoTile(QWidget):
@@ -175,15 +169,15 @@ class VideoTile(QWidget):
         :return:
         """
         logger.info('Un-discarded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video,
-                                                                   self.video.channel_title,
-                                                                   self.video.title))
+                                                             self.video.channel_title,
+                                                             self.video.title))
         update_plaintext_history('Un-discarded:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
-                                                                  self.video.title))
+                                                                      self.video.title))
         self.video.discarded = True
         self.parent.main_model.grid_view_listener.tileUndiscarded.emit(self.video)
         self.status_bar.showMessage('Un-discarded: {} ({} - {})'.format(self.video.url_video,
-                                                                    self.video.channel_title,
-                                                                    self.video.title))
+                                                                        self.video.channel_title,
+                                                                        self.video.title))
 
         self.history.add(self.video, self.unmark_discarded, self.mark_discarded)
 

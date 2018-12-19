@@ -1,18 +1,16 @@
 import re
 from datetime import timedelta
-
 from googleapiclient.errors import HttpError
-
-from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.generate_keys import GenerateKeys
-from sane_yt_subfeed.pickle_handler import load_batch_build_key, dump_batch_build_key
-from sane_yt_subfeed.youtube.uploads_thread import GetUploadsThread
-from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NORMAL_REFRESH, \
-    LISTENER_SIGNAL_DEEP_REFRESH
 from tqdm import tqdm
 
-from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions, list_uploaded_videos_videos, get_videos_result
+from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NORMAL_REFRESH, \
+    LISTENER_SIGNAL_DEEP_REFRESH
+from sane_yt_subfeed.generate_keys import GenerateKeys
 from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.pickle_handler import load_batch_build_key, dump_batch_build_key
+from sane_yt_subfeed.youtube.uploads_thread import GetUploadsThread
+from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions, get_videos_result
 
 YOUTUBE_URL = "https://www.youtube.com/"
 YOUTUBE_PARM_VIDEO = "watch?v="

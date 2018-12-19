@@ -24,7 +24,7 @@ class Channel(PermanentBase):
     def __init__(self, youtube_response, playlist_id, channel_list_response=False):
         self.logger = create_logger(__name__)
         if channel_list_response:
-            self.id = youtube_response['id']    # channelList response id is outside of snippet section
+            self.id = youtube_response['id']  # channelList response id is outside of snippet section
             youtube_response = youtube_response['snippet']  # Readjust to same level as subscriptionList response
         else:
             self.id = youtube_response['resourceId']['channelId']
@@ -89,5 +89,3 @@ class RunCost(PermanentBase):
         self.date = date
         self.quota_cost = quota_cost
         self.requests = requests
-
-

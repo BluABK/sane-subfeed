@@ -1,7 +1,7 @@
 import ast
 import os
-from shutil import copyfile
 from configparser import ConfigParser, NoSectionError, NoOptionError
+from shutil import copyfile
 
 OS_PATH = os.path.dirname(__file__)
 CONFIG_PATH = os.path.join(OS_PATH, '..', 'config.ini')
@@ -139,7 +139,7 @@ DEFAULTS = {
         'url_player_name': ""
     },
     'DefaultApp': {
-      'Image': ""
+        'Image': ""
     },
     'Logging': {
         'use_socket_log': 'False',

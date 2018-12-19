@@ -1,15 +1,15 @@
 from collections import Counter
-from datetime import datetime
+
 from PyQt5.QtWidgets import QGridLayout, QWidget, QMenu
+from datetime import datetime
+
+from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
 from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
-
+from sane_yt_subfeed.gui.views.download_view.download_thumbnail import DownloadThumbnailWidget
 from sane_yt_subfeed.gui.views.download_view.progress_bar import DownloadProgressBar
 from sane_yt_subfeed.gui.views.download_view.small_label import SmallLabel
 from sane_yt_subfeed.log_handler import create_logger
-
-from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.gui.views.download_view.download_thumbnail import DownloadThumbnailWidget
 
 
 class DownloadTile(QWidget):
@@ -191,7 +191,7 @@ class DownloadTile(QWidget):
                 # Cannot switch from manual field specification to automatic field numbering, thus separate variable.
                 byte_value_formatted = "{0:.2f}".format(byte_value)
                 return "{}{}".format(byte_value_formatted, unit)
-            byte_value = byte_value/1024
+            byte_value = byte_value / 1024
 
         # You should never reach this point
         self.logger.error("BUG in determine_si_unit: Bytes received larger than YiB unit!!!")
@@ -210,7 +210,7 @@ class DownloadTile(QWidget):
         speed_unit = speed_str[-5:].strip()
         speed = float(speed_str[:-5].strip())
 
-        return speed*si_units_speed[speed_unit]
+        return speed * si_units_speed[speed_unit]
 
     def calc_avg_speed(self, speed_str, ticks=None):
         """
@@ -380,4 +380,3 @@ class DownloadTile(QWidget):
                     self.resumed_download()
                 elif action == delete_incomplete_entry:
                     self.delete_incomplete_entry()
-

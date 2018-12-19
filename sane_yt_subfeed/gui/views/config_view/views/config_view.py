@@ -1,18 +1,12 @@
 # PyQt5
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QIntValidator, QDoubleValidator, QRegExpValidator
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox
 
 # Internal
-from sane_yt_subfeed.config_handler import DEFAULTS, get_size, get_options, read_config, has_section
+from sane_yt_subfeed.config_handler import get_options, read_config, has_section
 # import sane_yt_subfeed.gui.views.config_view.checkbox as checkbox
 from sane_yt_subfeed.gui.views.config_view.config_item_types import THUMBNAIL_QUALITIES, TT_FONT_SIZES
-from sane_yt_subfeed.gui.views.config_view.config_items import checkbox, combobox
-from sane_yt_subfeed.gui.views.config_view.config_items.checkbox import GenericConfigCheckBox
-from sane_yt_subfeed.gui.views.config_view.config_items.combobox import GenericConfigComboBox
-from sane_yt_subfeed.gui.views.config_view.config_items.line_edit import GenericLineEdit
 from sane_yt_subfeed.gui.views.config_view.input_super import InputSuper
-from sane_yt_subfeed.log_handler import create_logger
 
 HEXADECIMAL_COLOR_REGEX = '^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$'
 

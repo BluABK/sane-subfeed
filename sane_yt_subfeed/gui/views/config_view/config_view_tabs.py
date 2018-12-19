@@ -10,7 +10,7 @@ TAB_LIST = ["GUI", "Model", "Requests", "Thumbnails", "Threading", "Download", "
 
 class ConfigViewTabs(QTabWidget):
 
-    def __init__(self, parent, icon: QIcon=None):
+    def __init__(self, parent, icon: QIcon = None):
         super(ConfigViewTabs, self).__init__()
         self.sane_parent = parent
         if icon is not None:

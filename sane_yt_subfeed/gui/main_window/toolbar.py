@@ -24,4 +24,3 @@ class Toolbar(QToolBar):
         for action in self.actions():
             action.setCheckable(True)
             self.action_group.addAction(action)
-

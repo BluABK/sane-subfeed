@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QSizePolicy
 
 from sane_yt_subfeed.gui.views.download_view.buttons.clear_finished import ClearFinishedDownloads
 

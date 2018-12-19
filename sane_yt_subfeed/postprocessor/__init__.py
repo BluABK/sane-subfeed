@@ -1,6 +1,10 @@
 from __future__ import unicode_literals
 
 from youtube_dl.postprocessor.embedthumbnail import EmbedThumbnailPP
+from youtube_dl.postprocessor.execafterdownload import ExecAfterDownloadPP
+from youtube_dl.postprocessor.metadatafromtitle import MetadataFromTitlePP
+from youtube_dl.postprocessor.xattrpp import XAttrMetadataPP
+
 from .ffmpeg import (
     SaneFFmpegPostProcessor,
     SaneFFmpegEmbedSubtitlePP,
@@ -13,9 +17,6 @@ from .ffmpeg import (
     SaneFFmpegVideoConvertorPP,
     SaneFFmpegSubtitlesConvertorPP,
 )
-from youtube_dl.postprocessor.xattrpp import XAttrMetadataPP
-from youtube_dl.postprocessor.execafterdownload import ExecAfterDownloadPP
-from youtube_dl.postprocessor.metadatafromtitle import MetadataFromTitlePP
 
 
 def get_postprocessor(key):

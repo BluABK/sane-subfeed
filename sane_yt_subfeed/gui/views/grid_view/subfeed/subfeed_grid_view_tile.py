@@ -3,11 +3,10 @@ from PyQt5.QtWidgets import QMenu, QApplication
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.default_application_handler import open_with_default_application
-from sane_yt_subfeed.gui.views.grid_view.subfeed.subfeed_grid_thumbnail_tile import SubfeedGridViewThumbnailTile
-from sane_yt_subfeed.log_handler import create_logger
-
-from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
 from sane_yt_subfeed.gui.dialogs.sane_text_view_dialog import SaneTextViewDialog
+from sane_yt_subfeed.gui.views.grid_view.subfeed.subfeed_grid_thumbnail_tile import SubfeedGridViewThumbnailTile
+from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
+from sane_yt_subfeed.log_handler import create_logger
 
 
 class SubfeedGridViewTile(VideoTile):

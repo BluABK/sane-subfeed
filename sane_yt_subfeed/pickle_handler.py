@@ -1,6 +1,7 @@
+import time
+
 import os
 import pickle
-import time
 
 from sane_yt_subfeed.log_handler import create_logger
 
@@ -34,7 +35,7 @@ def load_pickle(path):
                 pickle_object = pickle.load(pickle_input)
             return pickle_object
         except MemoryError as mem_exc:
-            logger.error("Loading attempt #{} of pickle failed, retrying {} more time(s)...".format(tries, 6-tries))
+            logger.error("Loading attempt #{} of pickle failed, retrying {} more time(s)...".format(tries, 6 - tries))
             logger.exception("load_pickle exception: ", exc_info=mem_exc)
             logger.debug("pickle path: {}".format(path))
             if tries <= 6:
@@ -95,4 +96,3 @@ def load_sub_list():
     path = os.path.join(PICKLE_PATH, 'youtube_subs.pkl')
     logger.info("Loading sublist pickle from {}".format(path))
     return load_pickle(path)
-

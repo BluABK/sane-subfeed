@@ -1,7 +1,6 @@
 import datetime
 import threading
 from timeit import default_timer
-
 from tqdm import tqdm
 
 from sane_yt_subfeed.controller.controller import Controller
@@ -127,4 +126,3 @@ class RunTestsThreaded(threading.Thread):
 
         result = [datetime.datetime.utcnow(), test_pages, test_miss, self.subscription]
         self.results.append(result)
-

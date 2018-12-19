@@ -1,10 +1,7 @@
 import os
-
 from PyQt5.QtWidgets import QStyleFactory
 
 from sane_yt_subfeed.absolute_paths import RESOURCES_PATH
-
-from sane_yt_subfeed.resources.themes.breeze import breeze_resouces
 
 THEME_PATH = os.path.join(RESOURCES_PATH, 'themes')
 

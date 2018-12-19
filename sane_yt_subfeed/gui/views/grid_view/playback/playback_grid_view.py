@@ -31,5 +31,3 @@ class PlaybackGridView(GridView):
             q_label.set_video(video)
             self.q_labels[video.video_id] = q_label
         self.update_grid()
-
-

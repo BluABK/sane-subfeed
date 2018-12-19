@@ -257,7 +257,7 @@ class MainModel:
         sort_by_ascending_date = read_config('PlaySort', 'ascending_date')
         sort_by_channel = read_config('PlaySort', 'by_channel')
         self.logger.info("Sorting PlaybackGridView Videos: date = {} | channel = {}".format(sort_by_ascending_date,
-                                                                                    sort_by_channel))
+                                                                                            sort_by_channel))
         update_sort = (asc(Video.watch_prio),)
         # Sort-by ascending date
         if sort_by_ascending_date:
@@ -267,7 +267,7 @@ class MainModel:
             update_sort += (desc(Video.channel_title),)
         # Sort-by channel name then ascending date  # FIXME: Implement handling both sorts toggled
         if sort_by_channel and sort_by_ascending_date:
-            #update_sort += (asc(Video.channel_title),)
+            # update_sort += (asc(Video.channel_title),)
             self.logger.debug5("By-Channel|By-date update_sort: {}".format(str(update_sort)))
             for t in update_sort:
                 self.logger.debug5(t.compile(dialect=postgresql.dialect()))
@@ -281,6 +281,5 @@ class MainModel:
             update_sort += (desc(Video.date_downloaded), desc(Video.date_published))
 
         self.logger.info("Sorted PlaybackGridView Videos: date = {} | channel = {}".format(sort_by_ascending_date,
-                                                                                   sort_by_channel))
+                                                                                           sort_by_channel))
         return update_sort
-

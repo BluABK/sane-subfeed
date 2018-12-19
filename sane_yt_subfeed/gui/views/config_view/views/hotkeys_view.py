@@ -1,14 +1,12 @@
 # PyQt5
-from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox, QComboBox, QScrollArea
+from PyQt5.QtWidgets import QLabel
 
 # Internal
-from sane_yt_subfeed.config_handler import read_config, DEFAULTS_HOTKEYS, set_config
+from sane_yt_subfeed.config_handler import read_config, set_config
 # import sane_yt_subfeed.gui.views.config_view.checkbox as checkbox
 from sane_yt_subfeed.gui.views.config_view.config_items.line_edit import GenericLineEdit
 from sane_yt_subfeed.gui.views.config_view.input_super import InputSuper
-from sane_yt_subfeed.log_handler import create_logger
 
 
 class HotkeysViewWidget(InputSuper):
@@ -18,7 +16,7 @@ class HotkeysViewWidget(InputSuper):
     deco_l = "【"
     deco_r = "】"
 
-    def __init__(self, parent, root, icon: QIcon=None):
+    def __init__(self, parent, root, icon: QIcon = None):
         """
         A GUI Widget that shows hotkey bindings
         :param parent:
@@ -93,7 +91,8 @@ class HotkeysViewWidget(InputSuper):
         self.prio_decrease = self.add_option_line_edit('Decrease priority', 'Playback', 'prio_decrease')
         self.mark_watched = self.add_option_line_edit('Mark watched', 'Playback', 'mark_watched')
         self.play_item = self.add_option_line_edit('Play video (implies: mark watched)', 'Playback', 'play')
-        self.toggle_ascending_sort = self.add_option_line_edit('Toggle ascending sort', 'Playback', 'ascending_sort_toggle')
+        self.toggle_ascending_sort = self.add_option_line_edit('Toggle ascending sort', 'Playback',
+                                                               'ascending_sort_toggle')
 
     def input_read_config_default(self, section, option):
         return "Not implemented"

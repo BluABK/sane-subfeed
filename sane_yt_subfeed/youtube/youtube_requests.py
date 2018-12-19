@@ -1,5 +1,3 @@
-import time
-
 from googleapiclient.errors import HttpError
 from sqlalchemy import or_
 from tqdm import tqdm
@@ -8,14 +6,13 @@ from sane_yt_subfeed.authentication import youtube_auth_oauth
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.detached_models.video_d import VideoD, GRAB_METHOD_SEARCH, GRAB_METHOD_LIST, \
     GRAB_METHOD_VIDEOS
-from sane_yt_subfeed.database.models import Channel
-from sane_yt_subfeed.database.orm import db_session, engine
-from sane_yt_subfeed.database.write_operations import engine_execute_first, engine_execute, delete_sub_not_in_list
 from sane_yt_subfeed.database.engine_statements import update_channel_from_remote, get_channel_by_id_stmt
+from sane_yt_subfeed.database.models import Channel
+from sane_yt_subfeed.database.orm import db_session
+from sane_yt_subfeed.database.write_operations import engine_execute_first, engine_execute, delete_sub_not_in_list
 from sane_yt_subfeed.log_handler import create_logger
-from sane_yt_subfeed.pickle_handler import load_sub_list, load_youtube, dump_youtube, dump_sub_list
+from sane_yt_subfeed.pickle_handler import load_youtube, dump_youtube
 from sane_yt_subfeed.print_functions import remove_empty_kwargs
-import datetime
 
 YOUTUBE_URL = "https://www.youtube.com/"
 YOUTUBE_PARM_VIDEO = "watch?v="
@@ -148,10 +145,11 @@ def list_uploaded_videos(youtube_key, videos, uploads_playlist_id, req_limit):
         for search_result in playlistitems_list_response['items']:
             if read_config('Debug', 'log_list') and read_config('Debug', 'log_needle') != 'unset':
                 if search_result['snippet']['channelTitle'] == str(read_config('Debug', 'log_needle')):
-                    logger_list_search.debug("list():\t {} ({}) - {} | Desc: {}".format(search_result['snippet']['channelTitle'],
-                                                                             search_result['snippet']['publishedAt'],
-                                                                             search_result['snippet']['title'],
-                                                                             search_result['snippet']['description']))
+                    logger_list_search.debug(
+                        "list():\t {} ({}) - {} | Desc: {}".format(search_result['snippet']['channelTitle'],
+                                                                   search_result['snippet']['publishedAt'],
+                                                                   search_result['snippet']['title'],
+                                                                   search_result['snippet']['description']))
 
             if read_config('Debug', 'log_list') and read_config('Debug', 'log_needle') == 'unset':
                 logger_list_search.debug("list():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
@@ -210,6 +208,7 @@ def list_uploaded_videos_videos(youtube_key, video_ids, req_limit, part='snippet
         playlistitems_list_request = youtube_key.playlistItems().list_next(playlistitems_list_request,
                                                                            playlistitems_list_response)
     return videos
+
 
 def get_videos_result(youtube_key, video_ids, req_limit, part='snippet'):
     """
@@ -273,7 +272,8 @@ def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit, live
                             title += " [LIVESTREAM]"
                             logger_list_search.debug(
                                 "search():\t {} ({}) - {} | Desc: {}".format(search_result['snippet']['channelTitle'],
-                                                                  search_result['snippet']['publishedAt'], title,
+                                                                             search_result['snippet']['publishedAt'],
+                                                                             title,
                                                                              search_result['snippet']['description']))
 
                 if read_config('Debug', 'log_search') and read_config('Debug', 'log_needle') == 'unset':

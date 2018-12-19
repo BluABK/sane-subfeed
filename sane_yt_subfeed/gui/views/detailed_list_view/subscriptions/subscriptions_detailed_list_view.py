@@ -1,12 +1,9 @@
-import os
-
 # from PyQt5.QtGui import QListWidgetItem
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QListWidget, QListWidgetItem, QHBoxLayout, \
-    QTableWidgetItem, QHeaderView
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
 from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
 
 
 class SubscriptionsDetailedListView(QWidget):
@@ -71,7 +68,7 @@ class SubscriptionsDetailedListView(QWidget):
         for i in range(len(self.headers)):
             self.subs_table.horizontalHeaderItem(i).setToolTip(self.headers[i])
 
-        self.table_items = []   # FIXME: unused
+        self.table_items = []  # FIXME: unused
         for row in range(len(self.subs)):  # row
             item = QTableWidgetItem(self.subs[row].id)
             self.table_items.append(item)

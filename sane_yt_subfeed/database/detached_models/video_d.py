@@ -69,7 +69,6 @@ class VideoD:
         self.search_item = search_item
         self.watched = False
 
-
     def determine_thumbnails(self, thumbnails_item):
         """
         Takes a youtube#playListItem thumbnails section and determines which qualities are available.
@@ -95,8 +94,6 @@ class VideoD:
         if 'maxres' in thumbnails_item.keys():
             self.thumbnails['available_quality'].append("maxres")  # 1280x720 px
             self.thumbnails['maxres'] = thumbnails_item['maxres']
-
-
 
     @staticmethod
     def playlist_item_new_video_d(playlist_item, grab_methods=None):

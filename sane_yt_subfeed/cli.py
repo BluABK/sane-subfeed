@@ -1,16 +1,15 @@
-import datetime
 import sys
 
 import click
+import datetime
 from sqlalchemy import or_
 from subprocess import check_output
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.database.video import Video
-
 from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.main import run_with_gui, run_print, run_channels_test
+from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.main import run_with_gui, run_print, run_channels_test
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
 
 exceptions = []

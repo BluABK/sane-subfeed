@@ -96,4 +96,3 @@ class SaneHistory(QObject):
             self.pop(index)
         else:
             self.logger.error("Was told to undo an action with no corresponding anti-action: {}".format(item))
-

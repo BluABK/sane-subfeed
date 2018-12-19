@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import datetime
 import os
 import threading
-
 from youtube_dl import YoutubeDL
 from youtube_dl.utils import DownloadError
 

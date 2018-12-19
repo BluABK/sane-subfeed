@@ -1,10 +1,10 @@
 import math
-import os
-import shutil
-import threading
 from collections import defaultdict
 
 import certifi
+import os
+import shutil
+import threading
 import urllib3
 from PIL import Image  # Image cropping (black barred thumbs, issue #11)
 from PIL import ImageChops

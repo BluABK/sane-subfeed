@@ -2,7 +2,6 @@
 from PyQt5.QtWidgets import *
 
 # Project internal libs
-from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.read_operations import get_newest_stored_videos
 from sane_yt_subfeed.log_handler import create_logger
 

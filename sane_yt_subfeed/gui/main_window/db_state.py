@@ -1,13 +1,11 @@
 import os
-
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QPixmap, QPainter
 from PyQt5.QtWidgets import QLabel
 
 from sane_yt_subfeed.absolute_paths import ICONS_PATH
-from sane_yt_subfeed.log_handler import create_logger
-
 from sane_yt_subfeed.controller.listeners.database_listener import DatabaseListener
+from sane_yt_subfeed.log_handler import create_logger
 
 
 class DbStateIcon(QLabel):
@@ -19,7 +17,7 @@ class DbStateIcon(QLabel):
 
         self.base_icon = QPixmap(os.path.join(ICONS_PATH, 'database.png'))
         self.base_icon = self.base_icon.scaled(QSize(self.height(), self.height()), Qt.KeepAspectRatio,
-                                            Qt.SmoothTransformation)
+                                               Qt.SmoothTransformation)
         self.full_icon = self.base_icon.copy()
         self.sane_painter = QPainter(self.full_icon)
         self.default_dot = QPixmap(os.path.join(ICONS_PATH, 'default_dot.png')).scaled(

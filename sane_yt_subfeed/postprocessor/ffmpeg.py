@@ -1,16 +1,15 @@
 from __future__ import unicode_literals
 
+import time
+
 import io
 import os
-import subprocess
-import time
 import re
-
-from youtube_dl.postprocessor.common import AudioConversionError, PostProcessor
-
+import subprocess
 from youtube_dl.compat import (
     compat_subprocess_get_DEVNULL,
 )
+from youtube_dl.postprocessor.common import AudioConversionError, PostProcessor
 from youtube_dl.utils import (
     encodeArgument,
     encodeFilename,
@@ -352,7 +351,7 @@ class SaneFFmpegVideoConvertorPP(SaneFFmpegPostProcessor):
         prefix, sep, ext = path.rpartition('.')
         outpath = prefix + sep + self._preferedformat
         self._downloader.to_screen('[' + 'ffmpeg' + '] Converting video from %s to %s, Destination: ' % (
-        information['ext'], self._preferedformat) + outpath)
+            information['ext'], self._preferedformat) + outpath)
         self.run_ffmpeg(path, outpath, options)
         information['filepath'] = outpath
         information['format'] = self._preferedformat

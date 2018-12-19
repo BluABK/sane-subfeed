@@ -13,7 +13,7 @@ class TitleTile(QLabel):
         self.parent = parent
 
         margins = self.parent.layout.getContentsMargins()
-        self.setFixedSize(self.parent.width()-margins[0]-margins[2], (self.parent.height()-4*margins[3]) * 0.18)
+        self.setFixedSize(self.parent.width() - margins[0] - margins[2], (self.parent.height() - 4 * margins[3]) * 0.18)
 
         self.setWordWrap(True)
         self.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
@@ -28,14 +28,11 @@ class TitleTile(QLabel):
         self.setFont(t_font)
 
     def update_font(self):
-
         metrics = QFontMetrics(self.font())
         elided = metrics.elidedText(self.parent.video.title, Qt.ElideRight, self.width() * 1.8)
         self.setText(elided)
 
     # def detect_and_resize_utf8(self, text):
-
-
 
     # def resizeEvent(self, *args, **kwargs):
     #     margins = self.parent.layout.getContentsMargins()

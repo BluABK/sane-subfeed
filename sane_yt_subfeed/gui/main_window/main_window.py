@@ -3,14 +3,12 @@
 import sys
 
 import copy
-
 import os
-from subprocess import check_output
 import traceback
-
 from PyQt5.QtCore import QFile, QTextStream, QRegExp
 from PyQt5.QtGui import QIcon, QRegExpValidator
 from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QStackedWidget, QStyleFactory
+from subprocess import check_output
 
 # Project internal libs
 from sane_yt_subfeed.absolute_paths import ICONS_PATH, VERSION_PATH
@@ -32,14 +30,14 @@ from sane_yt_subfeed.gui.views.about_view.about_view import AboutView
 from sane_yt_subfeed.gui.views.config_view.config_view_tabs import ConfigViewTabs
 from sane_yt_subfeed.gui.views.config_view.config_window import ConfigWindow
 from sane_yt_subfeed.gui.views.config_view.views.hotkeys_view import HotkeysViewWidget
+from sane_yt_subfeed.gui.views.detailed_list_view.subfeed.list_detailed_view import SubfeedDetailedListView
+from sane_yt_subfeed.gui.views.detailed_list_view.subscriptions.subscriptions_detailed_list_view import \
+    SubscriptionsDetailedListView
 from sane_yt_subfeed.gui.views.download_view.dl_scroll_area import DownloadScrollArea
 from sane_yt_subfeed.gui.views.grid_view.grid_scroll_area import GridScrollArea
 from sane_yt_subfeed.gui.views.grid_view.playback.playback_grid_view import PlaybackGridView
 from sane_yt_subfeed.gui.views.grid_view.subfeed.subfeed_grid_view import SubfeedGridView
-from sane_yt_subfeed.gui.views.detailed_list_view.subfeed.list_detailed_view import SubfeedDetailedListView
 from sane_yt_subfeed.gui.views.tiled_list_view.subfeed.subfeed_tiled_list_view import SubfeedTiledListView
-from sane_yt_subfeed.gui.views.detailed_list_view.subscriptions.subscriptions_detailed_list_view import \
-    SubscriptionsDetailedListView
 from sane_yt_subfeed.history_handler import get_plaintext_history
 from sane_yt_subfeed.log_handler import create_logger
 

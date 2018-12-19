@@ -4,7 +4,7 @@ import threading
 from watchdog.events import PatternMatchingEventHandler
 
 from sane_yt_subfeed import create_logger
-from sane_yt_subfeed.database.read_operations import get_videos_by_ids, get_vid_by_id
+from sane_yt_subfeed.database.read_operations import get_videos_by_ids
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
@@ -41,6 +41,7 @@ class VidEventHandler(PatternMatchingEventHandler):
     def on_moved(self, event):
         self.logger.info("{}: {}".format(event.event_type, event.__dict__))
         self.check_file(event.dest_path)
+
     #     print("change")
     #     # self.process(event)
 

@@ -10,5 +10,3 @@ class ClearFinishedDownloads(QPushButton):
         self.download_view = download_view
 
         self.clicked.connect(download_view.clear_finished_downloads)
-
-

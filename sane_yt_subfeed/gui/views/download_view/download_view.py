@@ -1,16 +1,12 @@
 from PyQt5 import sip
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
-from sqlalchemy import false
-
-from sane_yt_subfeed.database.db_download_tile import DBDownloadTile
-from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
-from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.log_handler import create_logger
 
 from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
+from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
 from sane_yt_subfeed.gui.views.download_view.buttons.buttons_tile import ButtonsTile
 from sane_yt_subfeed.gui.views.download_view.download_tile import DownloadTile
+from sane_yt_subfeed.log_handler import create_logger
 
 
 class DownloadView(QWidget):
