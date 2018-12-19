@@ -1,27 +1,23 @@
-import sys
-import os
-import subprocess
-
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMenu, QApplication
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.default_application_handler import open_with_default_application
-from sane_yt_subfeed.gui.views.grid_view.sub_feed.sub_thumbnail_tile import SubThumbnailTile
+from sane_yt_subfeed.gui.views.grid_view.subfeed.subfeed_grid_thumbnail_tile import SubfeedGridViewThumbnailTile
 from sane_yt_subfeed.log_handler import create_logger
 
 from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
 from sane_yt_subfeed.gui.dialogs.sane_text_view_dialog import SaneTextViewDialog
 
 
-class SubFeedTile(VideoTile):
+class SubfeedGridViewTile(VideoTile):
 
     def __init__(self, parent, video, vid_id, clipboard, status_bar):
         super().__init__(parent, video, vid_id, clipboard, status_bar)
         self.logger = create_logger(__name__)
 
     def init_thumbnail_tile(self):
-        return SubThumbnailTile(self)
+        return SubfeedGridViewThumbnailTile(self)
 
     def contextMenuEvent(self, event):
         """

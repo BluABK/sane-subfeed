@@ -88,7 +88,7 @@ class HotkeysViewWidget(InputSuper):
         self.download = self.add_option_line_edit('Download', 'Subfeed', 'download')
         self.dismiss = self.add_option_line_edit('Dismiss', 'Subfeed', 'dismiss')
 
-        # Section [PlayView]
+        # Section [PlaybackGridView]
         self.add_section('{}View: Playback feed{}'.format(self.deco_l, self.deco_r))
         self.prio_decrease = self.add_option_line_edit('Decrease priority', 'Playback', 'prio_decrease')
         self.mark_watched = self.add_option_line_edit('Mark watched', 'Playback', 'mark_watched')

@@ -72,7 +72,7 @@ class ExtendedQLabel(QLabel):
         self.b.insertPlainText(text + '\n')
 
 
-class ListTiledView(QWidget):
+class SubfeedTiledListView(QWidget):
     """
     |------------------------------------------------------------------------------------------------------------------|
     |  ChannelICO?                  | Channel title                                                                    |
@@ -105,7 +105,7 @@ class ListTiledView(QWidget):
     eqlabels = None
 
     def __init__(self, parent, vid_limit=40):
-        super(ListTiledView, self).__init__(parent)
+        super(SubfeedTiledListView, self).__init__(parent)
         self.logger = create_logger(__name__)
         self.root = parent  # MainWindow
         self.eqlabels = []

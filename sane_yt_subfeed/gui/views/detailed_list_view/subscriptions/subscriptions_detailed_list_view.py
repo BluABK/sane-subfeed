@@ -9,18 +9,18 @@ from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
 from sane_yt_subfeed.log_handler import create_logger
 
 
-class SubscriptionsView(QWidget):
+class SubscriptionsDetailedListView(QWidget):
     subs = None
 
     def __init__(self, parent, headers=None):
         """
-        SubscriptionsView, a table representation of relevant parts of the Subscriptions list
+        SubscriptionsDetailedListView, a table representation of relevant parts of the Subscriptions list
         :param parent:
         :param clipboard:
         :param status_bar:
         :param headers:
         """
-        super(SubscriptionsView, self).__init__(parent)
+        super(SubscriptionsDetailedListView, self).__init__(parent)
         self.logger = create_logger(__name__)
         self.root = parent  # MainWindow
         self.clipboard = self.root.clipboard
@@ -38,7 +38,7 @@ class SubscriptionsView(QWidget):
         Initialize the UI
         :return:
         """
-        self.logger.info("Initializing UI: SubscriptionsView")
+        self.logger.info("Initializing UI: SubscriptionsDetailedListView")
         layout = QVBoxLayout()
         self.setLayout(layout)
         self.get_subs()

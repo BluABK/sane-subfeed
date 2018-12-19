@@ -10,7 +10,7 @@ import traceback
 
 from PyQt5.QtCore import QFile, QTextStream, QRegExp
 from PyQt5.QtGui import QIcon, QRegExpValidator
-from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QMenu, QStackedWidget, QStyleFactory
+from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QStackedWidget, QStyleFactory
 
 # Project internal libs
 from sane_yt_subfeed.absolute_paths import ICONS_PATH, VERSION_PATH
@@ -28,17 +28,18 @@ from sane_yt_subfeed.gui.main_window.toolbar import Toolbar
 from sane_yt_subfeed.gui.main_window.toolbar_action import SaneToolBarAction
 from sane_yt_subfeed.gui.themes import themes
 from sane_yt_subfeed.gui.themes.themes import THEMES_LIST, QSTYLES_AVAILABLE
-from sane_yt_subfeed.gui.views.about_view import AboutView
+from sane_yt_subfeed.gui.views.about_view.about_view import AboutView
 from sane_yt_subfeed.gui.views.config_view.config_view_tabs import ConfigViewTabs
 from sane_yt_subfeed.gui.views.config_view.config_window import ConfigWindow
 from sane_yt_subfeed.gui.views.config_view.views.hotkeys_view import HotkeysViewWidget
 from sane_yt_subfeed.gui.views.download_view.dl_scroll_area import DownloadScrollArea
 from sane_yt_subfeed.gui.views.grid_view.grid_scroll_area import GridScrollArea
-from sane_yt_subfeed.gui.views.grid_view.play_view.play_view import PlayView
-from sane_yt_subfeed.gui.views.grid_view.sub_feed.sub_feed_view import SubFeedView
-from sane_yt_subfeed.gui.views.list_detailed_view import ListDetailedView
-from sane_yt_subfeed.gui.views.list_tiled_view import ListTiledView
-from sane_yt_subfeed.gui.views.subscriptions_view import SubscriptionsView
+from sane_yt_subfeed.gui.views.grid_view.playback.playback_grid_view import PlaybackGridView
+from sane_yt_subfeed.gui.views.grid_view.subfeed.subfeed_grid_view import SubfeedGridView
+from sane_yt_subfeed.gui.views.detailed_list_view.subfeed.list_detailed_view import SubfeedDetailedListView
+from sane_yt_subfeed.gui.views.tiled_list_view.subfeed.subfeed_tiled_list_view import SubfeedTiledListView
+from sane_yt_subfeed.gui.views.detailed_list_view.subscriptions.subscriptions_detailed_list_view import \
+    SubscriptionsDetailedListView
 from sane_yt_subfeed.history_handler import get_plaintext_history
 from sane_yt_subfeed.log_handler import create_logger
 
@@ -47,18 +48,14 @@ HOTKEYS_EVAL = False
 HOTKEYS_INI = 'hotkeys'
 YOUTUBE_URL_REGEX = QRegExp('(http[s]?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/[^ ]+')
 YOUTUBE_URL_REGEX.setCaseSensitivity(False)
+QMAINWINDOW_TITLE = 'Sane Subscription Feed'
+QMAINWINDOW_ICON = 'yubbtubbz-padding.ico'
+PREFERENCES_ICON = 'preferences.png'
+HOTKEYS_ICON = 'hotkeys.png'
+QMAINWINDOW_DIMENSIONS = [770, 700]
 
 
 class MainWindow(QMainWindow):
-    current_view = None
-    grid_view = None
-    subs_view = None
-    list_detailed_view = None
-    list_tiled_view = None
-    about_view = None
-    menus = None
-    hotkey_ctrl_down = False
-
     # noinspection PyArgumentList
     def __init__(self, app: QApplication, main_model: MainModel, dimensions=None, position=None):
         super().__init__()
@@ -69,48 +66,55 @@ class MainWindow(QMainWindow):
 
         # Create the Exception Handler
         self.exceptionHandler = SaneExceptionHandler(self)
-        # Back up the reference to the exceptionhook
-        #sys._excepthook = sys.excepthook
+
         # Set the exception hook to be wrapped by the Exception Handler
         sys.excepthook = self.exceptionHandler.handler
 
         self.themes_list = THEMES_LIST
-        self.current_theme = None
-        self.current_theme_idx = 0
         self.bgcolor = read_config('Gui', 'bgcolor', literal_eval=False)
 
         self.clipboard = QApplication.clipboard()
         self.status_bar = self.statusBar()
-        self.menus = {}
+
+        self.position = position
         if dimensions:
             self.dimensions = dimensions
         else:
-            self.dimensions = [770, 700]
-        self.position = position
-        self.central_widget = QStackedWidget()
-        self.setCentralWidget(self.central_widget)
+            self.dimensions = QMAINWINDOW_DIMENSIONS
 
-        self.grid_view = GridScrollArea(self, main_model)
-        self.play_view = GridScrollArea(self, main_model)
-        self.grid_view.set_view(SubFeedView(self.grid_view, self, main_model), GRID_VIEW_ID)
-        self.play_view.set_view(PlayView(self.play_view, self, main_model), PLAY_VIEW_ID)
+        # Declare Views
+        self.central_widget = None
+        self.current_view = None
+        self.subfeed_grid_view = None
+        self.playback_grid_view = None
+        self.subscriptions_view = None
+        self.download_view = None
+        self.config_view = None
+        self.hotkeys_view = None
+        self.list_detailed_view = None
+        self.list_tiled_view = None
+        self.about_view = None
 
-        self.download_view = DownloadScrollArea(self, main_model)
+        # Declare theming
+        self.current_theme = None
+        self.current_theme_idx = 0
+        self.hotkey_ctrl_down = False
 
-        self.hotkeys_view = ConfigWindow(self)
-        self.hotkeys_view.setWidget(HotkeysViewWidget(self.hotkeys_view, self,
-                                                      icon=QIcon(os.path.join(ICONS_PATH, 'hotkeys.png'))))
-        self.config_view = ConfigViewTabs(self, icon=QIcon(os.path.join(ICONS_PATH, 'preferences.png')))
+        # Declare MainWindow things
+        self.views = {}
+        self.menubar = None
+        self.menus = {}
+        self.toolbar = None
+        self.toolbar_items = {}
 
-        self.list_detailed_view = ListDetailedView(self)
-        self.list_tiled_view = ListTiledView(self)
-        self.subs_view = SubscriptionsView(self)
-        self.about_view = AboutView(self)
-
+        # Initialize UI
         self.init_ui()
 
     def init_ui(self):
         self.logger.info("Initializing UI: MainWindow")
+
+        # Setup the views
+        self.setup_views()
 
         # Set the (last used) theme
         _last_theme = read_config('Theme', 'last_theme', literal_eval=False)
@@ -130,11 +134,89 @@ class MainWindow(QMainWindow):
             except Exception as exc:
                 self.logger.error("Failed setting 'last used' style: {}".format(_last_style), exc_info=exc)
 
-        # Define a menu and status bar
-        menubar = self.menuBar()
+        # Add and populate menus
+        self.menubar = self.add_menus()
+
+        # Add and populate toolbar
+        self.toolbar = self.add_toolbar()
+
+        # Spawn the status bar instance
         self.statusBar()
 
-        # File menu
+        # Set MainWindow properties
+        app_title = QMAINWINDOW_TITLE
+        version = self.determine_version()
+        if version:
+            app_title += " v{}".format(version)
+        self.setWindowTitle(app_title)
+        self.setWindowIcon(QIcon(os.path.join(ICONS_PATH, QMAINWINDOW_ICON)))
+        self.statusBar().showMessage('Ready.')
+
+        # Add progress bar to the status bar
+        progress_bar = self.main_model.new_status_bar_progress(self)
+        progress_bar.setVisible(False)
+        self.statusBar().addPermanentWidget(progress_bar)
+        self.statusBar().addPermanentWidget(DbStateIcon(self.toolbar, self.main_model))
+
+        # Display the window
+        self.central_widget.addWidget(self.subfeed_grid_view)
+        self.central_widget.addWidget(self.playback_grid_view)
+        self.central_widget.addWidget(self.download_view)
+        self.central_widget.addWidget(self.list_detailed_view)
+        if read_config('Debug', 'show_unimplemented_gui'):
+            self.central_widget.addWidget(self.list_tiled_view)
+        self.central_widget.addWidget(self.subscriptions_view)
+        if read_config('Debug', 'show_unimplemented_gui'):
+            self.central_widget.addWidget(self.about_view)
+        # self.central_widget.addWidget(self.hotkeys_view)
+        self.central_widget.setCurrentWidget(self.subfeed_grid_view)
+
+    # Init UI Helpers
+
+    def setup_views(self):
+        self.central_widget = QStackedWidget()
+        self.setCentralWidget(self.central_widget)
+
+        self.subfeed_grid_view = GridScrollArea(self, self.main_model)
+        self.playback_grid_view = GridScrollArea(self, self.main_model)
+        self.subfeed_grid_view.set_view(SubfeedGridView(self.subfeed_grid_view, self, self.main_model), GRID_VIEW_ID)
+        self.playback_grid_view.set_view(PlaybackGridView(self.playback_grid_view, self, self.main_model), PLAY_VIEW_ID)
+
+        self.download_view = DownloadScrollArea(self, self.main_model)
+
+        self.hotkeys_view = ConfigWindow(self)
+        self.hotkeys_view.setWidget(HotkeysViewWidget(self.hotkeys_view, self,
+                                                      icon=QIcon(os.path.join(ICONS_PATH, HOTKEYS_ICON))))
+        self.config_view = ConfigViewTabs(self, icon=QIcon(os.path.join(ICONS_PATH, PREFERENCES_ICON)))
+
+        self.list_detailed_view = SubfeedDetailedListView(self)
+        self.list_tiled_view = SubfeedTiledListView(self)
+        self.subscriptions_view = SubscriptionsDetailedListView(self)
+        self.about_view = AboutView(self)
+
+    # --- Menu
+    def add_menus(self):
+        """
+        Adds menu items to the menu bar.
+        :return: menubar
+        """
+        menubar = self.menuBar()
+        self.add_menu_file(menubar)
+        self.add_menu_function(menubar)
+        self.add_menu_view(menubar)
+        self.add_menu_window(menubar)
+        self.add_menu_help(menubar)
+        if read_config('Debug', 'debug'):
+            self.add_menu_debug(menubar)
+
+        return menubar
+
+    def add_menu_file(self, menubar):
+        """
+        Adds the File menu to menu bar.
+        :param menubar:
+        :return:
+        """
         self.add_menu(menubar, '&File')
         self.add_submenu('&File', 'Download by URL/ID', self.download_single_url_dialog,
                          shortcut=read_config('Global', 'download_video_by_url', custom_ini=HOTKEYS_INI,
@@ -155,7 +237,12 @@ class MainWindow(QMainWindow):
                                                                           literal_eval=HOTKEYS_EVAL),
                          tooltip='Exit application')
 
-        # Function menu
+    def add_menu_function(self, menubar):
+        """
+        Adds the Function menu to menu bar.
+        :param menubar:
+        :return:
+        """
         self.add_menu(menubar, '&Function')
 
         # Set function menu triggers
@@ -165,12 +252,15 @@ class MainWindow(QMainWindow):
                          tooltip='Copy URLs of all currently visible videos to clipboard', icon='copy.png')
 
         # refresh_list
-        refresh_feed = self.add_submenu('&Function', 'Refresh Feed', self.emit_signal_with_set_args,
-                                        shortcut=read_config('Global', 'refresh_feed', custom_ini=HOTKEYS_INI,
-                                                             literal_eval=HOTKEYS_EVAL),
-                                        tooltip='Refresh the subscription feed', icon='refresh.png',
-                                        signal=self.main_model.main_window_listener.refreshVideos,
-                                        args=(LISTENER_SIGNAL_NORMAL_REFRESH,))
+        self.toolbar_items['RefreshSubFeed'] = self.add_submenu('&Function', 'Refresh Feed',
+                                                                self.emit_signal_with_set_args,
+                                                                shortcut=read_config('Global', 'refresh_feed',
+                                                                                     custom_ini=HOTKEYS_INI,
+                                                                                     literal_eval=HOTKEYS_EVAL),
+                                                                tooltip='Refresh the subscription feed',
+                                                                icon='refresh.png',
+                                                                signal=self.main_model.main_window_listener.refreshVideos,
+                                                                args=(LISTENER_SIGNAL_NORMAL_REFRESH,))
 
         self.add_submenu('&Function', 'Reload Subscriptions &List',
                          self.main_model.main_window_listener.refreshSubs.emit,
@@ -221,45 +311,60 @@ class MainWindow(QMainWindow):
                          icon='refresh.png', shortcut=read_config('Global', 'history_undo_action',
                                                                   custom_ini=HOTKEYS_INI, literal_eval=HOTKEYS_EVAL))
 
-        # get_single_video = self.add_submenu('&Function', 'Get video', self.get_single_video,
-        #                                     tooltip='Fetch video by URL')
-
-        # View menu
+    def add_menu_view(self, menubar):
+        """
+        Adds the View menu to menu bar.
+        :param menubar:
+        :return:
+        """
         self.add_menu(menubar, '&View')
-        view_grid_view = self.add_submenu('&View', 'Subscription feed', self.set_current_widget,
-                                          shortcut=read_config('View', 'subfeed', custom_ini=HOTKEYS_INI,
-                                                               literal_eval=HOTKEYS_EVAL),
-                                          tooltip='View subscription feed as a grid', icon='grid.png',
-                                          widget=self.grid_view)
-        view_play_view = self.add_submenu('&View', 'Playback feed', self.set_current_widget,
-                                          shortcut=read_config('View', 'playback', custom_ini=HOTKEYS_INI,
-                                                               literal_eval=HOTKEYS_EVAL),
-                                          tooltip='View downloaded videos as a grid', widget=self.play_view,
-                                          icon='play_view_basic.png')
-        view_list_detailed_view = self.add_submenu('&View', 'Detailed List', self.set_current_widget,
-                                                   shortcut=read_config('View', 'detailed_list', custom_ini=HOTKEYS_INI,
-                                                                        literal_eval=HOTKEYS_EVAL),
-                                                   tooltip='View subscription feed as a detailed list',
-                                                   icon='table.png', widget=self.list_detailed_view)
-        view_downloads_view = self.add_submenu('&View', 'Downloads', self.set_current_widget,
-                                               shortcut=read_config('View', 'download', custom_ini=HOTKEYS_INI,
-                                                                    literal_eval=HOTKEYS_EVAL),
-                                               tooltip='Shows in progress downloads', icon='download_view.png',
-                                               widget=self.download_view)
-        view_subs_view = self.add_submenu('&View', 'Subscriptions', self.set_current_widget,
-                                          shortcut=read_config('View', 'subscriptions', custom_ini=HOTKEYS_INI,
-                                                               literal_eval=HOTKEYS_EVAL),
-                                          tooltip='View Subscriptions', icon='subs.png', widget=self.subs_view)
+        self.views['SubFeedGridView'] = self.add_submenu('&View', 'Subscription feed', self.set_current_widget,
+                                                         shortcut=read_config('View', 'subfeed', custom_ini=HOTKEYS_INI,
+                                                                              literal_eval=HOTKEYS_EVAL),
+                                                         tooltip='View subscription feed as a grid', icon='grid.png',
+                                                         widget=self.subfeed_grid_view)
+        self.views['PlaybackGridView'] = self.add_submenu('&View', 'Playback feed', self.set_current_widget,
+                                                          shortcut=read_config('View', 'playback',
+                                                                               custom_ini=HOTKEYS_INI,
+                                                                               literal_eval=HOTKEYS_EVAL),
+                                                          tooltip='View downloaded videos as a grid',
+                                                          widget=self.playback_grid_view,
+                                                          icon='play_view_basic.png')
+        self.views['SubfeedDetailedListView'] = self.add_submenu('&View', 'Detailed List', self.set_current_widget,
+                                                                 shortcut=read_config('View', 'detailed_list',
+                                                                                      custom_ini=HOTKEYS_INI,
+                                                                                      literal_eval=HOTKEYS_EVAL),
+                                                                 tooltip='View subscription feed as a detailed list',
+                                                                 icon='table.png', widget=self.list_detailed_view)
+        self.views['DownloadView'] = self.add_submenu('&View', 'Downloads', self.set_current_widget,
+                                                      shortcut=read_config('View', 'download', custom_ini=HOTKEYS_INI,
+                                                                           literal_eval=HOTKEYS_EVAL),
+                                                      tooltip='Shows in progress downloads', icon='download_view.png',
+                                                      widget=self.download_view)
+        self.views['SubscriptionsDetailedListView'] = self.add_submenu('&View', 'Subscriptions',
+                                                                       self.set_current_widget,
+                                                                       shortcut=read_config('View', 'subscriptions',
+                                                                                            custom_ini=HOTKEYS_INI,
+                                                                                            literal_eval=HOTKEYS_EVAL),
+                                                                       tooltip='View Subscriptions', icon='subs.png',
+                                                                       widget=self.subscriptions_view)
         if read_config('Debug', 'show_unimplemented_gui'):
-            view_list_tiled_view = self.add_submenu('&View', 'Tiled List', self.set_current_widget,
-                                                    shortcut=read_config('View', 'tiled_list', custom_ini=HOTKEYS_INI,
-                                                                         literal_eval=HOTKEYS_EVAL),
-                                                    tooltip='View subscription feed as a tiled list',
-                                                    icon='tiled_list.png', widget=self.list_tiled_view)
+            self.views['SubfeedTiledListView'] = self.add_submenu('&View', 'Tiled List', self.set_current_widget,
+                                                                  shortcut=read_config('View', 'tiled_list',
+                                                                                       custom_ini=HOTKEYS_INI,
+                                                                                       literal_eval=HOTKEYS_EVAL),
+                                                                  tooltip='View subscription feed as a tiled list',
+                                                                  icon='tiled_list.png', widget=self.list_tiled_view)
 
+    def add_menu_window(self, menubar):
+        """
+        Adds the Window menu to menu bar.
+        :param menubar:
+        :return:
+        """
         # Window menu
         window_menu = self.add_menu(menubar, '&Window')
-        #   Theme submenu
+        # --- Theme submenu
         theme_submenu = self.add_menu(window_menu, 'Theme')
         self.add_submenu(theme_submenu, 'Cycle theme', self.cycle_themes, tooltip='Cycle theme', subsubmenu=True)
         self.add_submenu(theme_submenu, 'Default', self.set_theme_native, tooltip='Set theme to system default',
@@ -270,82 +375,65 @@ class MainWindow(QMainWindow):
         self.add_submenu(theme_submenu, 'Breeze Dark', self.set_theme_breeze_dark, tooltip='Set theme to Breeze Dark',
                          subsubmenu=True)
         # self.add_submenu_separator('&Theme')
-        #   Style submenu
+        # --- Style submenu
         style_submenu = self.add_menu(window_menu, 'Style')
         self.add_available_qstyles_to_menu(style_submenu, subsubmenu=True)
 
-        # Help menu
+    def add_menu_help(self, menubar):
+        """
+        Adds the Help menu to menu bar.
+        :param menubar:
+        :return:
+        """
         self.add_menu(menubar, '&Help')
         self.add_submenu('&Help', 'Hotkeys', self.view_hotkeys,
                          shortcut=read_config('Global', 'hotkeys', custom_ini=HOTKEYS_INI, literal_eval=HOTKEYS_EVAL),
                          tooltip='View hotkeys', icon='hotkeys.png')
         if read_config('Debug', 'show_unimplemented_gui'):
-            view_about_view = self.add_submenu('&Help', 'About', self.set_current_widget, tooltip='About me',
-                                               icon='about.png', widget=self.about_view)
+            self.views['About'] = self.add_submenu('&Help', 'About', self.set_current_widget, tooltip='About me',
+                                                   icon='about.png', widget=self.about_view)
 
-        if read_config('Debug', 'debug'):
-            # Debug menu
-            self.add_menu(menubar, '&Debug')
-            self.add_submenu('&Debug', 'Raise a generic Exception (GUI)', self.debug_throw_exception,
-                             tooltip='Oh dear..')
-            self.add_submenu('&Debug', 'Raise (and don\'t catch) a generic Exception (GUI)',
-                             self.debug_throw_and_dont_catch_exception, tooltip='Oh dear..')
-            self.add_submenu('&Debug', 'Raise a generic Exception (Backend)', self.debug_throw_exception_backend,
-                             tooltip='Oh dear..')
-            self.add_submenu('&Debug', 'Poll Exceptions', self.poll_exceptions,
-                             tooltip='Oh dear..')
+    def add_menu_debug(self, menubar):
+        """
+        Adds the Debug menu to menu bar.
+        :param menubar:
+        :return:
+        """
+        self.add_menu(menubar, '&Debug')
+        self.add_submenu('&Debug', 'Raise a generic Exception (GUI)', self.debug_throw_exception,
+                         tooltip='Oh dear..')
+        self.add_submenu('&Debug', 'Raise (and don\'t catch) a generic Exception (GUI)',
+                         self.debug_throw_and_dont_catch_exception, tooltip='Oh dear..')
+        self.add_submenu('&Debug', 'Raise a generic Exception (Backend)', self.debug_throw_exception_backend,
+                         tooltip='Oh dear..')
+        self.add_submenu('&Debug', 'Poll Exceptions', self.poll_exceptions,
+                         tooltip='Oh dear..')
 
+    # --- Toolbar
+    def add_toolbar(self):
+        """
+        Adds toolbar items to the toolbar.
+
+        Most of these are referencing menu items.
+        :return: toolbar
+        """
         toolbar = Toolbar(self)
         self.addToolBar(toolbar)
-        toolbar.addAction(view_grid_view)
-        toolbar.addAction(view_play_view)
-        toolbar.addAction(view_list_detailed_view)
-        toolbar.addAction(view_downloads_view)
-        if read_config('Debug', 'show_unimplemented_gui'):  # FIXME: Implement
-            toolbar.addAction(view_list_tiled_view)
-        toolbar.addAction(view_subs_view)
+        toolbar.addAction(self.views['SubFeedGridView'])
+        toolbar.addAction(self.views['PlaybackGridView'])
+        toolbar.addAction(self.views['SubfeedDetailedListView'])
+        toolbar.addAction(self.views['DownloadView'])
+        if read_config('Debug', 'show_unimplemented_gui'):  # FIXME: Implement SubfeedTiledListView
+            toolbar.addAction(self.views['SubfeedTiledListView'])
+        toolbar.addAction(self.views['SubscriptionsDetailedListView'])
         if read_config('Debug', 'show_unimplemented_gui'):
-            toolbar.addAction(view_about_view)
+            toolbar.addAction(self.views['About'])
 
         toolbar.create_action_group()
-        # not included in exclusive action group
-        toolbar.addAction(refresh_feed)
+        # Items that should not be included in the exclusive action group.
+        toolbar.addAction(self.toolbar_items['RefreshSubFeed'])
 
-        # Set MainWindow properties
-        app_title = 'Sane Subscription Feed'
-        version = self.determine_version()
-        if version:
-            app_title += " v{}".format(version)
-        self.setWindowTitle(app_title)
-        self.setWindowIcon(QIcon(os.path.join(ICONS_PATH, 'yubbtubbz-padding.ico')))
-        self.statusBar().showMessage('Ready.')
-
-        progress_bar = self.main_model.new_status_bar_progress(self)
-        # progress_bar.setFixedHeight(20)
-        progress_bar.setVisible(False)
-        self.statusBar().addPermanentWidget(progress_bar)
-        self.statusBar().addPermanentWidget(DbStateIcon(toolbar, self.main_model))
-
-        # # Set a default view and layout
-        # window_layout = QVBoxLayout()
-        # self.view_grid()
-        # self.setLayout(window_layout)
-
-        # Display the window
-        self.central_widget.addWidget(self.grid_view)
-        self.central_widget.addWidget(self.play_view)
-        self.central_widget.addWidget(self.download_view)
-        self.central_widget.addWidget(self.list_detailed_view)
-        if read_config('Debug', 'show_unimplemented_gui'):
-            self.central_widget.addWidget(self.list_tiled_view)
-        self.central_widget.addWidget(self.subs_view)
-        if read_config('Debug', 'show_unimplemented_gui'):
-            self.central_widget.addWidget(self.about_view)
-        # self.central_widget.addWidget(self.hotkeys_view)
-        self.central_widget.setCurrentWidget(self.grid_view)
-
-        # if self.dimensions:
-        #     self.resize(self.dimensions[0], self.dimensions[1])
+        return toolbar
 
     # Debug
     def debug_throw_exception(self):
@@ -392,7 +480,7 @@ class MainWindow(QMainWindow):
 
     def check_for_backend_exceptions(self):
         """
-        Returns backend exceptions list (if any)
+        Returns backend exceptions list (if any).
         :return:
         """
         return self.exceptionHandler.exceptions
@@ -418,8 +506,8 @@ class MainWindow(QMainWindow):
             func()
         backend_exceptions = self.check_for_backend_exceptions()
         if len(backend_exceptions) is not 0:
-            exctype, value, this_traceback = self.exceptionHandler.pop_exception()
-            raise exctype(exctype, value, this_traceback)
+            exc_type, value, this_traceback = self.exceptionHandler.pop_exception()
+            raise exc_type(exc_type, value, this_traceback)
 
     def poll_exceptions(self, auto_clear=False):
         """
@@ -440,7 +528,7 @@ class MainWindow(QMainWindow):
     def rebuild_traceback(exc_info):
         """
         Reshuffles the traceback bits into a more sensible order, making it look like the actual thing.
-        :param exc_info:
+        :param exc_info: Exception tuple
         :return:
         """
         exctype, value, this_traceback = exc_info
@@ -465,10 +553,10 @@ class MainWindow(QMainWindow):
         exception_dialog.setWindowTitle(window_title)
         exception_dialog.show()
 
-    # Internal
+    # Version Control
     def determine_version(self):
         """
-        Attempt to determine current release version based on VERSION.txt (and git)
+        Attempt to determine current release version based on VERSION.txt (and git).
         :return:
         """
         git_branchtag = self.get_git_tag()
@@ -488,22 +576,22 @@ class MainWindow(QMainWindow):
 
     def get_git_tag(self):
         """
-        Gets git branch/commit_tag if in a git environment
+        Retrieves git branch/commit_tag if in a git environment.
         :return:
         """
         try:
-            branchtag = check_output("git rev-parse --abbrev-ref HEAD", shell=True).decode("UTF-8").strip('\n') + ' / '
+            branch_tag = check_output("git rev-parse --abbrev-ref HEAD", shell=True).decode("UTF-8").strip('\n') + ' / '
         except Exception as e:
             self.logger.critical("An unhandled exception occurred!", exc_info=e)
             return "N/A"
         try:
-            branchtag += check_output("git log -n 1 --pretty=format:%h", shell=True).decode("UTF-8").strip('\n')
+            branch_tag += check_output("git log -n 1 --pretty=format:%h", shell=True).decode("UTF-8").strip('\n')
         except Exception as e2:
             self.logger.critical("An unhandled exception occurred!", exc_info=e2)
             self.exception_dialog(copy.copy(sys.exc_info()))
             return "N/A"
 
-        return branchtag
+        return branch_tag
 
     # Theme handling
     def set_theme(self, theme, stylesheet=True):
@@ -525,6 +613,10 @@ class MainWindow(QMainWindow):
         self.current_theme = theme
 
     def set_theme_native(self):
+        """
+        Reset the theme to default/native.
+        :return:
+        """
         self.set_theme(None)
 
     def set_theme_breeze_dark(self):
@@ -534,6 +626,12 @@ class MainWindow(QMainWindow):
         self.set_theme(themes.BREEZE_LIGHT)
 
     def add_available_qstyles_to_menu(self, menu, subsubmenu=False):
+        """
+        Populates the given menu with all available QStyles.
+        :param menu:
+        :param subsubmenu:
+        :return:
+        """
         for name, _ in QSTYLES_AVAILABLE.items():
             action = self.set_qstyle
 
@@ -541,10 +639,19 @@ class MainWindow(QMainWindow):
             self.add_submenu(menu, name, action, tooltip="Apply the '{}' theme.".format(name), subsubmenu=subsubmenu,
                              qstyle=name)
 
-    def set_qstyle(self, qstyle):
-        self.set_theme(qstyle, stylesheet=False)
+    def set_qstyle(self, q_style):
+        """
+        Sets theme to a QStyle.
+        :param q_style:
+        :return:
+        """
+        self.set_theme(q_style, stylesheet=False)
 
     def cycle_themes(self):
+        """
+        Cycles through the available themes.
+        :return:
+        """
         if self.current_theme_idx >= len(self.themes_list) - 1:
             self.current_theme_idx = -1
 
@@ -556,6 +663,7 @@ class MainWindow(QMainWindow):
     def add_menu(self, menubar, name, submenu=False):
         """
         Adds a menu and an optional amount of submenus
+        :param submenu: If True menu is child of another menu.
         :param menubar:
         :param name:
         :return:
@@ -567,17 +675,20 @@ class MainWindow(QMainWindow):
             self.menus[name] = menubar.addMenu(name)
             return self.menus[name]
 
-    def add_submenu(self, menu, name, action, shortcut=None, shortcuts=None,
+    def add_submenu(self, menu: str, name: str, action, shortcut=None, shortcuts=None,
                     tooltip=None, icon=None, subsubmenu=False, dummy=False, disabled=False, **kwargs):
         """
-        Adds a submenu with optional properties to a menu
-        :param subsubmenu:
-        :param name:
-        :param icon: icon filename (with relative path)
-        :param tooltip: String
-        :param action: Function
-        :param shortcut: String on the form of '<key>+...n+key>' e.g. 'Ctrl+1'
-        :param menu:
+        Adds a submenu to a menu with optional properties.
+        :param disabled:    Menu is disabled/greyed out.
+        :param dummy:       Menu has no action bind.
+        :param shortcuts:   Keyboard hotkey.
+        :param subsubmenu:  If True submenu is child of a parent submenu.
+        :param name:        Name to give this submenu.
+        :param icon:        Icon filename (with relative path)
+        :param tooltip:     String to show on statusbar/on-hover.
+        :param action:      Function to bind action to.
+        :param shortcut:    String on the form of '<key>+...n+key>' e.g. 'Ctrl+1'
+        :param menu:        String identifier (name) of the Menu to attach this submenu to.
         :return:
         """
         if icon:
@@ -599,21 +710,22 @@ class MainWindow(QMainWindow):
                 self.menus[menu].addAction(submenu)
             else:
                 raise ValueError("add_submenu('{}', '{}', ...) ERROR: '{}' not in menus dict!".format(menu, name, menu))
-        return submenu  # FIXME: Used by toolbar to avoid redefining items
+        return submenu  # Used by toolbar, to avoid redefining items.
 
     def add_submenu_separator(self, menu):
+        """
+        Adds a separator item in a submenu.
+        :param menu:
+        :return:
+        """
         self.menus[menu].addSeparator()
 
-    @staticmethod
-    def hide_widget(widget):  # TODO: Deferred usage (Garbage collection issue)
+    def set_current_widget(self, widget):
         """
-        Hides a widget/view
+        Sets self.central_widget to reference the widget you want to show.
         :param widget:
         :return:
         """
-        widget.setHidden(True)
-
-    def set_current_widget(self, widget):
         self.central_widget.setCurrentWidget(widget)
 
     def view_config(self):
@@ -638,7 +750,7 @@ class MainWindow(QMainWindow):
         :return:
         """
         urls = ""
-        for q_label in self.grid_view.q_labels:
+        for q_label in self.subfeed_grid_view.q_labels:
             urls += "{}\n".format(q_label.video.url_video)
 
         self.logger.info("Copied URLs to clipboard: \n{}".format(urls))
@@ -765,29 +877,3 @@ class MainWindow(QMainWindow):
         history_dialog = SaneTextViewDialog(self, history)
         history_dialog.setWindowTitle("Usage history")
         history_dialog.show()
-
-    # Unused functions
-    def context_menu_event(self, event):  # TODO: Unused, planned usage in future
-        """
-        Context menu for right clicking video thumbnails and more.
-        :param event:
-        :return:
-        """
-        cmenu = QMenu(self)
-        copy_link_action = cmenu.addAction("Copy link")
-        open_link_action = cmenu.addAction("Open link")
-        close_action = cmenu.addAction("Close")
-        action = cmenu.exec_(self.mapToGlobal(event.pos()))
-
-    # Misc cleanup handling
-    @staticmethod
-    def clear_layout(layout):  # TODO: Unused
-        """
-        Deletes the given layout
-        :param layout:
-        :return:
-        """
-        while layout.count():
-            child = layout.takeAt(0)
-            if child.widget():
-                child.widget().deleteLater()

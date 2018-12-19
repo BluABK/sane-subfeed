@@ -41,7 +41,7 @@ v0.4.0
 - Made SaneInputDialog take an action as argument instead of using hardcoded calls
 - Added support for checking if YouTube says you are subscribed to a channel, and add an override/disable feature instead of deleting the subscription.
 - Added add_subscription function and dialog to MainWindow and tied it to File menu (manually add a local-only subscription)
-- Added subscribed and subscribed_override to SubscriptionsView
+- Added subscribed and subscribed_override to SubscriptionsDetailedListView
 - Added DB Statement function to get channel by title
 - Fixed issue where continuing a download would not redraw video, or update db
 - Made .watched be handled properly for NULL
@@ -80,15 +80,15 @@ v0.4.0
 - Added gui.dialogs with SaneInputDialog and SaneTextViewDialog
 - Added "No File" thumbnail overlay and made it update/vanish when download is finished
 - Made Subfeed View use show_downloaded and show_dismissed
-- Implemented show_watched and show_dismissed for PlayView
+- Implemented show_watched and show_dismissed for PlaybackGridView
 - Added option to pipe instead of downloading the youtube-dl request
-- Made SubFeedView and PlayView inherit and override ThumbnailTile, and split out overlay drawing from setPixmap() to add_overlay()
+- Made SubfeedGridView and PlaybackGridView inherit and override ThumbnailTile, and split out overlay drawing from setPixmap() to add_overlay()
 - Moved icons from gui/ to resources/
 - Fixed issue where YouTube API search() would return truncated descriptions
 - Significantly optimised DB performance
 - Added "tray" icon that indicates when DB is writing/busy
-- Added "View description" and "View image" functionality to SubfeedView and PlayView context menus
-- Added "play w/o mark watched" to PlayView context menu
+- Added "View description" and "View image" functionality to SubfeedView and PlaybackGridView context menus
+- Added "play w/o mark watched" to PlaybackGridView context menu
 - Added a usage history dialog (Ctrl+H)
 - Added GetUploadsThread exception handling
 - Improved geo proxy code to handle more generic error messages thrown at it.
@@ -108,7 +108,7 @@ v0.3.4
 - Scrolled views now load new videos when 100% scrolled to bottom, not 90%.
 - Removed ffmpeg import that created unnecessary dependencies.
 - NULL QPixmaps are now replaced with a custom 'Thumbnail N/A' image.
-- Fixed issue where SubFeedTile logger was accidentally named PlayView.
+- Fixed issue where SubfeedGridViewTile logger was accidentally named PlaybackGridView.
 
 v0.3.3
 - Added support for proxies to bypass geo blocks.
@@ -120,7 +120,7 @@ v0.3.2
 - Gave manual db grab shortcut(Ctrl+E)
 
 v0.3.1
-- Added scrollbar to GridView and PlayView
+- Added scrollbar to GridView and PlaybackGridView
 
 v0.3.0
 - Cleaned version of v0.3.0-pre
@@ -167,7 +167,7 @@ v0.2.0-dev
 - Added feature: Colouring of *new* videos in GridView.
 - Added feature: Reload subscriptions list on demand from GUI.
 - Added feature: Text (title, channel, date) on video tiles in GridView.
-- SubscriptionsView is now a table that practically mimics the DBs 'Channel' tbl.
+- SubscriptionsDetailedListView is now a table that practically mimics the DBs 'Channel' tbl.
 - Video tiles in GridView now have a fixed size and spawn new if space allows.
 - Fixed a lot of icons and related gfx.
 - Misc file/folder restructuring.

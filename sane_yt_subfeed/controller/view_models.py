@@ -1,7 +1,4 @@
-import time
-
 from PyQt5.QtCore import QThread
-# FIXME: imp*
 from PyQt5.QtWidgets import QProgressBar
 from sqlalchemy import asc, desc, false, or_
 from sqlalchemy.dialects import postgresql
@@ -15,7 +12,6 @@ from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, r
     get_best_playview_videos
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread
-from sane_yt_subfeed.gui.history.sane_history import SaneHistory
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
 
@@ -221,8 +217,8 @@ class MainModel:
 
     def db_update_play_view_videos(self):
 
-        update_filter = self.config_get_filter_play_view()
-        update_sort = self.config_get_sort_play_view()
+        update_filter = self.config_get_filter_playback_view()
+        update_sort = self.config_get_sort_playback_view()
         self.playview_videos = get_best_playview_videos(self.playview_videos_limit, filters=update_filter,
                                                         sort_method=update_sort)
         self.grid_view_listener.downloadedVideosChanged.emit()
@@ -236,9 +232,9 @@ class MainModel:
         UpdateVideosThread(videos, update_existing=True).start()
 
     @staticmethod
-    def config_get_filter_play_view():
+    def config_get_filter_playback_view():
         """
-        Applies a filter to the PlayView Videos list.
+        Applies a filter to the PlaybackGridView Videos list.
         :return:
         """
         show_watched = read_config('GridView', 'show_watched')
@@ -250,9 +246,9 @@ class MainModel:
             update_filter += (~Video.discarded,)
         return update_filter
 
-    def config_get_sort_play_view(self):
+    def config_get_sort_playback_view(self):
         """
-        Applies a sort-by rule to the PlayView videos list.
+        Applies a sort-by rule to the PlaybackGridView videos list.
 
         update_sort is a tuple of priority sort categories, first element is highest, last is lowest.
         update_sort += operations requires at least two items on rhs.
@@ -260,7 +256,7 @@ class MainModel:
         """
         sort_by_ascending_date = read_config('PlaySort', 'ascending_date')
         sort_by_channel = read_config('PlaySort', 'by_channel')
-        self.logger.info("Sorting PlayView Videos: date = {} | channel = {}".format(sort_by_ascending_date,
+        self.logger.info("Sorting PlaybackGridView Videos: date = {} | channel = {}".format(sort_by_ascending_date,
                                                                                     sort_by_channel))
         update_sort = (asc(Video.watch_prio),)
         # Sort-by ascending date
@@ -284,7 +280,7 @@ class MainModel:
         else:
             update_sort += (desc(Video.date_downloaded), desc(Video.date_published))
 
-        self.logger.info("Sorted PlayView Videos: date = {} | channel = {}".format(sort_by_ascending_date,
+        self.logger.info("Sorted PlaybackGridView Videos: date = {} | channel = {}".format(sort_by_ascending_date,
                                                                                    sort_by_channel))
         return update_sort
 

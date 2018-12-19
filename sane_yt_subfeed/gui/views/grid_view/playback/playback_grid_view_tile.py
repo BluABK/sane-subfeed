@@ -1,19 +1,18 @@
 import os
-import sys
 import subprocess
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QMenu, QAction
+from PyQt5.QtWidgets import QApplication, QMenu
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.default_application_handler import open_with_default_application
-from sane_yt_subfeed.gui.views.grid_view.play_view.play_thumbnail_tile import PlayThumbnailTile
+from sane_yt_subfeed.gui.views.grid_view.playback.playback_grid_view_thumbnail_tile import PlaybackGridViewThumbnailTile
 from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.gui.dialogs.sane_text_view_dialog import SaneTextViewDialog
 
 
-class PlayTile(VideoTile):
+class PlaybackGridViewTile(VideoTile):
 
     def __init__(self, parent, video, vid_id, clipboard, status_bar):
         super().__init__(parent, video, vid_id, clipboard, status_bar)
@@ -22,7 +21,7 @@ class PlayTile(VideoTile):
         self.parent = parent
 
     def init_thumbnail_tile(self):
-        return PlayThumbnailTile(self)
+        return PlaybackGridViewThumbnailTile(self)
 
     def mousePressEvent(self, QMouseEvent):  # FIXME: Make mouse hotkeys based on hotkeys.ini
         """
