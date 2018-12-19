@@ -1,0 +1,61 @@
+#FIXME
+> find . -name "*.py" | xargs grep -E "# FIXME:"
+- [ ] ./main.py:# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+- [ ] ./main.py:# FIXME: move this method to the youtube package
+- [ ] ./print_functions.py:        # Cut off at a sensible length # FIXME: Hack
+- [ ] ./database/engine_statements.py:# FIXME: probably outdated for variables and values
+- [ ] ./database/orm.py:# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+- [ ] ./database/read_operations.py:# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+- [ ] ./database/read_operations.py:    # FIXME: add to progress bar
+- [ ] ./database/write_operations.py:            # FIXME: add step to update
+- [ ] ./database/video.py:class Video(PermanentBase):     # FIXME: PickleTypes should probably be replaced by actual tables
+- [ ] ./gui/dialogs/sane_dialog.py:class SaneDialog(QDialog):  # FIXME: FUTURE: Was meant to be inherited, but might be useful on its own in future
+- [ ] ./gui/views/grid_view/play_view/play_tile.py:    def mousePressEvent(self, QMouseEvent):  # FIXME: Make mouse hotkeys based on hotkeys.ini
+- [ ] ./gui/views/grid_view/play_view/play_tile.py:        # FIXME: Add a loop that lets you define infinite players in config (see download proxy list method)
+- [ ] ./gui/views/grid_view/grid_scroll_area.py:            # FIXME: do something with auto reload so that this is not needed
+- [ ] ./gui/views/grid_view/thumbnail_tile.py:            # Overlay captions (if any) on thumbnail    # FIXME: Replace with something better like a small icon
+- [ ] ./gui/views/download_view/download_tile.py:        self.failed = False  # FIXME: Implement handling of failed downloads
+- [ ] ./gui/views/download_view/dl_scroll_area.py:            # FIXME: do something with auto reload so that this is not needed
+- [ ] ./gui/views/download_view/download_view.py:        # # FIXME: remove and fix signals instead
+- [ ] ./gui/views/config_view/config_items/combobox.py:   # FIXME: Get QComboBox to set strings not ints
+- [ ] ./gui/views/config_view/views/hotkeys_view.py:            self.setWindowIcon(icon)  # FIXME: Icon won't set
+- [ ] ./gui/views/subscriptions_view.py:        self.table_items = []   # FIXME: unused
+- [ ] ./gui/main_window/main_window.py:        # FIXME: icon, shortcut(alt/shift as extra modifier to the normal refresh shortcut?)
+- [ ] ./gui/main_window/main_window.py:        # FIXME: icon, look more related to action
+- [ ] ./gui/main_window/main_window.py:        if read_config('Debug', 'show_unimplemented_gui'):  # FIXME: Implement
+- [ ] ./gui/main_window/main_window.py:        return submenu  # FIXME: Used by toolbar to avoid redefining items
+- [ ] ./authentication.py:# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+- [ ] ./youtube/update_videos.py:# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+- [ ] ./youtube/update_videos.py:        except HttpError as exc_gapi_http_error:  # FIXME: Handle HttpError exceptions
+- [ ] ./youtube/thumbnail_handler.py:# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+- [ ] ./youtube/uploads_thread.py:                # FIXME: wasteful compare
+- [ ] ./youtube/uploads_thread.py:                    # FIXME: check if grab method is in list?
+- [ ] ./youtube/youtube_dl_handler.py:# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+- [ ] ./youtube/youtube_dl_handler.py:# FIXME: because of formating string, for channel, it can't do batch dl
+- [ ] ./youtube/youtube_dl_handler.py:        # FIXME: faux filename, as the application is currently not able to get final filname from youtube-dl
+- [ ] ./youtube/youtube_dl_handler.py:                # FIXME: Probably overkill, should maybe only flag as failed from parent caller
+- [ ] ./youtube/youtube_dl_handler.py:        # FIXME: Replace with info grabbed from youtube_dl (hook?)
+- [ ] ./youtube/youtube_dl_handler.py:        # FIXME: Replace with info grabbed from youtube_dl (hook?)
+- [ ] ./youtube/youtube_dl_handler.py:        # FIXME: Add other presets like music
+- [ ] ./youtube/youtube_dl_handler.py:            self.download_progress_listener.finishedDownload.emit()  # FIXME: Needs to emit failed status as well
+- [ ] ./youtube/youtube_requests.py:# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+- [ ] ./youtube/youtube_requests.py:# FIXME: integrate with socket system
+- [ ] ./youtube/youtube_requests.py:                            id=channel_id)  # FIXME: stats unnecessary?
+- [ ] ./youtube/youtube_requests.py:                            id=channel_id)  # FIXME: stats unnecessary?
+- [ ] ./youtube/youtube_requests.py:                            forUsername=username)  # FIXME: stats unnecessary?
+- [ ] ./youtube/youtube_requests.py:                            id=channel_id)  # FIXME: stats unnecessary?
+- [ ] ./youtube/youtube_requests.py:    # FIXME: Somewhat duplicate code of get_remote_subscriptions, move to own function -- START
+- [ ] ./youtube/youtube_requests.py:    # FIXME: Somewhat duplicate code of get_remote_subscriptions, move to own function -- END
+- [ ] ./youtube/youtube_requests.py:    # FIXME: Somewhat duplicate code of get_remote_subscriptions, move to own function -- START
+- [ ] ./youtube/youtube_requests.py:    # FIXME: Somewhat duplicate code of get_remote_subscriptions, move to own function -- END
+- [ ] ./controller/controller.py:# FIXME: imp*
+- [ ] ./controller/listeners/listeners.py:# FIXME: imp*
+- [ ] ./controller/listeners/listeners.py:    # FIXME: move youtube-dl listener to its own listener?
+- [ ] ./controller/listeners/listeners.py:    # FIXME: move to db listener
+- [ ] ./controller/listeners/listeners.py:        video_id = video_url.split('&')[0].split('v=')[-1]  # FIXME: Make a proper input sanitizer that handles YT IDs
+- [ ] ./controller/view_models.py:# FIXME: imp*
+- [ ] ./controller/view_models.py:        # FIXME: only does filtered videos
+- [ ] ./pickle_handler.py:# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+- [ ] ./default_application_handler.py:    for ext in IMAGE_EXTENSIONS: # FIXME: In future use actual MIME type detection not simply *.ext
+- [ ] ./config_handler.py:        # FIXME: check for correct custom_ini
+- [ ] ./__init__.py:# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
