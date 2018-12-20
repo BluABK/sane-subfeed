@@ -160,6 +160,8 @@ class GridViewListener(QObject):
     def tile_downloaded(self, video: VideoD):
         """
         Action to take if tile has been flagged as downloaded.
+
+        Called by Views: Subfeed
         :param video:
         :return:
         """
@@ -197,6 +199,7 @@ class GridViewListener(QObject):
         :param video:
         :return:
         """
+        # Update Playback View
         self.playbackVideosChanged.emit()
         # Update Video in Database with the changed attributes
         UpdateVideo(video, update_existing=True).start()
@@ -205,10 +208,27 @@ class GridViewListener(QObject):
         # Redraw the video
         self.redrawVideos.emit([video])
 
+    def subfeed_tile_update_and_redraw(self, video: Video):
+        """
+        Common operations for Subfeed tiles.
+        :param video:
+        :return:
+        """
+        # Update Subfeed View
+        self.hiddenVideosChanged.emit()
+        # Update Video in Database with the changed attributes
+        UpdateVideo(video, update_existing=True).start()
+        # Update SubfeedGridView from database.
+        self.model.update_subfeed_videos_from_db()
+        # Redraw the video
+        self.redrawVideos.emit([video])
+
     @pyqtSlot(VideoD)
     def tile_watched(self, video: Video):
         """
         Action to take if tile has been flagged as watched.
+
+        Called by Views: Playback
         :param video:
         :return:
         """
@@ -221,19 +241,22 @@ class GridViewListener(QObject):
     def tile_unwatched(self, video: Video):
         """
         Action to take if tile has been un-flagged as watched.
+
+        Called by Views: Playback
         :param video:
         :return:
         """
         self.logger.info("Mark unwatched: {} - {}".format(video.title, video.__dict__))
         video.watched = False
         self.model.unhide_video_item(video)
-        self.playbackVideosChanged.emit()
         self.playback_tile_update_and_redraw(video)
 
     @pyqtSlot(VideoD)
     def tile_discarded(self, video: Video):
         """
         Action to take if tile has been flagged as dismissed.
+
+        Called by Views: Subfeed and Playback
         :param video:
         :return:
         """
@@ -241,23 +264,25 @@ class GridViewListener(QObject):
                                                                        video.url_video))
         video.discarded = True
         self.model.hide_video_item(video)
-        self.playbackVideosChanged.emit()
         self.playback_tile_update_and_redraw(video)
+        self.subfeed_tile_update_and_redraw(video)
 
     @pyqtSlot(VideoD)
     def tile_undiscarded(self, video: Video):
         """
         Action to take if tile has been un-flagged as dismissed.
+
+        Called by Views: Subfeed and Playback
         :param video:
         :return:
         """
         self.logger.info("Un-hide video (Un-discarded): {} - {} [{}]".format(video.channel_title,
                                                                              video.title,
                                                                              video.url_video))
-        self.model.unhide_video_item(video)
         video.discarded = False
-        self.playbackVideosChanged.emit()
+        self.model.unhide_video_item(video)
         self.playback_tile_update_and_redraw(video)
+        self.subfeed_tile_update_and_redraw(video)
 
     def run(self):
         while True:
