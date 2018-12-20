@@ -218,7 +218,7 @@ class MainModel:
         Note: There's no remote update for PlaybackView like there is for SubfeedView.
         :return:
         """
-        update_filter = self.config_get_filter_playback_view()
+        update_filter = self.filter_playback_view_videos()
         update_sort = self.sort_playback_view_videos()
         self.playview_videos = get_best_playview_videos(self.playview_videos_limit, filters=update_filter,
                                                         sort_method=update_sort)
@@ -252,9 +252,9 @@ class MainModel:
         UpdateVideosThread(videos, update_existing=True).start()
 
     @staticmethod
-    def config_get_filter_playback_view():
+    def filter_playback_view_videos():
         """
-        Applies a filter to the PlaybackGridView Videos list.
+        Applies filters to the PlaybackGridView Videos list based on config.
         :return:
         """
         show_watched = read_config('GridView', 'show_watched')
