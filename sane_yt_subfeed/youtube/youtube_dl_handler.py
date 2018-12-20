@@ -179,7 +179,7 @@ class YoutubeDownload(threading.Thread):
                 'title': self.video.title,
                 'show': self.video.channel_title,
                 'date': self.video.date_published.isoformat(),
-                'purl': self.video.url_video,
+                'url': self.video.url_video,
                 'network': 'YouTube',
                 ('description', 'comment', 'synopsis'): self.video.description}
         logger.debug(info)
