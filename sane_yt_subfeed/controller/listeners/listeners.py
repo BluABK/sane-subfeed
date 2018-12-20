@@ -207,6 +207,8 @@ class GridViewListener(QObject):
         self.model.update_playback_videos_from_db()
         # Redraw the video
         self.redrawVideos.emit([video])
+        # Reload GridView from DB (or dismissed tiles shows right back up)
+        self.update_from_db()
 
     def subfeed_tile_update_and_redraw(self, video: Video):
         """
@@ -222,6 +224,8 @@ class GridViewListener(QObject):
         self.model.update_subfeed_videos_from_db()
         # Redraw the video
         self.redrawVideos.emit([video])
+        # Reload GridView from DB (or dismissed tiles shows right back up)
+        self.update_from_db()
 
     @pyqtSlot(VideoD)
     def tile_watched(self, video: Video):
