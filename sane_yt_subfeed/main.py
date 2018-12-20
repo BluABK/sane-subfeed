@@ -26,9 +26,9 @@ print_statistics = True
 
 # Create controller object
 
-def run_with_gui(exceptions):
+def run_with_gui():
     logger.info('Running with GUI')
-    controller = Controller(exceptions)
+    controller = Controller()
     controller.run()
 
 

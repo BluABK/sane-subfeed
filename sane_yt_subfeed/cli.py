@@ -94,7 +94,7 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day, print_subscri
             logger.info("=== ulimit info on next line ===")
             logger.info(ulimit_data.decode('utf8'))
 
-        run_with_gui(exceptions)
+        run_with_gui()
 
 
 if __name__ == '__main__':
