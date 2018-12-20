@@ -31,11 +31,11 @@ class Controller:
 
         model = MainModel([], vid_limit, self.exceptions)
         if start_with_stored_videos:
-            model.db_update_videos()
+            model.update_subfeed_videos_from_db()
         else:
-            model.remote_update_videos()
+            model.update_subfeed_videos_from_remote()
 
-        model.db_update_play_view_videos()
+        model.update_playback_videos_from_db()
 
         self.logger.info(
             "Created MainModel: len(subscription_feed) = {}, vid_limit = {}".format(len(model.subfeed_videos),

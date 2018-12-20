@@ -95,9 +95,17 @@ class MainModel:
             self.yt_dir_listener = None
 
     def get_exceptions(self):
+        """
+        Defined in MainWindow.
+        :return:
+        """
         return self.exceptions
 
     def clear_exceptions(self):
+        """
+        Defined in MainWindow.
+        :return:
+        """
         self.exceptions = []
 
     def determine_video_view(self, video):
@@ -130,7 +138,7 @@ class MainModel:
 
     def hide_video_item(self, video):
         """
-        Hides a video from view.
+        Hides the video from a View.
         :param video:
         :return:
         """
@@ -169,11 +177,16 @@ class MainModel:
         match = self.determine_removed_video_view(video)
         if match:
             key, video_list = match
-            self.logger.debug("Unhiding video item: {}".format(video.title))
+            self.logger.debug("Un-hiding video item: {}".format(video.title))
             add_video(video_list, video, self.removed_videos[key][video])
             self.removed_videos[key].pop(video)
 
-    def db_update_videos(self, filtered=True):
+    def update_subfeed_videos_from_db(self, filtered=True):
+        """
+        Updates Subscription feed video list from DB.
+        :param filtered:
+        :return:
+        """
         self.logger.info("Getting newest stored videos from DB")
         # FIXME: only does filtered videos
         if filtered:
@@ -190,7 +203,14 @@ class MainModel:
         else:
             self.videos = get_newest_stored_videos(self.videos_limit, filtered)
 
-    def remote_update_videos(self, filtered=True, refresh_type=LISTENER_SIGNAL_NORMAL_REFRESH):
+    def update_subfeed_videos_from_remote(self, filtered=True, refresh_type=LISTENER_SIGNAL_NORMAL_REFRESH):
+        """
+        Updates Subscription feed video list from a remote source (likely YouTube API).
+        :param filtered: Whether to filter out certain videos based on set boolean attributes.
+        :param refresh_type: A signal determining whether it is a Normal (int(0)) or Deep (int(1)) refresh.
+                             This kwarg is not used here, but passed on to the refresh function.
+        :return:
+        """
         self.logger.info("Reloading and getting newest videos from YouTube")
 
         if filtered:
@@ -206,24 +226,39 @@ class MainModel:
             self.videos = refresh_and_get_newest_videos(self.videos_limit, filtered, self.status_bar_listener,
                                                         refresh_type=refresh_type)
 
-    def new_status_bar_progress(self, parent):
+    def update_playback_videos_from_db(self):
+        """
+        Update the PlaybackView video list from DB.
+
+        Note: There's no remote update for PlaybackView like there is for SubfeedView.
+        :return:
+        """
+        update_filter = self.config_get_filter_playback_view()
+        update_sort = self.sort_playback_view_videos()
+        self.playview_videos = get_best_playview_videos(self.playview_videos_limit, filters=update_filter,
+                                                        sort_method=update_sort)
+        self.grid_view_listener.downloadedVideosChanged.emit()
+
+    def create_progressbar_on_statusbar(self, parent):
+        """
+        Creates a QProgressBar and attaches it to the status bar.
+        :param parent:
+        :return:
+        """
         self.status_bar_progress = QProgressBar(parent=parent)
         self.status_bar_listener = ProgressBar(self, self.status_bar_progress)
         self.status_bar_thread = QThread()
         self.status_bar_thread.setObjectName('status_bar_thread')
         self.status_bar_listener.moveToThread(self.status_bar_thread)
         self.status_bar_thread.start()
+
         return self.status_bar_progress
 
-    def db_update_play_view_videos(self):
-
-        update_filter = self.config_get_filter_playback_view()
-        update_sort = self.config_get_sort_playback_view()
-        self.playview_videos = get_best_playview_videos(self.playview_videos_limit, filters=update_filter,
-                                                        sort_method=update_sort)
-        self.grid_view_listener.downloadedVideosChanged.emit()
-
     def update_thumbnails(self):
+        """
+        Updates thumbnails for downloaded and filtered videos.
+        :return:
+        """
         videos = []
         videos.extend(self.playview_videos)
         videos.extend(self.subfeed_videos)
@@ -246,7 +281,7 @@ class MainModel:
             update_filter += (~Video.discarded,)
         return update_filter
 
-    def config_get_sort_playback_view(self):
+    def sort_playback_view_videos(self):
         """
         Applies a sort-by rule to the PlaybackGridView videos list.
 

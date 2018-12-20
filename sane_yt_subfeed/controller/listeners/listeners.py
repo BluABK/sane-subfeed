@@ -101,21 +101,21 @@ class GridViewListener(QObject):
         self.model.videos_limit = self.model.videos_limit + add_value
         self.logger.info(
             "Scroll for Sub Feed reached end, updating videos limit to {}".format(self.model.videos_limit))
-        self.model.db_update_videos()
+        self.model.update_subfeed_videos_from_db()
 
     def scroll_reached_end_play(self):
         add_value = read_config("Model", "loaded_videos")
         self.model.playview_videos_limit = self.model.playview_videos_limit + add_value
         self.logger.info(
             "Scroll for Play View reached end, updating videos limit to {}".format(self.model.playview_videos_limit))
-        self.model.db_update_play_view_videos()
+        self.model.update_playback_videos_from_db()
 
     def update_from_db(self):
-        self.model.db_update_videos()
-        self.model.db_update_play_view_videos()
+        self.model.update_subfeed_videos_from_db()
+        self.model.update_playback_videos_from_db()
 
     def update_grid_view_from_db(self):
-        self.model.db_update_videos()
+        self.model.update_subfeed_videos_from_db()
 
     @pyqtSlot(VideoD)
     def tile_downloaded(self, video: VideoD):
@@ -134,7 +134,7 @@ class GridViewListener(QObject):
         UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
 
     def download_finished_in_db(self):
-        self.model.db_update_play_view_videos()
+        self.model.update_playback_videos_from_db()
 
     @pyqtSlot(VideoD)
     def tile_watched(self, video: Video):
@@ -233,10 +233,10 @@ class MainWindowListener(QObject):
         self.logger.info("Reloading subfeed")
         hide_downloaded = read_config('Gui', 'hide_downloaded')
         if hide_downloaded:
-            self.model.remote_update_videos(refresh_type=refresh_type)
+            self.model.update_subfeed_videos_from_remote(refresh_type=refresh_type)
             # self.model.grid_view_listener.hiddenVideosChanged.emit()
         else:
-            self.model.remote_update_videos(refresh_type=refresh_type)
+            self.model.update_subfeed_videos_from_remote(refresh_type=refresh_type)
             self.logger.error('NOT IMPLEMENTED: disabled hide_downloaded')
 
         # Attempt to force garbage collection to close unnecessary sockets
@@ -395,8 +395,8 @@ class YtDirListener(QObject):
 
                 self.logger.info("Updating existing record in db: {} - {}".format(vid.title, vid.__dict__))
                 db_session.commit()
-                self.model.db_update_videos()
-                self.model.db_update_play_view_videos()
+                self.model.update_subfeed_videos_from_db()
+                self.model.update_playback_videos_from_db()
             else:
                 self.logger.info("File already downloaded by this system: {} - {}".format(vid.title, vid.__dict__))
             db_session.remove()
