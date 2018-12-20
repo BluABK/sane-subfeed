@@ -136,7 +136,6 @@ class VideoTile(QWidget):
                                                                 self.video.title))
         update_plaintext_history('Downloaded:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
                                                                     self.video.title))
-        self.video.downloaded = True
         self.video.date_downloaded = datetime.datetime.utcnow()
         self.parent.main_model.grid_view_listener.tileDownloaded.emit(self.video)
         if read_config('Gui', 'enable_auto_copy_to_clipboard'):
@@ -155,7 +154,6 @@ class VideoTile(QWidget):
                                                                self.video.title))
         update_plaintext_history('Discarded:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
                                                                    self.video.title))
-        self.video.discarded = True
         self.parent.main_model.grid_view_listener.tileDiscarded.emit(self.video)
         self.status_bar.showMessage('Discarded: {} ({} - {})'.format(self.video.url_video,
                                                                      self.video.channel_title,
@@ -173,7 +171,6 @@ class VideoTile(QWidget):
                                                              self.video.title))
         update_plaintext_history('Un-discarded:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
                                                                       self.video.title))
-        self.video.discarded = True
         self.parent.main_model.grid_view_listener.tileUndiscarded.emit(self.video)
         self.status_bar.showMessage('Un-discarded: {} ({} - {})'.format(self.video.url_video,
                                                                         self.video.channel_title,
@@ -190,9 +187,7 @@ class VideoTile(QWidget):
                                                               self.video.title))
         update_plaintext_history('Watched:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
                                                                  self.video.title))
-        self.video.watched = True
         self.parent.main_model.grid_view_listener.tileWatched.emit(self.video)
-
         self.history.add(self.video, self.mark_watched, self.unmark_watched)
 
     def unmark_watched(self):
@@ -204,7 +199,6 @@ class VideoTile(QWidget):
                                                                 self.video.title))
         update_plaintext_history('Unwatched:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
                                                                    self.video.title))
-        self.video.watched = True
         self.parent.main_model.grid_view_listener.tileUnwatched.emit(self.video)
 
         self.history.add(self.video, self.unmark_watched, self.mark_watched)

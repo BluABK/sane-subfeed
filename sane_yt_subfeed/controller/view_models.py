@@ -140,18 +140,16 @@ class MainModel:
                 self.logger.warning("Failover method determined view to be '{}' for video: {}".format('subfeed',
                                                                                                       video.title))
                 self.removed_videos['subfeed'].update({video: index_subfeed})
-                return
 
             index_playview = remove_video(self.playview_videos, video)
             if index_playview:
                 self.logger.warning("Failover method determined view to be '{}' for video: {}".format('playview',
                                                                                                       video.title))
                 self.removed_videos['playview'].update({video: index_playview})
-                return
-
-            # All methods of determination has failed us
-            self.logger.critical("ALL METHODS FAILED for determining which view video belongs to: {}".format(
-                video.title))
+            else:
+                # All methods of determination has failed us
+                self.logger.critical("ALL METHODS FAILED for determining which view video belongs to: {}".format(
+                    video.title))
 
     def unhide_video_item(self, video):
         """
@@ -222,7 +220,7 @@ class MainModel:
         update_sort = self.sort_playback_view_videos()
         self.playview_videos = get_best_playview_videos(self.playview_videos_limit, filters=update_filter,
                                                         sort_method=update_sort)
-        self.grid_view_listener.downloadedVideosChanged.emit()
+        self.grid_view_listener.playbackVideosChanged.emit()
 
     def create_progressbar_on_statusbar(self, parent):
         """

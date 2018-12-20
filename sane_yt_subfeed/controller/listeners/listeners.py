@@ -33,22 +33,25 @@ logger = create_logger(__name__ + '.listeners')
 class GridViewListener(QObject):
     static_self = None
 
+    # Subfeed
+    hiddenVideosChanged = pyqtSignal()
+    hiddenVideosUpdated = pyqtSignal()
+    # Playback
+    playbackVideosChanged = pyqtSignal()
+    playbackVideosUpdated = pyqtSignal()
+    decreaseWatchPrio = pyqtSignal(VideoD)
+    increaseWatchPrio = pyqtSignal(VideoD)
+    # GridView / Shared
     tileDownloaded = pyqtSignal(VideoD)
     tileDiscarded = pyqtSignal(VideoD)
     tileUndiscarded = pyqtSignal(VideoD)
     tileWatched = pyqtSignal(VideoD)
     tileUnwatched = pyqtSignal(VideoD)
-    hiddenVideosChanged = pyqtSignal()
-    hiddenVideosUpdated = pyqtSignal()
-    downloadedVideosChanged = pyqtSignal()
-    downloadedVideosUpdated = pyqtSignal()
     updateGridViewFromDb = pyqtSignal()
     updateFromDb = pyqtSignal()
     scrollReachedEndGrid = pyqtSignal()
     scrollReachedEndPlay = pyqtSignal()
     thumbnailDownload = pyqtSignal()
-    decreaseWatchPrio = pyqtSignal(VideoD)
-    increaseWatchPrio = pyqtSignal(VideoD)
     redrawVideos = pyqtSignal(list)
 
     # FIXME: move youtube-dl listener to its own listener?
@@ -80,23 +83,45 @@ class GridViewListener(QObject):
 
     @pyqtSlot(VideoD)
     def decrease_watch_prio(self, video):
+        """
+        Decreases the priority of a video, which will put it further down the list in a sort.
+        :param video:
+        :return:
+        """
         self.logger.info("Decreasing watch prio for: {}".format(video.__dict__))
         video.watch_prio += 1
+        # Update Video in Database with the changed attributes
         UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
 
     @pyqtSlot(VideoD)
     def increase_watch_prio(self, video):
+        """
+        Increases the priority of a video, which will put it further up the list in a sort.
+        :param video:
+        :return:
+        """
         self.logger.info("Increasing watch prio for: {}".format(video.__dict__))
         video.watch_prio -= 1
+        # Update Video in Database with the changed attributes
         UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
 
     def thumbnail_download(self):
+        """
+        Updates downloaded thumbnails.
+        :return:
+        """
         self.model.update_thumbnails()
-        self.logger.info("Updating thumbnails complete")
-        self.downloadedVideosUpdated.emit()
+        self.logger.debug("Updating thumbnails complete")
+        self.playbackVideosUpdated.emit()
         self.hiddenVideosUpdated.emit()
 
     def scroll_reached_end_grid(self):
+        """
+        Reaction to SubfeedGridView scrollbar reaching the end.
+
+        If there are more videos in the list, load a videos_limit amount of them.
+        :return:
+        """
         add_value = read_config("Model", "loaded_videos")
         self.model.videos_limit = self.model.videos_limit + add_value
         self.logger.info(
@@ -104,6 +129,12 @@ class GridViewListener(QObject):
         self.model.update_subfeed_videos_from_db()
 
     def scroll_reached_end_play(self):
+        """
+        Reaction to PlaybackGridView scrollbar reaching the end.
+
+        If there are more videos in the list, load a videos_limit amount of them.
+        :return:
+        """
         add_value = read_config("Model", "loaded_videos")
         self.model.playview_videos_limit = self.model.playview_videos_limit + add_value
         self.logger.info(
@@ -111,18 +142,32 @@ class GridViewListener(QObject):
         self.model.update_playback_videos_from_db()
 
     def update_from_db(self):
+        """
+        Update Subfeed and Playback Views from DB.
+        :return:
+        """
         self.model.update_subfeed_videos_from_db()
         self.model.update_playback_videos_from_db()
 
     def update_grid_view_from_db(self):
+        """
+        Update only Subfeed View from DB.
+        :return:
+        """
         self.model.update_subfeed_videos_from_db()
 
     @pyqtSlot(VideoD)
     def tile_downloaded(self, video: VideoD):
-        self.model.hide_video_item(video)
+        """
+        Action to take if tile has been flagged as downloaded.
+        :param video:
+        :return:
+        """
         self.logger.info(
-            "Video hidden from grid view(downloading): {} - {} [{}]".format(video.channel_title, video.title,
-                                                                            video.url_video))
+            "Hide video(Downloading): {} - {} [{}]".format(video.channel_title, video.title,
+                                                           video.url_video))
+        video.downloaded = True
+        self.model.hide_video_item(video)
         self.hiddenVideosChanged.emit()
         DownloadHandler.download_video(video,
                                        youtube_dl_finished_listener=[self.downloadFinished],
@@ -130,44 +175,89 @@ class GridViewListener(QObject):
 
     @pyqtSlot(VideoD)
     def download_finished(self, video: VideoD):
+        """
+        Action to take if download has finished.
+        :param video:
+        :return:
+        """
         self.redrawVideos.emit([video])
+        # Update Video in Database with the changed attributes
         UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
 
     def download_finished_in_db(self):
+        """
+        Action to take if tile has been flagged as downloaded (DB version).
+        :return:
+        """
         self.model.update_playback_videos_from_db()
+
+    def playback_tile_update_and_redraw(self, video: Video):
+        """
+        Common operations for Playback tiles.
+        :param video:
+        :return:
+        """
+        self.playbackVideosChanged.emit()
+        # Update Video in Database with the changed attributes
+        UpdateVideo(video, update_existing=True).start()
+        # Update PlaybackGridView from database.
+        self.model.update_playback_videos_from_db()
+        # Redraw the video
+        self.redrawVideos.emit([video])
 
     @pyqtSlot(VideoD)
     def tile_watched(self, video: Video):
+        """
+        Action to take if tile has been flagged as watched.
+        :param video:
+        :return:
+        """
         self.logger.info("Mark watched: {} - {}".format(video.title, video.__dict__))
+        video.watched = True
         self.model.hide_video_item(video)
-        self.downloadedVideosChanged.emit()
-        UpdateVideo(video, update_existing=True).start()
+        self.playback_tile_update_and_redraw(video)
 
     @pyqtSlot(VideoD)
     def tile_unwatched(self, video: Video):
+        """
+        Action to take if tile has been un-flagged as watched.
+        :param video:
+        :return:
+        """
         self.logger.info("Mark unwatched: {} - {}".format(video.title, video.__dict__))
+        video.watched = False
         self.model.unhide_video_item(video)
-        self.downloadedVideosChanged.emit()
-        UpdateVideo(video, update_existing=True).start()
+        self.playbackVideosChanged.emit()
+        self.playback_tile_update_and_redraw(video)
 
     @pyqtSlot(VideoD)
     def tile_discarded(self, video: Video):
+        """
+        Action to take if tile has been flagged as dismissed.
+        :param video:
+        :return:
+        """
+        self.logger.info("Hide video (Discarded): {} - {} [{}]".format(video.channel_title, video.title,
+                                                                       video.url_video))
+        video.discarded = True
         self.model.hide_video_item(video)
-        self.logger.info("Video hidden from grid view(Discarded): {} - {} [{}]".format(video.channel_title, video.title,
-                                                                                       video.url_video))
-        self.hiddenVideosChanged.emit()
-        self.downloadedVideosChanged.emit()
-        UpdateVideo(video, update_existing=True).start()
+        self.playbackVideosChanged.emit()
+        self.playback_tile_update_and_redraw(video)
 
     @pyqtSlot(VideoD)
     def tile_undiscarded(self, video: Video):
+        """
+        Action to take if tile has been un-flagged as dismissed.
+        :param video:
+        :return:
+        """
+        self.logger.info("Un-hide video (Un-discarded): {} - {} [{}]".format(video.channel_title,
+                                                                             video.title,
+                                                                             video.url_video))
         self.model.unhide_video_item(video)
-        self.logger.info("Video unhidden from GridView(Un-discarded): {} - {} [{}]".format(video.channel_title,
-                                                                                           video.title,
-                                                                                           video.url_video))
-        self.hiddenVideosChanged.emit()
-        self.downloadedVideosChanged.emit()
-        UpdateVideo(video, update_existing=True).start()
+        video.discarded = False
+        self.playbackVideosChanged.emit()
+        self.playback_tile_update_and_redraw(video)
 
     def run(self):
         while True:
