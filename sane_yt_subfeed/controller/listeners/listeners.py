@@ -13,7 +13,7 @@ from sane_yt_subfeed import main
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.dir_handler import VidEventHandler, CheckYoutubeFolderForNew
 from sane_yt_subfeed.controller.listeners import static_listeners
-from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
+from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
@@ -171,9 +171,9 @@ class GridViewListener(QObject):
         video.downloaded = True
         self.model.hide_video_item(video)
         self.hiddenVideosChanged.emit()
-        DownloadHandler.download_video(video,
-                                       youtube_dl_finished_listener=[self.downloadFinished],
-                                       db_update_listeners=[self.downloadedVideosChangedinDB])
+        DownloadViewListener.download_video(video,
+                                            youtube_dl_finished_listener=[self.downloadFinished],
+                                            db_update_listeners=[self.downloadedVideosChangedinDB])
 
     @pyqtSlot(VideoD)
     def download_finished(self, video: VideoD):
@@ -390,9 +390,9 @@ class MainWindowListener(QObject):
         self.logger.debug("{} --> ID: {}".format(video_url, video_id))
         video_d = list_uploaded_videos_videos(load_keys(1)[0], [video_id], 50)[0]
         download_thumbnails_threaded([video_d])
-        DownloadHandler.download_video(video_d,
-                                       youtube_dl_finished_listener=[GridViewListener.static_self.downloadFinished],
-                                       db_update_listeners=[GridViewListener.static_self.downloadedVideosChangedinDB])
+        DownloadViewListener.download_video(video_d,
+                                            youtube_dl_finished_listener=[GridViewListener.static_self.downloadFinished],
+                                            db_update_listeners=[GridViewListener.static_self.downloadedVideosChangedinDB])
 
     @pyqtSlot(str)
     def add_youtube_channel_subscription_by_id(self, channel_id):

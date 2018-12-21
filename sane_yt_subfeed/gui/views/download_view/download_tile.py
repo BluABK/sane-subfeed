@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QGridLayout, QWidget, QMenu
 from datetime import datetime
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
+from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
 from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
 from sane_yt_subfeed.gui.views.download_view.download_thumbnail import DownloadThumbnailWidget
 from sane_yt_subfeed.gui.views.download_view.progress_bar import DownloadProgressBar
@@ -177,7 +177,7 @@ class DownloadTile(QWidget):
         self.failed = True
         self.download_progress_listener.threading_event.clear()
         self.progress_bar.fail()
-        DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
+        DownloadViewListener.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
 
     def determine_si_unit(self, byte_value):
         """
@@ -276,7 +276,7 @@ class DownloadTile(QWidget):
             self.logger.error("A TypeError exception occurred while combining video+audio track sizes", exc_info=te_exc)
             self.total_size_value.setText("BUG: GitHub Issue #28")
         self.progress_bar.finish()
-        DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
+        DownloadViewListener.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
 
     def delete_incomplete_entry(self):
         """
@@ -342,7 +342,7 @@ class DownloadTile(QWidget):
             percentage_downloaded = int((event["downloaded_bytes"] / self.total_bytes) * 100)
             if percentage_downloaded > self.percentage_downloaded:
                 self.percentage_downloaded = percentage_downloaded
-                DownloadHandler.static_self.updateDownloadTileEvent.emit(DDBDownloadTile(self))
+                DownloadViewListener.static_self.updateDownloadTileEvent.emit(DDBDownloadTile(self))
         else:
             if "downloaded_bytes" not in event:
                 self.logger.warning("downloaded_bytes not in: {}".format(event))

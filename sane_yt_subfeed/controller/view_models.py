@@ -5,7 +5,7 @@ from sqlalchemy.dialects import postgresql
 
 from sane_yt_subfeed.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.database_listener import DatabaseListener
-from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
+from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
 from sane_yt_subfeed.controller.listeners.listeners import GridViewListener, MainWindowListener, YtDirListener, \
     LISTENER_SIGNAL_NORMAL_REFRESH, ProgressBar
 from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, refresh_and_get_newest_videos, \
@@ -77,7 +77,7 @@ class MainModel:
         self.main_window_listener.moveToThread(self.main_w_thread)
         self.main_w_thread.start()
 
-        self.download_handler = DownloadHandler(self)
+        self.download_handler = DownloadViewListener(self)
         self.download_thread = QThread()
         self.download_thread.setObjectName('download_thread')
         self.download_handler.moveToThread(self.download_thread)
