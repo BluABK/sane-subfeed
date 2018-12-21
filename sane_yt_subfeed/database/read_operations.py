@@ -107,17 +107,17 @@ def check_for_new(videos, deep_refresh=False):
             if deep_refresh:
                 if vid_age > datetime.timedelta(hours=1):
                     vid.missed = True
-                    logger.info("Missed video: {} - {} [{}]".format(vid.channel_title, vid.title, vid.url_video))
+                    logger.info("Missed video: {}".format(vid))
                 else:
                     vid.new = True
-                    logger.info("New video: {} - {} [{}]".format(vid.channel_title, vid.title, vid.url_video))
+                    logger.info("New video: {}".format(vid))
             else:
                 if vid_age > datetime.timedelta(hours=12):
                     vid.missed = True
-                    logger.info("Missed video: {} - {} [{}]".format(vid.channel_title, vid.title, vid.url_video))
+                    logger.info("Missed video: {}".format(vid))
                 else:
                     vid.new = True
-                    logger.info("New video: {} - {} [{}]".format(vid.channel_title, vid.title, vid.url_video))
+                    logger.info("New video: {}".format(vid))
         else:
             pass
     # print(timeit.default_timer() - start_time)

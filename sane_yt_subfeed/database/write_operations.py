@@ -119,7 +119,7 @@ class UpdateVideosExtraInfoThreaded(threading.Thread):
         update_list = []
         if len(self.video_list):
             for item in self.video_list:
-                vid_info = "{} - {} [{}]".format(item.channel_title, item.title, item.url_video)
+                vid_info = "{}".format(item)
                 if item.thumbnail_path is None:
                     self.logger.warning("Video missing thumbnail for update: {}".format(vid_info))
                     self.logger.error(self.obj_attrs_to_dict(item))

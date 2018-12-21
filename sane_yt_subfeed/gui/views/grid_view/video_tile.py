@@ -123,41 +123,31 @@ class VideoTile(QWidget):
         :return:
         """
         self.clipboard.setText(self.video.url_video)
-        self.status_bar.showMessage('Copied URL to clipboard: {} ({} - {})'.format(self.video.url_video,
-                                                                                   self.video.channel_title,
-                                                                                   self.video.title))
+        self.status_bar.showMessage('Copied URL to clipboard: {}'.format(self.video))
 
     def mark_downloaded(self):
         """
         Mark the video as downloaded
         :return:
         """
-        logger.info('Mark downloaded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
-                                                                self.video.title))
-        update_plaintext_history('Downloaded:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
-                                                                    self.video.title))
+        logger.info('Mark downloaded: {:2d}: {}'.format(self.id, self.video))
+        update_plaintext_history('Downloaded: {}'.format(self.video))
         self.video.date_downloaded = datetime.datetime.utcnow()
         self.parent.main_model.grid_view_listener.tileDownloaded.emit(self.video)
         if read_config('Gui', 'enable_auto_copy_to_clipboard'):
             self.copy_url()
         if read_config('Youtube-dl', 'use_youtube_dl'):
-            self.status_bar.showMessage('Downloading video with youtube-dl: {} ({} - {})'.format(self.video.url_video,
-                                                                                                 self.video.channel_title,
-                                                                                                 self.video.title))
+            self.status_bar.showMessage('Downloading video with youtube-dl: {}'.format(self.video))
 
     def mark_discarded(self):
         """
         Mark the video as discarded
         :return:
         """
-        logger.info('Mark discarded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
-                                                               self.video.title))
-        update_plaintext_history('Discarded:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
-                                                                   self.video.title))
+        logger.info('Mark discarded: {:2d}: {}'.format(self.id, self.video))
+        update_plaintext_history('Discarded: {}'.format(self.video))
         self.parent.main_model.grid_view_listener.tileDiscarded.emit(self.video)
-        self.status_bar.showMessage('Discarded: {} ({} - {})'.format(self.video.url_video,
-                                                                     self.video.channel_title,
-                                                                     self.video.title))
+        self.status_bar.showMessage('Discarded: {}'.format(self.video))
 
         self.history.add(self.video, self.mark_discarded, self.unmark_discarded)
 
@@ -166,15 +156,10 @@ class VideoTile(QWidget):
         Mark the video as un-discarded
         :return:
         """
-        logger.info('Un-discarded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video,
-                                                             self.video.channel_title,
-                                                             self.video.title))
-        update_plaintext_history('Un-discarded:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
-                                                                      self.video.title))
+        logger.info('Un-discarded: {:2d}: {}'.format(self.id, self.video))
+        update_plaintext_history('Un-discarded: {} '.format(self.video))
         self.parent.main_model.grid_view_listener.tileUndiscarded.emit(self.video)
-        self.status_bar.showMessage('Un-discarded: {} ({} - {})'.format(self.video.url_video,
-                                                                        self.video.channel_title,
-                                                                        self.video.title))
+        self.status_bar.showMessage('Un-discarded: {}'.format(self.video))
 
         self.history.add(self.video, self.unmark_discarded, self.mark_discarded)
 
@@ -183,10 +168,8 @@ class VideoTile(QWidget):
         Mark the video as watched
         :return:
         """
-        logger.debug('Mark watched: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
-                                                              self.video.title))
-        update_plaintext_history('Watched:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
-                                                                 self.video.title))
+        logger.debug('Mark watched: {:2d}: {}'.format(self.id, self.video))
+        update_plaintext_history('Watched: {}'.format(self.video))
         self.parent.main_model.grid_view_listener.tileWatched.emit(self.video)
         self.history.add(self.video, self.mark_watched, self.unmark_watched)
 
@@ -195,10 +178,8 @@ class VideoTile(QWidget):
         Mark the video as Unwatched
         :return:
         """
-        logger.debug('Mark Unwatched: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
-                                                                self.video.title))
-        update_plaintext_history('Unwatched:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
-                                                                   self.video.title))
+        logger.debug('Mark Unwatched: {:2d}: {}'.format(self.id, self.video))
+        update_plaintext_history('Unwatched: {}'.format(self.video))
         self.parent.main_model.grid_view_listener.tileUnwatched.emit(self.video)
 
         self.history.add(self.video, self.unmark_watched, self.mark_watched)

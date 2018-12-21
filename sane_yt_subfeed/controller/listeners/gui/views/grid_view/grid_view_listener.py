@@ -152,8 +152,7 @@ class GridViewListener(QObject):
         :return:
         """
         self.logger.info(
-            "Hide video(Downloading): {} - {} [{}]".format(video.channel_title, video.title,
-                                                           video.url_video))
+            "Hide video(Downloading): {}".format(video))
         video.downloaded = True
         self.model.hide_video_item(video)
         self.hiddenVideosChanged.emit()
@@ -250,8 +249,7 @@ class GridViewListener(QObject):
         :param video:
         :return:
         """
-        self.logger.info("Hide video (Discarded): {} - {} [{}]".format(video.channel_title, video.title,
-                                                                       video.url_video))
+        self.logger.info("Hide video (Discarded): {}".format(video))
         video.discarded = True
         self.model.hide_video_item(video)
         self.playback_tile_update_and_redraw(video)
@@ -266,9 +264,7 @@ class GridViewListener(QObject):
         :param video:
         :return:
         """
-        self.logger.info("Un-hide video (Un-discarded): {} - {} [{}]".format(video.channel_title,
-                                                                             video.title,
-                                                                             video.url_video))
+        self.logger.info("Un-hide video (Un-discarded): {}".format(video))
         video.discarded = False
         self.model.unhide_video_item(video)
         self.playback_tile_update_and_redraw(video)

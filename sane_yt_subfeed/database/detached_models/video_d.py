@@ -69,6 +69,13 @@ class VideoD:
         self.search_item = search_item
         self.watched = False
 
+    def __str__(self):
+        """
+        Override __str__ to print a more sensible string.
+        :return:
+        """
+        return "{} - {} [{}]".format(self.channel_title, self.title, self.url_video)
+
     def determine_thumbnails(self, thumbnails_item):
         """
         Takes a youtube#playListItem thumbnails section and determines which qualities are available.

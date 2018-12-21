@@ -47,14 +47,11 @@ class ExtendedQLabel(QLabel):
             painter.drawPixmap(self.rect(), self.p)
 
     def mouseReleaseEvent(self, ev):
-        print('clicked {:2d}: {} {} - {}'.format(self.img_id, self.video.url_video, self.video.channel_title,
-                                                 self.video.title))
+        print('clicked {:2d}: {}'.format(self.img_id, self.video))
         self.clipboard.setText(self.video.url_video)
         self.video.downloaded = True
         UpdateVideo(self.video, update_existing=True).start()
-        self.status_bar.showMessage('Copied URL to clipboard: {} ({} - {})'.format(self.video.url_video,
-                                                                                   self.video.channel_title,
-                                                                                   self.video.title))
+        self.status_bar.showMessage('Copied URL to clipboard: {}'.format(self.video))
 
     def contextMenuEvent(self, event):
         menu = QMenu(self)

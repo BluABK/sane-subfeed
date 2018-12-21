@@ -60,6 +60,13 @@ class Video(PermanentBase):  # FIXME: PickleTypes should probably be replaced by
         self.watched = False
         self.watch_prio = read_config('Play', 'default_watch_prio')
 
+    def __str__(self):
+        """
+        Override __str__ to print a more sensible string.
+        :return:
+        """
+        return "{} - {} [{}]".format(self.channel_title, self.title, self.url_video)
+
     def determine_thumbnails(self, thumbnails_item):
         """
         Takes a youtube#playListItem thumbnails section and determines which qualities are available.
