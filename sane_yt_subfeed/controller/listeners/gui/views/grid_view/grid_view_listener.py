@@ -8,9 +8,10 @@ from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideo
 from sane_yt_subfeed.log_handler import create_logger
-
-from sane_yt_subfeed.controller.listeners import static_listeners
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
+
+
+import sane_yt_subfeed.controller.listeners.gui.views.grid_view.static_grid_view_listener as static_grid_view_listener
 
 
 class GridViewListener(QObject):
@@ -47,7 +48,9 @@ class GridViewListener(QObject):
         self.model = model
         self.logger = create_logger(__name__ + '.GridViewListener')
         GridViewListener.static_self = self
-        static_listeners.STATIC_GRID_VIEW_LISTENER = self
+
+        # Assign myself to the static listener in order to communicate with DownloadView.
+        static_grid_view_listener.STATIC_GRID_VIEW_LISTENER = self
 
         self.tileDownloaded.connect(self.tile_downloaded)
         self.tileWatched.connect(self.tile_watched)

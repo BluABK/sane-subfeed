@@ -7,7 +7,7 @@ from sqlalchemy import false
 
 from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.controller.listeners import static_listeners
+import sane_yt_subfeed.controller.listeners.gui.views.grid_view.static_grid_view_listener as static_grid_view_listener
 from sane_yt_subfeed.database.db_download_tile import DBDownloadTile
 from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
 from sane_yt_subfeed.database.orm import db_session
@@ -86,7 +86,7 @@ class DownloadViewListener(QObject):
         db_result = db_session.query(DBDownloadTile).filter(DBDownloadTile.cleared == false()).all()
         detached_db_result = DDBDownloadTile.list_detach(db_result)
         use_youtube_dl = read_config('Youtube-dl', 'use_youtube_dl')
-        download_finished_signals = [static_listeners.STATIC_GRID_VIEW_LISTENER.downloadFinished]
+        download_finished_signals = [static_grid_view_listener.STATIC_GRID_VIEW_LISTENER.downloadFinished]
         for tile in detached_db_result:
             if use_youtube_dl and not tile.finished:
                 self.logger.info("Starting paused in progress download for: {}".format(tile.video.__dict__))
@@ -105,7 +105,7 @@ class DownloadViewListener(QObject):
                     finished_listeners=db_update_listeners).start()
         if use_youtube_dl:
             download_progress_signal = DownloadViewListener.download_using_youtube_dl(video, youtube_dl_finished_listener)
-            DownloadViewListener.static_self.newYTDLDownlaod.emit(download_progress_signal)
+            DownloadViewListener.static_self.newYTDLDownload.emit(download_progress_signal)
 
     @staticmethod
     def download_using_youtube_dl(video, youtube_dl_finished_listener=None, wait=False):

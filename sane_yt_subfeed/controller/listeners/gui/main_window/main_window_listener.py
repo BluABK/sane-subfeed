@@ -6,7 +6,7 @@ from PyQt5.QtCore import *
 from sane_yt_subfeed import main
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
-from sane_yt_subfeed.controller.listeners.gui.views.grid_view.grid_view_listenter import GridViewListener
+from sane_yt_subfeed.controller.listeners.gui.views.grid_view.grid_view_listener import GridViewListener
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
 from sane_yt_subfeed.youtube.update_videos import load_keys

@@ -5,9 +5,12 @@ from sqlalchemy.dialects import postgresql
 
 from sane_yt_subfeed.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.database.database_listener import DatabaseListener
+from sane_yt_subfeed.controller.listeners.gui.main_window.main_window_listener import MainWindowListener
+from sane_yt_subfeed.controller.listeners.gui.progress_bar.progress_bar_listener import ProgressBarListener
 from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
-from sane_yt_subfeed.controller.listeners.listeners import GridViewListener, MainWindowListener, YoutubeDirListener, \
-    LISTENER_SIGNAL_NORMAL_REFRESH, ProgressBarListener
+from sane_yt_subfeed.controller.listeners.gui.views.grid_view.grid_view_listener import GridViewListener
+from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH
+from sane_yt_subfeed.controller.listeners.youtube_dir_listener.youtube_dir_listener import YoutubeDirListener
 from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, refresh_and_get_newest_videos, \
     get_best_playview_videos
 from sane_yt_subfeed.database.video import Video
