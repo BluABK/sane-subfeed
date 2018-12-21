@@ -1,6 +1,6 @@
 import threading
 
-from sane_yt_subfeed.controller.listeners.database_listener import DatabaseListener
+from sane_yt_subfeed.controller.listeners.database.database_listener import DatabaseListener
 from sane_yt_subfeed.database.db_download_tile import DBDownloadTile
 from sane_yt_subfeed.database.engine_statements import update_video_statement_full, get_video_by_vidd_stmt, insert_item, \
     get_video_ids_by_video_ids_stmt, update_extra_information_stmt, update_video_stmt, update_channel_from_remote

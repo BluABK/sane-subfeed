@@ -3,7 +3,7 @@ import threading
 from sqlalchemy import desc, asc
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.controller.listeners.database_listener import DatabaseListener
+from sane_yt_subfeed.controller.listeners.database.database_listener import DatabaseListener
 from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NORMAL_REFRESH, \
     LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.database.engine_statements import get_video_by_vidd_stmt, get_video_by_id_stmt

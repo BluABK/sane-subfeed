@@ -4,7 +4,7 @@ from sqlalchemy import asc, desc, false, or_
 from sqlalchemy.dialects import postgresql
 
 from sane_yt_subfeed.config_handler import read_config, set_config
-from sane_yt_subfeed.controller.listeners.database_listener import DatabaseListener
+from sane_yt_subfeed.controller.listeners.database.database_listener import DatabaseListener
 from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
 from sane_yt_subfeed.controller.listeners.listeners import GridViewListener, MainWindowListener, YtDirListener, \
     LISTENER_SIGNAL_NORMAL_REFRESH, ProgressBar
