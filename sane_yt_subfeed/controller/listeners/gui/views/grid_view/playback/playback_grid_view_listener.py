@@ -6,7 +6,7 @@ from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.write_operations import UpdateVideo
 import sane_yt_subfeed.controller.listeners.gui.views.grid_view.static_grid_view_listener as static_grid_view_listener
-from sane_yt_subfeed.controller.static_controller_vars import PLAYBACK_VIEW_ID
+from sane_yt_subfeed.controller.static_controller_vars import PLAYBACK_VIEW_ID, SUBFEED_VIEW_ID
 
 
 class PlaybackGridViewListener(GridViewListener):
@@ -127,18 +127,17 @@ class PlaybackGridViewListener(GridViewListener):
         self.logger.info(
             "Hide video(Downloading): {}".format(video))
         video.downloaded = True
-        self.model.hide_video_item(video, self.widget_id)
-        # Update Subfeed to remove video from list
+        # Hide downloaded/ing video from *Subfeed*
+        self.model.hide_video_item(video, SUBFEED_VIEW_ID)
+        # Update Playback View to add video to its list
         self.videosChanged.emit()
-        # Update Playback to add video to list
-        self.model.playback_grid_view_listener.videos_changed()
         DownloadViewListener.download_video(video, youtube_dl_finished_listener=[self.downloadFinished],
                                             db_update_listeners=[self.downloadedVideosChangedinDB])
 
     @pyqtSlot(VideoD)
     def download_finished(self, video: VideoD):
         """
-        Action to take if download has finished.
+        Action to take when download has finished.
         :param video:
         :return:
         """
