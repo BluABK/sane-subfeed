@@ -20,6 +20,7 @@ class GridViewListener(QObject):
         """
         super().__init__()
         self.model = model
+        self.widget_id = None
         self.name = 'GridViewListener'
         self.logger = create_logger(__name__ + '.' + self.name)
         self.videos_limit = model.videos_limit
@@ -98,6 +99,7 @@ class GridViewListener(QObject):
         self.videos_changed()
         # Update Video in Database with the changed attributes
         UpdateVideo(video, update_existing=True).start()
+        # FIXME: Commenting the following makes redraw issue vanish, but fails if you show dismissed/watched
         # Update a GridView from database.
         #self.update_from_db()
         # Redraw the video
@@ -116,7 +118,7 @@ class GridViewListener(QObject):
         """
         self.logger.info("Mark watched: {} - {}".format(video.title, video.__dict__))
         video.watched = True
-        self.model.hide_video_item(video)
+        self.model.hide_video_item(video, self.widget_id)
         self.update_and_redraw_tiles(video)
 
     @pyqtSlot(VideoD)
@@ -130,7 +132,7 @@ class GridViewListener(QObject):
         """
         self.logger.info("Mark unwatched: {} - {}".format(video.title, video.__dict__))
         video.watched = False
-        self.model.unhide_video_item(video)
+        self.model.unhide_video_item(video, self.widget_id)
         self.update_and_redraw_tiles(video)
 
     @pyqtSlot(VideoD)
@@ -144,7 +146,7 @@ class GridViewListener(QObject):
         """
         self.logger.info("Hide video (Discarded): {}".format(video))
         video.discarded = True
-        self.model.hide_video_item(video)
+        self.model.hide_video_item(video, self.widget_id)
         self.update_and_redraw_tiles(video)
 
     @pyqtSlot(VideoD)
@@ -158,6 +160,6 @@ class GridViewListener(QObject):
         """
         self.logger.info("Un-hide video (Un-discarded): {}".format(video))
         video.discarded = False
-        self.model.unhide_video_item(video)
+        self.model.unhide_video_item(video, self.widget_id)
         self.update_and_redraw_tiles(video)
 

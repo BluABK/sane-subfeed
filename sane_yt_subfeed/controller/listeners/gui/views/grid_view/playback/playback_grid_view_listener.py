@@ -6,6 +6,7 @@ from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.database.write_operations import UpdateVideo
 import sane_yt_subfeed.controller.listeners.gui.views.grid_view.static_grid_view_listener as static_grid_view_listener
+from sane_yt_subfeed.controller.static_controller_vars import PLAYBACK_VIEW_ID
 
 
 class PlaybackGridViewListener(GridViewListener):
@@ -35,6 +36,7 @@ class PlaybackGridViewListener(GridViewListener):
     def __init__(self, model):
         super().__init__(model)
         self.model = model
+        self.widget_id = PLAYBACK_VIEW_ID
         self.name = 'PlaybackGridViewListener'
         self.logger = create_logger(__name__ + '.' + self.name)
         self.videos_limit = model.playview_videos_limit
@@ -119,15 +121,13 @@ class PlaybackGridViewListener(GridViewListener):
     def tile_downloaded(self, video: VideoD):
         """
         Action to take if tile has been flagged as downloaded.
-
-        Called by Views: Subfeed
         :param video:
         :return:
         """
         self.logger.info(
             "Hide video(Downloading): {}".format(video))
         video.downloaded = True
-        self.model.hide_video_item(video)
+        self.model.hide_video_item(video, self.widget_id)
         # Update Subfeed to remove video from list
         self.videosChanged.emit()
         # Update Playback to add video to list

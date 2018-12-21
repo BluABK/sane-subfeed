@@ -4,10 +4,10 @@ from sane_yt_subfeed import create_logger
 # from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view/_listener import DownloadViewListener
 from sane_yt_subfeed.controller.listeners.gui.views.grid_view.grid_view_listener import GridViewListener
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
+from sane_yt_subfeed.controller.static_controller_vars import SUBFEED_VIEW_ID
 
 
 class SubfeedGridViewListener(GridViewListener):
-
     # Declare listeners
     redrawVideos = pyqtSignal(list)  # Defined in grid_view.py
     tileDiscarded = pyqtSignal(VideoD)
@@ -23,6 +23,7 @@ class SubfeedGridViewListener(GridViewListener):
     def __init__(self, model):
         super().__init__(model)
         self.model = model
+        self.widget_id = SUBFEED_VIEW_ID
         self.name = 'SubfeedGridViewListener'
         self.logger = create_logger(__name__ + '.' + self.name)
         self.videos_limit = model.videos_limit

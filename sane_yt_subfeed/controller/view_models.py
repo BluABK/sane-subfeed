@@ -8,12 +8,12 @@ from sane_yt_subfeed.controller.listeners.database.database_listener import Data
 from sane_yt_subfeed.controller.listeners.gui.main_window.main_window_listener import MainWindowListener
 from sane_yt_subfeed.controller.listeners.gui.progress_bar.progress_bar_listener import ProgressBarListener
 from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
-from sane_yt_subfeed.controller.listeners.gui.views.grid_view.grid_view_listener import GridViewListener
 from sane_yt_subfeed.controller.listeners.gui.views.grid_view.playback.playback_grid_view_listener import \
     PlaybackGridViewListener
 from sane_yt_subfeed.controller.listeners.gui.views.grid_view.subfeed.subfeed_grid_view_listener import \
     SubfeedGridViewListener
 from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH
+from sane_yt_subfeed.controller.static_controller_vars import PLAYBACK_VIEW_ID, SUBFEED_VIEW_ID
 from sane_yt_subfeed.controller.listeners.youtube_dir_listener.youtube_dir_listener import YoutubeDirListener
 from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, refresh_and_get_newest_videos, \
     get_best_playview_videos
@@ -23,29 +23,29 @@ from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
 
 
-def remove_video(test_list, video):
+def remove_video(videos_list, video):
     """
     Removes a video from list and returns the index it had
-    :param test_list:
+    :param videos_list:
     :param video:
     :return:
     """
-    for vid in test_list:
+    for vid in videos_list:
         if vid.video_id == video.video_id:
-            index = test_list.index(vid)
-            test_list.remove(vid)
+            index = videos_list.index(vid)
+            videos_list.remove(vid)
             return index
 
 
-def add_video(test_list, video, index):
+def add_video(videos_list, video, index):
     """
     Inserts a video into list at the given index
-    :param test_list:
+    :param videos_list:
     :param video:
     :param index:
     :return:
     """
-    test_list.insert(index, video)
+    videos_list.insert(index, video)
 
 
 class MainModel:
@@ -60,17 +60,13 @@ class MainModel:
         self.playview_videos_limit = videos_limit
         self.videos = videos
         self.subfeed_videos = []
+        self.subfeed_videos_removed = {}
         self.playview_videos = []
-        self.removed_videos = {'subfeed': {}, 'playview': {}}
+        self.playview_videos_removed = {}
 
         self.download_progress_signals = []
 
         self.logger.info("Creating listeners and threads")
-        # self.grid_view_listener = GridViewListener(self)
-        # self.grid_thread = QThread()
-        # self.grid_thread.setObjectName('grid_thread')
-        # self.grid_view_listener.moveToThread(self.grid_thread)
-        # self.grid_thread.start()
         self.playback_grid_view_listener = PlaybackGridViewListener(self)
         self.playback_grid_thread = QThread()
         self.playback_grid_thread.setObjectName('playback_grid_thread')
@@ -110,76 +106,39 @@ class MainModel:
             self.logger.warning("No youtube file path provided, directory listener is disabled")
             self.yt_dir_listener = None
 
-    def determine_video_view(self, video):
-        """
-        Figures out which view/feed list the video belongs in.
-        :param video:
-        :return: list(key, the corresponding list the video belongs in).
-        """
-        if video in self.subfeed_videos:
-            return ['subfeed', self.subfeed_videos]
-        elif video in self.playview_videos:
-            return ['playview', self.playview_videos]
-        else:
-            self.logger.error("Unable to determine which view video belongs to: {}".format(video.title))
-            return None
-
-    def determine_removed_video_view(self, video):
-        """
-        Figures out which view/feed list the removed video belongs in.
-        :param video:
-        :return: list(key, the corresponding list the video belongs in).
-        """
-        if video in self.removed_videos['subfeed']:
-            return ['subfeed', self.subfeed_videos]
-        elif video in self.removed_videos['playview']:
-            return ['playview', self.playview_videos]
-        else:
-            self.logger.error("Unable to determine which view removed video belongs to: {}".format(video.title))
-            return None
-
-    def hide_video_item(self, video):
+    def hide_video_item(self, video, widget_id):
         """
         Hides the video from a View.
+        :param widget_id: Identifier for which View called this function.
         :param video:
         :return:
         """
-        match = self.determine_video_view(video)
-        if match:
-            key, video_list = match
-            self.logger.debug("Hiding video item: {}".format(video.title))
-            self.removed_videos[key].update({video: remove_video(video_list, video)})
+        if widget_id:
+            self.logger.debug("Hiding video item: {}".format(video))
+            if widget_id is SUBFEED_VIEW_ID:
+                self.subfeed_videos_removed.update({video: remove_video(self.subfeed_videos, video)})
+            elif widget_id is PLAYBACK_VIEW_ID:
+                self.playview_videos_removed.update({video: remove_video(self.playview_videos, video)})
         else:
-            # Even if we were unable to determine the view we should still remove the video (using the old method)
-            self.logger.warning("Using failover method to determine view for video: {}".format(video.title))
-            index_subfeed = remove_video(self.subfeed_videos, video)
-            if index_subfeed:
-                self.logger.warning("Failover method determined view to be '{}' for video: {}".format('subfeed',
-                                                                                                      video.title))
-                self.removed_videos['subfeed'].update({video: index_subfeed})
+            self.logger.error("Unable to hide video item: widget_id was None!")
 
-            index_playview = remove_video(self.playview_videos, video)
-            if index_playview:
-                self.logger.warning("Failover method determined view to be '{}' for video: {}".format('playview',
-                                                                                                      video.title))
-                self.removed_videos['playview'].update({video: index_playview})
-            else:
-                # All methods of determination has failed us
-                self.logger.critical("ALL METHODS FAILED for determining which view video belongs to: {}".format(
-                    video.title))
-
-    def unhide_video_item(self, video):
+    def unhide_video_item(self, video, widget_id):
         """
         Shows a video previously hidden from view.
+        :param widget_id: Identifier for which View called this function.
         :param video:
         :return:
         """
-        match = self.determine_removed_video_view(video)
-        if match:
-            key, video_list = match
+        if widget_id:
             self.logger.debug("Un-hiding video item: {}".format(video.title))
-            add_video(video_list, video, self.removed_videos[key][video])
-            self.removed_videos[key].pop(video)
+            if widget_id is SUBFEED_VIEW_ID:
+                add_video(self.subfeed_videos, video, self.subfeed_videos_removed[video])
+                self.subfeed_videos_removed.pop(video)
+            elif widget_id is PLAYBACK_VIEW_ID:
+                add_video(self.playview_videos, video, self.playview_videos_removed[video])
+                self.playview_videos_removed.pop(video)
+        else:
+            self.logger.error("Unable to hide video item: widget_id was None!")
 
     def update_subfeed_videos_from_db(self, filtered=True):
         """
