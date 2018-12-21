@@ -64,7 +64,8 @@ class PlaybackGridViewTile(VideoTile):
         else:
             subprocess.Popen([file_path], shell=True)
 
-    def str_to_list(self, s):
+    @staticmethod
+    def str_to_list(s):
         """
         Transform a space delimited string to a list of substrings.
         Returns s as-is if False.
@@ -76,7 +77,8 @@ class PlaybackGridViewTile(VideoTile):
         else:
             return s
 
-    def str_to_list_destructive(self, s):
+    @staticmethod
+    def str_to_list_destructive(s):
         """
         Destructively transform a space delimited string to a list of substrings.
         Does nothing If string is False.
@@ -233,3 +235,43 @@ class PlaybackGridViewTile(VideoTile):
 
     def old_videos(self, vid_age):
         pass
+
+    def mark_discarded(self):
+        """
+        Mark the video as discarded (override with correct listener).
+        :return:
+        """
+        self.parent.main_model.playback_grid_view_listener.tileDiscarded.emit(self.video)
+        super().mark_discarded()
+
+    def unmark_discarded(self):
+        """
+        Mark the video as un-discarded (override with correct listener).
+        :return:
+        """
+        self.parent.main_model.playback_grid_view_listener.tileUndiscarded.emit(self.video)
+        super().unmark_discarded()
+
+    def mark_watched(self):
+        """
+        Mark the video as watched (override with correct listener).
+        :return:
+        """
+        self.parent.main_model.playback_grid_view_listener.tileWatched.emit(self.video)
+        super().mark_watched()
+
+    def unmark_watched(self):
+        """
+        Mark the video as Unwatched (override with correct listener).
+        :return:
+        """
+        self.parent.main_model.playback_grid_view_listener.tileUnwatched.emit(self.video)
+        super().unmark_watched()
+
+    def decrease_prio(self):
+        self.parent.main_model.playback_grid_view_listener.decreaseWatchPrio.emit(self.video)
+        super().decrease_prio()
+
+    def increase_prio(self):
+        self.parent.main_model.playback_grid_view_listener.increaseWatchPrio.emit(self.video)
+        super().increase_prio()

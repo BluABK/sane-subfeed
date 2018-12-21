@@ -133,7 +133,6 @@ class VideoTile(QWidget):
         logger.info('Mark downloaded: {:2d}: {}'.format(self.id, self.video))
         update_plaintext_history('Downloaded: {}'.format(self.video))
         self.video.date_downloaded = datetime.datetime.utcnow()
-        self.parent.main_model.grid_view_listener.tileDownloaded.emit(self.video)
         if read_config('Gui', 'enable_auto_copy_to_clipboard'):
             self.copy_url()
         if read_config('Youtube-dl', 'use_youtube_dl'):
@@ -146,7 +145,6 @@ class VideoTile(QWidget):
         """
         logger.info('Mark discarded: {:2d}: {}'.format(self.id, self.video))
         update_plaintext_history('Discarded: {}'.format(self.video))
-        self.parent.main_model.grid_view_listener.tileDiscarded.emit(self.video)
         self.status_bar.showMessage('Discarded: {}'.format(self.video))
 
         self.history.add(self.video, self.mark_discarded, self.unmark_discarded)
@@ -158,7 +156,6 @@ class VideoTile(QWidget):
         """
         logger.info('Un-discarded: {:2d}: {}'.format(self.id, self.video))
         update_plaintext_history('Un-discarded: {} '.format(self.video))
-        self.parent.main_model.grid_view_listener.tileUndiscarded.emit(self.video)
         self.status_bar.showMessage('Un-discarded: {}'.format(self.video))
 
         self.history.add(self.video, self.unmark_discarded, self.mark_discarded)
@@ -170,7 +167,6 @@ class VideoTile(QWidget):
         """
         logger.debug('Mark watched: {:2d}: {}'.format(self.id, self.video))
         update_plaintext_history('Watched: {}'.format(self.video))
-        self.parent.main_model.grid_view_listener.tileWatched.emit(self.video)
         self.history.add(self.video, self.mark_watched, self.unmark_watched)
 
     def unmark_watched(self):
@@ -180,7 +176,6 @@ class VideoTile(QWidget):
         """
         logger.debug('Mark Unwatched: {:2d}: {}'.format(self.id, self.video))
         update_plaintext_history('Unwatched: {}'.format(self.video))
-        self.parent.main_model.grid_view_listener.tileUnwatched.emit(self.video)
 
         self.history.add(self.video, self.unmark_watched, self.mark_watched)
 
@@ -192,9 +187,7 @@ class VideoTile(QWidget):
         self.b.insertPlainText(text + '\n')
 
     def decrease_prio(self):
-        self.parent.main_model.grid_view_listener.decreaseWatchPrio.emit(self.video)
         self.history.add(self.video, self.decrease_prio, self.increase_prio)
 
     def increase_prio(self):
-        self.parent.main_model.grid_view_listener.increaseWatchPrio.emit(self.video)
         self.history.add(self.video, self.increase_prio, self.decrease_prio)

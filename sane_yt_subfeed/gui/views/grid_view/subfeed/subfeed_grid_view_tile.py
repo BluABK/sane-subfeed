@@ -67,3 +67,43 @@ class SubfeedGridViewTile(VideoTile):
             self.logger.error("Not Implemented: Select video")
         elif QMouseEvent.button() == Qt.LeftButton:
             self.mark_downloaded()
+
+    def mark_downloaded(self):
+        """
+        Mark the video as downloaded (override with correct listener).
+        :return:
+        """
+        super().mark_downloaded()  # Set attributes for video *before* emitting
+        self.parent.main_model.subfeed_grid_view_listener.tileDownloaded.emit(self.video)
+
+    def mark_discarded(self):
+        """
+        Mark the video as discarded (override with correct listener).
+        :return:
+        """
+        self.parent.main_model.subfeed_grid_view_listener.tileDiscarded.emit(self.video)
+        super().mark_discarded()
+
+    def unmark_discarded(self):
+        """
+        Mark the video as un-discarded (override with correct listener).
+        :return:
+        """
+        self.parent.main_model.subfeed_grid_view_listener.tileUndiscarded.emit(self.video)
+        super().unmark_discarded()
+
+    def mark_watched(self):
+        """
+        Mark the video as watched (override with correct listener).
+        :return:
+        """
+        self.parent.main_model.subfeed_grid_view_listener.tileWatched.emit(self.video)
+        super().mark_watched()
+
+    def unmark_watched(self):
+        """
+        Mark the video as Unwatched (override with correct listener).
+        :return:
+        """
+        self.parent.main_model.subfeed_grid_view_listener.tileUnwatched.emit(self.video)
+        super().unmark_watched()

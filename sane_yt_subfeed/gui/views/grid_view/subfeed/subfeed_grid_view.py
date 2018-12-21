@@ -10,8 +10,9 @@ class SubfeedGridView(GridView):
         super().__init__(parent, root, main_model)
         self.logger = create_logger(__name__ + ".SubfeedGridView")
 
-        self.main_model.grid_view_listener.hiddenVideosChanged.connect(self.videos_changed)
-        self.main_model.grid_view_listener.hiddenVideosUpdated.connect(self.update_videos)
+        self.main_model.subfeed_grid_view_listener.videosChanged.connect(self.videos_changed)
+        self.main_model.subfeed_grid_view_listener.videosUpdated.connect(self.update_videos)
+        self.main_model.subfeed_grid_view_listener.redrawVideos.connect(self.redraw_videos)
 
         self.logger.debug("Init grid")
         self.update_grid()

@@ -12,8 +12,9 @@ class PlaybackGridView(GridView):
         self.root = root
         self.parent = parent
 
-        self.main_model.grid_view_listener.playbackVideosChanged.connect(self.videos_changed)
-        self.main_model.grid_view_listener.playbackVideosUpdated.connect(self.update_videos)
+        self.main_model.playback_grid_view_listener.videosChanged.connect(self.videos_changed)
+        self.main_model.playback_grid_view_listener.videosUpdated.connect(self.update_videos)
+        self.main_model.playback_grid_view_listener.redrawVideos.connect(self.redraw_videos)
 
         self.logger.debug("Init grid")
         self.update_grid()

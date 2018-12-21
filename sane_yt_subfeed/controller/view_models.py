@@ -9,6 +9,10 @@ from sane_yt_subfeed.controller.listeners.gui.main_window.main_window_listener i
 from sane_yt_subfeed.controller.listeners.gui.progress_bar.progress_bar_listener import ProgressBarListener
 from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
 from sane_yt_subfeed.controller.listeners.gui.views.grid_view.grid_view_listener import GridViewListener
+from sane_yt_subfeed.controller.listeners.gui.views.grid_view.playback.playback_grid_view_listener import \
+    PlaybackGridViewListener
+from sane_yt_subfeed.controller.listeners.gui.views.grid_view.subfeed.subfeed_grid_view_listener import \
+    SubfeedGridViewListener
 from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH
 from sane_yt_subfeed.controller.listeners.youtube_dir_listener.youtube_dir_listener import YoutubeDirListener
 from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, refresh_and_get_newest_videos, \
@@ -67,6 +71,16 @@ class MainModel:
         self.grid_thread.setObjectName('grid_thread')
         self.grid_view_listener.moveToThread(self.grid_thread)
         self.grid_thread.start()
+        self.playback_grid_view_listener = PlaybackGridViewListener(self)
+        self.playback_grid_thread = QThread()
+        self.playback_grid_thread.setObjectName('playback_grid_thread')
+        self.playback_grid_view_listener.moveToThread(self.grid_thread)
+        self.playback_grid_thread.start()
+        self.subfeed_grid_view_listener = SubfeedGridViewListener(self)
+        self.subfeed_grid_thread = QThread()
+        self.subfeed_grid_thread.setObjectName('subfeed_grid_thread')
+        self.subfeed_grid_view_listener.moveToThread(self.grid_thread)
+        self.subfeed_grid_thread.start()
 
         self.database_listener = DatabaseListener(self)
         self.db_thread = QThread()
@@ -185,7 +199,7 @@ class MainModel:
                 update_filter += (~Video.discarded,)
 
             self.subfeed_videos = get_newest_stored_videos(self.videos_limit, filters=update_filter)
-            self.grid_view_listener.hiddenVideosChanged.emit()
+            self.subfeed_grid_view_listener.videosChanged.emit()
         else:
             self.videos = get_newest_stored_videos(self.videos_limit, filtered)
 
@@ -207,7 +221,7 @@ class MainModel:
                                                                 refresh_type=refresh_type,
                                                                 filter_discarded=show_dismissed,
                                                                 filter_downloaded=show_downloaded)
-            self.grid_view_listener.hiddenVideosChanged.emit()
+            self.subfeed_grid_view_listener.videosChanged.emit()
         else:
             self.videos = refresh_and_get_newest_videos(self.videos_limit, filtered, self.status_bar_listener,
                                                         refresh_type=refresh_type)
@@ -223,7 +237,7 @@ class MainModel:
         update_sort = self.sort_playback_view_videos()
         self.playview_videos = get_best_playview_videos(self.playview_videos_limit, filters=update_filter,
                                                         sort_method=update_sort)
-        self.grid_view_listener.playbackVideosChanged.emit()
+        self.playback_grid_view_listener.videosChanged.emit()
 
     def create_progressbar_on_statusbar(self, parent):
         """

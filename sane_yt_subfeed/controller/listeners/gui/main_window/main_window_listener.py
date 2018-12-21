@@ -88,8 +88,10 @@ class MainWindowListener(QObject):
         video_d = list_uploaded_videos_videos(load_keys(1)[0], [video_id], 50)[0]
         download_thumbnails_threaded([video_d])
         DownloadViewListener.download_video(video_d,
-                                            youtube_dl_finished_listener=[GridViewListener.static_self.downloadFinished],
-                                            db_update_listeners=[GridViewListener.static_self.downloadedVideosChangedinDB])
+                                            youtube_dl_finished_listener=[
+                                                GridViewListener.static_self.downloadFinished],
+                                            db_update_listeners=[
+                                                GridViewListener.static_self.downloadedVideosChangedinDB])
 
     @pyqtSlot(str)
     def add_youtube_channel_subscription_by_id(self, channel_id):

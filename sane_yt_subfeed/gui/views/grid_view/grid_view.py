@@ -38,12 +38,12 @@ class GridView(QWidget):
         if root.bgcolor:
             self.set_bgcolor(root.bgcolor)
 
-        self.main_model.grid_view_listener.redrawVideos.connect(self.redraw_videos)
+        # self.main_model.grid_view_listener.redrawVideos.connect(self.redraw_videos)
 
     def redraw_videos(self, videos):
         for video in videos:
             if video.video_id in self.q_labels.keys():
-                self.logger.info("Redrawing video: {} - {}".format(video.title, video.__dict__))
+                self.logger.info("Redrawing video: {}".format(video))
                 self.q_labels[video.video_id].set_video(video)
 
     def videos_changed(self):

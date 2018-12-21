@@ -14,7 +14,7 @@ from subprocess import check_output
 from sane_yt_subfeed.absolute_paths import ICONS_PATH, VERSION_PATH
 from sane_yt_subfeed.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
-from sane_yt_subfeed.controller.static_controller_vars import GRID_VIEW_ID, PLAY_VIEW_ID
+from sane_yt_subfeed.controller.static_controller_vars import SUBFEED_VIEW_ID, PLAYBACK_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.gui.dialogs.sane_confirmation_dialog import SaneConfirmationDialog
 from sane_yt_subfeed.gui.dialogs.sane_input_dialog import SaneInputDialog
@@ -177,8 +177,8 @@ class MainWindow(QMainWindow):
 
         self.subfeed_grid_view = GridScrollArea(self, self.main_model)
         self.playback_grid_view = GridScrollArea(self, self.main_model)
-        self.subfeed_grid_view.set_view(SubfeedGridView(self.subfeed_grid_view, self, self.main_model), GRID_VIEW_ID)
-        self.playback_grid_view.set_view(PlaybackGridView(self.playback_grid_view, self, self.main_model), PLAY_VIEW_ID)
+        self.subfeed_grid_view.set_view(SubfeedGridView(self.subfeed_grid_view, self, self.main_model), SUBFEED_VIEW_ID)
+        self.playback_grid_view.set_view(PlaybackGridView(self.playback_grid_view, self, self.main_model), PLAYBACK_VIEW_ID)
 
         self.download_view = DownloadScrollArea(self, self.main_model)
 
@@ -284,10 +284,10 @@ class MainWindow(QMainWindow):
 
         thumb_tooltip = 'Starts a manual download of thumbnails for videos currently in play view and sub feed'
         self.add_submenu('&Function', 'Manual thumbnail download',
-                         self.main_model.grid_view_listener.thumbnailDownload.emit,
+                         self.download_thumbnails_manually,
                          tooltip=thumb_tooltip, icon='folder_refresh.png')
 
-        self.add_submenu('&Function', 'Manual DB grab', self.main_model.grid_view_listener.updateFromDb.emit,
+        self.add_submenu('&Function', 'Manual DB grab', self.update_from_db,
                          tooltip='Starts a manual grab of data for the model', icon='database.png',
                          shortcut=read_config('Global', 'manual_db_grab', custom_ini=HOTKEYS_INI,
                                               literal_eval=HOTKEYS_EVAL))
@@ -771,7 +771,7 @@ class MainWindow(QMainWindow):
         """
         toggle = read_config('PlaySort', 'ascending_date')
         set_config('PlaySort', 'ascending_date', format(not toggle))
-        self.main_model.grid_view_listener.updateFromDb.emit()
+        self.main_model.playback_grid_view_listener.updateFromDb.emit()
 
     def toggle_sort_by_channel(self):
         """
@@ -780,7 +780,7 @@ class MainWindow(QMainWindow):
         """
         toggle = read_config('PlaySort', 'by_channel')
         set_config('PlaySort', 'by_channel', format(not toggle))
-        self.main_model.grid_view_listener.updateFromDb.emit()
+        self.main_model.playback_grid_view_listener.updateFromDb.emit()
 
     def history_log(self):
         """
@@ -799,6 +799,22 @@ class MainWindow(QMainWindow):
             self.history.undo(index)
         else:
             self.history.undo()
+
+    def download_thumbnails_manually(self):
+        """
+        Starts a manual download of thumbnails for videos currently in play view and sub feed.
+        :return:
+        """
+        self.main_model.subfeed_grid_view_listener.thumbnailDownload.emit()
+        self.main_model.playback_grid_view_listener.thumbnailDownload.emit()
+
+    def update_from_db(self):
+        """
+        Starts a manual grab of data for the model.
+        :return:
+        """
+        self.main_model.subfeed_grid_view_listener.updateFromDb.emit()
+        self.main_model.playback_grid_view_listener.updateFromDb.emit()
 
     # File menu functions
 
