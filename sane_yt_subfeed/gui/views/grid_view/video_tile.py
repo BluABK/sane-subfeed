@@ -138,8 +138,9 @@ class VideoTile(QWidget):
         if read_config('Youtube-dl', 'use_youtube_dl'):
             self.status_bar.showMessage('Downloading video with youtube-dl: {}'.format(self.video))
         self.parent.main_model.playback_grid_view_listener.tileDownloaded.emit(self.video)
-        # Update Subfeed to remove the video from its list.
-        self.parent.main_model.subfeed_grid_view_listener.videosChanged.emit()
+        # Update Subfeed to remove the video from its list unless show_downloaded=True.
+        if not read_config('SubFeed', 'show_downloaded'):
+            self.parent.main_model.subfeed_grid_view_listener.videosChanged.emit()
 
     def mark_discarded(self):
         """

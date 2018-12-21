@@ -43,7 +43,7 @@ class GridViewListener(QObject):
         self.model.update_<view>_videos_from_db()
         :return:
         """
-        self.logger.critical("DUMMY FUNCTION: Override in inheritance")
+        pass
 
     def thumbnail_download(self):
         """
@@ -68,7 +68,7 @@ class GridViewListener(QObject):
         self.videosChanged.emit()
         :return:
         """
-        self.logger.critical("DUMMY FUNCTION: Override in inheritance")
+        pass
 
     def videos_updated(self):
         """
@@ -77,7 +77,7 @@ class GridViewListener(QObject):
         self.videosUpdated.emit()
         :return:
         """
-        self.logger.critical("DUMMY FUNCTION: Override in inheritance")
+        pass
 
     def redraw_videos(self, video):
         """
@@ -87,7 +87,7 @@ class GridViewListener(QObject):
         :param video:
         :return:
         """
-        self.logger.critical("DUMMY FUNCTION: Override in inheritance")
+        pass
 
     def update_and_redraw_tiles(self, video):
         """
@@ -99,13 +99,11 @@ class GridViewListener(QObject):
         self.videos_changed()
         # Update Video in Database with the changed attributes
         UpdateVideo(video, update_existing=True).start()
-        # FIXME: Commenting the following makes redraw issue vanish, but fails if you show dismissed/watched
-        # Update a GridView from database.
-        #self.update_from_db()
-        # Redraw the video
-        # self.redraw_videos(video)
-        # # FIXME: Reload GridView from DB (or dismissed tiles shows right back up)
-        # self.update_from_db()
+        if read_config('GridView', 'show_dismissed'):
+            # Update a GridView from database.
+            self.update_from_db()
+            # Redraw the video
+            self.redraw_videos(video)
 
     @pyqtSlot(VideoD)
     def tile_watched(self, video: Video):
@@ -116,9 +114,10 @@ class GridViewListener(QObject):
         :param video:
         :return:
         """
-        self.logger.info("Mark watched: {} - {}".format(video.title, video.__dict__))
         video.watched = True
-        self.model.hide_video_item(video, self.widget_id)
+        if not read_config('GridView', 'show_watched'):
+            self.logger.info("Mark watched: {} - {}".format(video.title, video.__dict__))
+            self.model.hide_video_item(video, self.widget_id)
         self.update_and_redraw_tiles(video)
 
     @pyqtSlot(VideoD)
@@ -130,9 +129,10 @@ class GridViewListener(QObject):
         :param video:
         :return:
         """
-        self.logger.info("Mark unwatched: {} - {}".format(video.title, video.__dict__))
         video.watched = False
-        self.model.unhide_video_item(video, self.widget_id)
+        if not read_config('GridView', 'show_watched'):
+            self.logger.info("Mark unwatched: {} - {}".format(video.title, video.__dict__))
+            self.model.unhide_video_item(video, self.widget_id)
         self.update_and_redraw_tiles(video)
 
     @pyqtSlot(VideoD)
@@ -144,9 +144,10 @@ class GridViewListener(QObject):
         :param video:
         :return:
         """
-        self.logger.info("Hide video (Discarded): {}".format(video))
         video.discarded = True
-        self.model.hide_video_item(video, self.widget_id)
+        if not read_config('GridView', 'show_dismissed'):
+            self.logger.info("Hide video (Discarded): {}".format(video))
+            self.model.hide_video_item(video, self.widget_id)
         self.update_and_redraw_tiles(video)
 
     @pyqtSlot(VideoD)
@@ -158,8 +159,9 @@ class GridViewListener(QObject):
         :param video:
         :return:
         """
-        self.logger.info("Un-hide video (Un-discarded): {}".format(video))
         video.discarded = False
-        self.model.unhide_video_item(video, self.widget_id)
+        if not read_config('GridView', 'show_dismissed'):
+            self.logger.info("Un-hide video (Un-discarded): {}".format(video))
+            self.model.unhide_video_item(video, self.widget_id)
         self.update_and_redraw_tiles(video)
 

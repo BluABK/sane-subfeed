@@ -1,6 +1,7 @@
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
 from sane_yt_subfeed import create_logger
+from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.listeners.gui.views.grid_view.grid_view_listener import GridViewListener
 from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
@@ -127,8 +128,11 @@ class PlaybackGridViewListener(GridViewListener):
         self.logger.info(
             "Hide video(Downloading): {}".format(video))
         video.downloaded = True
-        # Hide downloaded/ing video from *Subfeed*
-        self.model.hide_video_item(video, SUBFEED_VIEW_ID)
+        if not read_config('SubFeed', 'show_downloaded'):
+            # Hide downloaded/ing video from *Subfeed*
+            self.model.hide_video_item(video, SUBFEED_VIEW_ID)
+        else:
+            self.model.subfeed_grid_view_listener.redraw_videos(video)
         # Update Playback View to add video to its list
         self.videosChanged.emit()
         DownloadViewListener.download_video(video, youtube_dl_finished_listener=[self.downloadFinished],
