@@ -6,8 +6,8 @@ from sqlalchemy.dialects import postgresql
 from sane_yt_subfeed.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.database.database_listener import DatabaseListener
 from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
-from sane_yt_subfeed.controller.listeners.listeners import GridViewListener, MainWindowListener, YtDirListener, \
-    LISTENER_SIGNAL_NORMAL_REFRESH, ProgressBar
+from sane_yt_subfeed.controller.listeners.listeners import GridViewListener, MainWindowListener, YoutubeDirListener, \
+    LISTENER_SIGNAL_NORMAL_REFRESH, ProgressBarListener
 from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, refresh_and_get_newest_videos, \
     get_best_playview_videos
 from sane_yt_subfeed.database.video import Video
@@ -84,7 +84,7 @@ class MainModel:
         self.download_thread.start()
 
         if read_config("Play", "yt_file_path", literal_eval=False):
-            self.yt_dir_listener = YtDirListener(self)
+            self.yt_dir_listener = YoutubeDirListener(self)
             self.yt_dir_thread = QThread()
             self.yt_dir_thread.setObjectName('yt_dir_thread')
             self.yt_dir_listener.moveToThread(self.yt_dir_thread)
@@ -229,7 +229,7 @@ class MainModel:
         :return:
         """
         self.status_bar_progress = QProgressBar(parent=parent)
-        self.status_bar_listener = ProgressBar(self, self.status_bar_progress)
+        self.status_bar_listener = ProgressBarListener(self, self.status_bar_progress)
         self.status_bar_thread = QThread()
         self.status_bar_thread.setObjectName('status_bar_thread')
         self.status_bar_listener.moveToThread(self.status_bar_thread)
