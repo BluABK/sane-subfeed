@@ -68,13 +68,13 @@ class SubfeedGridViewTile(VideoTile):
         elif QMouseEvent.button() == Qt.LeftButton:
             self.mark_downloaded()
 
-    def mark_downloaded(self):
-        """
-        Mark the video as downloaded (override with correct listener).
-        :return:
-        """
-        super().mark_downloaded()  # Set attributes for video *before* emitting
-        self.parent.main_model.subfeed_grid_view_listener.tileDownloaded.emit(self.video)
+    # def mark_downloaded(self):
+    #     """
+    #     Mark the video as downloaded (override with correct listener).
+    #     :return:
+    #     """
+    #     super().mark_downloaded()  # Set attributes for video *before* emitting
+    #     self.parent.main_model.subfeed_grid_view_listener.tileDownloaded.emit(self.video)
 
     def mark_discarded(self):
         """

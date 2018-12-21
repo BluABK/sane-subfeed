@@ -7,6 +7,8 @@ from sane_yt_subfeed import main
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
 from sane_yt_subfeed.controller.listeners.gui.views.grid_view.grid_view_listener import GridViewListener
+from sane_yt_subfeed.controller.listeners.gui.views.grid_view.playback.playback_grid_view_listener import \
+    PlaybackGridViewListener
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
 from sane_yt_subfeed.youtube.update_videos import load_keys
@@ -89,9 +91,9 @@ class MainWindowListener(QObject):
         download_thumbnails_threaded([video_d])
         DownloadViewListener.download_video(video_d,
                                             youtube_dl_finished_listener=[
-                                                GridViewListener.static_self.downloadFinished],
+                                                PlaybackGridViewListener.static_self.downloadFinished],
                                             db_update_listeners=[
-                                                GridViewListener.static_self.downloadedVideosChangedinDB])
+                                                PlaybackGridViewListener.static_self.downloadedVideosChangedinDB])
 
     @pyqtSlot(str)
     def add_youtube_channel_subscription_by_id(self, channel_id):

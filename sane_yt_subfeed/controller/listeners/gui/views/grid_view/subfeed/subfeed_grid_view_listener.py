@@ -1,23 +1,24 @@
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
 from sane_yt_subfeed import create_logger
-from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
+# from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view/_listener import DownloadViewListener
 from sane_yt_subfeed.controller.listeners.gui.views.grid_view.grid_view_listener import GridViewListener
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 
 
 class SubfeedGridViewListener(GridViewListener):
 
-    # Overridden inherited listeners
+    # Declare listeners
+    redrawVideos = pyqtSignal(list)  # Defined in grid_view.py
+    tileDiscarded = pyqtSignal(VideoD)
+    tileUndiscarded = pyqtSignal(VideoD)
+    tileWatched = pyqtSignal(VideoD)
+    tileUnwatched = pyqtSignal(VideoD)
+    videosChanged = pyqtSignal()
+    videosUpdated = pyqtSignal()
     updateFromDb = pyqtSignal()
     scrollReachedEnd = pyqtSignal()
     thumbnailDownload = pyqtSignal()
-    redrawVideos = pyqtSignal(list)
-
-    # Own listeners
-    videosChanged = pyqtSignal()
-    videosUpdated = pyqtSignal()
-    tileDownloaded = pyqtSignal(VideoD)
 
     def __init__(self, model):
         super().__init__(model)
@@ -26,18 +27,13 @@ class SubfeedGridViewListener(GridViewListener):
         self.logger = create_logger(__name__ + '.' + self.name)
         self.videos_limit = model.videos_limit
 
-        # Inherited listeners
+        # Connect isteners
         self.tileWatched.connect(self.tile_watched)
         self.tileUnwatched.connect(self.tile_unwatched)
         self.tileDiscarded.connect(self.tile_discarded)
         self.tileUndiscarded.connect(self.tile_undiscarded)
-
-        # Overridden inherited listeners
         self.updateFromDb.connect(self.update_from_db)
         self.thumbnailDownload.connect(self.thumbnail_download)
-
-        # Own listeners
-        self.tileDownloaded.connect(self.tile_downloaded)
         self.scrollReachedEnd.connect(self.scroll_reached_end)
 
     def update_from_db(self):
@@ -49,19 +45,24 @@ class SubfeedGridViewListener(GridViewListener):
         """
         self.model.update_subfeed_videos_from_db()
 
-    @pyqtSlot(VideoD)
-    def tile_downloaded(self, video: VideoD):
+    def videos_changed(self):
         """
-        Action to take if tile has been flagged as downloaded.
+        Emits a signal that video list has been modified, usual response is to reload feed.
+        :return:
+        """
+        self.videosChanged.emit()
 
-        Called by Views: Subfeed
+    def videos_updated(self):
+        """
+        Emits a signal that videos in the list have been modified, usual response is to redraw videos.
+        :return:
+        """
+        self.videosUpdated.emit()
+
+    def redraw_videos(self, video: VideoD):
+        """
+        Issue a redraw of one of more video tiles.
         :param video:
         :return:
         """
-        self.logger.info(
-            "Hide video(Downloading): {}".format(video))
-        video.downloaded = True
-        self.model.hide_video_item(video)
-        DownloadViewListener.download_video(video, youtube_dl_finished_listener=[self.downloadFinished],
-                                            db_update_listeners=[self.downloadedVideosChangedinDB])
-        self.videosChanged.emit()
+        self.redrawVideos.emit([video])

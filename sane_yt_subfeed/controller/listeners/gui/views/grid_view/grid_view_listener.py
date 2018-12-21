@@ -3,48 +3,26 @@ import time
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
 from sane_yt_subfeed.config_handler import read_config
+# from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideo
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
-import sane_yt_subfeed.controller.listeners.gui.views.grid_view.static_grid_view_listener as static_grid_view_listener
+# import sane_yt_subfeed.controller.listeners.gui.views.grid_view.static_grid_view_listener as static_grid_view_listener
 
 
 class GridViewListener(QObject):
-    static_self = None
-
-    # Listeners
-    tileDiscarded = pyqtSignal(VideoD)
-    tileUndiscarded = pyqtSignal(VideoD)
-    tileWatched = pyqtSignal(VideoD)
-    tileUnwatched = pyqtSignal(VideoD)
-
-    updateFromDb = pyqtSignal()
-    scrollReachedEnd = pyqtSignal()
-    thumbnailDownload = pyqtSignal()
-
-    # Function defined in gui grid_view.py
-    redrawVideos = pyqtSignal(list)
-
-    # FIXME: move youtube-dl listener to its own listener?
-    downloadFinished = pyqtSignal(VideoD)
-    # FIXME: move to db listener?
-    downloadedVideosChangedinDB = pyqtSignal()
 
     def __init__(self, model):
+        """
+        Structure/Model for GridViewListeners to inherit.
+        :param model:
+        """
         super().__init__()
         self.model = model
         self.name = 'GridViewListener'
         self.logger = create_logger(__name__ + '.' + self.name)
         self.videos_limit = model.videos_limit
-
-        GridViewListener.static_self = self
-
-        # Assign myself to the static listener in order to communicate with DownloadView.
-        static_grid_view_listener.STATIC_GRID_VIEW_LISTENER = self
-
-        self.downloadFinished.connect(self.download_finished)
-        self.downloadedVideosChangedinDB.connect(self.download_finished_in_db)
 
     def scroll_reached_end(self):
         """
@@ -55,15 +33,15 @@ class GridViewListener(QObject):
         """
         add_value = read_config("Model", "loaded_videos")
         self.model.videos_limit = self.model.videos_limit + add_value
-        # If inherited: Add update video list from db logic here
         self.update_from_db()
 
     def update_from_db(self):
         """
         Update video list from DB.
+
+        self.model.update_<view>_videos_from_db()
         :return:
         """
-        # self.model.update_playback_videos_from_db()
         self.logger.critical("DUMMY FUNCTION: Override in inheritance")
 
     def thumbnail_download(self):
@@ -73,8 +51,7 @@ class GridViewListener(QObject):
         """
         self.model.update_thumbnails()
         self.logger.debug("Updating thumbnails complete")
-        # If inherited: Add update *VideosUpdated emitter logic here
-        self.videosUpdated.emit()
+        self.videos_updated()
 
     def download_finished_in_db(self):
         """
@@ -83,33 +60,50 @@ class GridViewListener(QObject):
         """
         self.update_from_db()
 
-    def update_and_redraw_tiles(self, video: Video):
+    def videos_changed(self):
         """
-        Common operations for Playback tiles.
+        Emits a signal that video list has been modified, usual response is to reload feed.
+
+        self.videosChanged.emit()
+        :return:
+        """
+        self.logger.critical("DUMMY FUNCTION: Override in inheritance")
+
+    def videos_updated(self):
+        """
+        Emits a signal that videos in the list have been modified, usual response is to redraw videos.
+
+        self.videosUpdated.emit()
+        :return:
+        """
+        self.logger.critical("DUMMY FUNCTION: Override in inheritance")
+
+    def redraw_videos(self, video):
+        """
+        Issue a redraw of one of more video tiles.
+
+        self.redrawVideos.emit([video])
+        :param video:
+        :return:
+        """
+        self.logger.critical("DUMMY FUNCTION: Override in inheritance")
+
+    def update_and_redraw_tiles(self, video):
+        """
+        Common operations for tiles.
         :param video:
         :return:
         """
         # Update a Grid View
-        self.videosChanged.emit()
+        self.videos_changed()
         # Update Video in Database with the changed attributes
         UpdateVideo(video, update_existing=True).start()
         # Update a GridView from database.
-        self.update_from_db()
+        #self.update_from_db()
         # Redraw the video
-        self.redrawVideos.emit([video])
-        # FIXME: Reload GridView from DB (or dismissed tiles shows right back up)
-        self.update_from_db()
-
-    @pyqtSlot(VideoD)
-    def download_finished(self, video: VideoD):
-        """
-        Action to take if download has finished.
-        :param video:
-        :return:
-        """
-        self.redrawVideos.emit([video])
-        # Update Video in Database with the changed attributes
-        UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
+        # self.redraw_videos(video)
+        # # FIXME: Reload GridView from DB (or dismissed tiles shows right back up)
+        # self.update_from_db()
 
     @pyqtSlot(VideoD)
     def tile_watched(self, video: Video):
@@ -167,6 +161,3 @@ class GridViewListener(QObject):
         self.model.unhide_video_item(video)
         self.update_and_redraw_tiles(video)
 
-    def run(self):
-        while True:
-            time.sleep(2)

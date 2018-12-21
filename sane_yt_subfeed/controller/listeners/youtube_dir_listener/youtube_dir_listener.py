@@ -85,7 +85,8 @@ class YoutubeDirListener(QObject):
                 download_thumbnails_threaded([video])
                 self.logger.info("Adding new file to db: {} - {}".format(video.title, video.__dict__))
                 UpdateVideo(video,
-                            finished_listeners=[self.model.grid_view_listener.downloadedVideosChangedinDB]).start()
+                            finished_listeners=[
+                                self.model.playback_grid_view_listener.downloadedVideosChangedinDB]).start()
             else:
                 self.logger.warning("Video with id {}, not found on youtube servers".format(vid_id))
 
@@ -93,5 +94,5 @@ class YoutubeDirListener(QObject):
     def manual_check(self):
         youtube_folder = read_config("Play", "yt_file_path", literal_eval=False)
         CheckYoutubeFolderForNew(youtube_folder,
-                                 db_listeners=[self.model.grid_view_listener.downloadedVideosChangedinDB,
-                                               self.model.grid_view_listener.updateGridViewFromDb]).start()
+                                 db_listeners=[self.model.playback_grid_view_listener.downloadedVideosChangedinDB,
+                                               self.model.playback_grid_view_listener.updateGridViewFromDb]).start()
