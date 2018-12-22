@@ -2,7 +2,7 @@ import sys
 
 import click
 import datetime
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 from subprocess import check_output
 
 from sane_yt_subfeed.config_handler import read_config
@@ -11,6 +11,7 @@ from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.main import run_with_gui, run_print, run_channels_test
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
+import sane_yt_subfeed.print_functions as print_functions
 
 exceptions = []
 exc_id = 0
@@ -22,8 +23,12 @@ LEGACY_EXCEPTION_HANDLER = False
 @click.option(u'--update-watch-prio', is_flag=True)
 @click.option(u'--set-watched-day')
 @click.option(u'--print_subscriptions', is_flag=True)
+@click.option(u'--print_downloaded_videos', is_flag=True)
+@click.option(u'--print_watched_videos', is_flag=True)
+@click.option(u'--print_discarded_videos', is_flag=True)
 @click.command()
-def cli(no_gui, test_channels, update_watch_prio, set_watched_day, print_subscriptions):
+def cli(no_gui, test_channels, update_watch_prio, set_watched_day, print_subscriptions, print_watched_videos,
+        print_discarded_videos, print_downloaded_videos):
     logger = create_logger(__name__)
     if no_gui:
         run_print()
@@ -55,6 +60,15 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day, print_subscri
                 print(("[{}]    {} [Subscription override]".format(channel.id, channel.title)))
             else:
                 print(("[{}]    {}".format(channel.id, channel.title)))
+    if print_watched_videos:
+        videos = db_session.query(Video).filter(and_(Video.watched == True, (Video.vid_path.isnot(None)))).all()
+        print_functions.print_videos(videos, path_only=True)
+    if print_discarded_videos:
+        videos = db_session.query(Video).filter(and_(Video.discarded == True, (Video.vid_path.isnot(None)))).all()
+        print_functions.print_videos(videos, path_only=True)
+    if print_downloaded_videos:
+        videos = db_session.query(Video).filter(and_(Video.downloaded == True, (Video.vid_path.isnot(None)))).all()
+        print_functions.print_videos(videos, path_only=True)
     else:
         if LEGACY_EXCEPTION_HANDLER:
             """
