@@ -207,7 +207,13 @@ class DownloadTile(QWidget):
         si_units_speed = {'B/s': 1, 'KiB/s': 1024, 'MiB/s': 1048576, 'GiB/s': 1073741824, 'TiB/s': 1099511627776,
                           'PiB/s': 1125899906842624, 'EiB/s': 1152921504606846976, 'ZiB/s': 1180591620717411303424,
                           'YiB/s': 1208925819614629174706176}
-        speed_unit = speed_str[-5:].strip()
+        if speed_str[-5:] in si_units_speed:
+            speed_unit = speed_str[-5:].strip()  # Case: All other matches.
+        elif speed_str[-3:] in si_units_speed and speed_str[-5:] not in si_units_speed:
+            speed_unit = speed_str[:-3].strip()  # Case: 'B/s'.
+        else:
+            return None  # Skip invalid matches
+
         speed = float(speed_str[:-5].strip())
 
         return speed * si_units_speed[speed_unit]
@@ -236,7 +242,18 @@ class DownloadTile(QWidget):
                     self.logger.warning("Bad input to determine_bytes('{}')".format(speed_str), exc_info=exc)
             else:
                 # Add speed in bytes to list of speeds
-                self.speeds.append(self.determine_bytes(speed_str))
+                try:
+                    speed = self.determine_bytes(speed_str)
+                    if speed:
+                        # Only add valid speeds
+                        self.speeds.append(speed)
+                    else:
+                        return
+                except KeyError as ke_exc:
+                    self.logger.exception("KeyError exception occurred in calc_avg_speed", exc_info=ke_exc)
+                    self.logger.debug(speed_str)
+
+                # Increment tick (for valid speeds)
                 self.avg_speed_calc_tick += 1
 
     def most_common_eta(self, time_str, ticks=None):
