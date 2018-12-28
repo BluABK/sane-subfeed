@@ -252,6 +252,7 @@ class DownloadTile(QWidget):
                 except KeyError as ke_exc:
                     self.logger.exception("KeyError exception occurred in calc_avg_speed", exc_info=ke_exc)
                     self.logger.debug(speed_str)
+                    return
 
                 # Increment tick (for valid speeds)
                 self.avg_speed_calc_tick += 1
