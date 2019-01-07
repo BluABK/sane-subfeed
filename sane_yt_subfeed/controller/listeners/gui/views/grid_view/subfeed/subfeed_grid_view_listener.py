@@ -28,7 +28,7 @@ class SubfeedGridViewListener(GridViewListener):
         self.logger = create_logger(__name__ + '.' + self.name)
         self.videos_limit = model.videos_limit
 
-        # Connect isteners
+        # Connect listeners
         self.tileWatched.connect(self.tile_watched)
         self.tileUnwatched.connect(self.tile_unwatched)
         self.tileDiscarded.connect(self.tile_discarded)

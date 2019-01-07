@@ -65,7 +65,19 @@ class GridView(QWidget):
             if update_grid:
                 self.update_grid()
 
+    def get_feed(self):
+        """
+        Retrieves the list of videos in a feed.
+        Override in inheritance.
+        :return:
+        """
+        pass
+
     def update_grid(self):
+        """
+        Update/Redraw the GridView feed with a list of videos.
+        :return:
+        """
         feed = self.get_feed()
         counter = 0
         video_counter = 0
@@ -78,25 +90,31 @@ class GridView(QWidget):
         for position in positions:
             if counter >= len(feed):
                 pass
+            # Add every existing video as a feed widget and remove it from the deletion list.
             elif feed[counter].video_id in self.q_labels:
-                self.grid.addWidget(self.q_labels[feed[counter].video_id], *position)
-                q_labels_keys_to_delete.discard(feed[counter].video_id)
-                # q_labels_keys_to_delete.remove(feed[counter].video_id)
+                video = feed[counter]
+                self.logger.debug3("Inserting item in grid coord [{},{}]: {}".format(*position, video))
+                self.grid.addWidget(self.q_labels[video.video_id], *position)
+                q_labels_keys_to_delete.discard(video.video_id)
                 video_counter += 1
             else:
+                # Add new video feed widgets
                 video = feed[counter]
+                self.logger.debug3("Inserting *NEW* item in grid coord [{},{}]: {}".format(*position, video))
                 lbl = self.new_tile(counter, video)
                 self.grid.addWidget(lbl, *position)
                 self.q_labels[video.video_id] = lbl
                 video_counter += 1
             counter += 1
 
+        # Delete any orphaned items remaining in the deletion list.
         for key in q_labels_keys_to_delete:
-            self.grid.removeWidget(self.q_labels[key])
-            self.q_labels[key].deleteLater()
+            orphaned_video_tile = self.q_labels[key]
+            self.logger.debug3("Deleting orphaned grid video: {}".format(orphaned_video_tile.video))
+            self.grid.removeWidget(orphaned_video_tile)
+            orphaned_video_tile.deleteLater()
             del self.q_labels[key]
-        self.logger.debug(
-            "Updated view: currently {} widgets and {} items_x".format(video_counter, self.items_x))
+        self.logger.debug("Updated view: currently {} widgets and {} items_x".format(video_counter, self.items_x))
         self.resize_event()
 
     def set_bgcolor(self, color):

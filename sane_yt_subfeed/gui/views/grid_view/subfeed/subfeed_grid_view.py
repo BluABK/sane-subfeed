@@ -9,6 +9,8 @@ class SubfeedGridView(GridView):
     def __init__(self, parent, root, main_model: MainModel):
         super().__init__(parent, root, main_model)
         self.logger = create_logger(__name__ + ".SubfeedGridView")
+        self.root = root
+        self.parent = parent
 
         self.main_model.subfeed_grid_view_listener.videosChanged.connect(self.videos_changed)
         self.main_model.subfeed_grid_view_listener.videosUpdated.connect(self.update_videos)
@@ -22,6 +24,10 @@ class SubfeedGridView(GridView):
         return SubfeedGridViewTile(self, video, counter, self.clipboard, self.status_bar)
 
     def get_feed(self):
+        """
+        Retrieve the list of videos in this feed.
+        :return:
+        """
         subscription_feed = self.main_model.subfeed_videos
         return subscription_feed
 

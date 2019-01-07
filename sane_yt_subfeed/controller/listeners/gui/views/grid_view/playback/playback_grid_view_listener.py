@@ -125,8 +125,7 @@ class PlaybackGridViewListener(GridViewListener):
         :param video:
         :return:
         """
-        self.logger.info(
-            "Hide video(Downloading): {}".format(video))
+        self.logger.info("Hide video(Downloading): {}".format(video))
         video.downloaded = True
         if not read_config('SubFeed', 'show_downloaded'):
             # Hide downloaded/ing video from *Subfeed*

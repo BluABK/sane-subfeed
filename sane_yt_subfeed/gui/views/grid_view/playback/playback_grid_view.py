@@ -20,12 +20,16 @@ class PlaybackGridView(GridView):
         self.update_grid()
         self.logger.info("Initialized PlaybackGridView")
 
-    def get_feed(self):
-        subscription_feed = self.main_model.playview_videos
-        return subscription_feed
-
     def new_tile(self, counter, video):
         return PlaybackGridViewTile(self, video, counter, self.clipboard, self.status_bar)
+
+    def get_feed(self):
+        """
+        Retrieve the list of videos in this feed.
+        :return:
+        """
+        subscription_feed = self.main_model.playview_videos
+        return subscription_feed
 
     def update_videos(self):
         for q_label, video in zip(self.q_labels.values(), self.main_model.playview_videos):
