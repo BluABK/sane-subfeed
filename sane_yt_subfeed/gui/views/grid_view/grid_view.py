@@ -109,10 +109,9 @@ class GridView(QWidget):
 
         # Delete any orphaned items remaining in the deletion list.
         for key in q_labels_keys_to_delete:
-            orphaned_video_tile = self.q_labels[key]
-            self.logger.debug3("Deleting orphaned grid video: {}".format(orphaned_video_tile.video))
-            self.grid.removeWidget(orphaned_video_tile)
-            orphaned_video_tile.deleteLater()
+            self.logger.debug3("Deleting orphaned grid video: {}".format(self.q_labels[key].video))
+            self.grid.removeWidget(self.q_labels[key])
+            self.q_labels[key].deleteLater()
             del self.q_labels[key]
         self.logger.debug("Updated view: currently {} widgets and {} items_x".format(video_counter, self.items_x))
         self.resize_event()
