@@ -92,18 +92,16 @@ class GridView(QWidget):
                 pass
             # Add every existing video as a feed widget and remove it from the deletion list.
             elif feed[counter].video_id in self.q_labels:
-                video = feed[counter]
-                self.logger.debug3("Inserting item in grid coord [{},{}]: {}".format(*position, video))
-                self.grid.addWidget(self.q_labels[video.video_id], *position)
-                q_labels_keys_to_delete.discard(video.video_id)
+                self.logger.debug3("Inserting item in grid coord [{},{}]: {}".format(*position, feed[counter]))
+                self.grid.addWidget(self.q_labels[feed[counter].video_id], *position)
+                q_labels_keys_to_delete.discard(feed[counter].video_id)
                 video_counter += 1
             else:
                 # Add new video feed widgets
-                video = feed[counter]
-                self.logger.debug3("Inserting *NEW* item in grid coord [{},{}]: {}".format(*position, video))
-                lbl = self.new_tile(counter, video)
+                self.logger.debug3("Inserting *NEW* item in grid coord [{},{}]: {}".format(*position, feed[counter]))
+                lbl = self.new_tile(counter, feed[counter])
                 self.grid.addWidget(lbl, *position)
-                self.q_labels[video.video_id] = lbl
+                self.q_labels[feed[counter].video_id] = lbl
                 video_counter += 1
             counter += 1
 
