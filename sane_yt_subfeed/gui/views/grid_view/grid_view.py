@@ -98,10 +98,11 @@ class GridView(QWidget):
                 video_counter += 1
             else:
                 # Add new video feed widgets
-                self.logger.debug3("Inserting *NEW* item in grid coord [{},{}]: {}".format(*position, feed[counter]))
-                lbl = self.new_tile(counter, feed[counter])
+                video = feed[counter]
+                self.logger.debug3("Inserting *NEW* item in grid coord [{},{}]: {}".format(*position, video))
+                lbl = self.new_tile(counter, video)
                 self.grid.addWidget(lbl, *position)
-                self.q_labels[feed[counter].video_id] = lbl
+                self.q_labels[video.video_id] = lbl
                 video_counter += 1
             counter += 1
 
