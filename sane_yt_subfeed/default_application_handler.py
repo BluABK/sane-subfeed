@@ -1,12 +1,13 @@
+import sys
+
 import os
 import subprocess
-import sys
 
 from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.config_handler import read_config
 
 OPEN_FILE_HANDLERS_LINUX = ['xdg-open', 'gnome-open']
-IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg',]
+IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', ]
 FAIL_LOG_MSG = "Unable to open default application for '{}' using '{}'"
 FAIL_ALL_LOG_MSG = "Unable to open '{}' using default applications, please specify a custom one in config"
 
@@ -14,10 +15,11 @@ logger = create_logger(__name__)
 
 
 def is_image(file_path):
-    for ext in IMAGE_EXTENSIONS: # FIXME: In future use actual MIME type detection not simply *.ext
+    for ext in IMAGE_EXTENSIONS:  # FIXME: In future use actual MIME type detection not simply *.ext
         if file_path.endswith(ext):
             return True
     return False
+
 
 # def determine_filetype(file_path):
 

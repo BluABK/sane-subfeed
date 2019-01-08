@@ -1,27 +1,51 @@
-import time
-
 from PyQt5.QtCore import QThread
-# FIXME: imp*
 from PyQt5.QtWidgets import QProgressBar
 from sqlalchemy import asc, desc, false, or_
+from sqlalchemy.dialects import postgresql
 
-from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.controller.listeners.database_listener import DatabaseListener
-from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
-from sane_yt_subfeed.controller.listeners.listeners import GridViewListener, MainWindowListener, YtDirListener, \
-    LISTENER_SIGNAL_NORMAL_REFRESH, ProgressBar
+from sane_yt_subfeed.config_handler import read_config, set_config
+from sane_yt_subfeed.controller.listeners.database.database_listener import DatabaseListener
+from sane_yt_subfeed.controller.listeners.gui.main_window.main_window_listener import MainWindowListener
+from sane_yt_subfeed.controller.listeners.gui.progress_bar.progress_bar_listener import ProgressBarListener
+from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
+from sane_yt_subfeed.controller.listeners.gui.views.grid_view.playback.playback_grid_view_listener import \
+    PlaybackGridViewListener
+from sane_yt_subfeed.controller.listeners.gui.views.grid_view.subfeed.subfeed_grid_view_listener import \
+    SubfeedGridViewListener
+from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH
+from sane_yt_subfeed.controller.static_controller_vars import PLAYBACK_VIEW_ID, SUBFEED_VIEW_ID
+from sane_yt_subfeed.controller.listeners.youtube_dir_listener.youtube_dir_listener import YoutubeDirListener
 from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, refresh_and_get_newest_videos, \
-    get_best_downloaded_videos
+    get_best_playview_videos
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
 
 
-def remove_video(test_list, video):
-    for vid in test_list:
+def remove_video(videos_list, video):
+    """
+    Removes a video from list and returns the index it had
+    :param videos_list:
+    :param video:
+    :return:
+    """
+    for vid in videos_list:
         if vid.video_id == video.video_id:
-            test_list.remove(vid)
+            index = videos_list.index(vid)
+            videos_list.remove(vid)
+            return index
+
+
+def add_video(videos_list, video, index):
+    """
+    Inserts a video into list at the given index
+    :param videos_list:
+    :param video:
+    :param index:
+    :return:
+    """
+    videos_list.insert(index, video)
 
 
 class MainModel:
@@ -29,24 +53,30 @@ class MainModel:
     status_bar_thread = None
     status_bar_listener = None
 
-    def __init__(self, videos, videos_limit, exceptions):
+    def __init__(self, videos, videos_limit):
         super().__init__()
         self.logger = create_logger(__name__)
-        self.exceptions = exceptions
         self.videos_limit = videos_limit
-        self.downloaded_videos_limit = videos_limit
+        self.playview_videos_limit = videos_limit
         self.videos = videos
-        self.filtered_videos = []
-        self.downloaded_videos = []
+        self.subfeed_videos = []
+        self.subfeed_videos_removed = {}
+        self.playview_videos = []
+        self.playview_videos_removed = {}
 
         self.download_progress_signals = []
 
         self.logger.info("Creating listeners and threads")
-        self.grid_view_listener = GridViewListener(self)
-        self.grid_thread = QThread()
-        self.grid_thread.setObjectName('grid_thread')
-        self.grid_view_listener.moveToThread(self.grid_thread)
-        self.grid_thread.start()
+        self.playback_grid_view_listener = PlaybackGridViewListener(self)
+        self.playback_grid_thread = QThread()
+        self.playback_grid_thread.setObjectName('playback_grid_thread')
+        self.playback_grid_view_listener.moveToThread(self.playback_grid_thread)
+        self.playback_grid_thread.start()
+        self.subfeed_grid_view_listener = SubfeedGridViewListener(self)
+        self.subfeed_grid_thread = QThread()
+        self.subfeed_grid_thread.setObjectName('subfeed_grid_thread')
+        self.subfeed_grid_view_listener.moveToThread(self.subfeed_grid_thread)
+        self.subfeed_grid_thread.start()
 
         self.database_listener = DatabaseListener(self)
         self.db_thread = QThread()
@@ -60,14 +90,14 @@ class MainModel:
         self.main_window_listener.moveToThread(self.main_w_thread)
         self.main_w_thread.start()
 
-        self.download_handler = DownloadHandler(self)
+        self.download_handler = DownloadViewListener(self)
         self.download_thread = QThread()
         self.download_thread.setObjectName('download_thread')
         self.download_handler.moveToThread(self.download_thread)
         self.download_thread.start()
 
         if read_config("Play", "yt_file_path", literal_eval=False):
-            self.yt_dir_listener = YtDirListener(self)
+            self.yt_dir_listener = YoutubeDirListener(self)
             self.yt_dir_thread = QThread()
             self.yt_dir_thread.setObjectName('yt_dir_thread')
             self.yt_dir_listener.moveToThread(self.yt_dir_thread)
@@ -76,21 +106,46 @@ class MainModel:
             self.logger.warning("No youtube file path provided, directory listener is disabled")
             self.yt_dir_listener = None
 
-    def get_exceptions(self):
-        return self.exceptions
+    def hide_video_item(self, video, widget_id):
+        """
+        Hides the video from a View.
+        :param widget_id: Identifier for which View called this function.
+        :param video:
+        :return:
+        """
+        if widget_id:
+            self.logger.debug("Hiding video item: {}".format(video))
+            if widget_id is SUBFEED_VIEW_ID:
+                self.subfeed_videos_removed.update({video: remove_video(self.subfeed_videos, video)})
+            elif widget_id is PLAYBACK_VIEW_ID:
+                self.playview_videos_removed.update({video: remove_video(self.playview_videos, video)})
+        else:
+            self.logger.error("Unable to hide video item: widget_id was None!")
 
-    def clear_exceptions(self):
-        self.exceptions = []
+    def unhide_video_item(self, video, widget_id):
+        """
+        Shows a video previously hidden from view.
+        :param widget_id: Identifier for which View called this function.
+        :param video:
+        :return:
+        """
+        if widget_id:
+            self.logger.debug("Un-hiding video item: {}".format(video.title))
+            if widget_id is SUBFEED_VIEW_ID:
+                add_video(self.subfeed_videos, video, self.subfeed_videos_removed[video])
+                self.subfeed_videos_removed.pop(video)
+            elif widget_id is PLAYBACK_VIEW_ID:
+                add_video(self.playview_videos, video, self.playview_videos_removed[video])
+                self.playview_videos_removed.pop(video)
+        else:
+            self.logger.error("Unable to hide video item: widget_id was None!")
 
-    def hide_video_item(self, video):
-        self.logger.debug("Hiding video item: {}".format(video))
-        remove_video(self.filtered_videos, video)
-        remove_video(self.downloaded_videos, video)
-
-    def hide_downloaded_video_item(self, video):
-        remove_video(self.downloaded_videos, video)
-
-    def db_update_videos(self, filtered=True):
+    def update_subfeed_videos_from_db(self, filtered=True):
+        """
+        Updates Subscription feed video list from DB.
+        :param filtered:
+        :return:
+        """
         self.logger.info("Getting newest stored videos from DB")
         # FIXME: only does filtered videos
         if filtered:
@@ -102,53 +157,80 @@ class MainModel:
             if not show_dismissed:
                 update_filter += (~Video.discarded,)
 
-            self.filtered_videos = get_newest_stored_videos(self.videos_limit, filters=update_filter)
-            self.grid_view_listener.hiddenVideosChanged.emit()
+            self.subfeed_videos = get_newest_stored_videos(self.videos_limit, filters=update_filter)
+            self.subfeed_grid_view_listener.videosChanged.emit()
         else:
             self.videos = get_newest_stored_videos(self.videos_limit, filtered)
 
-    def remote_update_videos(self, filtered=True, refresh_type=LISTENER_SIGNAL_NORMAL_REFRESH):
+    def update_subfeed_videos_from_remote(self, filtered=True, refresh_type=LISTENER_SIGNAL_NORMAL_REFRESH):
+        """
+        Updates Subscription feed video list from a remote source (likely YouTube API).
+        :param filtered: Whether to filter out certain videos based on set boolean attributes.
+        :param refresh_type: A signal determining whether it is a Normal (int(0)) or Deep (int(1)) refresh.
+                             This kwarg is not used here, but passed on to the refresh function.
+        :return:
+        """
         self.logger.info("Reloading and getting newest videos from YouTube")
 
         if filtered:
             show_downloaded = not read_config('SubFeed', 'show_downloaded')
             show_dismissed = not read_config('GridView', 'show_dismissed')
-            self.filtered_videos = refresh_and_get_newest_videos(self.videos_limit,
-                                                                 progress_listener=self.status_bar_listener,
-                                                                 refresh_type=refresh_type,
-                                                                 filter_discarded=show_dismissed,
-                                                                 filter_downloaded=show_downloaded)
-            self.grid_view_listener.hiddenVideosChanged.emit()
+            self.subfeed_videos = refresh_and_get_newest_videos(self.videos_limit,
+                                                                progress_listener=self.status_bar_listener,
+                                                                refresh_type=refresh_type,
+                                                                filter_discarded=show_dismissed,
+                                                                filter_downloaded=show_downloaded)
+            self.subfeed_grid_view_listener.videosChanged.emit()
         else:
             self.videos = refresh_and_get_newest_videos(self.videos_limit, filtered, self.status_bar_listener,
                                                         refresh_type=refresh_type)
 
-    def new_status_bar_progress(self, parent):
+    def update_playback_videos_from_db(self):
+        """
+        Update the PlaybackView video list from DB.
+
+        Note: There's no remote update for PlaybackView like there is for SubfeedView.
+        :return:
+        """
+        update_filter = self.filter_playback_view_videos()
+        update_sort = self.sort_playback_view_videos()
+        self.playview_videos = get_best_playview_videos(self.playview_videos_limit, filters=update_filter,
+                                                        sort_method=update_sort)
+        self.playback_grid_view_listener.videosChanged.emit()
+
+    def create_progressbar_on_statusbar(self, parent):
+        """
+        Creates a QProgressBar and attaches it to the status bar.
+        :param parent:
+        :return:
+        """
         self.status_bar_progress = QProgressBar(parent=parent)
-        self.status_bar_listener = ProgressBar(self, self.status_bar_progress)
+        self.status_bar_listener = ProgressBarListener(self, self.status_bar_progress)
         self.status_bar_thread = QThread()
         self.status_bar_thread.setObjectName('status_bar_thread')
         self.status_bar_listener.moveToThread(self.status_bar_thread)
         self.status_bar_thread.start()
+
         return self.status_bar_progress
 
-    def db_update_downloaded_videos(self):
-
-        update_filter = self.config_get_filter_downloaded()
-        update_sort = self.config_get_sort_downloaded()
-        self.downloaded_videos = get_best_downloaded_videos(self.downloaded_videos_limit, filters=update_filter,
-                                                            sort_method=update_sort)
-        self.grid_view_listener.downloadedVideosChanged.emit()
-
     def update_thumbnails(self):
+        """
+        Updates thumbnails for downloaded and filtered videos.
+        :return:
+        """
         videos = []
-        videos.extend(self.downloaded_videos)
-        videos.extend(self.filtered_videos)
+        videos.extend(self.playview_videos)
+        videos.extend(self.subfeed_videos)
         self.logger.info("Updating thumbnails for downloaded and filtered videos")
         download_thumbnails_threaded(videos)
         UpdateVideosThread(videos, update_existing=True).start()
 
-    def config_get_filter_downloaded(self):
+    @staticmethod
+    def filter_playback_view_videos():
+        """
+        Applies filters to the PlaybackGridView Videos list based on config.
+        :return:
+        """
         show_watched = read_config('GridView', 'show_watched')
         show_dismissed = read_config('GridView', 'show_dismissed')
         update_filter = (Video.downloaded,)
@@ -158,12 +240,40 @@ class MainModel:
             update_filter += (~Video.discarded,)
         return update_filter
 
-    def config_get_sort_downloaded(self):
-        ascending_date = read_config('PlaySort', 'ascending_date')
+    def sort_playback_view_videos(self):
+        """
+        Applies a sort-by rule to the PlaybackGridView videos list.
+
+        update_sort is a tuple of priority sort categories, first element is highest, last is lowest.
+        update_sort += operations requires at least two items on rhs.
+        :return:
+        """
+        sort_by_ascending_date = read_config('PlaySort', 'ascending_date')
+        sort_by_channel = read_config('PlaySort', 'by_channel')
+        self.logger.info("Sorting PlaybackGridView Videos: date = {} | channel = {}".format(sort_by_ascending_date,
+                                                                                            sort_by_channel))
         update_sort = (asc(Video.watch_prio),)
-        if ascending_date:
+        # Sort-by ascending date
+        if sort_by_ascending_date:
             update_sort += (asc(Video.date_downloaded), asc(Video.date_published))
+        # Sort-by channel name (implied by default: then descending date)
+        if sort_by_channel:
+            update_sort += (desc(Video.channel_title),)
+        # Sort-by channel name then ascending date  # FIXME: Implement handling both sorts toggled
+        if sort_by_channel and sort_by_ascending_date:
+            # update_sort += (asc(Video.channel_title),)
+            self.logger.debug5("By-Channel|By-date update_sort: {}".format(str(update_sort)))
+            for t in update_sort:
+                self.logger.debug5(t.compile(dialect=postgresql.dialect()))
+
+            # FIXME: workaround for not handling both: disable channel sort if both toggled, and run date sort
+            set_config('PlaySort', 'by_channel', format(not read_config('PlaySort', 'by_channel')))
+            sort_by_channel = read_config('PlaySort', 'by_channel')
+            update_sort += (asc(Video.date_downloaded), asc(Video.date_published))
+        # DEFAULT: Sort-by descending date
         else:
             update_sort += (desc(Video.date_downloaded), desc(Video.date_published))
-        return update_sort
 
+        self.logger.info("Sorted PlaybackGridView Videos: date = {} | channel = {}".format(sort_by_ascending_date,
+                                                                                           sort_by_channel))
+        return update_sort

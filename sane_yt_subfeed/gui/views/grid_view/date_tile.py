@@ -9,7 +9,7 @@ class DateTile(QLabel):
         self.parent = parent
 
         margins = self.parent.layout.getContentsMargins()
-        self.setFixedSize(self.parent.width()-margins[0]-margins[2], (self.parent.height()-4*margins[3]) * 0.07)
+        self.setFixedSize(self.parent.width() - margins[0] - margins[2], (self.parent.height() - 4 * margins[3]) * 0.07)
 
         t_font = self.font()
         t_font.setStyleHint(QFont.Helvetica)

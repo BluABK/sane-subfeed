@@ -12,6 +12,7 @@ manual_thumb_dl =
 manual_db_grab = Ctrl+E
 download_video_by_url = Ctrl+O
 show_usage_history = Ctrl+H
+history_undo_action = Ctrl+Z
 
 [View]
 subfeed = Ctrl+1
@@ -30,3 +31,4 @@ prio_decrease = MidButton, Ctrl+LeftButton
 mark_watched = Alt+LeftButton
 play = MouseLeftButton
 ascending_sort_toggle = Ctrl+A
+by_channel_sort_toggle = Ctrl+B

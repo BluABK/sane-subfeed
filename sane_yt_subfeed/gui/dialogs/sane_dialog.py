@@ -17,4 +17,3 @@ class SaneDialog(QDialog):  # FIXME: FUTURE: Was meant to be inherited, but migh
         self.setWindowTitle(self.title)
         self.text = QLabel(text, self)
         self.alignment = alignment
-

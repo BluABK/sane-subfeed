@@ -1,9 +1,8 @@
 # std libs
 import os
-
+from PyQt5.QtGui import QPixmap, QPainter
 # PyQt5 libs
 from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout
-from PyQt5.QtGui import QPixmap, QPainter
 
 # Project internal libs
 from sane_yt_subfeed.log_handler import create_logger
@@ -72,4 +71,3 @@ class AboutView(QWidget):
         # self.q_labels.append(lbl)
         # layout.addWidget(QLabel(image_filename))
         # layout.addWidget(lbl)
-

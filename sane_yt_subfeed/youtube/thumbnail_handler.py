@@ -1,10 +1,10 @@
 import math
-import os
-import shutil
-import threading
 from collections import defaultdict
 
 import certifi
+import os
+import shutil
+import threading
 import urllib3
 from PIL import Image  # Image cropping (black barred thumbs, issue #11)
 from PIL import ImageChops
@@ -212,8 +212,6 @@ def quality_404_check(img):
     img_404 = Image.open(os.path.join(OS_PATH, '..', 'resources', 'quality404.jpg'))
     img_cmp = Image.open(img)
     check = ImageChops.difference(img_cmp, img_404).getbbox() is None
-    if check:
-        logger.warning("Thumbnail: '{}' is YouTube 404 Image".format(img))
     return check
 
 

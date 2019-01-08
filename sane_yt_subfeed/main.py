@@ -1,7 +1,6 @@
 import datetime
 import threading
 from timeit import default_timer
-
 from tqdm import tqdm
 
 from sane_yt_subfeed.controller.controller import Controller
@@ -27,9 +26,9 @@ print_statistics = True
 
 # Create controller object
 
-def run_with_gui(exceptions):
+def run_with_gui():
     logger.info('Running with GUI')
-    controller = Controller(exceptions)
+    controller = Controller()
     controller.run()
 
 
@@ -127,4 +126,3 @@ class RunTestsThreaded(threading.Thread):
 
         result = [datetime.datetime.utcnow(), test_pages, test_miss, self.subscription]
         self.results.append(result)
-

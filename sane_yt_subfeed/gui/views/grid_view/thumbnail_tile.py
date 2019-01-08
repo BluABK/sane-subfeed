@@ -1,8 +1,7 @@
 import os
-
 from PyQt5.QtCore import Qt, QSize, QPoint, QRect
-from PyQt5.QtGui import QPainter, QImage, QPixmap, QBrush, QColor, QPen, QFont
-from PyQt5.QtWidgets import QLabel, QSizePolicy
+from PyQt5.QtGui import QPainter, QPixmap, QBrush, QColor, QPen, QFont
+from PyQt5.QtWidgets import QLabel
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.log_handler import create_logger
@@ -37,8 +36,7 @@ class ThumbnailTile(QLabel):
     def paintEvent(self, event):
         if self.p:
             if self.p.isNull():
-                vid_info = "{} - {} [{}]".format(self.parent.video.channel_title, self.parent.video.title,
-                                                 self.parent.video.url_video)
+                vid_info = "{}".format(self.parent.video)
                 self.logger.warning("QPixmap self.p was NULL, replacing with 'Thumbnail N/A' image! Video: {}".format(
                     vid_info))
                 self.p = QPixmap(THUMBNAIL_NA_PATH)
@@ -55,8 +53,8 @@ class ThumbnailTile(QLabel):
             # Overlay video duration on thumbnail
             pen = QPen(Qt.white)
             painter.setPen(pen)
-            point = QPoint(thumb.width()*0.70, thumb.height()*0.85)
-            rect = QRect(point, QSize(thumb.width()*0.28, thumb.height()*0.12))
+            point = QPoint(thumb.width() * 0.70, thumb.height() * 0.85)
+            rect = QRect(point, QSize(thumb.width() * 0.28, thumb.height() * 0.12))
             painter.fillRect(rect, QBrush(QColor(0, 0, 0, 180)))
             painter.drawText(rect, Qt.AlignCenter, format(self.parent.video.duration))
 

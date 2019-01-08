@@ -1,5 +1,6 @@
-import copy
 import sys
+
+import copy
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from sane_yt_subfeed import create_logger
@@ -56,7 +57,7 @@ class SaneExceptionHandler(QObject):
         # Finally call an exception hook
         if self.app_ref is None:
             # Call the original Exception hook
-            #self.original_excepthook(exctype, value, traceback)
+            # self.original_excepthook(exctype, value, traceback)
             return
         else:
             if self.use_list:

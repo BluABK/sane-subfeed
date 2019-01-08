@@ -1,16 +1,12 @@
 from PyQt5 import sip
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
-from sqlalchemy import false
 
-from sane_yt_subfeed.database.db_download_tile import DBDownloadTile
+from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
 from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
-from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.log_handler import create_logger
-
-from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
 from sane_yt_subfeed.gui.views.download_view.buttons.buttons_tile import ButtonsTile
 from sane_yt_subfeed.gui.views.download_view.download_tile import DownloadTile
+from sane_yt_subfeed.log_handler import create_logger
 
 
 class DownloadView(QWidget):
@@ -32,10 +28,10 @@ class DownloadView(QWidget):
 
         self.widgets = []
 
-        DownloadHandler.static_self.dbDownloadTiles.connect(self.update_widgets)
-        DownloadHandler.static_self.newYTDLDownlaod.connect(self.new_download)
+        DownloadViewListener.static_self.dbDownloadTiles.connect(self.update_widgets)
+        DownloadViewListener.static_self.newYTDLDownload.connect(self.new_download)
 
-        DownloadHandler.static_self.loadDBDownloadTiles.emit()
+        DownloadViewListener.static_self.loadDBDownloadTiles.emit()
         # # FIXME: remove and fix signals instead
         # db_downloads = db_session.query(DBDownloadTile).filter(DBDownloadTile.cleared == false())
         # for download in db_downloads:
@@ -44,7 +40,7 @@ class DownloadView(QWidget):
     def new_download(self, download_progress_listener):
         self.logger.info("New download signal received: {}".format(download_progress_listener.__dict__))
         widget = DownloadTile(self, download_progress_listener)
-        DownloadHandler.static_self.newDownloadTile.emit(DDBDownloadTile(widget))
+        DownloadViewListener.static_self.newDownloadTile.emit(DDBDownloadTile(widget))
         self.widgets.append(widget)
         self.sane_layout.addWidget(widget)
 
@@ -57,7 +53,7 @@ class DownloadView(QWidget):
         for widget in self.widgets:
             if widget.finished:
                 widget.cleared = True
-                DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(widget))
+                DownloadViewListener.static_self.updateDownloadTile.emit(DDBDownloadTile(widget))
                 widgets_to_delete.append(widget)
             else:
                 self.logger.debug("Widget not finished: {}".format(widget.__dict__))
@@ -74,7 +70,7 @@ class DownloadView(QWidget):
         :return:
         """
         widget.cleared = True
-        DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(widget))
+        DownloadViewListener.static_self.updateDownloadTile.emit(DDBDownloadTile(widget))
         self.logger.info("Forcibly removing widget for video: {} - {}".format(widget.video.title, widget.__dict__))
         sip.delete(widget)
         self.widgets.remove(widget)
@@ -85,7 +81,7 @@ class DownloadView(QWidget):
         for db_download_tile in d_db_download_til_list:
             if db_download_tile.video:
                 widget = DownloadTile(self, db_download_tile.progress_listener, db_download_tile=db_download_tile)
-                DownloadHandler.static_self.newDownloadTile.emit(DDBDownloadTile(widget))
+                DownloadViewListener.static_self.newDownloadTile.emit(DDBDownloadTile(widget))
                 self.widgets.append(widget)
                 self.sane_layout.addWidget(widget)
             else:

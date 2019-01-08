@@ -1,7 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QScrollArea
 
-from sane_yt_subfeed.controller.static_controller_vars import PLAY_VIEW_ID, GRID_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.gui.views.download_view.download_view import DownloadView
 

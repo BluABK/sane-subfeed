@@ -1,10 +1,9 @@
 import datetime
 import threading
-
 from sqlalchemy import desc, asc
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.controller.listeners.database_listener import DatabaseListener
+from sane_yt_subfeed.controller.listeners.database.database_listener import DatabaseListener
 from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NORMAL_REFRESH, \
     LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.database.engine_statements import get_video_by_vidd_stmt, get_video_by_id_stmt
@@ -41,9 +40,9 @@ def get_newest_stored_videos(limit, filters=(~Video.downloaded, ~Video.discarded
     return videos
 
 
-def get_best_downloaded_videos(limit,
-                               filters=(~Video.watched, Video.downloaded, ~Video.discarded), sort_method=(
-        asc(Video.watch_prio), desc(Video.date_downloaded), desc(Video.date_published))):
+def get_best_playview_videos(limit,
+                             filters=(~Video.watched, Video.downloaded, ~Video.discarded), sort_method=(
+                asc(Video.watch_prio), desc(Video.date_downloaded), desc(Video.date_published))):
     """
 
     :param filters: Tuple of filters
@@ -95,7 +94,6 @@ def compare_db_filtered(videos, limit, discarded=False, downloaded=False):
     return return_list
 
 
-
 def check_for_new(videos, deep_refresh=False):
     logger.info("Checking for new videos{}".format((" (deep refresh)" if deep_refresh else "")))
     # FIXME: add to progress bar
@@ -109,17 +107,17 @@ def check_for_new(videos, deep_refresh=False):
             if deep_refresh:
                 if vid_age > datetime.timedelta(hours=1):
                     vid.missed = True
-                    logger.info("Missed video: {} - {} [{}]".format(vid.channel_title, vid.title, vid.url_video))
+                    logger.info("Missed video: {}".format(vid))
                 else:
                     vid.new = True
-                    logger.info("New video: {} - {} [{}]".format(vid.channel_title, vid.title, vid.url_video))
+                    logger.info("New video: {}".format(vid))
             else:
                 if vid_age > datetime.timedelta(hours=12):
                     vid.missed = True
-                    logger.info("Missed video: {} - {} [{}]".format(vid.channel_title, vid.title, vid.url_video))
+                    logger.info("Missed video: {}".format(vid))
                 else:
                     vid.new = True
-                    logger.info("New video: {} - {} [{}]".format(vid.channel_title, vid.title, vid.url_video))
+                    logger.info("New video: {}".format(vid))
         else:
             pass
     # print(timeit.default_timer() - start_time)

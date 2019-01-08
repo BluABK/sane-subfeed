@@ -1,5 +1,5 @@
-from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.cli import cli
+from sane_yt_subfeed.log_handler import create_logger
 
 logger = create_logger(__name__)
 

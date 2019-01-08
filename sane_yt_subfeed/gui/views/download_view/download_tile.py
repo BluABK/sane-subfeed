@@ -1,15 +1,15 @@
 from collections import Counter
-from datetime import datetime
-from PyQt5.QtWidgets import QGridLayout, QWidget, QMenu
-from sane_yt_subfeed.controller.listeners.download_handler import DownloadHandler
-from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
 
+from PyQt5.QtWidgets import QGridLayout, QWidget, QMenu
+from datetime import datetime
+
+from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
+from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
+from sane_yt_subfeed.gui.views.download_view.download_thumbnail import DownloadThumbnailWidget
 from sane_yt_subfeed.gui.views.download_view.progress_bar import DownloadProgressBar
 from sane_yt_subfeed.gui.views.download_view.small_label import SmallLabel
 from sane_yt_subfeed.log_handler import create_logger
-
-from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.gui.views.download_view.download_thumbnail import DownloadThumbnailWidget
 
 
 class DownloadTile(QWidget):
@@ -177,7 +177,7 @@ class DownloadTile(QWidget):
         self.failed = True
         self.download_progress_listener.threading_event.clear()
         self.progress_bar.fail()
-        DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
+        DownloadViewListener.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
 
     def determine_si_unit(self, byte_value):
         """
@@ -191,7 +191,7 @@ class DownloadTile(QWidget):
                 # Cannot switch from manual field specification to automatic field numbering, thus separate variable.
                 byte_value_formatted = "{0:.2f}".format(byte_value)
                 return "{}{}".format(byte_value_formatted, unit)
-            byte_value = byte_value/1024
+            byte_value = byte_value / 1024
 
         # You should never reach this point
         self.logger.error("BUG in determine_si_unit: Bytes received larger than YiB unit!!!")
@@ -207,10 +207,16 @@ class DownloadTile(QWidget):
         si_units_speed = {'B/s': 1, 'KiB/s': 1024, 'MiB/s': 1048576, 'GiB/s': 1073741824, 'TiB/s': 1099511627776,
                           'PiB/s': 1125899906842624, 'EiB/s': 1152921504606846976, 'ZiB/s': 1180591620717411303424,
                           'YiB/s': 1208925819614629174706176}
-        speed_unit = speed_str[-5:].strip()
+        if speed_str[-5:] in si_units_speed:
+            speed_unit = speed_str[-5:].strip()  # Case: All other matches.
+        elif speed_str[-3:] in si_units_speed and speed_str[-5:] not in si_units_speed:
+            speed_unit = speed_str[:-3].strip()  # Case: 'B/s'.
+        else:
+            return None  # Skip invalid matches
+
         speed = float(speed_str[:-5].strip())
 
-        return speed*si_units_speed[speed_unit]
+        return speed * si_units_speed[speed_unit]
 
     def calc_avg_speed(self, speed_str, ticks=None):
         """
@@ -236,7 +242,19 @@ class DownloadTile(QWidget):
                     self.logger.warning("Bad input to determine_bytes('{}')".format(speed_str), exc_info=exc)
             else:
                 # Add speed in bytes to list of speeds
-                self.speeds.append(self.determine_bytes(speed_str))
+                try:
+                    speed = self.determine_bytes(speed_str)
+                    if speed:
+                        # Only add valid speeds
+                        self.speeds.append(speed)
+                    else:
+                        return
+                except KeyError as ke_exc:
+                    self.logger.exception("KeyError exception occurred in calc_avg_speed", exc_info=ke_exc)
+                    self.logger.debug(speed_str)
+                    return
+
+                # Increment tick (for valid speeds)
                 self.avg_speed_calc_tick += 1
 
     def most_common_eta(self, time_str, ticks=None):
@@ -276,7 +294,7 @@ class DownloadTile(QWidget):
             self.logger.error("A TypeError exception occurred while combining video+audio track sizes", exc_info=te_exc)
             self.total_size_value.setText("BUG: GitHub Issue #28")
         self.progress_bar.finish()
-        DownloadHandler.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
+        DownloadViewListener.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
 
     def delete_incomplete_entry(self):
         """
@@ -342,7 +360,7 @@ class DownloadTile(QWidget):
             percentage_downloaded = int((event["downloaded_bytes"] / self.total_bytes) * 100)
             if percentage_downloaded > self.percentage_downloaded:
                 self.percentage_downloaded = percentage_downloaded
-                DownloadHandler.static_self.updateDownloadTileEvent.emit(DDBDownloadTile(self))
+                DownloadViewListener.static_self.updateDownloadTileEvent.emit(DDBDownloadTile(self))
         else:
             if "downloaded_bytes" not in event:
                 self.logger.warning("downloaded_bytes not in: {}".format(event))
@@ -380,4 +398,3 @@ class DownloadTile(QWidget):
                     self.resumed_download()
                 elif action == delete_incomplete_entry:
                     self.delete_incomplete_entry()
-

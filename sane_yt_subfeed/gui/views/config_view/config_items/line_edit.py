@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import QLineEdit
 
 
-
 class GenericLineEdit(QLineEdit):
     def __init__(self, parent, description, cfg_section, cfg_option, cfg_validator=None):
         super(QLineEdit, self).__init__(parent=parent)

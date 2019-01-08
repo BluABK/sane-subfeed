@@ -1,6 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QValidator
-from PyQt5.QtWidgets import QPushButton, QHBoxLayout, QLabel, QLineEdit, QVBoxLayout, QDialog
+from PyQt5.QtWidgets import QPushButton, QHBoxLayout, QLabel, QVBoxLayout, QDialog
 
 from sane_yt_subfeed import create_logger
 

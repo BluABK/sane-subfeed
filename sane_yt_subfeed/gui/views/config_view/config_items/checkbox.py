@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt  # PyCharm bug: Anything from QtCore will fail detection, but it *is* there.
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QCheckBox
+from PyQt5.QtWidgets import QCheckBox
 
 from sane_yt_subfeed.config_handler import set_config
 
@@ -11,7 +11,7 @@ from sane_yt_subfeed.config_handler import set_config
 class GenericConfigCheckBox(QCheckBox):
     def __init__(self, parent, description, cfg_section, cfg_option):
         super(QCheckBox, self).__init__(parent=parent)
-        self.cfg_parent=parent
+        self.cfg_parent = parent
         self.description = description
         self.cfg_section = cfg_section
         self.cfg_option = cfg_option

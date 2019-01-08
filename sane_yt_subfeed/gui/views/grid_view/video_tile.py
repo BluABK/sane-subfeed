@@ -1,21 +1,15 @@
 import datetime
-
-from PyQt5.QtCore import Qt, QEvent
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette, QPixmap
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QApplication, QMenu, qApp, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QVBoxLayout
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.gui.views.grid_view.thumbnail_tile import ThumbnailTile
-from sane_yt_subfeed.gui.views.grid_view.title_tile import TitleTile
 from sane_yt_subfeed.gui.views.grid_view.channel_tile import ChannelTile
 from sane_yt_subfeed.gui.views.grid_view.date_tile import DateTile
-from sane_yt_subfeed.history_handler import update_history
+from sane_yt_subfeed.gui.views.grid_view.title_tile import TitleTile
+from sane_yt_subfeed.history_handler import update_plaintext_history
 from sane_yt_subfeed.log_handler import logger
-from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.youtube.thumbnail_handler import resize_thumbnail
-from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_search, get_channel_uploads, \
-    list_uploaded_videos
 
 
 class VideoTile(QWidget):
@@ -29,6 +23,7 @@ class VideoTile(QWidget):
         self.id = vid_id
         self.parent = parent
         self.root = parent.root  # MainWindow
+        self.history = self.root.history
         # parent.parent.parent.bind('<KeyPress-ctrl>', self.key_press_ctrl)
         # parent.parent.parent.bind('<KeyRelease-ctrl>', self.key_release_ctrl)
 
@@ -38,7 +33,7 @@ class VideoTile(QWidget):
 
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(0, 0, 0, 4)
-        self.thumbnail_widget = self.init_thumbnailtile()
+        self.thumbnail_widget = self.init_thumbnail_tile()
         self.layout.addWidget(self.thumbnail_widget)
 
         self.title_widget = TitleTile(video.title, self)
@@ -53,8 +48,16 @@ class VideoTile(QWidget):
 
         self.set_video(video)
 
-    def init_thumbnailtile(self):
+    def init_thumbnail_tile(self):
         raise ValueError("ThumbnailTile initialised from VideoTile, not subclass!")
+
+    def set_thumbnail_pixmap(self, thumbnail_path):
+        """
+        Runs
+        :return:
+        """
+        self.thumbnail_widget.setPixmap(QPixmap(thumbnail_path))
+        self.update()
 
     def set_video(self, video):
         self.video = video
@@ -74,15 +77,13 @@ class VideoTile(QWidget):
             self.channel_widget.setText(self.video.channel_title)
 
         vid_age = datetime.datetime.utcnow() - self.video.date_published
-        self.date_widget.setText(self.strfdelta(vid_age, "{hours}:{minutes}:{seconds}", "{days} days "))
+        self.date_widget.setText(self.strf_delta(vid_age, "{hours}:{minutes}:{seconds}", "{days} days "))
         self.old_videos(vid_age)
 
-        self.thumbnail_widget.setPixmap(QPixmap(video.thumbnail_path))
-
-        self.update()
+        self.set_thumbnail_pixmap(video.thumbnail_path)
 
     @staticmethod
-    def strfdelta(tdelta, hours, days):
+    def strf_delta(tdelta, hours, days):
         d = {}
         d["hours"], rem = divmod(tdelta.seconds, 3600)
         d["minutes"], d["seconds"] = divmod(rem, 60)
@@ -128,55 +129,65 @@ class VideoTile(QWidget):
         :return:
         """
         self.clipboard.setText(self.video.url_video)
-        self.status_bar.showMessage('Copied URL to clipboard: {} ({} - {})'.format(self.video.url_video,
-                                                                                   self.video.channel_title,
-                                                                                   self.video.title))
+        self.status_bar.showMessage('Copied URL to clipboard: {}'.format(self.video))
 
     def mark_downloaded(self):
         """
         Mark the video as downloaded
         :return:
         """
-        logger.info('Mark downloaded: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
-                                                                self.video.title))
-        update_history('Downloaded:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
-                                                         self.video.title))
-        self.video.downloaded = True
+        logger.info('Mark downloaded: {:2d}: {}'.format(self.id, self.video))
+        update_plaintext_history('Downloaded: {}'.format(self.video))
         self.video.date_downloaded = datetime.datetime.utcnow()
-        self.parent.main_model.grid_view_listener.tileDownloaded.emit(self.video)
         if read_config('Gui', 'enable_auto_copy_to_clipboard'):
             self.copy_url()
         if read_config('Youtube-dl', 'use_youtube_dl'):
-            self.status_bar.showMessage('Downloading video with youtube-dl: {} ({} - {})'.format(self.video.url_video,
-                                                                                                 self.video.channel_title,
-                                                                                                 self.video.title))
+            self.status_bar.showMessage('Downloading video with youtube-dl: {}'.format(self.video))
+        self.parent.main_model.playback_grid_view_listener.tileDownloaded.emit(self.video)
+        # Update Subfeed to remove the video from its list unless show_downloaded=True.
+        if not read_config('SubFeed', 'show_downloaded'):
+            self.parent.main_model.subfeed_grid_view_listener.videosChanged.emit()
 
     def mark_discarded(self):
         """
         Mark the video as discarded
         :return:
         """
-        logger.info('Mark dismissed: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
-                                                               self.video.title))
-        update_history('Dismissed:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
-                                                        self.video.title))
-        self.video.discarded = True
-        self.parent.main_model.grid_view_listener.tileDiscarded.emit(self.video)
-        self.status_bar.showMessage('Dismissed: {} ({} - {})'.format(self.video.url_video,
-                                                                     self.video.channel_title,
-                                                                     self.video.title))
+        logger.info('Mark discarded: {:2d}: {}'.format(self.id, self.video))
+        update_plaintext_history('Discarded: {}'.format(self.video))
+        self.status_bar.showMessage('Discarded: {}'.format(self.video))
+
+        self.history.add(self.video, self.mark_discarded, self.unmark_discarded)
+
+    def unmark_discarded(self):
+        """
+        Mark the video as un-discarded
+        :return:
+        """
+        logger.info('Un-discarded: {:2d}: {}'.format(self.id, self.video))
+        update_plaintext_history('Un-discarded: {} '.format(self.video))
+        self.status_bar.showMessage('Un-discarded: {}'.format(self.video))
+
+        self.history.add(self.video, self.unmark_discarded, self.mark_discarded)
 
     def mark_watched(self):
         """
-        Mark the video as downloaded
+        Mark the video as watched
         :return:
         """
-        logger.debug('Mark watched: {:2d}: {} {} - {}'.format(self.id, self.video.url_video, self.video.channel_title,
-                                                              self.video.title))
-        update_history('Watched:\t{}\t{} - {} '.format(self.video.url_video, self.video.channel_title,
-                                                      self.video.title))
-        self.video.watched = True
-        self.parent.main_model.grid_view_listener.tileWatched.emit(self.video)
+        logger.debug('Mark watched: {:2d}: {}'.format(self.id, self.video))
+        update_plaintext_history('Watched: {}'.format(self.video))
+        self.history.add(self.video, self.mark_watched, self.unmark_watched)
+
+    def unmark_watched(self):
+        """
+        Mark the video as Unwatched
+        :return:
+        """
+        logger.debug('Mark Unwatched: {:2d}: {}'.format(self.id, self.video))
+        update_plaintext_history('Unwatched: {}'.format(self.video))
+
+        self.history.add(self.video, self.unmark_watched, self.mark_watched)
 
     # Get the system clipboard contents
     def clipboard_changed(self):
@@ -186,4 +197,7 @@ class VideoTile(QWidget):
         self.b.insertPlainText(text + '\n')
 
     def decrease_prio(self):
-        self.parent.main_model.grid_view_listener.decreaseWatchPrio.emit(self.video)
+        self.history.add(self.video, self.decrease_prio, self.increase_prio)
+
+    def increase_prio(self):
+        self.history.add(self.video, self.increase_prio, self.decrease_prio)

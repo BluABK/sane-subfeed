@@ -1,27 +1,22 @@
-import sys
-import os
-import subprocess
-
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMenu, QApplication
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.default_application_handler import open_with_default_application
-from sane_yt_subfeed.gui.views.grid_view.sub_feed.sub_thumbnail_tile import SubThumbnailTile
+from sane_yt_subfeed.gui.dialogs.sane_text_view_dialog import SaneTextViewDialog
+from sane_yt_subfeed.gui.views.grid_view.subfeed.subfeed_grid_thumbnail_tile import SubfeedGridViewThumbnailTile
+from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
 from sane_yt_subfeed.log_handler import create_logger
 
-from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
-from sane_yt_subfeed.gui.dialogs.sane_text_view_dialog import SaneTextViewDialog
 
-
-class SubFeedTile(VideoTile):
+class SubfeedGridViewTile(VideoTile):
 
     def __init__(self, parent, video, vid_id, clipboard, status_bar):
         super().__init__(parent, video, vid_id, clipboard, status_bar)
         self.logger = create_logger(__name__)
 
-    def init_thumbnailtile(self):
-        return SubThumbnailTile(self)
+    def init_thumbnail_tile(self):
+        return SubfeedGridViewThumbnailTile(self)
 
     def contextMenuEvent(self, event):
         """
@@ -72,3 +67,35 @@ class SubFeedTile(VideoTile):
             self.logger.error("Not Implemented: Select video")
         elif QMouseEvent.button() == Qt.LeftButton:
             self.mark_downloaded()
+
+    def mark_discarded(self):
+        """
+        Mark the video as discarded (override with correct listener).
+        :return:
+        """
+        self.parent.main_model.subfeed_grid_view_listener.tileDiscarded.emit(self.video)
+        super().mark_discarded()
+
+    def unmark_discarded(self):
+        """
+        Mark the video as un-discarded (override with correct listener).
+        :return:
+        """
+        self.parent.main_model.subfeed_grid_view_listener.tileUndiscarded.emit(self.video)
+        super().unmark_discarded()
+
+    def mark_watched(self):
+        """
+        Mark the video as watched (override with correct listener).
+        :return:
+        """
+        self.parent.main_model.subfeed_grid_view_listener.tileWatched.emit(self.video)
+        super().mark_watched()
+
+    def unmark_watched(self):
+        """
+        Mark the video as Unwatched (override with correct listener).
+        :return:
+        """
+        self.parent.main_model.subfeed_grid_view_listener.tileUnwatched.emit(self.video)
+        super().unmark_watched()

@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import datetime
 import os
 import threading
-
 from youtube_dl import YoutubeDL
 from youtube_dl.utils import DownloadError
 
@@ -109,20 +108,17 @@ class YoutubeDownload(threading.Thread):
             try:
                 self.proxy_ydl_opts['proxy'] = proxy
                 logger.info(
-                    "Video is geo blocked, retrying with proxy '{}': {}".format(proxy, self.video.title))
+                    "Video is geo blocked, retrying with proxy '{}': {}".format(proxy, self.video))
 
                 with YoutubeDL(self.proxy_ydl_opts) as ydl:
-                    logger.info(
-                        "Starting download (proxy: {}) for: {} - {} [{}]".format(proxy, self.video.channel_title,
-                                                                                 self.video.title,
-                                                                                 self.video.url_video))
+                    logger.info("Starting download (proxy: {}) for: {}".format(proxy, self.video))
                     self.download_status = DOWNLOAD_RUNNING
                     ydl.download([self.video.url_video])
                     self.download_status = DOWNLOAD_FINISHED
                     return True
             except DownloadError as dl_exc:
                 logger.warning(
-                    "Proxy {} download of geo blocked video '{}' failed.".format(proxy, self.video.title))
+                    "Proxy {} download of geo blocked video '{}' failed.".format(proxy, self.video))
                 logger.exception(dl_exc)
                 # FIXME: Probably overkill, should maybe only flag as failed from parent caller
                 self.download_status = DOWNLOAD_FAILED
@@ -180,7 +176,7 @@ class YoutubeDownload(threading.Thread):
                 'title': self.video.title,
                 'show': self.video.channel_title,
                 'date': self.video.date_published.isoformat(),
-                'purl': self.video.url_video,
+                'url': self.video.url_video,
                 'network': 'YouTube',
                 ('description', 'comment', 'synopsis'): self.video.description}
         logger.debug(info)
@@ -191,8 +187,7 @@ class YoutubeDownload(threading.Thread):
         self.threading_event.wait()
         try:
             with YoutubeDL(self.ydl_opts) as ydl:
-                logger.info("Starting download for: {} - {} [{}]".format(self.video.channel_title, self.video.title,
-                                                                         self.video.url_video))
+                logger.info("Starting download for: {}".format(self.video))
                 self.download_status = DOWNLOAD_RUNNING
                 ydl.download([self.video.url_video])
                 self.download_status = DOWNLOAD_FINISHED
@@ -263,8 +258,7 @@ class YoutubeDownload(threading.Thread):
 
         # self.download_status_listener = self.download_status  # TODO: IMPLEMENT failed download handling (listener)
         if self.download_status is DOWNLOAD_FINISHED:
-            logger.info("Finished downloading: {} - {} [{}]".format(self.video.channel_title, self.video.title,
-                                                                    self.video.url_video))
+            logger.info("Finished downloading: {}".format(self.video))
             # self.video.vid_path = os.path.join(self.youtube_folder, self.determine_filename())
             self.video.vid_path = self.determine_filepath()
 
@@ -284,13 +278,9 @@ class YoutubeDownload(threading.Thread):
                 for listener in self.listeners:
                     listener.emit(self.video)
         elif self.download_status is DOWNLOAD_FAILED:
-            logger.error("FAILED downloading: {} - {} [{}]".format(self.video.channel_title, self.video.title,
-                                                                   self.video.url_video))
+            logger.error("FAILED downloading: {}".format(self.video))
         else:
-            logger.critical("BUG: WRONG DOWNLOAD STATUS ({}) : {} - {} [{}]".format(self.download_status,
-                                                                                    self.video.channel_title,
-                                                                                    self.video.title,
-                                                                                    self.video.url_video))
+            logger.critical("BUG: WRONG DOWNLOAD STATUS ({}) : {}".format(self.download_status, self.video))
 
     def my_hook(self, event):
         self.download_progress_listener.updateProgress.emit(event)

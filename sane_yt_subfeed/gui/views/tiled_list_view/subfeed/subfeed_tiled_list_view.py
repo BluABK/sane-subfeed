@@ -1,18 +1,17 @@
 import os
-
-# from PyQt5.QtWidgets import QWidget, QMessageBox, qApp, \
-#     QMenu, QGridLayout, QLabel, QVBoxLayout, QLineEdit, QHBoxLayout
-# from PyQt5.QtGui import QPixmap, QPainter
-# from sqlalchemy import desc
-
+from PyQt5.QtGui import *
 # TODO: Easier to work with wildcard imports from PyQt, fix afterwards
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
 
 from sane_yt_subfeed.absolute_paths import ICONS_PATH
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.write_operations import UpdateVideo
 from sane_yt_subfeed.log_handler import create_logger
+
+# from PyQt5.QtWidgets import QWidget, QMessageBox, qApp, \
+#     QMenu, QGridLayout, QLabel, QVBoxLayout, QLineEdit, QHBoxLayout
+# from PyQt5.QtGui import QPixmap, QPainter
+# from sqlalchemy import desc
 
 # Constants
 DUMMY_ICO_PATH = os.path.join(ICONS_PATH, 'dummies')
@@ -48,14 +47,11 @@ class ExtendedQLabel(QLabel):
             painter.drawPixmap(self.rect(), self.p)
 
     def mouseReleaseEvent(self, ev):
-        print('clicked {:2d}: {} {} - {}'.format(self.img_id, self.video.url_video, self.video.channel_title,
-                                                 self.video.title))
+        print('clicked {:2d}: {}'.format(self.img_id, self.video))
         self.clipboard.setText(self.video.url_video)
         self.video.downloaded = True
         UpdateVideo(self.video, update_existing=True).start()
-        self.status_bar.showMessage('Copied URL to clipboard: {} ({} - {})'.format(self.video.url_video,
-                                                                                   self.video.channel_title,
-                                                                                   self.video.title))
+        self.status_bar.showMessage('Copied URL to clipboard: {}'.format(self.video))
 
     def contextMenuEvent(self, event):
         menu = QMenu(self)
@@ -72,7 +68,7 @@ class ExtendedQLabel(QLabel):
         self.b.insertPlainText(text + '\n')
 
 
-class ListTiledView(QWidget):
+class SubfeedTiledListView(QWidget):
     """
     |------------------------------------------------------------------------------------------------------------------|
     |  ChannelICO?                  | Channel title                                                                    |
@@ -105,7 +101,7 @@ class ListTiledView(QWidget):
     eqlabels = None
 
     def __init__(self, parent, vid_limit=40):
-        super(ListTiledView, self).__init__(parent)
+        super(SubfeedTiledListView, self).__init__(parent)
         self.logger = create_logger(__name__)
         self.root = parent  # MainWindow
         self.eqlabels = []

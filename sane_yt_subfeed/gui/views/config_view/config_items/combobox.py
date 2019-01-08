@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import QComboBox
 
-
-   # FIXME: Get QComboBox to set strings not ints
+# FIXME: Get QComboBox to set strings not ints
 tt_font_sizes = ['h1', 'h2', 'h3', 'h4', 'h5', 'p']
 
 
@@ -30,5 +29,3 @@ class GenericConfigComboBox(QComboBox):
 
     def save_option(self, value):
         self.cfg_parent.output_set_config(self.cfg_section, self.cfg_option, format(self.itemText(value)))
-
-

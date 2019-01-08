@@ -3,9 +3,9 @@ import threading
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session
+from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_search, list_uploaded_videos, \
     list_uploaded_videos_videos
-from sane_yt_subfeed.log_handler import create_logger
 
 
 class GetUploadsThread(threading.Thread):
@@ -133,7 +133,6 @@ class GetUploadsThread(threading.Thread):
             self.logger.info("Requesting additional information for search items: {}".format(low_prio_unique_ids))
             output_list.extend(list_uploaded_videos_videos(self.youtube, low_prio_unique_ids, 50))
         return output_list
-
 
     @staticmethod
     def merge_same_videos_in_list(videos):

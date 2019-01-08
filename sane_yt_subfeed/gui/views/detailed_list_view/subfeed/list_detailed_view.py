@@ -2,12 +2,11 @@
 from PyQt5.QtWidgets import *
 
 # Project internal libs
-from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.read_operations import get_newest_stored_videos
 from sane_yt_subfeed.log_handler import create_logger
 
 
-class ListDetailedView(QWidget):
+class SubfeedDetailedListView(QWidget):
     vid_limit = None
     subfeed_table = None
     table_items = None
@@ -16,12 +15,12 @@ class ListDetailedView(QWidget):
 
     def __init__(self, parent, vid_limit=40, headers=None):
         """
-        ListDetailedView, a table representation of relevant parts of the Subscription Feed
+        SubfeedDetailedListView, a table representation of relevant parts of the Subscription Feed
         :param clipboard:
         :param status_bar:
         :param vid_limit:
         """
-        super(ListDetailedView, self).__init__(parent)
+        super(SubfeedDetailedListView, self).__init__(parent)
         self.logger = create_logger(__name__)
         self.config_file = None
         self.root = parent  # MainWindow
@@ -40,7 +39,7 @@ class ListDetailedView(QWidget):
         Initialize the UI
         :return:
         """
-        self.logger.info("Initializing UI: ListDetailedView")
+        self.logger.info("Initializing UI: SubfeedDetailedListView")
         layout = QVBoxLayout()
         self.setLayout(layout)
         self.get_videos()

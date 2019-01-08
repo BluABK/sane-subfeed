@@ -69,6 +69,12 @@ class VideoD:
         self.search_item = search_item
         self.watched = False
 
+    def __str__(self):
+        """
+        Override __str__ to print a more sensible string.
+        :return:
+        """
+        return "{} - {} [{}]".format(self.channel_title, self.title, self.url_video)
 
     def determine_thumbnails(self, thumbnails_item):
         """
@@ -95,8 +101,6 @@ class VideoD:
         if 'maxres' in thumbnails_item.keys():
             self.thumbnails['available_quality'].append("maxres")  # 1280x720 px
             self.thumbnails['maxres'] = thumbnails_item['maxres']
-
-
 
     @staticmethod
     def playlist_item_new_video_d(playlist_item, grab_methods=None):

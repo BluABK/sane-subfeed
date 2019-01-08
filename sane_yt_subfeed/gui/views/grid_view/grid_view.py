@@ -1,14 +1,11 @@
 import math
 
-from PyQt5 import sip
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap, QColor
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QWidget, QGridLayout, QSizePolicy
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.view_models import MainModel
-from sane_yt_subfeed.database.detached_models.video_d import VideoD
-from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
 from sane_yt_subfeed.log_handler import create_logger
 
 
@@ -41,19 +38,61 @@ class GridView(QWidget):
         if root.bgcolor:
             self.set_bgcolor(root.bgcolor)
 
-        self.main_model.grid_view_listener.redrawVideos.connect(self.redraw_videos)
+        # self.main_model.grid_view_listener.redrawVideos.connect(self.redraw_videos)
 
-    def redraw_videos(self, videos):
+    def redraw_video(self, video):
+        """
+        Sets a video tile using their current properties.
+        :param video:
+        :return:
+        """
+        if video.video_id in self.q_labels.keys():
+            self.logger.info("Redrawing video: {}".format(video))
+            self.q_labels[video.video_id].set_video(video)
+        else:
+            self.logger.error("Was told to redraw video that isn't in q_labels.keys: {}".format(video))
+
+    def redraw_videos(self, videos: list):
+        """
+        Sets all the video tiles using their current properties.
+        :param videos:
+        :return:
+        """
         for video in videos:
-            if video.video_id in self.q_labels.keys():
-                self.logger.info("Redrawing video: {} - {}".format(video.title, video.__dict__))
-                self.q_labels[video.video_id].set_video(video)
+            self.redraw_video(video)
+
+    def repaint_video(self, video):
+        """
+        Sets pixmap on a video thumbnail tile using their current properties.
+        :param video:
+        :return:
+        """
+        if video.video_id in self.q_labels.keys():
+            self.logger.info("Repainting video: {}".format(video))
+            self.q_labels[video.video_id].set_thumbnail_pixmap(video.thumbnail_path)
+
+    def repaint_videos(self, videos: list):
+        """
+        Sets pixmap on all video thumbnail tiles using their current properties.
+        :param videos:
+        :return:
+        """
+        for video in videos:
+            self.repaint_video(video)
 
     def videos_changed(self):
-        self.logger.info('Updating tiles')
+        """
+        Actions to be taken when video list detects a change.
+        :return:
+        """
+        self.logger.info('Updating tiles (Videos change detected)')
         self.update_grid()
 
     def resize_event(self):
+        """
+        Handling of window being resized.
+        :return:
+        """
         if self.items_x >= 1:
             margins = self.grid.getContentsMargins()
             update_grid = False
@@ -68,8 +107,20 @@ class GridView(QWidget):
             if update_grid:
                 self.update_grid()
 
+    def get_feed(self):
+        """
+        Retrieves the list of videos in a feed.
+        Override in inheritance.
+        :return: list
+        """
+        pass
+
     def update_grid(self):
-        feed = self.get_feed()
+        """
+        Update/Redraw the GridView feed with a list of videos.
+        :return:
+        """
+        feed: list = self.get_feed()
         counter = 0
         video_counter = 0
         q_labels_keys_to_delete = set(self.q_labels)
@@ -81,25 +132,29 @@ class GridView(QWidget):
         for position in positions:
             if counter >= len(feed):
                 pass
+            # Add every existing video as a feed widget and remove it from the deletion list.
             elif feed[counter].video_id in self.q_labels:
+                self.logger.debug3("Inserting item in grid coord [{},{}]: {}".format(*position, feed[counter]))
                 self.grid.addWidget(self.q_labels[feed[counter].video_id], *position)
                 q_labels_keys_to_delete.discard(feed[counter].video_id)
-                # q_labels_keys_to_delete.remove(feed[counter].video_id)
                 video_counter += 1
             else:
+                # Add new video feed widgets
                 video = feed[counter]
+                self.logger.debug3("Inserting *NEW* item in grid coord [{},{}]: {}".format(*position, video))
                 lbl = self.new_tile(counter, video)
                 self.grid.addWidget(lbl, *position)
                 self.q_labels[video.video_id] = lbl
                 video_counter += 1
             counter += 1
 
+        # Delete any orphaned items remaining in the deletion list.
         for key in q_labels_keys_to_delete:
+            self.logger.debug3("Deleting orphaned grid video: {}".format(self.q_labels[key].video))
             self.grid.removeWidget(self.q_labels[key])
             self.q_labels[key].deleteLater()
             del self.q_labels[key]
-        self.logger.debug(
-            "Updated view: currently {} widgets and {} items_x".format(video_counter, self.items_x))
+        self.logger.debug("Updated view: currently {} widgets and {} items_x".format(video_counter, self.items_x))
         self.resize_event()
 
     def set_bgcolor(self, color):

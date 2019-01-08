@@ -1,26 +1,23 @@
-import os
-
 # from PyQt5.QtGui import QListWidgetItem
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QListWidget, QListWidgetItem, QHBoxLayout, \
-    QTableWidgetItem, QHeaderView
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView
 
 from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
 from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
 
 
-class SubscriptionsView(QWidget):
+class SubscriptionsDetailedListView(QWidget):
     subs = None
 
     def __init__(self, parent, headers=None):
         """
-        SubscriptionsView, a table representation of relevant parts of the Subscriptions list
+        SubscriptionsDetailedListView, a table representation of relevant parts of the Subscriptions list
         :param parent:
         :param clipboard:
         :param status_bar:
         :param headers:
         """
-        super(SubscriptionsView, self).__init__(parent)
+        super(SubscriptionsDetailedListView, self).__init__(parent)
         self.logger = create_logger(__name__)
         self.root = parent  # MainWindow
         self.clipboard = self.root.clipboard
@@ -38,7 +35,7 @@ class SubscriptionsView(QWidget):
         Initialize the UI
         :return:
         """
-        self.logger.info("Initializing UI: SubscriptionsView")
+        self.logger.info("Initializing UI: SubscriptionsDetailedListView")
         layout = QVBoxLayout()
         self.setLayout(layout)
         self.get_subs()
@@ -71,7 +68,7 @@ class SubscriptionsView(QWidget):
         for i in range(len(self.headers)):
             self.subs_table.horizontalHeaderItem(i).setToolTip(self.headers[i])
 
-        self.table_items = []   # FIXME: unused
+        self.table_items = []  # FIXME: unused
         for row in range(len(self.subs)):  # row
             item = QTableWidgetItem(self.subs[row].id)
             self.table_items.append(item)

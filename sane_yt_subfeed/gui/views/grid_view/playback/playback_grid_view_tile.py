@@ -1,26 +1,26 @@
 import os
-import sys
 import subprocess
-
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QMenu, QAction
+from PyQt5.QtWidgets import QApplication, QMenu
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.default_application_handler import open_with_default_application
-from sane_yt_subfeed.gui.views.grid_view.play_view.play_thumbnail_tile import PlayThumbnailTile
+from sane_yt_subfeed.gui.dialogs.sane_text_view_dialog import SaneTextViewDialog
+from sane_yt_subfeed.gui.views.grid_view.playback.playback_grid_view_thumbnail_tile import PlaybackGridViewThumbnailTile
 from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
 from sane_yt_subfeed.log_handler import create_logger
-from sane_yt_subfeed.gui.dialogs.sane_text_view_dialog import SaneTextViewDialog
 
 
-class PlayTile(VideoTile):
+class PlaybackGridViewTile(VideoTile):
 
     def __init__(self, parent, video, vid_id, clipboard, status_bar):
         super().__init__(parent, video, vid_id, clipboard, status_bar)
         self.logger = create_logger(__name__)
+        self.root = parent.root
+        self.parent = parent
 
-    def init_thumbnailtile(self):
-        return PlayThumbnailTile(self)
+    def init_thumbnail_tile(self):
+        return PlaybackGridViewThumbnailTile(self)
 
     def mousePressEvent(self, QMouseEvent):  # FIXME: Make mouse hotkeys based on hotkeys.ini
         """
@@ -64,7 +64,8 @@ class PlayTile(VideoTile):
         else:
             subprocess.Popen([file_path], shell=True)
 
-    def str_to_list(self, s):
+    @staticmethod
+    def str_to_list(s):
         """
         Transform a space delimited string to a list of substrings.
         Returns s as-is if False.
@@ -76,7 +77,8 @@ class PlayTile(VideoTile):
         else:
             return s
 
-    def str_to_list_destructive(self, s):
+    @staticmethod
+    def str_to_list_destructive(s):
         """
         Destructively transform a space delimited string to a list of substrings.
         Does nothing If string is False.
@@ -233,3 +235,43 @@ class PlayTile(VideoTile):
 
     def old_videos(self, vid_age):
         pass
+
+    def mark_discarded(self):
+        """
+        Mark the video as discarded (override with correct listener).
+        :return:
+        """
+        self.parent.main_model.playback_grid_view_listener.tileDiscarded.emit(self.video)
+        super().mark_discarded()
+
+    def unmark_discarded(self):
+        """
+        Mark the video as un-discarded (override with correct listener).
+        :return:
+        """
+        self.parent.main_model.playback_grid_view_listener.tileUndiscarded.emit(self.video)
+        super().unmark_discarded()
+
+    def mark_watched(self):
+        """
+        Mark the video as watched (override with correct listener).
+        :return:
+        """
+        self.parent.main_model.playback_grid_view_listener.tileWatched.emit(self.video)
+        super().mark_watched()
+
+    def unmark_watched(self):
+        """
+        Mark the video as Unwatched (override with correct listener).
+        :return:
+        """
+        self.parent.main_model.playback_grid_view_listener.tileUnwatched.emit(self.video)
+        super().unmark_watched()
+
+    def decrease_prio(self):
+        self.parent.main_model.playback_grid_view_listener.decreaseWatchPrio.emit(self.video)
+        super().decrease_prio()
+
+    def increase_prio(self):
+        self.parent.main_model.playback_grid_view_listener.increaseWatchPrio.emit(self.video)
+        super().increase_prio()

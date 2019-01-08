@@ -1,7 +1,7 @@
 import ast
 import os
-from shutil import copyfile
 from configparser import ConfigParser, NoSectionError, NoOptionError
+from shutil import copyfile
 
 OS_PATH = os.path.dirname(__file__)
 CONFIG_PATH = os.path.join(OS_PATH, '..', 'config.ini')
@@ -74,7 +74,8 @@ DEFAULTS = {
         'download_tile_height': '200'
     },
     'PlaySort': {
-        'ascending_date': 'False'
+        'ascending_date': 'False',
+        'by_channel': 'False'
     },
     'Thumbnails': {
         'force_download_best': 'True',
@@ -138,7 +139,7 @@ DEFAULTS = {
         'url_player_name': ""
     },
     'DefaultApp': {
-      'Image': ""
+        'Image': ""
     },
     'Logging': {
         'use_socket_log': 'False',
@@ -161,7 +162,8 @@ DEFAULTS_HOTKEYS = {
         'manual_thumb_dl': "",
         'manual_db_grab': 'Ctrl+E',
         'download_video_by_url': 'Ctrl+O',
-        'show_usage_history': 'Ctrl+H'
+        'show_usage_history': 'Ctrl+H',
+        'history_undo_action': 'Ctrl+Z'
     },
     'View': {
         'subfeed': 'Ctrl+1',
@@ -179,7 +181,8 @@ DEFAULTS_HOTKEYS = {
         'prio_decrease': 'MidButton, Ctrl+LeftButton',
         'mark_watched': 'Alt+LeftButton',
         'play': 'MouseLeftButton',
-        'ascending_sort_toggle': 'Ctrl+A'
+        'ascending_sort_toggle': 'Ctrl+A',
+        'by_channel_sort_toggle': 'Ctrl+B'
     }
 }
 
