@@ -1,5 +1,6 @@
 import datetime
 
+from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 
@@ -9,6 +10,11 @@ GRAB_METHOD_VIDEOS = 'videos()'
 
 
 class VideoD:
+    VIDEO_KIND_VOD = 100
+    VIDEO_KIND_LIVE = 200
+    VIDEO_KIND_LIVE_SCHEDULED = 201
+    VIDEO_KIND_PREMIERE = 300
+
     thumbnail_path = ""
     playlist_pos = None
     url_playlist_video = None
@@ -17,11 +23,12 @@ class VideoD:
     missed = False
     watch_prio = read_config('Play', 'default_watch_prio')
 
-    def __init__(self, search_item, grab_methods=None):
+    def __init__(self, search_item, grab_methods=None, kind=VIDEO_KIND_VOD):
         """
         Creates a Video object from a YouTube playlist_item
-        :param search_item:
+        :param search_item: A raw YouTube API search()/list() JSON Snippet
         """
+        self.logger = create_logger(__name__)
         self.grab_methods = []
         self.vid_path = ""
         self.date_downloaded = None
@@ -33,6 +40,7 @@ class VideoD:
         self.projection = ""
         self.region_restriction_allowed = []
         self.region_restriction_blocked = []
+        self.kind = kind  # Assume VOD by default.
 
         if grab_methods is None:
             grab_methods = []
@@ -53,10 +61,13 @@ class VideoD:
             self.thumbnails = ""
             self.search_item = ""
             self.watched = False
-            self.duration = None
             return
-
-        self.video_id = search_item['id']['videoId']
+        try:
+            self.video_id = search_item['id']['videoId']
+        except Exception as anomaly:
+            self.logger.exception("Exception while creating VideoD obj!", exc_info=anomaly)
+            self.logger.info(search_item)
+            raise
         self.channel_title = search_item['snippet']['channelTitle']
         self.title = search_item['snippet']['title']
         str_date = search_item['snippet']['publishedAt']

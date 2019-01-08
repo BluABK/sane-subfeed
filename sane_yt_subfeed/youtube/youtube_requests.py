@@ -123,6 +123,32 @@ def channels_list(youtube_key, **kwargs):
     return response
 
 
+def check_if_livestream(search_result):
+    """
+    Checks if a search_result is of type liveBroadcastContent.
+    :param search_result:
+    :return:
+    """
+    try:
+        if 'liveBroadcastContent' in search_result['snippet']:
+            live_str = search_result['snippet']['liveBroadcastContent']
+            if live_str == 'live':
+                logger.info("Livestream video: {}".format(search_result))
+                return VideoD.VIDEO_KIND_LIVE
+            elif live_str == 'upcoming':
+                logger.info("Livestream video (scheduled): {}".format(search_result))
+                return VideoD.VIDEO_KIND_LIVE_SCHEDULED
+            elif live_str != 'none':
+                # Catch future anomalies in value type
+                logger.error("liveBroadcastContent in snippet, but val is '{}' NOT 'live' or 'none'!".format(live_str))
+                logger.info(search_result)
+                return VideoD.VIDEO_KIND_VOD
+    except Exception as anomaly:
+        logger.critical("Anomaly detected while checking if search_result was liveBroadcastContent", exc_info=anomaly)
+        logger.info(search_result)
+        return None
+
+
 def list_uploaded_videos(youtube_key, videos, uploads_playlist_id, req_limit):
     """
     Get a list of videos in a playlist
@@ -143,19 +169,6 @@ def list_uploaded_videos(youtube_key, videos, uploads_playlist_id, req_limit):
 
         # Grab information about each video.
         for search_result in playlistitems_list_response['items']:
-            if read_config('Debug', 'log_list') and read_config('Debug', 'log_needle') != 'unset':
-                if search_result['snippet']['channelTitle'] == str(read_config('Debug', 'log_needle')):
-                    logger_list_search.debug(
-                        "list():\t {} ({}) - {} | Desc: {}".format(search_result['snippet']['channelTitle'],
-                                                                   search_result['snippet']['publishedAt'],
-                                                                   search_result['snippet']['title'],
-                                                                   search_result['snippet']['description']))
-
-            if read_config('Debug', 'log_list') and read_config('Debug', 'log_needle') == 'unset':
-                logger_list_search.debug("list():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
-                                                                         search_result['snippet']['publishedAt'],
-                                                                         search_result['snippet']['title']))
-
             videos.append(VideoD.playlist_item_new_video_d(search_result, grab_methods=[GRAB_METHOD_LIST]))
         if searched_pages >= req_limit:
             break
@@ -260,31 +273,12 @@ def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit, live
 
         # Grab information about each video.
         for search_result in playlistitems_list_response['items']:
-            live_broadcast_snippet = search_result['snippet']['liveBroadcastContent']
-            live_broadcast = live_broadcast_snippet == 'none'
-            if (not live_videos) and (not live_broadcast):
-                break
             if search_result['id']['kind'] == 'youtube#video':
-                if read_config('Debug', 'log_search') and read_config('Debug', 'log_needle') != 'unset':
-                    if search_result['snippet']['channelTitle'] == str(read_config('Debug', 'log_needle')):
-                        title = search_result['snippet']['title']
-                        if search_result['snippet']['liveBroadcastContent'] != "none":
-                            title += " [LIVESTREAM]"
-                            logger_list_search.debug(
-                                "search():\t {} ({}) - {} | Desc: {}".format(search_result['snippet']['channelTitle'],
-                                                                             search_result['snippet']['publishedAt'],
-                                                                             title,
-                                                                             search_result['snippet']['description']))
-
-                if read_config('Debug', 'log_search') and read_config('Debug', 'log_needle') == 'unset':
-                    title = search_result['snippet']['title']
-                    if search_result['snippet']['liveBroadcastContent'] != "none":
-                        title += " [LIVESTREAM]"
-                        logger_list_search.debug(
-                            "search():\t {} ({}) - {}".format(search_result['snippet']['channelTitle'],
-                                                              search_result['snippet']['publishedAt'], title))
-
-                videos.append(VideoD(search_result, grab_methods=[GRAB_METHOD_SEARCH]))
+                video_kind = check_if_livestream(search_result)
+                if video_kind is not None:
+                    videos.append(VideoD(search_result, grab_methods=[GRAB_METHOD_SEARCH], kind=video_kind))
+                else:
+                    videos.append(VideoD(search_result, grab_methods=[GRAB_METHOD_SEARCH]))
         if search_pages >= req_limit:
             break
 
