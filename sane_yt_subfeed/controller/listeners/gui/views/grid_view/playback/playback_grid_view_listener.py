@@ -154,15 +154,16 @@ class PlaybackGridViewListener(GridViewListener):
         :param video:
         :return:
         """
-        self.logger.info("Hide video(Downloading): {}".format(video))
         video.downloaded = True
         if not read_config('SubFeed', 'show_downloaded'):
-            # Hide downloaded/ing video from *Subfeed*
+            self.logger.info("Hide video(Downloading): {}".format(video))
             self.model.hide_video_item(video, SUBFEED_VIEW_ID)
         else:
             self.model.subfeed_grid_view_listener.redraw_video(video)
-        # Update Playback View to add video to its list
+        # Update Playback View to add video to its grid feed
         self.videosChanged.emit()
+        # Update Subfeed View to remove video from its grid feed
+        self.model.subfeed_grid_view_listener.videosChanged.emit()
         DownloadViewListener.download_video(video, youtube_dl_finished_listener=[self.downloadFinished],
                                             db_update_listeners=[self.downloadedVideosChangedinDB])
 
