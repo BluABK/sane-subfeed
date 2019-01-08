@@ -51,6 +51,14 @@ class VideoTile(QWidget):
     def init_thumbnail_tile(self):
         raise ValueError("ThumbnailTile initialised from VideoTile, not subclass!")
 
+    def set_thumbnail_pixmap(self, thumbnail_path):
+        """
+        Runs
+        :return:
+        """
+        self.thumbnail_widget.setPixmap(QPixmap(thumbnail_path))
+        self.update()
+
     def set_video(self, video):
         self.video = video
         self.set_tool_tip()
@@ -72,9 +80,7 @@ class VideoTile(QWidget):
         self.date_widget.setText(self.strf_delta(vid_age, "{hours}:{minutes}:{seconds}", "{days} days "))
         self.old_videos(vid_age)
 
-        self.thumbnail_widget.setPixmap(QPixmap(video.thumbnail_path))
-
-        self.update()
+        self.set_thumbnail_pixmap(video.thumbnail_path)
 
     @staticmethod
     def strf_delta(tdelta, hours, days):

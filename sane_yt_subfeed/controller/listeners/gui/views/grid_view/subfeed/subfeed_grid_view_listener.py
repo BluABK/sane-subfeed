@@ -8,8 +8,7 @@ from sane_yt_subfeed.controller.static_controller_vars import SUBFEED_VIEW_ID
 
 
 class SubfeedGridViewListener(GridViewListener):
-    # Declare listeners
-    redrawVideos = pyqtSignal(list)  # Defined in grid_view.py
+    # Listeners
     tileDiscarded = pyqtSignal(VideoD)
     tileUndiscarded = pyqtSignal(VideoD)
     tileWatched = pyqtSignal(VideoD)
@@ -19,6 +18,12 @@ class SubfeedGridViewListener(GridViewListener):
     updateFromDb = pyqtSignal()
     scrollReachedEnd = pyqtSignal()
     thumbnailDownload = pyqtSignal()
+
+    # Defined in grid_view.py inheritance
+    redrawVideos = pyqtSignal(list)
+    redrawVideo = pyqtSignal(VideoD)
+    repaintVideos = pyqtSignal(list)
+    repaintVideo = pyqtSignal(VideoD)
 
     def __init__(self, model):
         super().__init__(model)
@@ -60,10 +65,34 @@ class SubfeedGridViewListener(GridViewListener):
         """
         self.videosUpdated.emit()
 
-    def redraw_videos(self, video: VideoD):
+    def redraw_video(self, video: VideoD):
         """
-        Issue a redraw of one of more video tiles.
+        Issue a redraw of a video tile.
         :param video:
         :return:
         """
-        self.redrawVideos.emit([video])
+        self.redrawVideo.emit(video)
+
+    def redraw_videos(self, videos: list):
+        """
+        Issue a redraw of one of more video tiles.
+        :param videos:
+        :return:
+        """
+        self.redrawVideos.emit([videos])
+
+    def repaint_video(self, video: VideoD):
+        """
+        Issue a repaint (re-pixmap) of a video tile.
+        :param video:
+        :return:
+        """
+        self.repaintVideo.emit(video)
+
+    def repaint_videos(self, videos: list):
+        """
+        Issue a redraw of one of more video tiles.
+        :param videos:
+        :return:
+        """
+        self.repaintVideos.emit([videos])

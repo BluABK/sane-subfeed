@@ -79,6 +79,14 @@ class GridViewListener(QObject):
         """
         pass
 
+    def redraw_video(self, video: VideoD):
+        """
+        Issue a redraw of a video tile.
+        :param video:
+        :return:
+        """
+        pass
+
     def redraw_videos(self, video):
         """
         Issue a redraw of one of more video tiles.
@@ -88,6 +96,38 @@ class GridViewListener(QObject):
         :return:
         """
         pass
+
+    def repaint_video(self, video: VideoD):
+        """
+        Issue a repaint (re-pixmap) of a video tile.
+        :param video:
+        :return:
+        """
+        pass
+
+    def repaint_videos(self, videos: list):
+        """
+        Issue a redraw of one of more video tiles.
+        :param videos:
+        :return:
+        """
+        pass
+
+    def update_and_repaint_tile(self, video):
+        """
+        Common operations for tiles.
+        :param video:
+        :return:
+        """
+        # Update a Grid View
+        self.videos_changed()
+        # Update Video in Database with the changed attributes
+        UpdateVideo(video, update_existing=True).start()
+        if read_config('GridView', 'show_dismissed'):
+            # Update a GridView from database.
+            self.update_from_db()
+            # Repaint the video thumbnail pixmap
+            self.repaint_video(video)
 
     def update_and_redraw_tiles(self, video):
         """
@@ -118,7 +158,7 @@ class GridViewListener(QObject):
         if not read_config('GridView', 'show_watched'):
             self.logger.info("Mark watched: {} - {}".format(video.title, video.__dict__))
             self.model.hide_video_item(video, self.widget_id)
-        self.update_and_redraw_tiles(video)
+        self.update_and_repaint_tile(video)
 
     @pyqtSlot(VideoD)
     def tile_unwatched(self, video: Video):
@@ -133,7 +173,7 @@ class GridViewListener(QObject):
         if not read_config('GridView', 'show_watched'):
             self.logger.info("Mark unwatched: {} - {}".format(video.title, video.__dict__))
             self.model.unhide_video_item(video, self.widget_id)
-        self.update_and_redraw_tiles(video)
+        self.update_and_repaint_tile(video)
 
     @pyqtSlot(VideoD)
     def tile_discarded(self, video: Video):
@@ -148,7 +188,7 @@ class GridViewListener(QObject):
         if not read_config('GridView', 'show_dismissed'):
             self.logger.info("Hide video (Discarded): {}".format(video))
             self.model.hide_video_item(video, self.widget_id)
-        self.update_and_redraw_tiles(video)
+        self.update_and_repaint_tile(video)
 
     @pyqtSlot(VideoD)
     def tile_undiscarded(self, video: Video):
@@ -163,5 +203,5 @@ class GridViewListener(QObject):
         if not read_config('GridView', 'show_dismissed'):
             self.logger.info("Un-hide video (Un-discarded): {}".format(video))
             self.model.unhide_video_item(video, self.widget_id)
-        self.update_and_redraw_tiles(video)
+        self.update_and_repaint_tile(video)
 

@@ -40,17 +40,59 @@ class GridView(QWidget):
 
         # self.main_model.grid_view_listener.redrawVideos.connect(self.redraw_videos)
 
-    def redraw_videos(self, videos):
+    def redraw_video(self, video):
+        """
+        Sets a video tile using their current properties.
+        :param video:
+        :return:
+        """
+        if video.video_id in self.q_labels.keys():
+            self.logger.info("Redrawing video: {}".format(video))
+            self.q_labels[video.video_id].set_video(video)
+        else:
+            self.logger.error("Was told to redraw video that isn't in q_labels.keys: {}".format(video))
+
+    def redraw_videos(self, videos: list):
+        """
+        Sets all the video tiles using their current properties.
+        :param videos:
+        :return:
+        """
         for video in videos:
-            if video.video_id in self.q_labels.keys():
-                self.logger.info("Redrawing video: {}".format(video))
-                self.q_labels[video.video_id].set_video(video)
+            self.redraw_video(video)
+
+    def repaint_video(self, video):
+        """
+        Sets pixmap on a video thumbnail tile using their current properties.
+        :param video:
+        :return:
+        """
+        if video.video_id in self.q_labels.keys():
+            self.logger.info("Repainting video: {}".format(video))
+            self.q_labels[video.video_id].set_thumbnail_pixmap(video.thumbnail_path)
+
+    def repaint_videos(self, videos: list):
+        """
+        Sets pixmap on all video thumbnail tiles using their current properties.
+        :param videos:
+        :return:
+        """
+        for video in videos:
+            self.repaint_video(video)
 
     def videos_changed(self):
-        self.logger.info('Updating tiles')
+        """
+        Actions to be taken when video list detects a change.
+        :return:
+        """
+        self.logger.info('Updating tiles (Videos change detected)')
         self.update_grid()
 
     def resize_event(self):
+        """
+        Handling of window being resized.
+        :return:
+        """
         if self.items_x >= 1:
             margins = self.grid.getContentsMargins()
             update_grid = False
@@ -69,7 +111,7 @@ class GridView(QWidget):
         """
         Retrieves the list of videos in a feed.
         Override in inheritance.
-        :return:
+        :return: list
         """
         pass
 
@@ -78,7 +120,7 @@ class GridView(QWidget):
         Update/Redraw the GridView feed with a list of videos.
         :return:
         """
-        feed = self.get_feed()
+        feed: list = self.get_feed()
         counter = 0
         video_counter = 0
         q_labels_keys_to_delete = set(self.q_labels)

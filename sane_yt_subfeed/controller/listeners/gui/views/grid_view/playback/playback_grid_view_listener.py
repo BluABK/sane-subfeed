@@ -18,7 +18,6 @@ class PlaybackGridViewListener(GridViewListener):
     updateFromDb = pyqtSignal()
     scrollReachedEnd = pyqtSignal()
     thumbnailDownload = pyqtSignal()
-    redrawVideos = pyqtSignal(list)
     tileDiscarded = pyqtSignal(VideoD)
     tileUndiscarded = pyqtSignal(VideoD)
     tileWatched = pyqtSignal(VideoD)
@@ -28,6 +27,12 @@ class PlaybackGridViewListener(GridViewListener):
     tileDownloaded = pyqtSignal(VideoD)
     decreaseWatchPrio = pyqtSignal(VideoD)
     increaseWatchPrio = pyqtSignal(VideoD)
+
+    # Defined in grid_view.py inheritance
+    redrawVideos = pyqtSignal(list)
+    redrawVideo = pyqtSignal(VideoD)
+    repaintVideos = pyqtSignal(list)
+    repaintVideo = pyqtSignal(VideoD)
 
     # FIXME: move youtube-dl listener to its own listener?
     downloadFinished = pyqtSignal(VideoD)
@@ -86,13 +91,37 @@ class PlaybackGridViewListener(GridViewListener):
         """
         self.videosUpdated.emit()
 
-    def redraw_videos(self, video: VideoD):
+    def redraw_video(self, video: VideoD):
         """
-        Issue a redraw of one of more video tiles.
+        Issue a redraw of a video tile.
         :param video:
         :return:
         """
-        self.redrawVideos.emit([video])
+        self.redrawVideo.emit(video)
+
+    def redraw_videos(self, videos: list):
+        """
+        Issue a redraw of one of more video tiles.
+        :param videos:
+        :return:
+        """
+        self.redrawVideos.emit([videos])
+
+    def repaint_video(self, video: VideoD):
+        """
+        Issue a repaint (re-pixmap) of a video tile.
+        :param video:
+        :return:
+        """
+        self.repaintVideo.emit(video)
+
+    def repaint_videos(self, videos: list):
+        """
+        Issue a redraw of one of more video tiles.
+        :param videos:
+        :return:
+        """
+        self.repaintVideos.emit([videos])
 
     @pyqtSlot(VideoD)
     def decrease_watch_prio(self, video):
@@ -131,7 +160,7 @@ class PlaybackGridViewListener(GridViewListener):
             # Hide downloaded/ing video from *Subfeed*
             self.model.hide_video_item(video, SUBFEED_VIEW_ID)
         else:
-            self.model.subfeed_grid_view_listener.redraw_videos(video)
+            self.model.subfeed_grid_view_listener.redraw_video(video)
         # Update Playback View to add video to its list
         self.videosChanged.emit()
         DownloadViewListener.download_video(video, youtube_dl_finished_listener=[self.downloadFinished],
@@ -144,6 +173,6 @@ class PlaybackGridViewListener(GridViewListener):
         :param video:
         :return:
         """
-        self.redraw_videos(video)
+        self.redraw_video(video)
         # Update Video in Database with the changed attributes
         UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
