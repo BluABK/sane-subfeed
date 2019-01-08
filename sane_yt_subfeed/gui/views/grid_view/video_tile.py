@@ -4,6 +4,8 @@ from PyQt5.QtGui import QPalette, QPixmap
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 
 from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VIDEO_KIND_LIVE, \
+    VIDEO_KIND_LIVE_SCHEDULED, VIDEO_KIND_PREMIERE
 from sane_yt_subfeed.gui.views.grid_view.channel_tile import ChannelTile
 from sane_yt_subfeed.gui.views.grid_view.date_tile import DateTile
 from sane_yt_subfeed.gui.views.grid_view.title_tile import TitleTile
@@ -79,6 +81,7 @@ class VideoTile(QWidget):
         vid_age = datetime.datetime.utcnow() - self.video.date_published
         self.date_widget.setText(self.strf_delta(vid_age, "{hours}:{minutes}:{seconds}", "{days} days "))
         self.old_videos(vid_age)
+        # self.debug_live_videos()
 
         self.set_thumbnail_pixmap(video.thumbnail_path)
 
@@ -106,6 +109,23 @@ class VideoTile(QWidget):
                 pal.setColor(QPalette.Background, Qt.white)
                 self.setAutoFillBackground(True)
                 self.setPalette(pal)
+
+    def debug_live_videos(self):
+        if self.video.kind is VIDEO_KIND_LIVE:
+            pal = self.palette()
+            pal.setColor(QPalette.Background, Qt.red)
+            self.setAutoFillBackground(True)
+            self.setPalette(pal)
+        elif self.video.kind is VIDEO_KIND_LIVE_SCHEDULED:
+            pal = self.palette()
+            pal.setColor(QPalette.Background, Qt.yellow)
+            self.setAutoFillBackground(True)
+            self.setPalette(pal)
+        elif self.video.kind is VIDEO_KIND_PREMIERE:
+            pal = self.palette()
+            pal.setColor(QPalette.Background, Qt.pink)
+            self.setAutoFillBackground(True)
+            self.setPalette(pal)
 
     def set_tool_tip(self):
         if not read_config('Debug', 'disable_tooltips'):

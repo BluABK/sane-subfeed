@@ -7,14 +7,13 @@ from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 GRAB_METHOD_LIST = 'list()'
 GRAB_METHOD_SEARCH = 'search()'
 GRAB_METHOD_VIDEOS = 'videos()'
+VIDEO_KIND_VOD = 100
+VIDEO_KIND_LIVE = 200
+VIDEO_KIND_LIVE_SCHEDULED = 201
+VIDEO_KIND_PREMIERE = 300
 
 
 class VideoD:
-    VIDEO_KIND_VOD = 100
-    VIDEO_KIND_LIVE = 200
-    VIDEO_KIND_LIVE_SCHEDULED = 201
-    VIDEO_KIND_PREMIERE = 300
-
     thumbnail_path = ""
     playlist_pos = None
     url_playlist_video = None
@@ -41,6 +40,12 @@ class VideoD:
         self.region_restriction_allowed = []
         self.region_restriction_blocked = []
         self.kind = kind  # Assume VOD by default.
+
+        # Put liveBroadcastContent at start of feed to avoid it being buried.
+        if self.kind is VIDEO_KIND_LIVE:
+            self.watch_prio = 0
+        elif self.kind is VIDEO_KIND_LIVE_SCHEDULED:
+            self.watch_prio = 1
 
         if grab_methods is None:
             grab_methods = []

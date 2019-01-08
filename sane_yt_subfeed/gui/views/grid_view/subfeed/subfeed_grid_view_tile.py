@@ -6,8 +6,13 @@ from sane_yt_subfeed.default_application_handler import open_with_default_applic
 from sane_yt_subfeed.gui.dialogs.sane_text_view_dialog import SaneTextViewDialog
 from sane_yt_subfeed.gui.views.grid_view.subfeed.subfeed_grid_thumbnail_tile import SubfeedGridViewThumbnailTile
 from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
+from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VIDEO_KIND_LIVE, \
+    VIDEO_KIND_LIVE_SCHEDULED, VIDEO_KIND_PREMIERE
 from sane_yt_subfeed.log_handler import create_logger
 
+VIDEO_IS_LIVE_TITLE = "This video is live broadcast content!"
+VIDEO_IS_LIVE_MSG = "If you proceed to download this video is will be streamed in realtime and not finish until the" \
+                    "stream ends."
 
 class SubfeedGridViewTile(VideoTile):
 
@@ -37,13 +42,20 @@ class SubfeedGridViewTile(VideoTile):
             debug_log_video_obj = menu.addAction("Send to logger")
 
         action = menu.exec_(self.mapToGlobal(event.pos()))
-        if action == copy_url_action:
-            self.copy_url()
-        elif action == downloaded_item_action:
-            self.mark_downloaded()
-        elif action == discard_item_action:
-            self.mark_discarded()
-        elif action == open_thumbnail_file:
+        if self.video.kind is VIDEO_KIND_VOD:
+            if action == copy_url_action:
+                self.copy_url()
+            elif action == downloaded_item_action:
+                self.mark_downloaded()
+            elif action == discard_item_action:
+                self.mark_discarded()
+        elif self.video.kind is VIDEO_KIND_LIVE or self.video.kind is VIDEO_KIND_LIVE_SCHEDULED:
+            if action == copy_url_action:
+                self.copy_url()
+            elif action == discard_item_action:
+                self.mark_discarded()
+
+        if action == open_thumbnail_file:
             open_with_default_application(self.video.thumbnail_path)
         elif action == show_description_dialog:
             description_dialog = SaneTextViewDialog(self.parent, self.video.description)
@@ -61,12 +73,19 @@ class SubfeedGridViewTile(VideoTile):
         :param QMouseEvent:
         :return:
         """
-        if QMouseEvent.button() == Qt.MidButton:
-            self.mark_discarded()
-        elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
-            self.logger.error("Not Implemented: Select video")
-        elif QMouseEvent.button() == Qt.LeftButton:
-            self.mark_downloaded()
+        if self.video.kind is VIDEO_KIND_VOD:
+            if QMouseEvent.button() == Qt.MidButton:
+                self.mark_discarded()
+            elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
+                self.logger.error("Not Implemented: Select video")
+            elif QMouseEvent.button() == Qt.LeftButton:
+                self.mark_downloaded()
+        elif self.video.kind is VIDEO_KIND_LIVE or self.video.kind is VIDEO_KIND_LIVE_SCHEDULED:
+            if QMouseEvent.button() == Qt.MidButton:
+                self.mark_discarded()
+            elif QMouseEvent.button() == Qt.LeftButton:
+                self.root.confirmation_dialog(self, VIDEO_IS_LIVE_MSG, self.mark_downloaded, title=VIDEO_IS_LIVE_TITLE,
+                                              ok_text="Yes, *stream* it.", cancel_text="Abort, abort, ABORT!")
 
     def mark_discarded(self):
         """

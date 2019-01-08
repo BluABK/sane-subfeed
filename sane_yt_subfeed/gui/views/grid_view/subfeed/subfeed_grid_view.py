@@ -22,7 +22,7 @@ class SubfeedGridView(GridView):
 
         self.logger.debug("Init grid")
         self.update_grid()
-        self.logger.info("Initialized PlaybackGridView")
+        self.logger.info("Initialized SubfeedGridView")
 
     def new_tile(self, counter, video):
         return SubfeedGridViewTile(self, video, counter, self.clipboard, self.status_bar)
