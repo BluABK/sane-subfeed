@@ -13,6 +13,8 @@ from sane_yt_subfeed.database.write_operations import engine_execute_first, engi
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.pickle_handler import load_youtube, dump_youtube
 from sane_yt_subfeed.print_functions import remove_empty_kwargs
+from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VIDEO_KIND_LIVE, \
+    VIDEO_KIND_LIVE_SCHEDULED, VIDEO_KIND_PREMIERE
 
 YOUTUBE_URL = "https://www.youtube.com/"
 YOUTUBE_PARM_VIDEO = "watch?v="
@@ -21,9 +23,6 @@ YT_VIDEO_URL = YOUTUBE_URL + YOUTUBE_PARM_VIDEO
 
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 logger = create_logger(__name__)
-
-# FIXME: integrate with socket system
-logger_list_search = create_logger("youtube_requests: list()/search()", logfile="debug_list_search.log")
 
 
 def get_channel_uploads_playlist_id(youtube_key, channel_id):
@@ -61,8 +60,8 @@ def get_channel_by_id(youtube_key, channel_id):
 def get_channel_by_username(youtube_key, username):
     """
     Get a channel response, given its ID.
+    :param username:
     :param youtube_key:
-    :param channel_id:
     :return: A channelList response
     """
     # Get channel
@@ -134,15 +133,15 @@ def check_if_livestream(search_result):
             live_str = search_result['snippet']['liveBroadcastContent']
             if live_str == 'live':
                 logger.info("Livestream video: {}".format(search_result))
-                return VideoD.VIDEO_KIND_LIVE
+                return VIDEO_KIND_LIVE
             elif live_str == 'upcoming':
                 logger.info("Livestream video (scheduled): {}".format(search_result))
-                return VideoD.VIDEO_KIND_LIVE_SCHEDULED
+                return VIDEO_KIND_LIVE_SCHEDULED
             elif live_str != 'none':
                 # Catch future anomalies in value type
                 logger.error("liveBroadcastContent in snippet, but val is '{}' NOT 'live' or 'none'!".format(live_str))
                 logger.info(search_result)
-                return VideoD.VIDEO_KIND_VOD
+                return VIDEO_KIND_VOD
     except Exception as anomaly:
         logger.critical("Anomaly detected while checking if search_result was liveBroadcastContent", exc_info=anomaly)
         logger.info(search_result)
@@ -252,11 +251,10 @@ def get_videos_result(youtube_key, video_ids, req_limit, part='snippet'):
     return results
 
 
-def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit, live_videos=True):
+def list_uploaded_videos_search(youtube_key, channel_id, videos, req_limit):
     """
     Get a list of videos through the API search()
     Quota cost: 100 units / response
-    :param live_videos:
     :param videos:
     :param req_limit:
     :param channel_id:
@@ -290,17 +288,12 @@ def get_remote_subscriptions(youtube_oauth):
     """
     Get a list of the authenticated user's subscriptions.
     :param youtube_oauth:
-    :param stats:
-    :param info: debug lite
-    :param debug:
-    :param traverse_pages:
-    :return: [total, subs, statistics]
+    :return: [subs]
     """
     subscription_list_request = youtube_oauth.subscriptions().list(part='snippet', mine=True,
                                                                    maxResults=50)
     subs = []
     # Retrieve the list of subscribed channels for authenticated user's channel.
-    update_stmts = []
     channel_ids = []
     while subscription_list_request:
         subscription_list_response = subscription_list_request.execute()
@@ -366,7 +359,6 @@ def add_subscription_remote(channel_id):
     Add a YouTube subscription (On YouTube).
 
     DEPRECATED: Google doesn't let you, see supported op table https://developers.google.com/youtube/v3/getting-started
-    :param youtube_oauth:
     :param channel_id:
     :return: returns response or raises exception
     """
