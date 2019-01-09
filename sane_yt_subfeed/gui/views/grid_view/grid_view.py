@@ -134,14 +134,14 @@ class GridView(QWidget):
                 pass
             # Add every existing video as a feed widget and remove it from the deletion list.
             elif feed[counter].video_id in self.q_labels:
-                self.logger.debug3("Inserting item in grid coord [{},{}]: {}".format(*position, feed[counter]))
+                # self.logger.debug3("Inserting item in grid coord [{},{}]: {}".format(*position, feed[counter]))
                 self.grid.addWidget(self.q_labels[feed[counter].video_id], *position)
                 q_labels_keys_to_delete.discard(feed[counter].video_id)
                 video_counter += 1
             else:
                 # Add new video feed widgets
                 video = feed[counter]
-                self.logger.debug3("Inserting *NEW* item in grid coord [{},{}]: {}".format(*position, video))
+                # self.logger.debug3("Inserting *NEW* item in grid coord [{},{}]: {}".format(*position, video))
                 lbl = self.new_tile(counter, video)
                 self.grid.addWidget(lbl, *position)
                 self.q_labels[video.video_id] = lbl
@@ -150,7 +150,7 @@ class GridView(QWidget):
 
         # Delete any orphaned items remaining in the deletion list.
         for key in q_labels_keys_to_delete:
-            self.logger.debug3("Deleting orphaned grid video: {}".format(self.q_labels[key].video))
+            # self.logger.debug3("Deleting orphaned grid video: {}".format(self.q_labels[key].video))
             self.grid.removeWidget(self.q_labels[key])
             self.q_labels[key].deleteLater()
             del self.q_labels[key]
