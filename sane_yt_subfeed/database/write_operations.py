@@ -144,12 +144,16 @@ class UpdateVideosExtraInfoThreaded(threading.Thread):
                 elif item.region_restriction_blocked is None:
                     self.logger.warning("Video missing region_restriction_blocked for update: {}".format(vid_info))
                     self.logger.error(self.obj_attrs_to_dict(item))
+                elif item.kind is None:
+                    self.logger.warning("Video missing kind for update: {}".format(vid_info))
+                    self.logger.error(self.obj_attrs_to_dict(item))
                 else:
                     update_list.append(
                         {"thumbnail_path": item.thumbnail_path, "_video_id": item.video_id, "duration": item.duration,
                          "has_caption": item.has_caption, "dimension": item.dimension, "definition": item.definition,
                          "projection": item.projection, "region_restriction_allowed": item.region_restriction_allowed,
-                         "region_restriction_blocked": item.region_restriction_blocked})
+                         "region_restriction_blocked": item.region_restriction_blocked,
+                         "kind": item.kind})
             try:
                 engine.execute(update_extra_information_stmt(), update_list)
             except Exception as e:

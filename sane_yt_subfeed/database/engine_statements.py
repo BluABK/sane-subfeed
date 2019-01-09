@@ -30,7 +30,8 @@ def update_video_statement_full(db_video):
         projection=db_video.projection,
         region_restriction_allowed=db_video.region_restriction_allowed,
         region_restriction_blocked=db_video.region_restriction_blocked,
-        date_downloaded=db_video.date_downloaded)
+        date_downloaded=db_video.date_downloaded,
+        kind=db_video.kind)
 
 
 def update_video_statement_selective(db_video, values):
@@ -47,7 +48,8 @@ def update_extra_information_stmt():
         'definition': bindparam('definition'),
         'projection': bindparam('projection'),
         'region_restriction_allowed': bindparam('region_restriction_allowed'),
-        'region_restriction_blocked': bindparam('region_restriction_blocked')})
+        'region_restriction_blocked': bindparam('region_restriction_blocked'),
+        'kind': bindparam('kind')})
 
 
 def update_video_stmt():
@@ -72,7 +74,8 @@ def update_video_stmt():
         'definition': bindparam('definition'),
         'projection': bindparam('projection'),
         'region_restriction_allowed': bindparam('region_restriction_allowed'),
-        'region_restriction_blocked': bindparam('region_restriction_blocked')
+        'region_restriction_blocked': bindparam('region_restriction_blocked'),
+        'kind': bindparam('kind')
     })
 
 

@@ -4,6 +4,8 @@ from sqlalchemy import Boolean, DateTime, Column, Integer, String, Interval
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.decorators import TextPickleType
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
+# from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VIDEO_KIND_LIVE, \
+#     VIDEO_KIND_LIVE_SCHEDULED, VIDEO_KIND_PREMIERE
 from sane_yt_subfeed.database.orm import PermanentBase
 from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 
@@ -39,6 +41,7 @@ class Video(PermanentBase):  # FIXME: PickleTypes should probably be replaced by
     projection = Column(String)
     region_restriction_allowed = Column(TextPickleType())
     region_restriction_blocked = Column(TextPickleType())
+    kind = Column(Integer)
 
     def __init__(self, search_item):
         """
@@ -110,6 +113,7 @@ class Video(PermanentBase):  # FIXME: PickleTypes should probably be replaced by
         video_d.projection = video.projection
         video_d.region_restriction_allowed = video.region_restriction_allowed
         video_d.region_restriction_blocked = video.region_restriction_blocked
+        video_d.kind = video.kind
         return video_d
 
     @staticmethod
@@ -134,6 +138,7 @@ class Video(PermanentBase):  # FIXME: PickleTypes should probably be replaced by
         self.projection = video_d.projection
         self.region_restriction_allowed = video_d.region_restriction_allowed
         self.region_restriction_blocked = video_d.region_restriction_blocked
+        self.kind = video_d.kind
 
     @staticmethod
     def video_d_to_video(video_d):
@@ -152,4 +157,5 @@ class Video(PermanentBase):  # FIXME: PickleTypes should probably be replaced by
         video.projection = video_d.projection
         video.region_restriction_allowed = video_d.region_restriction_allowed
         video.region_restriction_blocked = video_d.region_restriction_blocked
+        video.kind = video_d.kind
         return video
