@@ -233,7 +233,7 @@ class PlaybackGridViewTile(VideoTile):
             if action == debug_log_video_obj:
                 self.logger.debug(self.video.__dict__)
 
-    def old_videos(self, vid_age):
+    def color_old_video(self, vid_age):
         pass
 
     def mark_discarded(self):

@@ -30,9 +30,24 @@ class SubfeedGridViewTile(VideoTile):
         :return:
         """
         menu = QMenu(self)
+        mark_as_live_content_submenu = QMenu(self)
+        mark_as_live_content_submenu.setTitle("Mark as liveBroadcastContent")
+        # mark_as_live_content_submenu.setHidden(True)
         copy_url_action = menu.addAction("Copy link")
-        downloaded_item_action = menu.addAction("Copy link and mark as downloaded")
+        downloaded_item_action = menu.addAction("Copy link and download")
         discard_item_action = menu.addAction("Dismiss video")
+
+        menu.addMenu(mark_as_live_content_submenu)
+        mark_premiere_action = mark_as_live_content_submenu.addAction("Mark as Premiere")
+        mark_livestream_upcoming_action = mark_as_live_content_submenu.addAction("Mark as Scheduled livestream")
+        mark_livestream_action = mark_as_live_content_submenu.addAction("Mark as Livestream")
+
+        menu.addSeparator()
+        unmark_live_content_action = menu.addAction("Unmark as liveBroadcastContent")
+        # if self.video.kind is VIDEO_KIND_VOD:
+        #     mark_as_live_content_submenu.setHidden(False)
+        # else:
+        #     mark_as_live_content_submenu.setHidden(True)
 
         menu.addSeparator()
         show_description_dialog = menu.addAction("View description")
@@ -49,11 +64,30 @@ class SubfeedGridViewTile(VideoTile):
                 self.mark_downloaded()
             elif action == discard_item_action:
                 self.mark_discarded()
-        elif self.video.kind is VIDEO_KIND_LIVE or self.video.kind is VIDEO_KIND_LIVE_SCHEDULED:
+            elif action == mark_premiere_action:
+                self.mark_premiere()
+            elif action == mark_livestream_upcoming_action:
+                self.mark_livestream_upcoming()
+            elif action == mark_livestream_action:
+                self.mark_livestream()
+        # Video is in a special "livestream"-family state, only allow unmarking of these states
+        elif self.video.kind is VIDEO_KIND_LIVE or self.video.kind is VIDEO_KIND_LIVE_SCHEDULED \
+                or self.video.kind is VIDEO_KIND_PREMIERE:
             if action == copy_url_action:
                 self.copy_url()
             elif action == discard_item_action:
                 self.mark_discarded()
+
+            # All-in-one tri-state action that unmarks the relevant liveBroadcastContent
+            elif action == unmark_live_content_action:
+                if self.video.kind is VIDEO_KIND_PREMIERE:
+                    self.unmark_premiere()
+                elif self.video.kind is VIDEO_KIND_LIVE_SCHEDULED:
+                    self.unmark_livestream_upcoming()
+                elif self.video.kind is VIDEO_KIND_LIVE:
+                    self.unmark_livestream()
+                else:
+                    self.logger.error("Invalid Video.kind == {}".format(self.video.kind))
 
         if action == open_thumbnail_file:
             open_with_default_application(self.video.thumbnail_path)
@@ -80,12 +114,14 @@ class SubfeedGridViewTile(VideoTile):
                 self.logger.error("Not Implemented: Select video")
             elif QMouseEvent.button() == Qt.LeftButton:
                 self.mark_downloaded()
-        elif self.video.kind is VIDEO_KIND_LIVE or self.video.kind is VIDEO_KIND_LIVE_SCHEDULED:
+        elif self.video.kind is VIDEO_KIND_LIVE or self.video.kind is VIDEO_KIND_LIVE_SCHEDULED \
+                or self.video.kind is VIDEO_KIND_PREMIERE:
             if QMouseEvent.button() == Qt.MidButton:
                 self.mark_discarded()
             elif QMouseEvent.button() == Qt.LeftButton:
                 self.root.confirmation_dialog(VIDEO_IS_LIVE_MSG, self.mark_downloaded, title=VIDEO_IS_LIVE_TITLE,
-                                              ok_text="Yes, *stream* it.", cancel_text="Abort, abort, ABORT!")
+                                              ok_text="Yes, stream it.",
+                                              cancel_text="Abort, abort, ABORT!")
 
     def mark_discarded(self):
         """
@@ -118,3 +154,55 @@ class SubfeedGridViewTile(VideoTile):
         """
         self.parent.main_model.subfeed_grid_view_listener.tileUnwatched.emit(self.video)
         super().unmark_watched()
+
+    def mark_premiere(self):
+        """
+        Mark the video as live broadcast content (premiere)
+
+        A premiere is: upcoming stream --> live stream --> vod
+        :return:
+        """
+        self.parent.main_model.subfeed_grid_view_listener.tileMarkedPremiere.emit(self.video)
+        super().mark_premiere()
+
+    def unmark_premiere(self):
+        """
+        Unmark the video as live broadcast content (premiere)
+
+        A premiere is: upcoming stream --> live stream --> vod
+        :return:
+        """
+        self.parent.main_model.subfeed_grid_view_listener.tileUnmarkedPremiere.emit(self.video)
+        super().unmark_premiere()
+
+    def mark_livestream_upcoming(self):
+        """
+        Mark the video as live broadcast content (upcoming)
+        :return:
+        """
+        self.parent.main_model.subfeed_grid_view_listener.tileMarkedLivestreamUpcoming.emit(self.video)
+        super().mark_livestream_upcoming()
+
+    def unmark_livestream_upcoming(self):
+        """
+        Unmark the video as live broadcast content (upcoming)
+        :return:
+        """
+        self.parent.main_model.subfeed_grid_view_listener.tileUnmarkedLivestreamUpcoming.emit(self.video)
+        super().unmark_livestream_upcoming()
+
+    def mark_livestream(self):
+        """
+        Mark the video as live broadcast content (live)
+        :return:
+        """
+        self.parent.main_model.subfeed_grid_view_listener.tileMarkedLivestream.emit(self.video)
+        super().mark_livestream()
+
+    def unmark_livestream(self):
+        """
+        Unmark the video as live broadcast content (live)
+        :return:
+        """
+        self.parent.main_model.subfeed_grid_view_listener.tileUnmarkedLivestream.emit(self.video)
+        super().unmark_livestream()

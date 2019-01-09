@@ -5,14 +5,26 @@ from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.controller.listeners.gui.views.grid_view.grid_view_listener import GridViewListener
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.controller.static_controller_vars import SUBFEED_VIEW_ID
+from sane_yt_subfeed.database.video import Video
+from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VIDEO_KIND_LIVE, \
+    VIDEO_KIND_LIVE_SCHEDULED, VIDEO_KIND_PREMIERE
 
 
 class SubfeedGridViewListener(GridViewListener):
-    # Listeners
+    # Shared Listeners
     tileDiscarded = pyqtSignal(VideoD)
     tileUndiscarded = pyqtSignal(VideoD)
     tileWatched = pyqtSignal(VideoD)
     tileUnwatched = pyqtSignal(VideoD)
+
+    # Own listeners
+    tileMarkedPremiere = pyqtSignal(VideoD)
+    tileUnmarkedPremiere = pyqtSignal(VideoD)
+    tileMarkedLivestreamUpcoming = pyqtSignal(VideoD)
+    tileUnmarkedLivestreamUpcoming = pyqtSignal(VideoD)
+    tileMarkedLivestream = pyqtSignal(VideoD)
+    tileUnmarkedLivestream = pyqtSignal(VideoD)
+
     videosChanged = pyqtSignal()
     videosUpdated = pyqtSignal()
     updateFromDb = pyqtSignal()
@@ -33,11 +45,20 @@ class SubfeedGridViewListener(GridViewListener):
         self.logger = create_logger(__name__ + '.' + self.name)
         self.videos_limit = model.videos_limit
 
-        # Connect listeners
+        # Connect shared listeners
         self.tileWatched.connect(self.tile_watched)
         self.tileUnwatched.connect(self.tile_unwatched)
         self.tileDiscarded.connect(self.tile_discarded)
         self.tileUndiscarded.connect(self.tile_undiscarded)
+
+        # Connect own listeners
+        self.tileMarkedPremiere.connect(self.tile_marked_premiere)
+        self.tileUnmarkedPremiere.connect(self.tile_unmarked_premiere)
+        self.tileMarkedLivestreamUpcoming.connect(self.tile_marked_livestream_upcoming)
+        self.tileUnmarkedLivestreamUpcoming.connect(self.tile_unmarked_livestream_upcoming)
+        self.tileMarkedLivestream.connect(self.tile_marked_livestream)
+        self.tileUnmarkedLivestream.connect(self.tile_unmarked_livestream)
+
         self.updateFromDb.connect(self.update_from_db)
         self.thumbnailDownload.connect(self.thumbnail_download)
         self.scrollReachedEnd.connect(self.scroll_reached_end)
@@ -96,3 +117,61 @@ class SubfeedGridViewListener(GridViewListener):
         :return:
         """
         self.repaintVideos.emit([videos])
+
+    @pyqtSlot(VideoD)
+    def tile_marked_premiere(self, video: Video):
+        """
+        Mark the video as live broadcast content (premiere)
+
+        A premiere is: upcoming stream --> live stream --> vod
+        :return:
+        """
+        video.kind = VIDEO_KIND_PREMIERE
+        self.update_and_repaint_tile(video)
+
+    @pyqtSlot(VideoD)
+    def tile_unmarked_premiere(self, video: Video):
+        """
+        Unmark the video as live broadcast content (premiere)
+
+        A premiere is: upcoming stream --> live stream --> vod
+        :return:
+        """
+        video.kind = VIDEO_KIND_VOD
+        self.update_and_repaint_tile(video)
+
+    @pyqtSlot(VideoD)
+    def tile_marked_livestream_upcoming(self, video: Video):
+        """
+        Mark the video as live broadcast content (upcoming)
+        :return:
+        """
+        video.kind = VIDEO_KIND_LIVE_SCHEDULED
+        self.update_and_repaint_tile(video)
+
+    @pyqtSlot(VideoD)
+    def tile_unmarked_livestream_upcoming(self, video: Video):
+        """
+        Unmark the video as live broadcast content (upcoming)
+        :return:
+        """
+        video.kind = VIDEO_KIND_VOD
+        self.update_and_repaint_tile(video)
+
+    @pyqtSlot(VideoD)
+    def tile_marked_livestream(self, video: Video):
+        """
+        Mark the video as live broadcast content (live)
+        :return:
+        """
+        video.kind = VIDEO_KIND_LIVE
+        self.update_and_repaint_tile(video)
+
+    @pyqtSlot(VideoD)
+    def tile_unmarked_livestream(self, video: Video):
+        """
+        Unmark the video as live broadcast content (live)
+        :return:
+        """
+        video.kind = VIDEO_KIND_VOD
+        self.update_and_repaint_tile(video)

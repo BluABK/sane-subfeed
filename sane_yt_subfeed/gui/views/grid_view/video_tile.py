@@ -26,8 +26,6 @@ class VideoTile(QWidget):
         self.parent = parent
         self.root = parent.root  # MainWindow
         self.history = self.root.history
-        # parent.parent.parent.bind('<KeyPress-ctrl>', self.key_press_ctrl)
-        # parent.parent.parent.bind('<KeyRelease-ctrl>', self.key_release_ctrl)
 
         self.pref_height = read_config('Gui', 'tile_pref_height')
         self.pref_width = read_config('Gui', 'tile_pref_width')
@@ -80,8 +78,8 @@ class VideoTile(QWidget):
 
         vid_age = datetime.datetime.utcnow() - self.video.date_published
         self.date_widget.setText(self.strf_delta(vid_age, "{hours}:{minutes}:{seconds}", "{days} days "))
-        self.old_videos(vid_age)
-        # self.debug_live_videos()
+        self.color_old_video(vid_age)
+        self.color_live_video()
 
         self.set_thumbnail_pixmap(video.thumbnail_path)
 
@@ -97,33 +95,53 @@ class VideoTile(QWidget):
 
         return return_string
 
-    def old_videos(self, vid_age):
+    def color_old_video(self, vid_age, days=1):
+        """
+        Colors the QPalette background element of a video grey if it is older than days (default: 1)
+
+        :param days:
+        :param vid_age:
+        :return:
+        """
         if read_config('Gui', 'grey_old_videos'):
-            if vid_age > datetime.timedelta(days=1):
+            if vid_age > datetime.timedelta(days):
                 pal = self.palette()
-                pal.setColor(QPalette.Background, Qt.lightGray)
+                pal.setColor(QPalette.Window, Qt.lightGray)
                 self.setAutoFillBackground(True)
                 self.setPalette(pal)
             else:
                 pal = self.palette()
-                pal.setColor(QPalette.Background, Qt.white)
+                pal.setColor(QPalette.Window, Qt.white)
                 self.setAutoFillBackground(True)
                 self.setPalette(pal)
 
-    def debug_live_videos(self):
+    def color_live_video(self, logging=False):
+        """
+        Colors the QPalette background element of a video in the following manner:
+        Livestream:                 darkRed
+        Upcoming/Scheduled stream:  darkYellow
+        Premiere:                   darkMagenta
+
+        :return:
+        """
         if self.video.kind is VIDEO_KIND_LIVE:
             pal = self.palette()
-            pal.setColor(QPalette.Background, Qt.red)
+            pal.setColor(QPalette.Window, Qt.darkRed)
             self.setAutoFillBackground(True)
             self.setPalette(pal)
         elif self.video.kind is VIDEO_KIND_LIVE_SCHEDULED:
             pal = self.palette()
-            pal.setColor(QPalette.Background, Qt.yellow)
+            pal.setColor(QPalette.Window, Qt.darkYellow)
             self.setAutoFillBackground(True)
             self.setPalette(pal)
         elif self.video.kind is VIDEO_KIND_PREMIERE:
             pal = self.palette()
-            pal.setColor(QPalette.Background, Qt.pink)
+            pal.setColor(QPalette.Window, Qt.darkMagenta)
+            self.setAutoFillBackground(True)
+            self.setPalette(pal)
+        else:
+            # Set a default palette to reset any colouring.
+            pal = self.palette()
             self.setAutoFillBackground(True)
             self.setPalette(pal)
 
@@ -137,9 +155,6 @@ class VideoTile(QWidget):
 
                 self.setToolTip("<{} style='text-align:center;'><img src={} style='float:below'>{}: {}</{}>".format(
                     text_element, resized_thumb, self.video.channel_title, self.video.title, text_element))
-                # if self.root.hotkey_ctrl_down:
-                # print(self.root.hotkey_ctrl_down)
-                # self.showTooltip()
             else:
                 self.setToolTip("{}: {}".format(self.video.channel_title, self.video.title))
 
@@ -189,6 +204,82 @@ class VideoTile(QWidget):
         self.status_bar.showMessage('Un-discarded: {}'.format(self.video))
 
         self.history.add(self.video, self.unmark_discarded, self.mark_discarded)
+
+    def mark_premiere(self):
+        """
+        Mark the video as live broadcast content (premiere)
+
+        A premiere is: upcoming stream --> live stream --> vod
+        :return:
+        """
+        logger.info('Marked as premiere: {:2d}: {}'.format(self.id, self.video))
+        update_plaintext_history('Marked as premiere: {} '.format(self.video))
+        self.status_bar.showMessage('Marked as premiere: {}'.format(self.video))
+        self.color_live_video()
+
+        self.history.add(self.video, self.mark_premiere, self.unmark_premiere)
+
+    def unmark_premiere(self):
+        """
+        Unmark the video as live broadcast content (premiere)
+
+        A premiere is: upcoming stream --> live stream --> vod
+        :return:
+        """
+        logger.info('Unmarked as premiere: {:2d}: {}'.format(self.id, self.video))
+        update_plaintext_history('Unmarked as premiere: {} '.format(self.video))
+        self.status_bar.showMessage('Unmarked as premiere: {}'.format(self.video))
+        self.color_live_video()
+
+        self.history.add(self.video, self.unmark_premiere, self.mark_premiere)
+
+    def mark_livestream_upcoming(self):
+        """
+        Mark the video as live broadcast content (upcoming)
+        :return:
+        """
+        logger.info('Marked as livestream: {:2d}: {}'.format(self.id, self.video))
+        update_plaintext_history('Marked as livestream: {} '.format(self.video))
+        self.status_bar.showMessage('Marked as livestream: {}'.format(self.video))
+        self.color_live_video()
+
+        self.history.add(self.video, self.mark_livestream_upcoming, self.unmark_livestream_upcoming)
+
+    def unmark_livestream_upcoming(self):
+        """
+        Unmark the video as live broadcast content (upcoming)
+        :return:
+        """
+        logger.info('Unmarked as upcoming livestream: {:2d}: {}'.format(self.id, self.video))
+        update_plaintext_history('Unmarked as upcoming livestream: {} '.format(self.video))
+        self.status_bar.showMessage('Unmarked as upcoming livestream: {}'.format(self.video))
+        self.color_live_video()
+
+        self.history.add(self.video, self.unmark_livestream_upcoming, self.mark_livestream_upcoming)
+
+    def mark_livestream(self):
+        """
+        Mark the video as live broadcast content (live)
+        :return:
+        """
+        logger.info('Marked as livestream: {:2d}: {}'.format(self.id, self.video))
+        update_plaintext_history('Marked as livestream: {} '.format(self.video))
+        self.status_bar.showMessage('Marked as livestream: {}'.format(self.video))
+        self.color_live_video()
+
+        self.history.add(self.video, self.mark_livestream, self.unmark_livestream)
+
+    def unmark_livestream(self):
+        """
+        Unmark the video as live broadcast content (live)
+        :return:
+        """
+        logger.info('Unmarked as livestream: {:2d}: {}'.format(self.id, self.video))
+        update_plaintext_history('Unmarked as livestream: {} '.format(self.video))
+        self.status_bar.showMessage('Unmarked as livestream: {}'.format(self.video))
+        self.color_live_video()
+
+        self.history.add(self.video, self.unmark_livestream, self.mark_livestream)
 
     def mark_watched(self):
         """

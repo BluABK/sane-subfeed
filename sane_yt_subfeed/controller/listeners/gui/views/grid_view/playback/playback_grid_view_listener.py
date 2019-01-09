@@ -52,15 +52,16 @@ class PlaybackGridViewListener(GridViewListener):
         # Assign myself to the static listener in order to communicate with DownloadView.
         static_grid_view_listener.STATIC_GRID_VIEW_LISTENER = self
 
-        # Listeners
+        # Connect shared listeners
         self.tileWatched.connect(self.tile_watched)
         self.tileUnwatched.connect(self.tile_unwatched)
         self.tileDiscarded.connect(self.tile_discarded)
         self.tileUndiscarded.connect(self.tile_undiscarded)
+
+        # Connect own listeners
         self.tileDownloaded.connect(self.tile_downloaded)
         self.downloadFinished.connect(self.download_finished)
         self.downloadedVideosChangedinDB.connect(self.download_finished_in_db)
-
         self.decreaseWatchPrio.connect(self.decrease_watch_prio)
         self.increaseWatchPrio.connect(self.increase_watch_prio)
 

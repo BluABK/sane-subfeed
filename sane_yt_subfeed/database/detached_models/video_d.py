@@ -46,6 +46,8 @@ class VideoD:
             self.watch_prio = 0
         elif self.kind is VIDEO_KIND_LIVE_SCHEDULED:
             self.watch_prio = 1
+        elif self.kind is VIDEO_KIND_PREMIERE:
+            self.watch_prio = 2
 
         if grab_methods is None:
             grab_methods = []
