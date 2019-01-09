@@ -82,15 +82,22 @@ class ConfigViewWidget(InputSuper):
             self.add_option_checkbox('Show watched videos', 'GridView', 'show_watched', tab_id='GUI')
             self.add_option_checkbox('Show dismissed videos', 'GridView', 'show_dismissed', tab_id='GUI')
 
-            # Section [GridView]
+            # Section [SubFeed]
             self.add_section('{}Subscription feed{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
             self.add_option_checkbox('Show downloaded videos', 'SubFeed', 'show_downloaded', tab_id='GUI')
             self.add_option_line_edit('Title-tile pixel size', 'GridView', 'title_tile_pixel_size',
                                       cfg_validator=QDoubleValidator(), tab_id='GUI')
 
+            # Section [SubSort]
+            self.add_section('{}Subscription feed (sorting){}'.format(self.deco_l, self.deco_r), tab_id='GUI')
+            self.add_option_checkbox('Sort by ascending date', 'SubSort', 'ascending_date', tab_id='GUI')
+            self.add_option_checkbox('Sort by channel', 'SubSort', 'by_channel', tab_id='GUI')
+            self.add_option_checkbox('Pin livestreams', 'SubSort', 'pin_live_broadcast_content', tab_id='GUI')
+
             # Section [DownloadView]
             self.add_section('{}Downloads view{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
-            self.add_option_checkbox('Download view tile height', 'DownloadView', 'download_tile_height', tab_id='GUI')
+            self.add_option_line_edit('Download view tile height', 'DownloadView', 'download_tile_height',
+                                      cfg_validator=QIntValidator(), tab_id='GUI')
 
             # Section [Play]
             self.add_section('{}Playback feed{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
@@ -102,8 +109,10 @@ class ConfigViewWidget(InputSuper):
                                       cfg_validator=QIntValidator(),
                                       tab_id='GUI')
             # Section [PlaySort]
-            # self.add_section('{}Play: Sort{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
+            self.add_section('{}Playback feed (sorting){}'.format(self.deco_l, self.deco_r), tab_id='GUI')
             self.add_option_checkbox('Sort by ascending date', 'PlaySort', 'ascending_date', tab_id='GUI')
+            self.add_option_checkbox('Sort by channel', 'PlaySort', 'by_channel', tab_id='GUI')
+
 
         # Section [Debug]
         elif self.tab_id == 'Debug':
@@ -116,9 +125,6 @@ class ConfigViewWidget(InputSuper):
             self.add_option_checkbox('Disable tooltips', 'Debug', 'disable_tooltips', tab_id='Debug')
             self.add_option_checkbox('Disable tqdm (cli)', 'Debug', 'disable_tqdm', tab_id='Debug')
             self.add_option_checkbox('Show channel grab methods', 'Debug', 'show_grab_method', tab_id='Debug')
-            self.add_option_checkbox('Log all YouTube API responses: search()', 'Debug', 'log_search', tab_id='Debug')
-            self.add_option_checkbox('Log all YouTube API responses: list()', 'Debug', 'log_list', tab_id='Debug')
-            self.add_option_line_edit('\t Haystack needle ', 'Debug', 'log_needle', tab_id='Debug')
             self.add_option_checkbox('Show unimplemented GUI elements', 'Debug', 'show_unimplemented_gui',
                                      tab_id='Debug')
             self.add_option_checkbox('Display all Exceptions', 'Debug', 'display_all_exceptions', tab_id='Debug')

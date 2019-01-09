@@ -36,9 +36,6 @@ DEFAULTS = {
         'disable_tqdm': 'True',
         'disable_tooltips': 'False',
         'show_grab_method': 'False',
-        'log_search': 'False',
-        'log_list': 'False',
-        'log_needle': 'unset',
         'show_unimplemented_gui': 'False',
         'display_all_exceptions': 'False'
     },
@@ -69,6 +66,7 @@ DEFAULTS = {
     },
     'SubFeed': {
         'show_downloaded': 'False',
+        'color_live_broadcast_content': 'True'
     },
     'DownloadView': {
         'download_tile_height': '200'
@@ -76,6 +74,11 @@ DEFAULTS = {
     'PlaySort': {
         'ascending_date': 'False',
         'by_channel': 'False'
+    },
+    'SubSort': {
+        'ascending_date': 'False',
+        'by_channel': 'False',
+        'pin_live_broadcast_content': 'True'
     },
     'Thumbnails': {
         'force_download_best': 'True',
