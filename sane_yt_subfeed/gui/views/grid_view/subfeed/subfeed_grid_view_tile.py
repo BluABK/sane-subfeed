@@ -84,7 +84,7 @@ class SubfeedGridViewTile(VideoTile):
             if QMouseEvent.button() == Qt.MidButton:
                 self.mark_discarded()
             elif QMouseEvent.button() == Qt.LeftButton:
-                self.root.confirmation_dialog(self, VIDEO_IS_LIVE_MSG, self.mark_downloaded, title=VIDEO_IS_LIVE_TITLE,
+                self.root.confirmation_dialog(VIDEO_IS_LIVE_MSG, self.mark_downloaded, title=VIDEO_IS_LIVE_TITLE,
                                               ok_text="Yes, *stream* it.", cancel_text="Abort, abort, ABORT!")
 
     def mark_discarded(self):
