@@ -69,11 +69,11 @@ class SubfeedGridViewTile(VideoTile):
 
         # All-in-one tri-state action that unmarks the relevant liveBroadcastContent
         elif action == unmark_live_content_action:
-            if self.video.kind is VIDEO_KIND_PREMIERE:
+            if self.video.kind == VIDEO_KIND_PREMIERE:
                 self.unmark_premiere()
-            elif self.video.kind is VIDEO_KIND_LIVE_SCHEDULED:
+            elif self.video.kind == VIDEO_KIND_LIVE_SCHEDULED:
                 self.unmark_livestream_upcoming()
-            elif self.video.kind is VIDEO_KIND_LIVE:
+            elif self.video.kind == VIDEO_KIND_LIVE:
                 self.unmark_livestream()
 
         if action == open_thumbnail_file:
@@ -94,15 +94,15 @@ class SubfeedGridViewTile(VideoTile):
         :param QMouseEvent:
         :return:
         """
-        if self.video.kind is VIDEO_KIND_VOD:
+        if self.video.kind == VIDEO_KIND_VOD:
             if QMouseEvent.button() == Qt.MidButton:
                 self.mark_discarded()
             elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
                 self.logger.error("Not Implemented: Select video")
             elif QMouseEvent.button() == Qt.LeftButton:
                 self.mark_downloaded()
-        elif self.video.kind is VIDEO_KIND_LIVE or self.video.kind is VIDEO_KIND_LIVE_SCHEDULED \
-                or self.video.kind is VIDEO_KIND_PREMIERE:
+        elif self.video.kind == VIDEO_KIND_LIVE or self.video.kind == VIDEO_KIND_LIVE_SCHEDULED \
+                or self.video.kind == VIDEO_KIND_PREMIERE:
             if QMouseEvent.button() == Qt.MidButton:
                 self.mark_discarded()
             elif QMouseEvent.button() == Qt.LeftButton:
