@@ -14,6 +14,7 @@ VIDEO_IS_LIVE_TITLE = "This video is live broadcast content!"
 VIDEO_IS_LIVE_MSG = "If you proceed to download this video is will be streamed in realtime and not finish until the" \
                     "stream ends."
 
+
 class SubfeedGridViewTile(VideoTile):
 
     def __init__(self, parent, video, vid_id, clipboard, status_bar):
@@ -29,10 +30,10 @@ class SubfeedGridViewTile(VideoTile):
         :param event:
         :return:
         """
+        # Context Menu
         menu = QMenu(self)
         mark_as_live_content_submenu = QMenu(self)
         mark_as_live_content_submenu.setTitle("Mark as liveBroadcastContent")
-        # mark_as_live_content_submenu.setHidden(True)
         copy_url_action = menu.addAction("Copy link")
         downloaded_item_action = menu.addAction("Copy link and download")
         discard_item_action = menu.addAction("Dismiss video")
@@ -41,13 +42,8 @@ class SubfeedGridViewTile(VideoTile):
         mark_premiere_action = mark_as_live_content_submenu.addAction("Mark as Premiere")
         mark_livestream_upcoming_action = mark_as_live_content_submenu.addAction("Mark as Scheduled livestream")
         mark_livestream_action = mark_as_live_content_submenu.addAction("Mark as Livestream")
-
-        menu.addSeparator()
-        unmark_live_content_action = menu.addAction("Unmark as liveBroadcastContent")
-        # if self.video.kind is VIDEO_KIND_VOD:
-        #     mark_as_live_content_submenu.setHidden(False)
-        # else:
-        #     mark_as_live_content_submenu.setHidden(True)
+        mark_as_live_content_submenu.addSeparator()
+        unmark_live_content_action = mark_as_live_content_submenu.addAction("Unmark as liveBroadcastContent")
 
         menu.addSeparator()
         show_description_dialog = menu.addAction("View description")
@@ -56,38 +52,29 @@ class SubfeedGridViewTile(VideoTile):
             menu.addSeparator()
             debug_log_video_obj = menu.addAction("Send to logger")
 
+        # Context menu action logic
         action = menu.exec_(self.mapToGlobal(event.pos()))
-        if self.video.kind is VIDEO_KIND_VOD:
-            if action == copy_url_action:
-                self.copy_url()
-            elif action == downloaded_item_action:
-                self.mark_downloaded()
-            elif action == discard_item_action:
-                self.mark_discarded()
-            elif action == mark_premiere_action:
-                self.mark_premiere()
-            elif action == mark_livestream_upcoming_action:
-                self.mark_livestream_upcoming()
-            elif action == mark_livestream_action:
-                self.mark_livestream()
-        # Video is in a special "livestream"-family state, only allow unmarking of these states
-        elif self.video.kind is VIDEO_KIND_LIVE or self.video.kind is VIDEO_KIND_LIVE_SCHEDULED \
-                or self.video.kind is VIDEO_KIND_PREMIERE:
-            if action == copy_url_action:
-                self.copy_url()
-            elif action == discard_item_action:
-                self.mark_discarded()
+        if action == copy_url_action:
+            self.copy_url()
+        elif action == downloaded_item_action:
+            self.mark_downloaded()
+        elif action == discard_item_action:
+            self.mark_discarded()
+        elif action == mark_premiere_action:
+            self.mark_premiere()
+        elif action == mark_livestream_upcoming_action:
+            self.mark_livestream_upcoming()
+        elif action == mark_livestream_action:
+            self.mark_livestream()
 
-            # All-in-one tri-state action that unmarks the relevant liveBroadcastContent
-            elif action == unmark_live_content_action:
-                if self.video.kind is VIDEO_KIND_PREMIERE:
-                    self.unmark_premiere()
-                elif self.video.kind is VIDEO_KIND_LIVE_SCHEDULED:
-                    self.unmark_livestream_upcoming()
-                elif self.video.kind is VIDEO_KIND_LIVE:
-                    self.unmark_livestream()
-                else:
-                    self.logger.error("Invalid Video.kind == {}".format(self.video.kind))
+        # All-in-one tri-state action that unmarks the relevant liveBroadcastContent
+        elif action == unmark_live_content_action:
+            if self.video.kind is VIDEO_KIND_PREMIERE:
+                self.unmark_premiere()
+            elif self.video.kind is VIDEO_KIND_LIVE_SCHEDULED:
+                self.unmark_livestream_upcoming()
+            elif self.video.kind is VIDEO_KIND_LIVE:
+                self.unmark_livestream()
 
         if action == open_thumbnail_file:
             open_with_default_application(self.video.thumbnail_path)
