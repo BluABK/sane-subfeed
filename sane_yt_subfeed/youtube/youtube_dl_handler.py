@@ -257,7 +257,7 @@ class YoutubeDownload(threading.Thread):
             pass
 
         # self.download_status_listener = self.download_status  # TODO: IMPLEMENT failed download handling (listener)
-        if self.download_status is DOWNLOAD_FINISHED:
+        if self.download_status == DOWNLOAD_FINISHED:
             logger.info("Finished downloading: {}".format(self.video))
             # self.video.vid_path = os.path.join(self.youtube_folder, self.determine_filename())
             self.video.vid_path = self.determine_filepath()
@@ -277,7 +277,7 @@ class YoutubeDownload(threading.Thread):
             if self.listeners:
                 for listener in self.listeners:
                     listener.emit(self.video)
-        elif self.download_status is DOWNLOAD_FAILED:
+        elif self.download_status == DOWNLOAD_FAILED:
             logger.error("FAILED downloading: {}".format(self.video))
         else:
             logger.critical("BUG: WRONG DOWNLOAD STATUS ({}) : {}".format(self.download_status, self.video))

@@ -115,9 +115,9 @@ class MainModel:
         """
         if widget_id:
             self.logger.debug("Hiding video item: {}".format(video))
-            if widget_id is SUBFEED_VIEW_ID:
+            if widget_id == SUBFEED_VIEW_ID:
                 self.subfeed_videos_removed.update({video: remove_video(self.subfeed_videos, video)})
-            elif widget_id is PLAYBACK_VIEW_ID:
+            elif widget_id == PLAYBACK_VIEW_ID:
                 self.playview_videos_removed.update({video: remove_video(self.playview_videos, video)})
         else:
             self.logger.error("Unable to hide video item: widget_id was None!")
@@ -131,10 +131,10 @@ class MainModel:
         """
         if widget_id:
             self.logger.debug("Un-hiding video item: {}".format(video.title))
-            if widget_id is SUBFEED_VIEW_ID:
+            if widget_id == SUBFEED_VIEW_ID:
                 add_video(self.subfeed_videos, video, self.subfeed_videos_removed[video])
                 self.subfeed_videos_removed.pop(video)
-            elif widget_id is PLAYBACK_VIEW_ID:
+            elif widget_id == PLAYBACK_VIEW_ID:
                 add_video(self.playview_videos, video, self.playview_videos_removed[video])
                 self.playview_videos_removed.pop(video)
         else:

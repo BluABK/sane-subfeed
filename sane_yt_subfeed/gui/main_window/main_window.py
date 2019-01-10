@@ -494,7 +494,7 @@ class MainWindow(QMainWindow):
         if args and kwargs:
             func(args, kwargs)
         elif args and not kwargs:
-            if len(args) is 1:
+            if len(args) == 1:
                 func(args[0])
             else:
                 func(args)
@@ -503,7 +503,7 @@ class MainWindow(QMainWindow):
         else:
             func()
         backend_exceptions = self.check_for_backend_exceptions()
-        if len(backend_exceptions) is not 0:
+        if len(backend_exceptions) != 0:
             exc_type, value, this_traceback = self.exceptionHandler.pop_exception()
             raise exc_type(exc_type, value, this_traceback)
 

@@ -148,17 +148,17 @@ def print_videos_filtered(videos, video_filter, path_only=False):
     """
     for video in videos:
         if video_filter:
-            if video_filter is VIDEO_FILTER_DOWNLOADED and video.downloaded:
+            if video_filter == VIDEO_FILTER_DOWNLOADED and video.downloaded:
                 if path_only:
                     print("{}".format(video.vid_path))
                 else:
                     print("{}".format(video))
-            if video_filter is VIDEO_FILTER_DISCARDED and video.discarded:
+            if video_filter == VIDEO_FILTER_DISCARDED and video.discarded:
                 if path_only:
                     print("{}".format(video.vid_path))
                 else:
                     print("{}".format(video))
-            if video_filter is VIDEO_FILTER_WATCHED and video.watched:
+            if video_filter == VIDEO_FILTER_WATCHED and video.watched:
                 if path_only:
                     print("{}".format(video.vid_path))
                 else:

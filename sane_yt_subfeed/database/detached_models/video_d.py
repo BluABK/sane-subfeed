@@ -42,11 +42,11 @@ class VideoD:
         self.kind = kind  # Assume VOD by default.
 
         # Put liveBroadcastContent at start of feed to avoid it being buried.
-        if self.kind is VIDEO_KIND_LIVE:
+        if self.kind == VIDEO_KIND_LIVE:
             self.watch_prio = 0
-        elif self.kind is VIDEO_KIND_LIVE_SCHEDULED:
+        elif self.kind == VIDEO_KIND_LIVE_SCHEDULED:
             self.watch_prio = 1
-        elif self.kind is VIDEO_KIND_PREMIERE:
+        elif self.kind == VIDEO_KIND_PREMIERE:
             self.watch_prio = 2
 
         if grab_methods is None:
