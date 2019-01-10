@@ -10,7 +10,7 @@ from sane_yt_subfeed.gui.views.grid_view.channel_tile import ChannelTile
 from sane_yt_subfeed.gui.views.grid_view.date_tile import DateTile
 from sane_yt_subfeed.gui.views.grid_view.title_tile import TitleTile
 from sane_yt_subfeed.history_handler import update_plaintext_history
-from sane_yt_subfeed.log_handler import logger
+from sane_yt_subfeed.log_handler import logger, create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import resize_thumbnail
 
 
@@ -19,6 +19,7 @@ class VideoTile(QWidget):
 
     def __init__(self, parent, video, vid_id, clipboard, status_bar):
         QWidget.__init__(self, parent=parent)
+        self.logger = create_logger(__name__)
         self.clipboard = clipboard
         self.status_bar = status_bar
         self.video = video
@@ -95,6 +96,25 @@ class VideoTile(QWidget):
 
         return return_string
 
+    def color_palette(self, color, role=QPalette.Window, log_facility=None, log_msg=""):
+        """
+        Colors a given palette.
+        :param palette:
+        :param color: A Qt color integer
+        :param role: Which QPalette role to apply color to (default: background)
+        :param log_facility: if set, log to this facility
+        :param log_msg:
+        :return:
+        """
+        if log_facility:
+            log_facility("Coloring tile ({}): {}" .format(log_msg, self.video))
+        palette = self.palette()
+        # Set color if specified, if not skip this to create a default/reset palette.
+        if color:
+            palette.setColor(role, color)
+        self.setAutoFillBackground(True)
+        self.setPalette(palette)
+
     def color_old_video(self, vid_age, days=1):
         """
         Colors the QPalette background element of a video grey if it is older than days (default: 1)
@@ -105,17 +125,11 @@ class VideoTile(QWidget):
         """
         if read_config('Gui', 'grey_old_videos'):
             if vid_age > datetime.timedelta(days):
-                pal = self.palette()
-                pal.setColor(QPalette.Window, Qt.lightGray)
-                self.setAutoFillBackground(True)
-                self.setPalette(pal)
+                self.color_palette(Qt.lightGray)
             else:
-                pal = self.palette()
-                pal.setColor(QPalette.Window, Qt.white)
-                self.setAutoFillBackground(True)
-                self.setPalette(pal)
+                self.color_palette(Qt.white)
 
-    def color_live_video(self, logging=False):
+    def color_live_video(self):
         """
         Colors the QPalette background element of a video in the following manner:
         Livestream:                 darkRed
@@ -124,26 +138,21 @@ class VideoTile(QWidget):
 
         :return:
         """
-        if self.video.kind is VIDEO_KIND_LIVE:
-            pal = self.palette()
-            pal.setColor(QPalette.Window, Qt.darkRed)
-            self.setAutoFillBackground(True)
-            self.setPalette(pal)
-        elif self.video.kind is VIDEO_KIND_LIVE_SCHEDULED:
-            pal = self.palette()
-            pal.setColor(QPalette.Window, Qt.darkYellow)
-            self.setAutoFillBackground(True)
-            self.setPalette(pal)
-        elif self.video.kind is VIDEO_KIND_PREMIERE:
-            pal = self.palette()
-            pal.setColor(QPalette.Window, Qt.darkMagenta)
-            self.setAutoFillBackground(True)
-            self.setPalette(pal)
-        else:
+        if self.video.kind == VIDEO_KIND_LIVE:
+            self.color_palette(Qt.darkRed, log_facility=self.logger.info, log_msg="liveBroadcastContent: live")
+        elif self.video.kind == VIDEO_KIND_LIVE_SCHEDULED:
+            self.color_palette(Qt.darkYellow, log_facility=self.logger.info, log_msg="liveBroadcastContent: upcoming")
+        elif self.video.kind == VIDEO_KIND_PREMIERE:
+            self.color_palette(Qt.darkMagenta, log_facility=self.logger.info, log_msg="liveBroadcastContent: premiere")
+        elif self.video.kind == VIDEO_KIND_VOD:
             # Set a default palette to reset any colouring.
-            pal = self.palette()
-            self.setAutoFillBackground(True)
-            self.setPalette(pal)
+            self.color_palette(None, log_msg="vod")
+        elif self.video.kind is None:
+            # Set a default palette to reset any colouring. Account for cases that predate implementation of kind.
+            self.color_palette(None, log_facility=self.logger.debug2, log_msg="likely vod (kind: None)")
+        else:
+            # Set a default palette to reset any colouring. Account for edge cases with invalid kind.
+            self.color_palette(None, log_facility=self.logger.error, log_msg="invalid kind: {}".format(self.video.kind))
 
     def set_tool_tip(self):
         if not read_config('Debug', 'disable_tooltips'):
