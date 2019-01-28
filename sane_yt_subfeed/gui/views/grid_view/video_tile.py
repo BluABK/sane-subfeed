@@ -149,7 +149,7 @@ class VideoTile(QWidget):
             self.color_palette(None, log_msg="vod")
         elif self.video.kind is None:
             # Set a default palette to reset any colouring. Account for cases that predate implementation of kind.
-            self.color_palette(None, log_facility=self.logger.debug2, log_msg="likely vod (kind: None)")
+            self.color_palette(None)
         else:
             # Set a default palette to reset any colouring. Account for edge cases with invalid kind.
             self.color_palette(None, log_facility=self.logger.error, log_msg="invalid kind: {}".format(self.video.kind))
