@@ -2,6 +2,7 @@ import gc
 import time
 
 from PyQt5.QtCore import *
+from PyQt5.QtGui import QPalette
 
 from sane_yt_subfeed.log_handler import create_logger
 
@@ -32,6 +33,26 @@ class ProgressBarListener(QObject):
         while True:
             time.sleep(2)
 
+    def set_color(self, color):
+        palette = QPalette(self.palette())
+        palette.setColor(QPalette.Highlight, color)
+        self.setPalette(palette)
+
+    def reset_palette(self):
+        self.setPalette(self.default_palette)
+
+    def pause(self):
+        self.set_color(Qt.darkYellow)
+
+    def resume(self):
+        self.reset_palette()
+
+    def finish(self):
+        self.set_color(Qt.darkGreen)
+
+    def fail(self):
+        self.set_color(Qt.darkRed)
+
     def set_maximum(self, max):
         self.progress_bar.setMaximum(max)
 
@@ -51,3 +72,4 @@ class ProgressBarListener(QObject):
     def reset_bar(self):
         self.progress_bar.reset()
         self.progress_bar.update()
+
