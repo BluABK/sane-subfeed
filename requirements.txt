@@ -28,11 +28,11 @@ PyYAML==4.2b4
 requests==2.21.0
 requests-oauthlib==1.0.0
 rsa==3.4.2
--e git+git@github.com:BluABK/sane-subfeed.git@861eebc93bbc6f83e185ae978dd79c5a8fdcf6df#egg=Sane_Subscription_Feed
+-e git+git@github.com:BluABK/sane-subfeed.git@f165de62cf16d343f388dce64a61de29545847fb#egg=Sane_Subscription_Feed
 six==1.11.0
 SQLAlchemy==1.2.10
 tqdm==4.23.4
 uritemplate==3.0.0
 urllib3==1.23
 watchdog==0.8.3
-youtube-dl==2019.1.27
+youtube-dl==2019.1.30.1
