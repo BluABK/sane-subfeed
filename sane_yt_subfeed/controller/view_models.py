@@ -19,6 +19,7 @@ from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, r
     get_best_playview_videos
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread
+from sane_yt_subfeed.exceptions.sane_aborted_operation import SaneAbortedOperation
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
 
@@ -165,25 +166,31 @@ class MainModel:
     def update_subfeed_videos_from_remote(self, filtered=True, refresh_type=LISTENER_SIGNAL_NORMAL_REFRESH):
         """
         Updates Subscription feed video list from a remote source (likely YouTube API).
+
         :param filtered: Whether to filter out certain videos based on set boolean attributes.
         :param refresh_type: A signal determining whether it is a Normal (int(0)) or Deep (int(1)) refresh.
                              This kwarg is not used here, but passed on to the refresh function.
         :return:
         """
         self.logger.info("Reloading and getting newest videos from YouTube")
-
-        if filtered:
-            show_downloaded = not read_config('SubFeed', 'show_downloaded')
-            show_dismissed = not read_config('GridView', 'show_dismissed')
-            self.subfeed_videos = refresh_and_get_newest_videos(self.videos_limit,
-                                                                progress_listener=self.status_bar_listener,
-                                                                refresh_type=refresh_type,
-                                                                filter_discarded=show_dismissed,
-                                                                filter_downloaded=show_downloaded)
-            self.subfeed_grid_view_listener.videosChanged.emit()
-        else:
-            self.videos = refresh_and_get_newest_videos(self.videos_limit, filtered, self.status_bar_listener,
-                                                        refresh_type=refresh_type)
+        try:
+            if filtered:
+                show_downloaded = not read_config('SubFeed', 'show_downloaded')
+                show_dismissed = not read_config('GridView', 'show_dismissed')
+                self.subfeed_videos = refresh_and_get_newest_videos(self.videos_limit,
+                                                                    progress_listener=self.status_bar_listener,
+                                                                    refresh_type=refresh_type,
+                                                                    filter_discarded=show_dismissed,
+                                                                    filter_downloaded=show_downloaded)
+                self.subfeed_grid_view_listener.videosChanged.emit()
+            else:
+                self.videos = refresh_and_get_newest_videos(self.videos_limit, filtered, self.status_bar_listener,
+                                                            refresh_type=refresh_type)
+        except SaneAbortedOperation as exc_sao:
+            # FIXME: Send aborted operation signal back up to GUI
+            self.logger.critical("A SaneAbortedOperation exc occurred while updating subfeed from remote! Exceptions:")
+            for exc in exc_sao.exceptions:
+                self.logger.exception(str(exc), exc_info=exc_sao)
 
     def update_playback_videos_from_db(self):
         """

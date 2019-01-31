@@ -6,6 +6,7 @@ from tqdm import tqdm
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NORMAL_REFRESH, \
     LISTENER_SIGNAL_DEEP_REFRESH
+from sane_yt_subfeed.exceptions.sane_aborted_operation import SaneAbortedOperation
 from sane_yt_subfeed.generate_keys import GenerateKeys
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.pickle_handler import load_batch_build_key, dump_batch_build_key
@@ -24,9 +25,21 @@ logger = create_logger(__name__)
 refresh_ul_thread_exc_http = []
 refresh_ul_thread_exc_other = []
 
+abort = False
+
 
 def refresh_uploads(progress_bar_listener=None, add_to_max=0,
                     refresh_type=LISTENER_SIGNAL_NORMAL_REFRESH):
+    """
+    Refresh the subscription feed with new entries, if any.
+
+    Throws SaneAbortedOperation exception if any critical exceptions occurs.
+    :param progress_bar_listener:
+    :param add_to_max:
+    :param refresh_type:
+    :return:
+    """
+    global abort
     thread_increment = 0
     thread_list = []
     videos = []
@@ -55,8 +68,6 @@ def refresh_uploads(progress_bar_listener=None, add_to_max=0,
 
         if 0 < channels_limit <= thread_increment:
             break
-        # if thread_increment >= thread_limit:
-        #     break
 
     if progress_bar_listener:
         progress_bar_listener.setText.emit('Starting video update threads')
@@ -69,23 +80,56 @@ def refresh_uploads(progress_bar_listener=None, add_to_max=0,
     if progress_bar_listener:
         progress_bar_listener.setText.emit('Waiting for video update threads')
 
+    exceptions = []
     for t in tqdm(thread_list, desc="Waiting for video update threads", disable=read_config('Debug', 'disable_tqdm')):
         if progress_bar_listener:
             progress_bar_listener.updateProgress.emit()
         try:
-            t.join()
+            if not abort:
+                t.join()
+            else:
+                # Delete thread due to abort condition being set.
+                del t
         # Store exceptions to lists, because raise breaks joining process and return
         except HttpError as exc_gapi_http_error:  # FIXME: Handle HttpError exceptions
+            # Don't abort because the job might still be mostly successful.
             logger.error("A Google API HttpError exception occurred in thread {}! -- !!IMPLEMENT HANDLING!!".format(
                 t.thread_id), exc_info=exc_gapi_http_error)
             refresh_ul_thread_exc_http.append(exc_gapi_http_error)
             pass
+        except OSError as exc_ose:
+            # Abort the entire operation since this usually means several (if not all) operations will fail.
+            abort = True
+
+            # Handle hitting the file descriptor ceiling.
+            if "Too many open files" in str(exc_ose):
+                _ = "refresh_uploads() hit fd ceiling with thread #{}! " \
+                    "Aborting job and deleting unjoined threads..".format(t.thread_id)
+                logger.critical(_, exc_info=exc_ose)
+                del t
+                exceptions.append(exc_ose)
+            else:
+                logger.critical("An *UNEXPECTED* OSError exception occurred in thread #{}!".format(t.thread_id),
+                                exc_info=exc_ose)
+                exceptions.append(exc_ose)
+                refresh_ul_thread_exc_other.append(exc_ose)  # FIXME: Is this actually used?
+                pass
         except Exception as exc_other:
-            logger.critical("An *UNEXPECTED* exception occurred in thread {}!".format(t.thread_id), exc_info=exc_other)
-            refresh_ul_thread_exc_other.append(exc_other)
+            # Abort the entire operation since this usually means several (if not all) operations will fail.
+            abort = True
+
+            logger.critical("An *UNEXPECTED* exception occurred in thread #{}!".format(t.thread_id), exc_info=exc_other)
+
+            exceptions.append(exc_other)
+            refresh_ul_thread_exc_other.append(exc_other)  # FIXME: Is this actually used?
             pass
 
-    return sorted(videos, key=lambda video: video.date_published, reverse=True)
+    if abort:
+        abort = False
+        raise SaneAbortedOperation("Refresh uploads operation ABORTED due to critical exceptions.",
+                                   exceptions=exceptions)
+    else:
+        return sorted(videos, key=lambda video: video.date_published, reverse=True)
 
 
 def load_keys(number_of_keys):

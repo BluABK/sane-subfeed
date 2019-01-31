@@ -10,6 +10,7 @@ from sane_yt_subfeed.database.engine_statements import get_video_by_vidd_stmt, g
 from sane_yt_subfeed.database.orm import db_session, engine
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread, UpdateVideosExtraInfoThreaded
+from sane_yt_subfeed.exceptions.sane_aborted_operation import SaneAbortedOperation
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
 from sane_yt_subfeed.youtube.update_videos import refresh_uploads, get_extra_videos_information
@@ -140,7 +141,19 @@ def refresh_and_get_newest_videos(limit, filter_downloaded=True, filter_discarde
     if progress_listener:
         progress_listener.progress_bar.setVisible(True)
         progress_listener.resetBar.emit()
-    videos = refresh_uploads(progress_bar_listener=progress_listener, add_to_max=2 * limit, refresh_type=refresh_type)
+
+    try:
+        videos = refresh_uploads(progress_bar_listener=progress_listener, add_to_max=2 * limit, refresh_type=refresh_type)
+    except SaneAbortedOperation as exc_sao:
+        # Clean up progress bar after aborted operation
+        if progress_listener:
+            progress_listener.progress_bar.setVisible(False)
+            progress_listener.resetBar.emit()
+            raise exc_sao
+    except Exception as exc_other:
+        logger.critical("Unexpected exception occurred in refresh_and_get_newest_videos!", exc_info=exc_other)
+        pass
+
     if filter_downloaded or filter_discarded:
         return_list = compare_db_filtered(videos, limit, discarded=filter_discarded, downloaded=filter_downloaded)
     else:
