@@ -143,7 +143,8 @@ def refresh_and_get_newest_videos(limit, filter_downloaded=True, filter_discarde
         progress_listener.resetBar.emit()
 
     try:
-        videos = refresh_uploads(progress_bar_listener=progress_listener, add_to_max=2 * limit, refresh_type=refresh_type)
+        videos = refresh_uploads(progress_bar_listener=progress_listener, add_to_max=2 * limit,
+                                 refresh_type=refresh_type)
     except SaneAbortedOperation as exc_sao:
         # Clean up progress bar after aborted operation
         if progress_listener:

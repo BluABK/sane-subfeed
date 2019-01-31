@@ -12,6 +12,7 @@ from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.main import run_with_gui, run_print, run_channels_test
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
 import sane_yt_subfeed.print_functions as print_functions
+import sane_yt_subfeed.debug_functions as debug_functions
 
 exceptions = []
 exc_id = 0
@@ -26,9 +27,10 @@ LEGACY_EXCEPTION_HANDLER = False
 @click.option(u'--print_downloaded_videos', is_flag=True)
 @click.option(u'--print_watched_videos', is_flag=True)
 @click.option(u'--print_discarded_videos', is_flag=True)
+@click.option(u'--debug_open_1k_fds', is_flag=True)
 @click.command()
 def cli(no_gui, test_channels, update_watch_prio, set_watched_day, print_subscriptions, print_watched_videos,
-        print_discarded_videos, print_downloaded_videos):
+        print_discarded_videos, print_downloaded_videos, debug_open_1k_fds):
     logger = create_logger(__name__)
     if no_gui:
         run_print()
@@ -69,6 +71,9 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day, print_subscri
     if print_downloaded_videos:
         videos = db_session.query(Video).filter(and_(Video.downloaded == True, (Video.vid_path.isnot(None)))).all()
         print_functions.print_videos(videos, path_only=True)
+    if debug_open_1k_fds:
+        debug_functions.open_1000_file_descriptors()
+        run_with_gui()
     else:
         if LEGACY_EXCEPTION_HANDLER:
             """
