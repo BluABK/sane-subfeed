@@ -5,6 +5,9 @@
 env/
 env.old/
 
+# Pipenv
+Pipfile.lock
+
 # sane-yt-subfeed
 client_secret.json
 client_secret_private.json
