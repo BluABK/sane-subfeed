@@ -218,7 +218,7 @@ class DownloadTile(QWidget):
 
         return speed * si_units_speed[speed_unit]
 
-    def calc_avg_speed(self, speed_str, ticks=None):
+    def calc_avg_speed(self, speed_str, ticks=None, debug=False):
         """
         Calculates the average speed during n amount of ticks
         :param speed_str:
@@ -250,8 +250,11 @@ class DownloadTile(QWidget):
                     else:
                         return
                 except KeyError as ke_exc:
-                    self.logger.exception("KeyError exception occurred in calc_avg_speed", exc_info=ke_exc)
-                    self.logger.debug(speed_str)
+                    # FIXME: Handle B/s speed in determine_bytes (currently results in a KeyError).
+                    # Non critical exception that only serves to spam down the logger.
+                    if debug:
+                        self.logger.debug5("KeyError exception occurred in calc_avg_speed: {}".format(speed_str),
+                                           exc_info=ke_exc)
                     return
 
                 # Increment tick (for valid speeds)
