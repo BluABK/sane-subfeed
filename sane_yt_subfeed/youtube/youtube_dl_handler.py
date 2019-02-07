@@ -20,6 +20,9 @@ AUDIO_MERGE_FAILS = ["Could not write header for output file #0 (incorrect codec
                      ]
 IO_ERROR = ["ERROR: unable to write data: [Errno 5] Input/output error"]
 WRITE_DENIED_ERROR = ["ERROR: unable to open for writing: [Errno 13] Permission denied"]
+VIDEO_IS_GEOBLOCKED_ERRORS = ["The uploader has not made this video available in your country.",
+                              "blocked it in your country",
+                              "ERROR: This video is not available."]
 
 DOWNLOAD_RUNNING = 0
 DOWNLOAD_FINISHED = 1
@@ -48,7 +51,7 @@ class YoutubeDownload(threading.Thread):
         self.download_status = None
         self.download_progress_listener = download_progress_listener
         self.threading_event = threading_event
-        # FIXME: faux filename, as the application is currently not able to get final filname from youtube-dl
+        # FIXME: faux filename, as the application is currently not able to get final filename from youtube-dl
         # file_name = "{channel_title} - {date} - %(title)s (%(fps)s_%(vcodec)s_%(acodec)s).%(ext)s".format(
         #     channel_title=self.video.channel_title, date=self.video.date_published.strftime("%Y-%m-%d"))
         file_name = "%(uploader)s - {date} - %(title)s - _v-id-{id}.%(ext)s".format(
@@ -107,8 +110,6 @@ class YoutubeDownload(threading.Thread):
         for proxy in self.proxies:
             try:
                 self.proxy_ydl_opts['proxy'] = proxy
-                logger.info(
-                    "Video is geo blocked, retrying with proxy '{}': {}".format(proxy, self.video))
 
                 with YoutubeDL(self.proxy_ydl_opts) as ydl:
                     logger.info("Starting download (proxy: {}) for: {}".format(proxy, self.video))
@@ -120,7 +121,6 @@ class YoutubeDownload(threading.Thread):
                 logger.warning(
                     "Proxy {} download of geo blocked video '{}' failed.".format(proxy, self.video))
                 logger.exception(dl_exc)
-                # FIXME: Probably overkill, should maybe only flag as failed from parent caller
                 self.download_status = DOWNLOAD_FAILED
                 pass
 
@@ -172,11 +172,11 @@ class YoutubeDownload(threading.Thread):
         # Video as TV-series preset
         info = {'not_a_tag': ['not_a_tag', 'filepath', 'ext'],
                 'filepath': self.video.vid_path,
-                'ext': self.video.vid_path.split('.')[-1],
-                'title': self.video.title,
-                'show': self.video.channel_title,
-                'date': self.video.date_published.isoformat(),
-                'url': self.video.url_video,
+                'ext':      self.video.vid_path.split('.')[-1],
+                'title':    self.video.title,
+                'show':     self.video.channel_title,
+                'date':     self.video.date_published.isoformat(),
+                'url':      self.video.url_video,
                 'network': 'YouTube',
                 ('description', 'comment', 'synopsis'): self.video.description}
         logger.debug(info)
@@ -192,10 +192,8 @@ class YoutubeDownload(threading.Thread):
                 ydl.download([self.video.url_video])
                 self.download_status = DOWNLOAD_FINISHED
         except DownloadError as dl_exc:
-            if "The uploader has not made this video available in your country." in str(dl_exc) or \
-                    ("ERROR:" in str(dl_exc) and "blocked it in your country" in str(dl_exc)) or \
-                    "ERROR: This video is not available." in str(dl_exc):
-                # Download with proxy if available, returns True on successful download.
+            if str(dl_exc) in VIDEO_IS_GEOBLOCKED_ERRORS:
+                logger.info("Video is geo blocked, retrying with proxy: {}".format(self.video))
                 if self.download_with_proxy() is not True:
                     self.download_status = DOWNLOAD_FAILED
                     logger.error("All proxies have failed to download geo blocked video '{}'!".format(self.video.title))
