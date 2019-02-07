@@ -193,9 +193,9 @@ class YoutubeDownload(threading.Thread):
                 self.download_status = DOWNLOAD_FINISHED
         except DownloadError as dl_exc:
             if "The uploader has not made this video available in your country." in str(dl_exc) or \
-                    ("ERROR:" in str(dl_exc) and "blocked it in your country" in str(dl_exc)):
-                # -- used for debug
-                # logger.error("ERROR: The uploader has not made this video available in your country")
+                    ("ERROR:" in str(dl_exc) and "blocked it in your country" in str(dl_exc)) or \
+                    "ERROR: This video is not available." in str(dl_exc):
+                # Download with proxy if available, returns True on successful download.
                 if self.download_with_proxy() is not True:
                     self.download_status = DOWNLOAD_FAILED
                     logger.error("All proxies have failed to download geo blocked video '{}'!".format(self.video.title))
@@ -247,6 +247,10 @@ class YoutubeDownload(threading.Thread):
                     logger.exception("Failing download due to DownloadError exception (PermissionError)!",
                                      exc_info=dl_exc)
 
+            if self.download_status == DOWNLOAD_RUNNING:
+                logger.critical("INNER BUG: WRONG DOWNLOAD STATUS ({}) : {}".format(self.download_status, self.video))
+                logger.exception(dl_exc)
+
         except PermissionError as pe_exc:
             self.download_status = DOWNLOAD_FAILED
             logger.exception("Failing download due to PermissionError exception!", exc_info=pe_exc)
@@ -280,7 +284,7 @@ class YoutubeDownload(threading.Thread):
         elif self.download_status == DOWNLOAD_FAILED:
             logger.error("FAILED downloading: {}".format(self.video))
         else:
-            logger.critical("BUG: WRONG DOWNLOAD STATUS ({}) : {}".format(self.download_status, self.video))
+            logger.critical("OUTER BUG: WRONG DOWNLOAD STATUS ({}) : {}".format(self.download_status, self.video))
 
     def my_hook(self, event):
         self.download_progress_listener.updateProgress.emit(event)
