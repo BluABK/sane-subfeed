@@ -53,7 +53,8 @@ DEFAULTS = {
         'tooltip_picture_size': 'h1',
         'keep_thumb_ar': 'True',
         'enable_auto_copy_to_clipboard': 'False',
-        'bgcolor': ""
+        'bgcolor': "",
+        'darkmode_icons': 'False'
     },
     'Theme': {
         'last_style': "",

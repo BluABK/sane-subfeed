@@ -70,12 +70,14 @@ class ConfigViewWidget(InputSuper):
                                      tab_id='GUI')
             self.add_option_checkbox('Keep Aspect Ratop on resized thumbnails', 'Gui', 'keep_thumb_ar', tab_id='GUI')
             self.add_option_checkbox('Auto copy to clipboard', 'Gui', 'enable_auto_copy_to_clipboard', tab_id='GUI')
+            self.add_section('{}Theme{}'.format(self.deco_l, self.deco_r))
             self.add_option_line_edit('Set custom background color hexadecimal <br/>'
                                       '(only works in default theme. Ex: #ffffff for white bg)',
                                       'Gui', 'bgcolor',
                                       cfg_validator=QRegExpValidator(QRegExp(HEXADECIMAL_COLOR_REGEX)), tab_id='GUI')
             self.add_option_button('Clear bgcolor', 'Clears the background color setting ', 'Gui', 'bgcolor',
                                    tooltip='(required due to validator shenanigans)', clear=True, tab_id='GUI')
+            self.add_option_checkbox('Use darkmode icon set', 'Gui', 'darkmode_icons', tab_id='GUI')
 
             # Section [GridView]
             self.add_section('{}Grid Views{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
