@@ -46,15 +46,15 @@ class DbStateIcon(QLabel):
         painter = QPainter(self.full_icon)
 
         if state == DatabaseListener.DB_STATE_READ_WRITE:
-            self.logger.debug("Changing db state icon to read/write".format(state))
+            self.logger.debug6("Changing db state icon to read/write".format(state))
             self.draw_read_icon(self.full_icon, self.read_dot, painter)
             self.draw_write_icon(self.full_icon, self.write_dot, painter)
         elif state == DatabaseListener.DB_STATE_WRITE:
-            self.logger.debug("Changing db state icon to write".format(state))
+            self.logger.debug6("Changing db state icon to write".format(state))
             self.draw_write_icon(self.full_icon, self.write_dot, painter)
         elif state == DatabaseListener.DB_STATE_READ:
-            self.logger.debug("Changing db state icon to read".format(state))
+            self.logger.debug6("Changing db state icon to read".format(state))
             self.draw_read_icon(self.full_icon, self.read_dot, painter)
         else:
-            self.logger.debug("Changing db state icon to idle".format(state))
+            self.logger.debug6("Changing db state icon to idle".format(state))
         self.setPixmap(self.full_icon)

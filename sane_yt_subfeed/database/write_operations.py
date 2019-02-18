@@ -54,7 +54,7 @@ class UpdateVideosThread(threading.Thread):
         items_to_update = []
         # bulk_items_to_add = []
         lock.acquire()
-        self.logger.debug("Thread {} - Acquired lock".format(self.db_id, len(items_to_update)))
+        self.logger.debug6("Thread {} - Acquired lock".format(self.db_id, len(items_to_update)))
         DatabaseListener.static_instance.startRead.emit(self.db_id)
         select_step = 500
         for i in range(0, len(self.video_list), select_step):
@@ -71,11 +71,11 @@ class UpdateVideosThread(threading.Thread):
         DatabaseListener.static_instance.startWrite.emit(self.db_id)
         step = 1000
         if len(items_to_add) > 0:
-            self.logger.debug("Thread {} - inserting {} new videos".format(self.db_id, len(items_to_add)))
+            self.logger.debug6("Thread {} - inserting {} new videos".format(self.db_id, len(items_to_add)))
             for i in range(0, len(items_to_add), step):
                 engine.execute(Video.__table__.insert(), items_to_add[i:i + step])
         if len(items_to_update) > 0:
-            self.logger.debug("Thread {} - updating {} items".format(self.db_id, len(items_to_update)))
+            self.logger.debug6("Thread {} - updating {} items".format(self.db_id, len(items_to_update)))
             update_list = []
             # FIXME: add step to update
             for item in items_to_update:

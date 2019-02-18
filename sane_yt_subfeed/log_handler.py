@@ -24,7 +24,11 @@ DEBUG2_LEVEL_NUM = 9
 DEBUG3_LEVEL_NUM = 8
 DEBUG4_LEVEL_NUM = 7
 DEBUG5_LEVEL_NUM = 6
-SPAM_LEVEL_NUM = 5
+DEBUG6_LEVEL_NUM = 5
+DEBUG7_LEVEL_NUM = 4
+DEBUG8_LEVEL_NUM = 3
+DEBUG9_LEVEL_NUM = 2
+SPAM_LEVEL_NUM = 1
 
 OS_PATH = os.path.dirname(__file__)
 LOGDIR = os.path.join(OS_PATH, 'logs')
@@ -43,6 +47,10 @@ logging.addLevelName(DEBUG2_LEVEL_NUM, "DEBUG2")
 logging.addLevelName(DEBUG3_LEVEL_NUM, "DEBUG3")
 logging.addLevelName(DEBUG4_LEVEL_NUM, "DEBUG4")
 logging.addLevelName(DEBUG5_LEVEL_NUM, "DEBUG5")
+logging.addLevelName(DEBUG6_LEVEL_NUM, "DEBUG6")
+logging.addLevelName(DEBUG7_LEVEL_NUM, "DEBUG7")
+logging.addLevelName(DEBUG8_LEVEL_NUM, "DEBUG8")
+logging.addLevelName(DEBUG9_LEVEL_NUM, "DEBUG9")
 logging.addLevelName(SPAM_LEVEL_NUM, "SPAM")
 
 
@@ -102,6 +110,62 @@ def debug5(self, message, *args, **kws):
         self._log(DEBUG5_LEVEL_NUM, message, args, **kws)
 
 
+def debug6(self, message, *args, **kws):
+    """
+    Custom Logging level log function: DEBUG6
+    :param self:
+    :param message: String to log
+    :param args: logging args
+    :param kws: logging keywords
+    :return:
+    """
+    # Yes, logger takes its '*args' as 'args'.
+    if self.isEnabledFor(DEBUG6_LEVEL_NUM):
+        self._log(DEBUG6_LEVEL_NUM, message, args, **kws)
+
+
+def debug7(self, message, *args, **kws):
+    """
+    Custom Logging level log function: DEBUG7
+    :param self:
+    :param message: String to log
+    :param args: logging args
+    :param kws: logging keywords
+    :return:
+    """
+    # Yes, logger takes its '*args' as 'args'.
+    if self.isEnabledFor(DEBUG7_LEVEL_NUM):
+        self._log(DEBUG7_LEVEL_NUM, message, args, **kws)
+
+
+def debug8(self, message, *args, **kws):
+    """
+    Custom Logging level log function: DEBUG8
+    :param self:
+    :param message: String to log
+    :param args: logging args
+    :param kws: logging keywords
+    :return:
+    """
+    # Yes, logger takes its '*args' as 'args'.
+    if self.isEnabledFor(DEBUG8_LEVEL_NUM):
+        self._log(DEBUG8_LEVEL_NUM, message, args, **kws)
+
+
+def debug9(self, message, *args, **kws):
+    """
+    Custom Logging level log function: DEBUG9
+    :param self:
+    :param message: String to log
+    :param args: logging args
+    :param kws: logging keywords
+    :return:
+    """
+    # Yes, logger takes its '*args' as 'args'.
+    if self.isEnabledFor(DEBUG9_LEVEL_NUM):
+        self._log(DEBUG9_LEVEL_NUM, message, args, **kws)
+
+
 def spam(self, message, *args, **kws):
     """
     Custom Logging level log function: SPAM
@@ -124,6 +188,10 @@ logging.Logger.debug2 = debug2
 logging.Logger.debug3 = debug3
 logging.Logger.debug4 = debug4
 logging.Logger.debug5 = debug5
+logging.Logger.debug6 = debug6
+logging.Logger.debug7 = debug7
+logging.Logger.debug8 = debug8
+logging.Logger.debug9 = debug9
 logging.Logger.spam = spam
 
 

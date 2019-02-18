@@ -34,7 +34,7 @@ class Channel(PermanentBase):
         except KeyError as ke_exc_title:
             self.logger.error("DB <--: Failed getting title key from YouTube response! Setting value to: None",
                               exc_info=ke_exc_title)
-            self.logger.debug(youtube_response)
+            self.logger.debug6(youtube_response)
             # raise ke_exc_title
             self.title = None
         try:
@@ -42,7 +42,7 @@ class Channel(PermanentBase):
         except KeyError as ke_exc_desc:
             self.logger.error("DB <--: failed getting description key from YouTube response!! Setting value to: None",
                               exc_info=ke_exc_desc)
-            self.logger.debug(youtube_response)
+            self.logger.debug6(youtube_response)
             # raise ke_exc_desc
             self.description = None
         try:
@@ -50,7 +50,7 @@ class Channel(PermanentBase):
         except KeyError as ke_exc_thumbs:
             self.logger.error("DB <--: failed getting thumbnails key from YouTube response!! Setting value to: None",
                               exc_info=ke_exc_thumbs)
-            self.logger.debug(youtube_response)
+            self.logger.debug6(youtube_response)
             # raise ke_exc_thumbs
             self.thumbnails = None
 
