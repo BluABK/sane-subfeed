@@ -273,7 +273,15 @@ class DownloadTile(QWidget):
             # Enough ticks to reach a verdict on avg rate
             if self.avg_speed_calc_tick >= ticks:
                 # Get most common ETA
-                self.common_eta_str = Counter(self.etas).most_common(1)[0][0]
+                try:
+                    self.common_eta_str = Counter(self.etas).most_common(1)[0][0]
+                # Debug some unexpected 'IndexError: Out of range' cases (GH Issue #36).
+                except IndexError as ie_exc:
+                    self.logger.error("Unexpected IndexError in most_common_eta(time_str=={}, ticks={})"
+                                      ", self.etas on next line:".format(time_str, ticks), exc_info=ie_exc)
+                    self.logger.error(self.etas)
+                    return None
+
                 self.etas.clear()
                 self.common_eta_calc_tick = 0
             else:
