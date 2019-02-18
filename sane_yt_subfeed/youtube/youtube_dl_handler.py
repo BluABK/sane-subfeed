@@ -22,7 +22,7 @@ IO_ERROR = ["ERROR: unable to write data: [Errno 5] Input/output error"]
 WRITE_DENIED_ERROR = ["ERROR: unable to open for writing: [Errno 13] Permission denied"]
 VIDEO_IS_GEOBLOCKED_ERRORS = ["The uploader has not made this video available in your country.",
                               "blocked it in your country",
-                              "ERROR: This video is not available."]
+                              "This video is not available."]
 
 DOWNLOAD_RUNNING = 0
 DOWNLOAD_FINISHED = 1
@@ -192,7 +192,8 @@ class YoutubeDownload(threading.Thread):
                 ydl.download([self.video.url_video])
                 self.download_status = DOWNLOAD_FINISHED
         except DownloadError as dl_exc:
-            if str(dl_exc) in VIDEO_IS_GEOBLOCKED_ERRORS:
+            # If the DownloadError is a match for any of the VIDEO_IS_GEOBLOCKED_ERRORS, attempt download with proxy.
+            if any(x in str(dl_exc) for x in VIDEO_IS_GEOBLOCKED_ERRORS):
                 logger.info("Video is geo blocked, retrying with proxy: {}".format(self.video))
                 if self.download_with_proxy() is not True:
                     self.download_status = DOWNLOAD_FAILED
@@ -281,8 +282,8 @@ class YoutubeDownload(threading.Thread):
                     listener.emit(self.video)
         elif self.download_status == DOWNLOAD_FAILED:
             logger.error("FAILED downloading: {}".format(self.video))
-        else:
-            logger.critical("OUTER BUG: WRONG DOWNLOAD STATUS ({}) : {}".format(self.download_status, self.video))
+        # else:
+        #     logger.critical("OUTER BUG: WRONG DOWNLOAD STATUS ({}) : {}".format(self.download_status, self.video))
 
     def my_hook(self, event):
         self.download_progress_listener.updateProgress.emit(event)
