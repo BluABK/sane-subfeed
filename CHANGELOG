@@ -1,4 +1,148 @@
 Current
+
+v0.5.0
+- Refomatted CHANGELOG to over exceed 80 char line width
+- Changed logging levels for DB to DEBUG6 and DB listener to DEBUG7
+- Made geoblock if stmt look up partial match in list instead of exact, which makes it less susceptible to changes in
+  error message (which happens *quite* a lot)
+- Added some debug logging for Issue #36
+- Implemented dark-mode icon set to be toggled on/off (Solves Issue #16)
+- Muted non-critical KeyError errors about B/s speed in calc_avg_speed
+- Refactored geo block if check to use a list of predefined strings
+- Handle geo blocked videos that throw "This video is not available."
+- Added Pipfile.lock to .gitignore and removed it from git cache (people need to re-run Pipenv lock)
+- Added debugging code to arbitrarily open 1000 fds
+- Added handling of OSError and other critical or unexpected exceptions in subfeed refresh (too many open files issue)
+- Added fail, pause, finish and set_color functionality to ProgressBarListener
+- Created a SaneAbortedOperation Exception which can hold other exceptions
+- Removed coloured VideoTile logging of "likely vod" cases
+- Updated youtube-dl dependency to latest version (fixes broken music video dl, somehow o0)
+- Replaced all integer is obj comparisons with == and != across project
+- Replaced all video kind obj comparisons with == to fix more potential issues project wide
+- Replaced obj comparison with == to fix an issue where VIDEO_KIND_PREMIERE was not correctly evaluated on startup
+- Simplified SubfeedGridViewTile contextMenu logic to avoid instability issues
+- Commented out debug logging of inserting/deleting GridView items
+- Added option to mark/unmark videos as liveBroadcastContent, as well as colouring them
+- Cleaned up youtube_requests and removed debug list/search and needle (old debug code)
+- Added SubSort section (PlaySort copy) and colouring and pinning of live broadcast content to config files and GUI
+- Added confirmation dialog when left-clicking (download action) a non-VOD
+- Added Video kind attribute to database
+- Made liveBroadcastContent video tiles behave differently to VODs
+- Added livestream (live/upcoming) handling and added a video kind attr
+- Reduced unnecessary SubFeed tile removal on-download by reloading it before PlayView
+- Fixed CVE-2017-18342 (pyaml >= 4.2b1)
+- Fixed pesky SubFeed redraw glitch introduced by GridViewListener rewrite
+- Added thumbnail overlay functionality to SubFeedView
+- Added Downloaded video overlay and darkened bg of Watched overlay so it's not eerily similar to the Discarded overlay
+- Created repaint_video(s) and singular redraw_video functions and split VideoTile setPixmap into own function:
+  set_thumbnail_pixmap
+- Fixed accidental removal of already existing video ptr
+- Reverted rest of update_grid code to avoid possible ptr issues
+- Reverted q_labels_keys_to_delete code to avoid possible ptr issues
+- Added some documentation to GridView functions and debug of update_grid
+- Added missing return in calc_avg_speed KeyError exception handling.
+- Added Handling of 'B/s' cases in determine_si_unit
+- Added cli options to print downloaded, discarded and/or watched videos (--print_downloaded_videos,
+  --print_watched_videos, --print_discarded_videos)
+- Fixed issue with get_single_video being broken due to referencing the static PlaybackGridViewListener instead of the
+  instantiated one from MainModel (more listener rewrite bugs)
+- Fixed all issues with tile glitchyness (introduced by listener rewrite) both when showing and not showing videos that
+  are watched/discarded/downloaded. Videos will only be hidden/unhidden if the respective watched/discarded/downloaded
+  option is False, in the case of those options the video will skip hide/unhide calls and just do the redraw.
+- Fixed issue with downloaded videos not disappearing from Subfeed
+- Obliterated Issue #32 by always passing in a widget_id to hide/unhide functions (deprecates all the messy
+  "determine which view" code
+- Moved download and related listeners into PlaybackViewListener and made GridViewListener an inheritable
+  structure/model
+- Split GridViewListener into Subfeed and Playback listeners respectively
+- Created a Video.__str__ override that prints "channel - title [url]" (allowed for changing all instances of
+  {} - {} [{}]".format(video.channel_title, video.title, video.url_video) to the more sensible "{}".format(video)
+- Moved listeners.py listeners into their own files
+- Moved DatabaseListener to new listener structure
+- Renamed DownloadHandler to DownloadViewListener and structured it
+- Removed redundant logging of 404 thumbnails that gets handled by caller
+- Fixed broken logic in GridView tile listeners (fixes issues #31 and #32)
+- Removed exception hook parsing deprecated by SaneExceptionHandler
+- Renamed strangely named 'purl' video file metadata tag to the established standard 'url'
+- Deleted deprecated test_file.py from eons past
+- Moved MainWindow stuff out of init and into functions; renamed and restructured all the Views, added some missing
+  pydoc here and there and fixed a lot of stuff in MainWindow in general
+- Merged pull request #30 from skandix/master (things found in .py files, that obviously need  to be fixed)
+- Mapped global hotkey Ctrl+Z to undo action
+- SaneHistory can now undo prio, watched and discarded actions (created anti-functions for watch,
+  discard and decrease_watch_prio)
+- Implemented SaneHistory in QMainWindow and related
+- Fixed peculiarities in SaneHistory/SaneHistoryItem's __str__ and __log__ (also fixed bug where entries got removed
+  even if Exception was raised)
+- Renamed the old history system to plaintext_history (now legacy, should be removed at a later point)
+- Remade SaneGridViewHistory to SaneHistory, and made it a global history.
+- Created a SaneGridViewHistory(QObject) for better history control
+- Implemented sort-by channel title in Play View (with some FIXME caveats)
+- Added average download speed indicator and most common ETA speed indicator (default ticks = 50)
+- Removed nonsensical ability to pause a finished download (with no effect, backend)
+- Added a started/finished on field to Download View
+- Properly implemented duration field in Download view
+- Added support for deleting incomplete entries from DownloadView (context menu on the video/item tile)
+- Hotfixed issue #28 (Low priority UI Visual Bug)
+- Fixed bug where a successful geo block proxy download would be set as failed
+- Removed useless "pause/resume" context menu from finished downloads
+- Made Download view progress bar say "Postprocessing..." during mux (and optionally postprocessing) stage
+- Fixed issue with Total size only showing audio track size on finished download.
+- Added paused and failed status to ProgressBar Status field (WIP: failed not yet handled anywhere)
+- Made youtube_dl_handler detect and report failed downloads (WIP: Not yet handled anywhere)
+- Changed to a saner colour scheme (darker variety)
+- Made DownloadView and ProgressBar handle paused videos + misc small stuff
+- Recoded sane_try to take a func parameter and apply args and kwargs on it
+- Added option to display all exceptions in GUI dialogs (useful for testing/debug)
+- Made Sane able to display exceptions in GUI using the SaneTextViewDialog
+- Made MainWindow use the new SaneExceptionHandler and added necessary functions
+- Created a SaneExceptionHandler(QObject) and made the cli.py hook legacy.
+- Created an exceptions list that the sys_excepthook appends to so others can poll it for exceptions
+- Created an exception_pyqt_slot that wraps the pyqtSlot in order to handle backend Exceptions in frontend (very WIP)
+- Added a debug menu with some subitems that raises generic Exceptions
+- Fixed startup failures caused by missing {clients_secret,keys}.json by copying over public no no custom keys/secret
+  exists
+- Fixed CVE-2018-18074 by updating 'requests' dependency to >=2.20.0
+- Removed leftover PlayView ThumbnailTile debug.
+- Added a big red SD definition indicator at top left of video thumbs to make it easier to spot still-processing
+  (youtube's end) videos
+- Added cli option --print_subscriptions to print subscriptions (from DB) and quit.
+- Reclassified Database logging from DEBUG to DEBUG5 and DEBUG4 in order to make it easier to filter out DB logging
+  when it's not relevant (it's raaather spammy)
+- Added more logging levels (DEBUG2-5) and pydoc
+- Fixed false-positive bug in thumbnail matching for YouTube 404 image in cases the check shouldn't be run.
+- Make "Initializing UI" info logging a bit less vague by specifying who logged it
+- Added has_captions overlay to thumbnail tile (where applicable) and re-aligned duration position
+- Fixed headache-inducing bug where an if test for None also reacted to False
+- Added checks in write_operations for videos missing the newly implemented extra video info columns (helps with
+  backwards compatibility)
+- Added new video DB extra video info columns
+- Removed video response logging debug
+- Fixed bug in yt_duration_to_timedeltat() regex that failed matching durations with hours
+- Fixed broken bool input validation in boolify_string()
+- Fixed issue #26 by making MainWindow omit the 'Manual dir search' submenu if yt_file_path is unset in config.
+- Handle regionRestrictions not always existing in YouTube API contentDetails resource
+- Added extra video info properties (has_caption, dimension, definition, projection, region_restriction_allowed,
+  region_restriction_blocked) to Video object and Database
+- Fixed duration check accidentally setting has_captions property on videos and actually implement has_caption
+- Add forced garbage collection at end of refresh_videos() to combat "Too many open files" bug
+- Added logging of 'ulimit -a' on Linux to debug "Too many open files" bug
+- Removed debug log spam from on_any_event in dir_handler and add info logging to on_moved and on_created
+- Made (GridView) background color customisable (fixes issues for people with Qt as their system theme)
+- Fix Subscriptions view that was set to Downloads view (code typo-ish)
+- Swapped subprocess call(...) with Popen([..]) to fix custom img app on Linux
+- Added configurable friendly names for the various player options
+- Added 7 more optional configurable alternative/external players and listificated to all player strings
+- Added handling for external player arguments
+- Fix issue with proxied dl never triggering due to youtube_dl putting bash color codes in the Exception msg >_<
+- Added working pipenv Pipfile (and lock) to project as an alternative to virtualenv
+- Rephrased logger messages to be less vague
+- Set missing youtube_response keys to None instead of raising Exception
+- Fixed use of wrong kwarg and some message typos in logger calls
+- Added exception handling to most of models' Channel DB insertion
+- Made DB write_operations missing thumb/duration log message specify which video it occurred for
+- Made Thumbnail N/A log message specify which video it occurred for
+- Massive README.md overhaul
 - Bug fix: Subscriptions list API retrieval now handles strange cases where channels are missing title in backend.
 
 v0.4.1
@@ -11,10 +155,13 @@ v0.4.1
 - Fixed white text on white background tooltip issue in breeze light theme
 - Changed various config defaults for GUI
 - Video duration is now displayed on thumbnail tiles
-- Renamed functions from *filename to *filepath where applicable, and made filepath function os.path.join its return value and send paths - not names - to SaneFFmpegMergerPP
+- Renamed functions from *filename to *filepath where applicable, and made filepath function os.path.join its return
+  value and send paths - not names - to SaneFFmpegMergerPP
 - Split output filename detection into functions and created a new one for finding incomplete downloads
-- Made SaneFFmpegMergerPP attempt merge as follows: 1. Attempt to encode audio to aac, 2. Attempt to encode video to h264 or 3. Encode both audio and video to above formats (worst case scenario)
-- Added handling of incompatible container audio and video stream muxing (mostly MP4) where youtube_dl would just die to an unhandled Exception
+- Made SaneFFmpegMergerPP attempt merge as follows: 1. Attempt to encode audio to aac, 2. Attempt to encode video to
+  h264 or 3. Encode both audio and video to above formats (worst case scenario)
+- Added handling of incompatible container audio and video stream muxing (mostly MP4) where youtube_dl would just die
+  to an unhandled Exception
 - Made SaneFFmpegPostProcessor use config.ini options instead of youtube_dl's _downloader.params
 - Added postprocessing section and options to config files and gui
 - Forked own version of youtube_dl's ffmpeg.py to override some hardcoded stuff
@@ -32,15 +179,19 @@ v0.4.0
 - Centered progress bar text in breeze themes
 - Fixed overlapping submenu icon padding issue in breeze themes
 - Implemented themes (bundling in breeze light/dark theme)
-- Added missing config options/handling for DefaultApp and its members and finalised implementation of custom image viewer, for both linux and windows
-- Hotfixed issue #82 by changing t_font.PixelSize from 0.45 to 0.40 (resulting in *slightly* smaller font) and add TitleTile PixelSize as a config option (default: 0.40, old oob-issue value was 0.45)
+- Added missing config options/handling for DefaultApp and its members and finalised implementation of custom
+  image viewer, for both linux and windows
+- Hotfixed issue #82 by changing t_font.PixelSize from 0.45 to 0.40 (resulting in *slightly* smaller font) and add
+  TitleTile PixelSize as a config option (default: 0.40, old oob-issue value was 0.45)
 - Align ConfigView items to top of window frame (Fixes wonky (default centered) alignment)
 - Added SPAM log level to ConfigView/Logging description
 - Added Log level description to Logging ConfigView section
 - Added function add_option_info for adding flavour text to left and/or right ConfigView grid columns
 - Made SaneInputDialog take an action as argument instead of using hardcoded calls
-- Added support for checking if YouTube says you are subscribed to a channel, and add an override/disable feature instead of deleting the subscription.
-- Added add_subscription function and dialog to MainWindow and tied it to File menu (manually add a local-only subscription)
+- Added support for checking if YouTube says you are subscribed to a channel, and add an override/disable feature
+  instead of deleting the subscription.
+- Added add_subscription function and dialog to MainWindow and tied it to File menu (manually add a local-only
+  subscription)
 - Added subscribed and subscribed_override to SubscriptionsDetailedListView
 - Added DB Statement function to get channel by title
 - Fixed issue where continuing a download would not redraw video, or update db
@@ -82,7 +233,8 @@ v0.4.0
 - Made Subfeed View use show_downloaded and show_dismissed
 - Implemented show_watched and show_dismissed for PlaybackGridView
 - Added option to pipe instead of downloading the youtube-dl request
-- Made SubfeedGridView and PlaybackGridView inherit and override ThumbnailTile, and split out overlay drawing from setPixmap() to add_overlay()
+- Made SubfeedGridView and PlaybackGridView inherit and override ThumbnailTile, and split out overlay drawing from
+  setPixmap() to add_overlay()
 - Moved icons from gui/ to resources/
 - Fixed issue where YouTube API search() would return truncated descriptions
 - Significantly optimised DB performance
