@@ -11,7 +11,7 @@ from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.write_operations import engine_execute_first, engine_execute, delete_sub_not_in_list
 from sane_yt_subfeed.log_handler import create_logger
-from sane_yt_subfeed.pickle_handler import load_youtube, dump_youtube
+from sane_yt_subfeed.pickle_handler import load_youtube_resource_oauth, save_youtube_resource_oauth
 from sane_yt_subfeed.print_functions import remove_empty_kwargs
 from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VIDEO_KIND_LIVE, \
     VIDEO_KIND_LIVE_SCHEDULED, VIDEO_KIND_PREMIERE
@@ -344,12 +344,12 @@ def get_stored_subscriptions():
 def get_remote_subscriptions_cached_oauth():
     logger.info("Getting subscriptions from remote (cached OAuth).")
     try:
-        youtube_oauth = load_youtube()
+        youtube_oauth = load_youtube_resource_oauth()
         temp_subscriptions = get_remote_subscriptions(youtube_oauth)
     except FileNotFoundError:
         logger.warning("Loading of cached OAuth: File not found. Requesting new OAuth from user.")
         youtube_oauth = youtube_auth_oauth()
-        dump_youtube(youtube_oauth)
+        save_youtube_resource_oauth(youtube_oauth)
         temp_subscriptions = get_remote_subscriptions(youtube_oauth)
     return temp_subscriptions
 
@@ -362,7 +362,7 @@ def add_subscription_remote(channel_id):
     :param channel_id:
     :return: returns response or raises exception
     """
-    youtube_oauth = load_youtube()
+    youtube_oauth = load_youtube_resource_oauth()
     response = youtube_oauth.subscriptions().insert(
         part='snippet',
         body=dict(
