@@ -10,9 +10,11 @@ from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.main import run_with_gui, run_print, run_channels_test
+from sane_yt_subfeed.youtube.update_videos import load_keys
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
 import sane_yt_subfeed.print_functions as print_functions
 import sane_yt_subfeed.debug_functions as debug_functions
+import sane_yt_subfeed.youtube as youtube
 
 exceptions = []
 exc_id = 0
@@ -28,9 +30,12 @@ LEGACY_EXCEPTION_HANDLER = False
 @click.option(u'--print_watched_videos', is_flag=True)
 @click.option(u'--print_discarded_videos', is_flag=True)
 @click.option(u'--debug_open_1k_fds', is_flag=True)
+@click.option(u'--print_playlist_items', is_flag=False)
+@click.option(u'--print_playlist_items_url_only', is_flag=True)
 @click.command()
 def cli(no_gui, test_channels, update_watch_prio, set_watched_day, print_subscriptions, print_watched_videos,
-        print_discarded_videos, print_downloaded_videos, debug_open_1k_fds):
+        print_discarded_videos, print_downloaded_videos, debug_open_1k_fds, print_playlist_items,
+        print_playlist_items_url_only):
     logger = create_logger(__name__)
     if no_gui:
         run_print()
@@ -74,6 +79,16 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day, print_subscri
     if debug_open_1k_fds:
         debug_functions.open_1000_file_descriptors()
         run_with_gui()
+    if print_playlist_items:
+        youtube_auth_resource = load_keys(1)[0]
+        playlist_video_items = []
+        youtube.youtube_requests.list_uploaded_videos(youtube_auth_resource, playlist_video_items,
+                                                      print_playlist_items, 50)
+        for vid in playlist_video_items:
+            if print_playlist_items_url_only:
+                print(vid.url_video)
+            else:
+                print(vid)
     else:
         if LEGACY_EXCEPTION_HANDLER:
             """

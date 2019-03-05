@@ -1,4 +1,6 @@
 Current
+- Added --print_playlist_items cli option with and optional --print_playlist_items_url_only switch for use in exploding
+  YouTube playlist IDs into individual video items.
 
 v0.5.0
 - Refomatted CHANGELOG to over exceed 80 char line width
