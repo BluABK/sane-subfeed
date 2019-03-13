@@ -1,6 +1,9 @@
 # Sane Subscription Feed
 
-![app_preview](docs/readme_assets/app_preview.png)
+## Screenshots
+Light theme                                                    | Dark theme
+---------------------------------------------------------------|--------------------------------------------------------
+![app_preview_light](docs/readme_assets/app_preview_light.png) | ![app_preview_dark](docs/readme_assets/app_preview_dark.png)
 
 ## How it works
 Instead of directly accessing YouTube's unreliable subscription feed  (which already has been processed through the infamous "algorithm") it retrieves your subscriptions list and then queries the YouTube API for each channel separately ([using a mix of videos.search and videos.list](https://github.com/BluABK/sane-subfeed/wiki/Missed-videos-(and-tests)#youtube-apis-list-and-search)).
