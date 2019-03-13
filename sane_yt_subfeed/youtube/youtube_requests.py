@@ -290,6 +290,9 @@ def get_remote_subscriptions(youtube_oauth):
     :param youtube_oauth:
     :return: [subs]
     """
+    if youtube_oauth is None:
+        logger.critical("YouTube API OAuth object was NoneType, aborting!")
+        return None
     subscription_list_request = youtube_oauth.subscriptions().list(part='snippet', mine=True,
                                                                    maxResults=50)
     subs = []
@@ -349,6 +352,9 @@ def get_remote_subscriptions_cached_oauth():
     except FileNotFoundError:
         logger.warning("Loading of cached OAuth: File not found. Requesting new OAuth from user.")
         youtube_oauth = youtube_auth_oauth()
+        if youtube_oauth is None:
+            logger.critical("Failed to authenticate YouTube API OAuth2!")
+            return None
         save_youtube_resource_oauth(youtube_oauth)
         temp_subscriptions = get_remote_subscriptions(youtube_oauth)
     return temp_subscriptions

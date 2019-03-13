@@ -133,3 +133,6 @@ Image =
 use_socket_log = False
 log_level = 1
 logging_port = 19996
+
+[Authentication]
+oauth2_local_server_port = 10600

@@ -3,6 +3,7 @@ import threading
 from timeit import default_timer
 from tqdm import tqdm
 
+from sane_yt_subfeed.settings import mutable_settings
 from sane_yt_subfeed.controller.controller import Controller
 from sane_yt_subfeed.database.models import Test
 from sane_yt_subfeed.database.orm import db_session
@@ -28,6 +29,8 @@ print_statistics = True
 
 def run_with_gui():
     logger.info('Running with GUI')
+    # Used by backend to determine whether or not application is using GUI
+    mutable_settings.using_gui = True
     controller = Controller()
     controller.run()
 

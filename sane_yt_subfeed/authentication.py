@@ -4,8 +4,11 @@ import json
 import os
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
+from oauthlib.oauth2 import MissingCodeError
 
+from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.settings import mutable_settings
 
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 logger = create_logger(__name__)
@@ -50,7 +53,21 @@ def youtube_auth_oauth():
     """
     logger.info("OAuth: Authorising API...")
     flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET_FILE, SCOPES)
-    credentials = flow.run_console()
+    if mutable_settings.using_gui:
+        try:
+            credentials = flow.run_local_server(host='localhost',
+                                                port=read_config('Authentication', 'oauth2_local_server_port',
+                                                                 literal_eval=True),
+                                                authorization_prompt_message='Please visit this URL: {url}',
+                                                success_message='The auth flow is complete; you may close this window.',
+                                                open_browser=True)
+        except MissingCodeError as exc_mce:
+            logger.exception("A MissingCodeError Exception occurred during OAuth2",
+                             exc_info=exc_mce)
+            return None
+
+    else:
+        credentials = flow.run_console()
     logger.info("OAuth: Instantiated flow (console)")
     # Note: If you try to send in requestBuilder here it will fail, but OAuth isn't threaded so it should be fine...
     return build(API_SERVICE_NAME, API_VERSION, credentials=credentials)

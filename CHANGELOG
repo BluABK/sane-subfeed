@@ -1,4 +1,9 @@
 Current
+
+v0.5.1
+- Made OAuth2 AppFlow run local server and open in browser when using GUI. This should entirely rid us of needing access
+  to a console \o/
+- Made application a bit more robust when tackling OAuth failures, be it aborted auth or missing files.
 - Moved API Key/OAuth file exists logic to MainWindow and made it a pop-up. In the case of a missing key or client
   secret file, the user will from now on be prompted from GUI about whether they want to load their own or use the
   public set (NB: prone to exceeded quota).
