@@ -4,10 +4,11 @@ import sys
 
 import copy
 import os
+import shutil
 import traceback
 from PyQt5.QtCore import QFile, QTextStream, QRegExp
 from PyQt5.QtGui import QIcon, QRegExpValidator
-from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QStackedWidget, QStyleFactory
+from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QStackedWidget, QStyleFactory, QFileDialog
 from subprocess import check_output
 
 # Project internal libs
@@ -41,8 +42,14 @@ from sane_yt_subfeed.gui.views.grid_view.subfeed.subfeed_grid_view import Subfee
 from sane_yt_subfeed.gui.views.tiled_list_view.subfeed.subfeed_tiled_list_view import SubfeedTiledListView
 from sane_yt_subfeed.history_handler import get_plaintext_history
 from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.settings import ROOT_PATH
 
 # Constants
+
+CLIENT_SECRET_FILE = os.path.join(ROOT_PATH, 'resources', 'client_secret.json')
+CLIENT_SECRET_PUBLIC_FILE = os.path.join(ROOT_PATH, "resources", "client_secret_public.json")
+KEYS_FILE = os.path.join(ROOT_PATH, 'resources', 'keys.json')
+KEYS_PULIC_FILE = os.path.join(ROOT_PATH, "resources", "keys_public.json")
 HOTKEYS_EVAL = False
 HOTKEYS_INI = 'hotkeys'
 YOUTUBE_URL_REGEX = QRegExp('(http[s]?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/[^ ]+')
@@ -144,8 +151,79 @@ class MainWindow(QMainWindow):
         self.toolbar = None
         self.toolbar_items = {}
 
+        # Used in startup check dialogs, thus set before init_ui()
+        self.setWindowIcon(QIcon(os.path.join(ICONS_PATH, QMAINWINDOW_ICON)))
+
+        # Do some startup checks
+        self.startup_checks_status = 0
+        self.custom_api_keys_file = False
+        self.custom_client_secrets_file = False
+        self.startup_checks()
+        if self.startup_checks_status != 0:
+            self.logger.critical("Something failed during startup checks (wrong status: running). Aborting!")
+            exit(1)  # qApp.quit() doesn't work until MainWindow has fully loaded for some reason..
+
         # Initialize UI
         self.init_ui()
+
+    def startup_check_custom_api_keys(self):
+        self.custom_api_keys_file = True
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        filename, _ = QFileDialog.getOpenFileName(self, "Locate your YouTube API Keys file (usually keys.json)", "",
+                                                  "All Files (*);;JSON files (*.json)", options=options)
+        if filename:
+            self.logger.info("Copying '{}' to '{}'".format(filename, KEYS_FILE))
+            shutil.copyfile(filename, KEYS_FILE)
+        else:
+            self.logger.warning("User cancelled custom YouTube API Key file loader dialog, falling back to public set!")
+            self.custom_api_keys_file = False
+
+    def startup_check_custom_oauth_secret(self):
+        self.custom_client_secrets_file = True
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        filename, _ = QFileDialog.getOpenFileName(self, "Locate your YouTube API OAuth2 Client Secret file "
+                                                        "(usually client_secret.json)", "",
+                                                  "All Files (*);;JSON files (*.json)", options=options)
+        if filename:
+            shutil.copyfile(filename, CLIENT_SECRET_FILE)
+            self.logger.info("Copying '{}' to '{}'".format(filename, CLIENT_SECRET_FILE))
+        else:
+            self.logger.warning("User cancelled custom YouTube API OAuth Client Secret file loader dialog, "
+                                "falling back to public set!")
+            self.custom_client_secrets_file = False
+
+    def startup_checks(self):
+        """
+        Makes sure all necessities are satisfied.
+        :return:
+        """
+        # Indicate function is in running state.
+        self.startup_checks_status = 1
+
+        if not os.path.isfile(KEYS_FILE):
+            self.logger.info("Startup check triggered: Missing YouTube API Keys file.")
+            self.confirmation_dialog("Failed to detect the YouTube API keys file!",
+                                     self.startup_check_custom_api_keys, title="Missing API keys",
+                                     ok_text="Load custom API Keys file", cancel_text="Use public API Keys",
+                                     exclusive=True)
+            if not self.custom_api_keys_file:
+                self.logger.info("User went with public file option (read: cancel button pressed.)")
+                shutil.copyfile(KEYS_PULIC_FILE,  KEYS_FILE)
+
+        if not os.path.isfile(CLIENT_SECRET_FILE):
+            self.logger.info("Startup check triggered: Missing YouTube API OAuth2 client secret file.")
+            self.confirmation_dialog("Failed to detect the YouTube API OAuth2 client secret file!",
+                                     self.startup_check_custom_oauth_secret, title="Missing YouTube API OAuth2 Secret",
+                                     ok_text="Load custom OAuth2 client secret file", cancel_text="Use public API Keys",
+                                     exclusive=True)
+            if not self.custom_client_secrets_file:
+                self.logger.info("User went with public OAuth2 secret file option (read: cancel button pressed.)")
+                shutil.copyfile(CLIENT_SECRET_PUBLIC_FILE,  CLIENT_SECRET_FILE)
+
+        # Indicate all checks ran successfully
+        self.startup_checks_status = 0
 
     def determine_icons(self):
         """
@@ -219,7 +297,6 @@ class MainWindow(QMainWindow):
         if version:
             app_title += " v{}".format(version)
         self.setWindowTitle(app_title)
-        self.setWindowIcon(QIcon(os.path.join(ICONS_PATH, QMAINWINDOW_ICON)))
         self.statusBar().showMessage('Ready.')
 
         # Add progress bar to the status bar
@@ -906,9 +983,12 @@ class MainWindow(QMainWindow):
         """
         self.main_model.main_window_listener.addYouTubeChannelSubscriptionByUsername.emit(input_text)
 
-    def confirmation_dialog(self, message, actions, caller=None, title=None, ok_text='Yes', cancel_text='No'):
+    def confirmation_dialog(self, message, actions, caller=None, title=None, ok_text='Yes', cancel_text='No',
+                            exclusive=False):
         """
         Prompts user for a Yes/No Confirmation where Yes results in a call for each action in actions
+        :param feedback: Send in a variable here which will be True if OK is pressed.
+        :param exclusive: If True, spawn an instance that halts Main thread until resolved.
         :param message: Text to display in dialog body.
         :param actions: A function, or a list of functions to be called
         :param caller: (If given) applies action to the caller function e.g. action(caller)
@@ -921,7 +1001,10 @@ class MainWindow(QMainWindow):
             title = "Are you sure?"
         dialog = SaneConfirmationDialog(self, actions, caller=caller, title=title, text=message,
                                         ok_text=ok_text, cancel_text=cancel_text)
-        dialog.show()
+        if exclusive:
+            dialog.exec()
+        else:
+            dialog.show()
 
     def download_single_url_dialog(self):
         """

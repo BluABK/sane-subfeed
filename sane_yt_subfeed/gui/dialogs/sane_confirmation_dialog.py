@@ -12,8 +12,20 @@ HEIGHT = 80
 
 
 class SaneConfirmationDialog(QDialog):
-    def __init__(self, parent, actions, caller=None, title=TITLE, text=TEXT, ok_text=OK, cancel_text=CANCEL,
-                 flags=Qt.WindowFlags):
+    def __init__(self, parent, actions, caller=None, title=TITLE,
+                 text=TEXT, ok_text=OK, cancel_text=CANCEL, flags=Qt.WindowFlags):
+        """
+        Prompts user for a Yes/No Confirmation where Yes results in a call for each action in actions
+
+        :param parent:
+        :param text: Text to display in dialog body.
+        :param actions: A function, or a list of functions to be called
+        :param caller: (If given) applies action to the caller function e.g. action(caller)
+        :param title: Title of dialog window.
+        :param ok_text: Text to display on OK button.
+        :param cancel_text: Text to display on Cancel button.
+        :param flags:
+        """
         super(SaneConfirmationDialog, self).__init__(parent, flags())
         self.logger = create_logger(__name__)
         self.sane_parent = parent
@@ -58,7 +70,7 @@ class SaneConfirmationDialog(QDialog):
 
     def do_action(self, action):
         """
-        Executes an action
+        Executes an action.
         :param action:
         :return:
         """
@@ -68,6 +80,9 @@ class SaneConfirmationDialog(QDialog):
         else:
             # Do an action that doesn't depend on who called me.
             action()
+
+        # Close the dialog
+        self.close()
 
     def do_actions(self):
         """
@@ -80,5 +95,6 @@ class SaneConfirmationDialog(QDialog):
         else:
             for action in self.actions:
                 self.do_action(action)
+
         # Close the dialog
         self.close()
