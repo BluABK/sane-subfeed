@@ -1,4 +1,7 @@
 Current
+- Moved API Key/OAuth file exists logic to MainWindow and made it a pop-up. In the case of a missing key or client
+  secret file, the user will from now on be prompted from GUI about whether they want to load their own or use the
+  public set (NB: prone to exceeded quota).
 - Made it possible again to run CLI commands without GUI, using the --no_gui flag.
 - Added option for doing a single refresh and print of subfeed with --refresh_and_print_subfeed
 - Made all icon constant variables in MainWindow default to the light version, to avoid false positive "NoneType"
