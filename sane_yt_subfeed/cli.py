@@ -3,7 +3,6 @@ import sys
 import click
 import datetime
 from sqlalchemy import or_, and_
-from subprocess import check_output
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.orm import db_session
@@ -68,13 +67,13 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day, print_subscri
             else:
                 print(("[{}]    {}".format(channel.id, channel.title)))
     if print_watched_videos:
-        videos = db_session.query(Video).filter(and_(Video.watched == True, (Video.vid_path.isnot(None)))).all()
+        videos = db_session.query(Video).filter(and_(Video.watched is True, (Video.vid_path.isnot(None)))).all()
         print_functions.print_videos(videos, path_only=True)
     if print_discarded_videos:
-        videos = db_session.query(Video).filter(and_(Video.discarded == True, (Video.vid_path.isnot(None)))).all()
+        videos = db_session.query(Video).filter(and_(Video.discarded is True, (Video.vid_path.isnot(None)))).all()
         print_functions.print_videos(videos, path_only=True)
     if print_downloaded_videos:
-        videos = db_session.query(Video).filter(and_(Video.downloaded == True, (Video.vid_path.isnot(None)))).all()
+        videos = db_session.query(Video).filter(and_(Video.downloaded is True, (Video.vid_path.isnot(None)))).all()
         print_functions.print_videos(videos, path_only=True)
     if debug_open_1k_fds:
         debug_functions.open_1000_file_descriptors()
@@ -121,12 +120,6 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day, print_subscri
 
             # Set the exception hook to our wrapping function
             sys.excepthook = my_exception_hook
-
-        # Log the current ulimit
-        if sys.platform.startswith('linux'):
-            ulimit_data = check_output("ulimit -a", shell=True)
-            logger.info("=== ulimit info on next line ===")
-            logger.info(ulimit_data.decode('utf8'))
 
         run_with_gui()
 

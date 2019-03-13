@@ -890,7 +890,6 @@ class MainWindow(QMainWindow):
         self.main_model.playback_grid_view_listener.updateFromDb.emit()
 
     # File menu functions
-
     def add_subscription_by_id(self, input_text):
         """
         Add a YouTube subscription (On YouTube).
