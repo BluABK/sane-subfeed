@@ -14,6 +14,8 @@ client_secret_private.json
 client_secret_private - Copy.json
 keys.json
 keys_private.json
+client_secret_production.json
+keys_production.json
 *.pkl
 config.ini
 hotkeys.ini
