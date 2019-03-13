@@ -1,4 +1,6 @@
 Current
+- Made it possible again to run CLI commands without GUI, using the --no_gui flag.
+- Added option for doing a single refresh and print of subfeed with --refresh_and_print_subfeed
 - Made all icon constant variables in MainWindow default to the light version, to avoid false positive "NoneType"
   warnings in code.
 - Changed Configuration pop-out window to a CentralWidget/View and added it to toolbar.

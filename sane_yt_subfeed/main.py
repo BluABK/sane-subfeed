@@ -32,12 +32,17 @@ def run_with_gui():
     controller.run()
 
 
-def run_print():
+def run_with_cli():
+    logger.info('Running with CLI')
+    logger.error("CLI UI Not yet implemented")
+    exit(0)
+
+
+def cli_refresh_and_print_subfeed():
     logger.info('Running with print/console')
-    start = default_timer()
-    refresh_uploads()
-    time_elsapsed = default_timer() - start
-    print("\nRun time: {}".format(time_elsapsed))
+    new_videos = refresh_uploads()
+    for vid in new_videos:
+        print(vid)
 
 
 # FIXME: move this method to the youtube package
