@@ -51,31 +51,31 @@ QMAINWINDOW_TITLE = 'Sane Subscription Feed'
 QMAINWINDOW_ICON = 'yubbtubbz-padding.ico'
 SUBFEED_VIEW_ICON_LIGHT = 'grid.png'
 SUBFEED_VIEW_ICON_DARK = 'grid_darkmode.png'
-SUBFEED_VIEW_ICON = None
+SUBFEED_VIEW_ICON = SUBFEED_VIEW_ICON_LIGHT
 SUBFEED_TILED_LIST_VIEW_ICON_LIGHT = 'tiled_list.png'
 SUBFEED_TILED_LIST_VIEW_ICON_DARK = 'tiled_list_darkmode.png'
-SUBFEED_TILED_LIST_VIEW_ICON = None
+SUBFEED_TILED_LIST_VIEW_ICON = SUBFEED_TILED_LIST_VIEW_ICON_LIGHT
 PLAYBACK_VIEW_ICON_LIGHT = 'play_view_basic.png'
 PLAYBACK_VIEW_ICON_DARK = 'play_view_basic_darkmode.png'
-PLAYBACK_VIEW_ICON = None
+PLAYBACK_VIEW_ICON = PLAYBACK_VIEW_ICON_LIGHT
 DETAILED_LIST_VIEW_ICON_LIGHT = 'table.png'
 DETAILED_LIST_VIEW_ICON_DARK = 'table_darkmode.png'
-DETAILED_LIST_VIEW_ICON = None
+DETAILED_LIST_VIEW_ICON = DETAILED_LIST_VIEW_ICON_LIGHT
 DOWNLOAD_VIEW_ICON_LIGHT = 'download_view.png'
 DOWNLOAD_VIEW_ICON_DARK = 'download_view_darkmode.png'
-DOWNLOAD_VIEW_ICON = None
+DOWNLOAD_VIEW_ICON = DOWNLOAD_VIEW_ICON_LIGHT
 SUBS_LIST_VIEW_ICON = 'subs.png'
-PREFERENCES_ICON_LIGHT = 'preferences.png'
-PREFERENCES_ICON_DARK = 'preferences_darkmode.png'
-PREFERENCES_ICON = None
+CONFIG_ICON_LIGHT = 'config.png'
+CONFIG_ICON_DARK = 'config_darkmode.png'
+CONFIG_ICON = CONFIG_ICON_LIGHT
 HOTKEYS_ICON = 'hotkeys.png'
 COPY_ALL_URLS_ICON = 'copy.png'
 REFRESH_SUBFEED_ICON_LIGHT = 'refresh.png'
 REFRESH_SUBFEED_ICON_DARK = 'refresh_darkmode.png'
-REFRESH_SUBFEED_ICON = None
+REFRESH_SUBFEED_ICON = REFRESH_SUBFEED_ICON_LIGHT
 REFRESH_SUBFEED_DEEP_ICON_LIGHT = 'refresh.png'
 REFRESH_SUBFEED_DEEP_ICON_DARK = 'refresh_darkmode.png'
-REFRESH_SUBFEED_DEEP_ICON = None
+REFRESH_SUBFEED_DEEP_ICON = REFRESH_SUBFEED_DEEP_ICON_LIGHT
 RELOAD_SUBS_LIST_ICON = 'refresh_subs.png'
 RERUN_TEST_ICON = 'rerun_test.png'
 MANUAL_DIR_SEARCH_ICON = 'folder_refresh.png'
@@ -85,7 +85,7 @@ SORT_BY_ASC_DATE_ICON = 'database.png'
 SORT_BY_CHANNEL_ICON = 'database.png'
 UNDO_ICON_LIGHT = 'refresh.png'
 UNDO_ICON_DARK = 'refresh_darkmode.png'
-UNDO_ICON = None
+UNDO_ICON = UNDO_ICON_LIGHT
 ABOUT_ICON = 'about.png'
 
 QMAINWINDOW_DIMENSIONS = [770, 700]
@@ -156,7 +156,7 @@ class MainWindow(QMainWindow):
         """
         # FIXME: Create a iconpack system instead of setting darkmode applicable icons explicitly light or dark
         global SUBFEED_VIEW_ICON, SUBFEED_TILED_LIST_VIEW_ICON, PLAYBACK_VIEW_ICON, DETAILED_LIST_VIEW_ICON
-        global DOWNLOAD_VIEW_ICON, PREFERENCES_ICON, REFRESH_SUBFEED_ICON, REFRESH_SUBFEED_DEEP_ICON, UNDO_ICON
+        global DOWNLOAD_VIEW_ICON, CONFIG_ICON, REFRESH_SUBFEED_ICON, REFRESH_SUBFEED_DEEP_ICON, UNDO_ICON
 
         if self.darkmode:
             SUBFEED_VIEW_ICON = SUBFEED_VIEW_ICON_DARK
@@ -164,7 +164,7 @@ class MainWindow(QMainWindow):
             PLAYBACK_VIEW_ICON = PLAYBACK_VIEW_ICON_DARK
             DETAILED_LIST_VIEW_ICON = DETAILED_LIST_VIEW_ICON_DARK
             DOWNLOAD_VIEW_ICON = DOWNLOAD_VIEW_ICON_DARK
-            PREFERENCES_ICON = PREFERENCES_ICON_DARK
+            CONFIG_ICON = CONFIG_ICON_DARK
             REFRESH_SUBFEED_ICON = REFRESH_SUBFEED_ICON_DARK
             REFRESH_SUBFEED_DEEP_ICON = REFRESH_SUBFEED_DEEP_ICON_DARK
             UNDO_ICON = UNDO_ICON_DARK
@@ -174,7 +174,7 @@ class MainWindow(QMainWindow):
             PLAYBACK_VIEW_ICON = PLAYBACK_VIEW_ICON_LIGHT
             DETAILED_LIST_VIEW_ICON = DETAILED_LIST_VIEW_ICON_LIGHT
             DOWNLOAD_VIEW_ICON = DOWNLOAD_VIEW_ICON_LIGHT
-            PREFERENCES_ICON = PREFERENCES_ICON_LIGHT
+            CONFIG_ICON = CONFIG_ICON_LIGHT
             REFRESH_SUBFEED_ICON = REFRESH_SUBFEED_ICON_LIGHT
             REFRESH_SUBFEED_DEEP_ICON = REFRESH_SUBFEED_DEEP_ICON_LIGHT
             UNDO_ICON = UNDO_ICON_LIGHT
@@ -228,7 +228,7 @@ class MainWindow(QMainWindow):
         self.statusBar().addPermanentWidget(progress_bar)
         self.statusBar().addPermanentWidget(DbStateIcon(self.toolbar, self.main_model))
 
-        # Display the window
+        # Add Views/CentralWidgets
         self.central_widget.addWidget(self.subfeed_grid_view)
         self.central_widget.addWidget(self.playback_grid_view)
         self.central_widget.addWidget(self.download_view)
@@ -238,11 +238,10 @@ class MainWindow(QMainWindow):
         self.central_widget.addWidget(self.subscriptions_view)
         if read_config('Debug', 'show_unimplemented_gui'):
             self.central_widget.addWidget(self.about_view)
-        # self.central_widget.addWidget(self.hotkeys_view)
+        self.central_widget.addWidget(self.config_view)
         self.central_widget.setCurrentWidget(self.subfeed_grid_view)
 
     # Init UI Helpers
-
     def setup_views(self):
         self.central_widget = QStackedWidget()
         self.setCentralWidget(self.central_widget)
@@ -258,7 +257,7 @@ class MainWindow(QMainWindow):
         self.hotkeys_view = ConfigWindow(self)
         self.hotkeys_view.setWidget(HotkeysViewWidget(self.hotkeys_view, self,
                                                       icon=QIcon(os.path.join(ICONS_PATH, HOTKEYS_ICON))))
-        self.config_view = ConfigViewTabs(self, icon=QIcon(os.path.join(ICONS_PATH, PREFERENCES_ICON)))
+        self.config_view = ConfigViewTabs(self, icon=QIcon(os.path.join(ICONS_PATH, CONFIG_ICON)))
 
         self.list_detailed_view = SubfeedDetailedListView(self)
         self.list_tiled_view = SubfeedTiledListView(self)
@@ -300,10 +299,6 @@ class MainWindow(QMainWindow):
                          shortcut=read_config('Global', 'show_usage_history',
                                               custom_ini=HOTKEYS_INI, literal_eval=HOTKEYS_EVAL),
                          tooltip='Show usage history in a dialog box')
-        self.add_submenu('&File', 'Preferences', self.view_config,
-                         shortcut=read_config('Global', 'preferences', custom_ini=HOTKEYS_INI,
-                                              literal_eval=HOTKEYS_EVAL),
-                         tooltip='Change application settings', icon=PREFERENCES_ICON)
         self.add_submenu('&File', 'Exit', qApp.quit, shortcut=read_config('Global', 'quit', custom_ini=HOTKEYS_INI,
                                                                           literal_eval=HOTKEYS_EVAL),
                          tooltip='Exit application')
@@ -423,6 +418,12 @@ class MainWindow(QMainWindow):
                                                                        tooltip='View Subscriptions',
                                                                        icon=SUBS_LIST_VIEW_ICON,
                                                                        widget=self.subscriptions_view)
+        self.views['ConfigView'] = self.add_submenu('&View', 'Configuration', self.set_current_widget,
+                                                    shortcut=read_config('View', 'config',
+                                                                         custom_ini=HOTKEYS_INI,
+                                                                         literal_eval=HOTKEYS_EVAL),
+                                                    tooltip='View or change program settings', icon=CONFIG_ICON,
+                                                    widget=self.config_view)
         if read_config('Debug', 'show_unimplemented_gui'):
             self.views['SubfeedTiledListView'] = self.add_submenu('&View', 'Tiled List', self.set_current_widget,
                                                                   shortcut=read_config('View', 'tiled_list',
@@ -500,6 +501,7 @@ class MainWindow(QMainWindow):
         toolbar.addAction(self.views['PlaybackGridView'])
         toolbar.addAction(self.views['SubfeedDetailedListView'])
         toolbar.addAction(self.views['DownloadView'])
+        toolbar.addAction(self.views['ConfigView'])
         if read_config('Debug', 'show_unimplemented_gui'):  # FIXME: Implement SubfeedTiledListView
             toolbar.addAction(self.views['SubfeedTiledListView'])
         toolbar.addAction(self.views['SubscriptionsDetailedListView'])
@@ -804,14 +806,6 @@ class MainWindow(QMainWindow):
         :return:
         """
         self.central_widget.setCurrentWidget(widget)
-
-    def view_config(self):
-        """
-        Set View variable and CentralWidget to ConfigView
-        :return:
-        """
-        self.config_view.show()
-        # self.central_widget.setCurrentWidget(self.config_view)
 
     def view_hotkeys(self):
         """

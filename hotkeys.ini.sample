@@ -1,5 +1,4 @@
 [Global]
-preferences = Ctrl+P
 hotkeys = F2
 quit = Ctrl+Q
 copy_all_urls = Ctrl+D
@@ -21,6 +20,7 @@ detailed_list = Ctrl+3
 download = Ctrl+4
 subscriptions = Ctrl+5
 tiled_list = Ctrl+9
+config = Ctrl+P
 
 [Subfeed]
 download = LeftButton
