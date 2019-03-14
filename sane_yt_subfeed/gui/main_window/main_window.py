@@ -18,6 +18,7 @@ from sane_yt_subfeed.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import SUBFEED_VIEW_ID, PLAYBACK_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
+from sane_yt_subfeed.gui.dialogs.SaneOAuth2BuilderDialog import SaneOAuth2BuilderDialog
 from sane_yt_subfeed.gui.dialogs.sane_confirmation_dialog import SaneConfirmationDialog
 from sane_yt_subfeed.gui.dialogs.sane_dialog import SaneDialog
 from sane_yt_subfeed.gui.dialogs.sane_input_dialog import SaneInputDialog
@@ -175,7 +176,17 @@ class MainWindow(QMainWindow):
         shutil.copyfile(src, dst)
         self.logger.info("Copying '{}' to '{}'".format(src, dst))
 
-    def select_custom_api_keys(self):
+    def select_custom_api_keys_choice_dialog(self):
+        """
+        Presents user with a choice between the two available method to create/load a custom API key file.
+        :return:
+        """
+        self.confirmation_dialog("Which method do you prefer?",
+                                 self.select_custom_api_keys_file, title="Select which method",
+                                 ok_text="Browse for file", cancel_text="Build from string",
+                                 cancel_actions=self.select_custom_api_keys_wizard, exclusive=True)
+
+    def select_custom_api_keys_file(self):
         """
         Copies custom api keys file to KEYS_FILE via OpenFile dialog.
         If no file is chosen, it will fall back to public file option.
@@ -188,10 +199,54 @@ class MainWindow(QMainWindow):
         if filename:
             self.copy_file(filename, KEYS_FILE)
         else:
+            self.dialog(self, "User cancelled YouTube API Key file loader dialog,"
+                              "\n falling back to public key set", exclusive=True)
             self.logger.warning("User cancelled custom YouTube API Key file loader dialog, falling back to public set!")
             self.select_public_api_keys()
 
-    def select_custom_oauth_secret(self):
+    def build_and_select_custom_api_keys_file(self, key_str):
+        """
+        Creates an API keys file from an API Key string, and then writes it to KEYS_FILE.
+        :param key_str:
+        :return:
+        """
+        s = ['{\n',
+             '  "api_key": "{}"\n'.format(key_str),
+             '}']
+        try:
+            with open(KEYS_FILE, 'w') as keys_file:
+                keys_file.writelines(s)
+        except Exception as exc:
+            self.logger.exception("An exception occurred while writing API Key of len '{}' to {}".format(len(key_str),
+                                                                                                         KEYS_FILE),
+                                  exc_info=exc)
+            # Let user know and fall back to public set
+            self.dialog(self, "Unable to open API Keys file, falling back to public key set", exclusive=True)
+            self.select_public_api_keys()
+            pass
+
+    def select_custom_api_keys_wizard(self):
+        """
+        Builds and selects an API Key file based on user input.
+        :return:
+        """
+        input_dialog = SaneInputDialog(self, self.build_and_select_custom_api_keys_file,
+                                       title='YouTube API Key file builder',
+                                       text='Enter API Key', ok_text='Build API Key file')
+        input_dialog.exec()
+
+    def select_custom_oauth_secret_wizard(self):
+        """
+        Builds and selects an API OAuth2 client secret file based on user input.
+        :return:
+        """
+        input_dialog = SaneOAuth2BuilderDialog(self, self.build_and_select_custom_api_keys_file,
+                                       title='YouTube API OAuth2 client secret file builder',
+                                       text='Enter API OAuth2 client secret values',
+                                               ok_text='Build OAuth2 client secret file')
+        input_dialog.exec()
+
+    def select_custom_oauth_secret_file(self):
         """
         Copies custom api keys file to KEYS_FILE via OpenFile dialog.
         If no file is chosen, it will fall back to public file option.
@@ -205,6 +260,8 @@ class MainWindow(QMainWindow):
         if filename:
             self.copy_file(filename, CLIENT_SECRET_FILE)
         else:
+            self.dialog(self, "User cancelled YouTube API OAuth Client Secret file loader dialog,"
+                              "\n falling back to public key set", exclusive=True)
             self.logger.warning("User cancelled custom YouTube API OAuth Client Secret file loader dialog, "
                                 "falling back to public set!")
             self.select_public_oauth_secret()
@@ -236,14 +293,14 @@ class MainWindow(QMainWindow):
         if not os.path.isfile(KEYS_FILE):
             self.logger.info("Startup check triggered: Missing YouTube API Keys file.")
             self.confirmation_dialog("Failed to detect the YouTube API keys file!",
-                                     self.select_custom_api_keys, title="Missing API keys",
+                                     self.select_custom_api_keys_choice_dialog, title="Missing API keys",
                                      ok_text="Load custom API Keys file", cancel_text="Use public API Keys",
                                      cancel_actions=self.select_public_api_keys, exclusive=True)
 
         if not os.path.isfile(CLIENT_SECRET_FILE):
             self.logger.info("Startup check triggered: Missing YouTube API OAuth2 client secret file.")
             self.confirmation_dialog("Failed to detect the YouTube API OAuth2 client secret file!",
-                                     self.select_custom_oauth_secret, title="Missing YouTube API OAuth2 Secret",
+                                     self.select_custom_oauth_secret_file, title="Missing YouTube API OAuth2 Secret",
                                      ok_text="Load custom OAuth2 client secret file", cancel_text="Use public API Keys",
                                      cancel_actions=self.select_public_oauth_secret, exclusive=True)
 
