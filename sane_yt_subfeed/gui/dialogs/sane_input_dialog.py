@@ -101,6 +101,9 @@ class SaneInputDialog(QDialog):
             self.action(self.input_box.text())
             self.reset_values()
 
+            # Close dialog
+            self.close()
+
     def check_validator_state(self, *args, **kwargs):
         sender = self.sender()
         validator = sender.validator()
