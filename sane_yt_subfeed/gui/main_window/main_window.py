@@ -157,43 +157,73 @@ class MainWindow(QMainWindow):
 
         # Do some startup checks
         self.startup_checks_status = 0
-        self.custom_api_keys_file = False
-        self.custom_client_secrets_file = False
         self.startup_checks()
         if self.startup_checks_status != 0:
             self.logger.critical("Something failed during startup checks (wrong status: running). Aborting!")
-            exit(1)  # qApp.quit() doesn't work until MainWindow has fully loaded for some reason..
+            exit(1)  # FIXME: qApp.quit() doesn't work until MainWindow has fully loaded for some reason..
 
         # Initialize UI
         self.init_ui()
 
-    def startup_check_custom_api_keys(self):
-        self.custom_api_keys_file = True
+    def copy_file(self, src, dst):
+        """
+        Copies a src file to a dst file, with some logging..
+        :param src: filename str
+        :param dst: filename str
+        :return:
+        """
+        shutil.copyfile(src, dst)
+        self.logger.info("Copying '{}' to '{}'".format(src, dst))
+
+    def select_custom_api_keys(self):
+        """
+        Copies custom api keys file to KEYS_FILE via OpenFile dialog.
+        If no file is chosen, it will fall back to public file option.
+        :return:
+        """
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         filename, _ = QFileDialog.getOpenFileName(self, "Locate your YouTube API Keys file (usually keys.json)", "",
                                                   "All Files (*);;JSON files (*.json)", options=options)
         if filename:
-            self.logger.info("Copying '{}' to '{}'".format(filename, KEYS_FILE))
-            shutil.copyfile(filename, KEYS_FILE)
+            self.copy_file(filename, KEYS_FILE)
         else:
             self.logger.warning("User cancelled custom YouTube API Key file loader dialog, falling back to public set!")
-            self.custom_api_keys_file = False
+            self.select_public_api_keys()
 
-    def startup_check_custom_oauth_secret(self):
-        self.custom_client_secrets_file = True
+    def select_custom_oauth_secret(self):
+        """
+        Copies custom api keys file to KEYS_FILE via OpenFile dialog.
+        If no file is chosen, it will fall back to public file option.
+        :return:
+        """
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         filename, _ = QFileDialog.getOpenFileName(self, "Locate your YouTube API OAuth2 Client Secret file "
                                                         "(usually client_secret.json)", "",
                                                   "All Files (*);;JSON files (*.json)", options=options)
         if filename:
-            shutil.copyfile(filename, CLIENT_SECRET_FILE)
-            self.logger.info("Copying '{}' to '{}'".format(filename, CLIENT_SECRET_FILE))
+            self.copy_file(filename, CLIENT_SECRET_FILE)
         else:
             self.logger.warning("User cancelled custom YouTube API OAuth Client Secret file loader dialog, "
                                 "falling back to public set!")
-            self.custom_client_secrets_file = False
+            self.select_public_oauth_secret()
+
+    def select_public_api_keys(self):
+        """
+        Copies public API keys to KEYS_FILE
+        :return:
+        """
+        self.logger.info("User went with public API keys file option (cancel button pressed.)")
+        self.copy_file(KEYS_PULIC_FILE, KEYS_FILE)
+
+    def select_public_oauth_secret(self):
+        """
+        Copies public OAuth2 client secret to CLIENT_SECRET_FILE
+        :return:
+        """
+        self.logger.info("User went with public OAuth2 client secret file option (cancel button pressed.)")
+        self.copy_file(CLIENT_SECRET_PUBLIC_FILE, CLIENT_SECRET_FILE)
 
     def startup_checks(self):
         """
@@ -206,22 +236,16 @@ class MainWindow(QMainWindow):
         if not os.path.isfile(KEYS_FILE):
             self.logger.info("Startup check triggered: Missing YouTube API Keys file.")
             self.confirmation_dialog("Failed to detect the YouTube API keys file!",
-                                     self.startup_check_custom_api_keys, title="Missing API keys",
+                                     self.select_custom_api_keys, title="Missing API keys",
                                      ok_text="Load custom API Keys file", cancel_text="Use public API Keys",
-                                     exclusive=True)
-            if not self.custom_api_keys_file:
-                self.logger.info("User went with public file option (read: cancel button pressed.)")
-                shutil.copyfile(KEYS_PULIC_FILE,  KEYS_FILE)
+                                     cancel_actions=self.select_public_api_keys, exclusive=True)
 
         if not os.path.isfile(CLIENT_SECRET_FILE):
             self.logger.info("Startup check triggered: Missing YouTube API OAuth2 client secret file.")
             self.confirmation_dialog("Failed to detect the YouTube API OAuth2 client secret file!",
-                                     self.startup_check_custom_oauth_secret, title="Missing YouTube API OAuth2 Secret",
+                                     self.select_custom_oauth_secret, title="Missing YouTube API OAuth2 Secret",
                                      ok_text="Load custom OAuth2 client secret file", cancel_text="Use public API Keys",
-                                     exclusive=True)
-            if not self.custom_client_secrets_file:
-                self.logger.info("User went with public OAuth2 secret file option (read: cancel button pressed.)")
-                shutil.copyfile(CLIENT_SECRET_PUBLIC_FILE,  CLIENT_SECRET_FILE)
+                                     cancel_actions=self.select_public_oauth_secret, exclusive=True)
 
         # Indicate all checks ran successfully
         self.startup_checks_status = 0
@@ -1002,9 +1026,11 @@ class MainWindow(QMainWindow):
         else:
             dialog.show()
 
-    def confirmation_dialog(self, message, actions, title, ok_text, cancel_text, caller=None, exclusive=False):
+    def confirmation_dialog(self, message, actions, title, ok_text, cancel_text, caller=None, cancel_actions=None,
+                            exclusive=False):
         """
         Prompts user for a Yes/No Confirmation where Yes results in a call for each action in actions
+        :param cancel_actions: Actions to perform on cancel/no, if None it will bind to reject.
         :param exclusive: If True, spawn an instance that halts Main thread until resolved.
         :param message: Text to display in dialog body.
         :param actions: A function, or a list of functions to be called
@@ -1014,7 +1040,8 @@ class MainWindow(QMainWindow):
         :param cancel_text: Text to display on Cancel button.
         :return:
         """
-        dialog = SaneConfirmationDialog(self, actions, title, message, ok_text, cancel_text, caller=caller)
+        dialog = SaneConfirmationDialog(self, actions, title, message, ok_text, cancel_text,
+                                        cancel_actions=cancel_actions, caller=caller)
         if exclusive:
             dialog.exec()
         else:
