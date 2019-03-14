@@ -233,7 +233,29 @@ class MainWindow(QMainWindow):
                                                                                                          KEYS_FILE),
                                   exc_info=exc)
             # Let user know and fall back to public set
-            self.dialog(self, "Unable to open API Keys file, falling back to public key set", exclusive=True)
+            self.dialog("Unable to open API Keys file", "Unable to open API Keys file, falling back to public key set",
+                        exclusive=True)
+            self.select_public_api_keys()
+            pass
+
+    def build_and_select_custom_oauth_secret_file(self, client_secret_json):
+        """
+        Builds a client_secret.json file from a given client_secret_json dict
+        :param client_secret_json:
+        :return:
+        """
+        try:
+            with open(CLIENT_SECRET_FILE, 'w') as client_secret_file:
+                client_secret_file.write(str(client_secret_json))
+        except Exception as exc:
+            self.logger.exception("An exception occurred while writing API "
+                                  "OAuth2 client secret of len '{}' to {}".format(len(client_secret_json),
+                                                                                  CLIENT_SECRET_FILE),
+                                  exc_info=exc)
+            # Let user know and fall back to public set
+            self.dialog("Unable to open API OAuth2 client secret file",
+                        "Unable to open API OAuth2 client secret file, falling back to public key set",
+                        exclusive=True)
             self.select_public_api_keys()
             pass
 
@@ -252,7 +274,7 @@ class MainWindow(QMainWindow):
         Builds and selects an API OAuth2 client secret file based on user input.
         :return:
         """
-        input_dialog = SaneOAuth2BuilderDialog(self, self.build_and_select_custom_api_keys_file,
+        input_dialog = SaneOAuth2BuilderDialog(self, self.build_and_select_custom_oauth_secret_file,
                                                'YouTube API OAuth2 client secret file builder',
                                                'Enter API OAuth2 client secret values',
                                                'Build OAuth2 client secret file')
