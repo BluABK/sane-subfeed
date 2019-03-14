@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QPushButton, QHBoxLayout, QLabel, QVBoxLayout, QDial
 
 from sane_yt_subfeed import create_logger
 
-TITLE = 'Unnamed SaneConfirmationDialog'
+TITLE = 'Are you sure?'
 TEXT = 'This is a SaneConfirmationDialog'
 OK = 'OK'
 CANCEL = 'Cancel'
@@ -12,8 +12,7 @@ HEIGHT = 80
 
 
 class SaneConfirmationDialog(QDialog):
-    def __init__(self, parent, actions, caller=None, title=TITLE,
-                 text=TEXT, ok_text=OK, cancel_text=CANCEL, flags=Qt.WindowFlags):
+    def __init__(self, parent, actions, title, text, ok_text, cancel_text, caller=None, flags=Qt.WindowFlags):
         """
         Prompts user for a Yes/No Confirmation where Yes results in a call for each action in actions
 
@@ -29,16 +28,30 @@ class SaneConfirmationDialog(QDialog):
         super(SaneConfirmationDialog, self).__init__(parent, flags())
         self.logger = create_logger(__name__)
         self.sane_parent = parent
-        self.text = text
-        self.ok_text = ok_text
-        self.cancel_text = cancel_text
+
+        if not title:
+            self.title = TITLE
+        else:
+            self.title = title
+        if not text:
+            self.text = TEXT
+        else:
+            self.text = text
+        if not ok_text:
+            self.ok_text = OK
+        else:
+            self.ok_text = ok_text
+        if not cancel_text:
+            self.cancel_text = CANCEL
+        else:
+            self.cancel_text = cancel_text
+
         if type(actions) is not list:
             self.action = actions
         else:
             self.action = None
             self.actions = actions
         self.caller = caller
-        self.title = title
         self.cancel_button = QPushButton(self)
         self.ok_button = QPushButton(self)
 

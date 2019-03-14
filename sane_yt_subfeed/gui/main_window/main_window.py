@@ -19,6 +19,7 @@ from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMA
 from sane_yt_subfeed.controller.static_controller_vars import SUBFEED_VIEW_ID, PLAYBACK_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.gui.dialogs.sane_confirmation_dialog import SaneConfirmationDialog
+from sane_yt_subfeed.gui.dialogs.sane_dialog import SaneDialog
 from sane_yt_subfeed.gui.dialogs.sane_input_dialog import SaneInputDialog
 from sane_yt_subfeed.gui.dialogs.sane_text_view_dialog import SaneTextViewDialog
 from sane_yt_subfeed.gui.exception_handler.sane_exception_handler import SaneExceptionHandler
@@ -562,7 +563,6 @@ class MainWindow(QMainWindow):
                          tooltip='Oh dear..')
         self.add_submenu('&Debug', 'Poll Exceptions', self.poll_exceptions,
                          tooltip='Oh dear..')
-        # self.add_submenu('&Debug', 'Open 1K FDs', debug_functions.open_1000_file_descriptors, tooltip="Uh oh..")
 
     # --- Toolbar
     def add_toolbar(self):
@@ -983,8 +983,7 @@ class MainWindow(QMainWindow):
         """
         self.main_model.main_window_listener.addYouTubeChannelSubscriptionByUsername.emit(input_text)
 
-    def confirmation_dialog(self, message, actions, caller=None, title=None, ok_text='Yes', cancel_text='No',
-                            exclusive=False):
+    def dialog(self, title, message, ok_text=None, exclusive=False):
         """
         Prompts user for a Yes/No Confirmation where Yes results in a call for each action in actions
         :param feedback: Send in a variable here which will be True if OK is pressed.
@@ -997,10 +996,25 @@ class MainWindow(QMainWindow):
         :param cancel_text: Text to display on Cancel button.
         :return:
         """
-        if not title:
-            title = "Are you sure?"
-        dialog = SaneConfirmationDialog(self, actions, caller=caller, title=title, text=message,
-                                        ok_text=ok_text, cancel_text=cancel_text)
+        dialog = SaneDialog(self, title, message, ok_text)
+        if exclusive:
+            dialog.exec()
+        else:
+            dialog.show()
+
+    def confirmation_dialog(self, message, actions, title, ok_text, cancel_text, caller=None, exclusive=False):
+        """
+        Prompts user for a Yes/No Confirmation where Yes results in a call for each action in actions
+        :param exclusive: If True, spawn an instance that halts Main thread until resolved.
+        :param message: Text to display in dialog body.
+        :param actions: A function, or a list of functions to be called
+        :param caller: (If given) applies action to the caller function e.g. action(caller)
+        :param title: Title of dialog window.
+        :param ok_text: Text to display on OK button.
+        :param cancel_text: Text to display on Cancel button.
+        :return:
+        """
+        dialog = SaneConfirmationDialog(self, actions, title, message, ok_text, cancel_text, caller=caller)
         if exclusive:
             dialog.exec()
         else:
