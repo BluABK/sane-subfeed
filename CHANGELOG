@@ -1,4 +1,11 @@
 Current
+- Fixed bug where SaneInputDialog didn't auto close after OK was clicked.
+- Added startup choice between build API key and oauth from string or load from file
+- Updated startup checks to send in a cancel_action instead of needing to carry around (and update) two boolean
+  variables for whether or not public files were used.
+- Made it possible to bind actions to cancel button on SaneConfirmationDialog
+- Implemented an init_ui() in SaneDialog, giving it new purpose.
+- Made essential Sane{Confirmation,}Dialog args normal instead of kwarg
 
 v0.5.1
 - Made OAuth2 AppFlow run local server and open in browser when using GUI. This should entirely rid us of needing access
