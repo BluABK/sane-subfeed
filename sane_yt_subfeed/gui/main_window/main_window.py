@@ -6,6 +6,7 @@ import copy
 import os
 import shutil
 import traceback
+import json
 from PyQt5.QtCore import QFile, QTextStream, QRegExp
 from PyQt5.QtGui import QIcon, QRegExpValidator
 from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QStackedWidget, QStyleFactory, QFileDialog
@@ -222,12 +223,9 @@ class MainWindow(QMainWindow):
         :param key_str:
         :return:
         """
-        s = ['{\n',
-             '  "api_key": "{}"\n'.format(key_str),
-             '}']
         try:
             with open(KEYS_FILE, 'w') as keys_file:
-                keys_file.writelines(s)
+                json.dump({'api_key': key_str}, keys_file)
         except Exception as exc:
             self.logger.exception("An exception occurred while writing API Key of len '{}' to {}".format(len(key_str),
                                                                                                          KEYS_FILE),
@@ -246,7 +244,7 @@ class MainWindow(QMainWindow):
         """
         try:
             with open(CLIENT_SECRET_FILE, 'w') as client_secret_file:
-                client_secret_file.write(str(client_secret_json))
+                json.dump(client_secret_json, client_secret_file)
         except Exception as exc:
             self.logger.exception("An exception occurred while writing API "
                                   "OAuth2 client secret of len '{}' to {}".format(len(client_secret_json),
