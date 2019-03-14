@@ -307,14 +307,16 @@ class MainWindow(QMainWindow):
             self.logger.info("Startup check triggered: Missing YouTube API Keys file.")
             self.confirmation_dialog("Failed to detect the YouTube API keys file!",
                                      self.select_custom_api_keys_choice_dialog, title="Missing API keys",
-                                     ok_text="Load custom API Keys file", cancel_text="Use public API Keys",
+                                     ok_text="Load/Create custom API Keys file", cancel_text="Use public API Keys",
                                      cancel_actions=self.select_public_api_keys, exclusive=True)
 
         if not os.path.isfile(CLIENT_SECRET_FILE):
             self.logger.info("Startup check triggered: Missing YouTube API OAuth2 client secret file.")
             self.confirmation_dialog("Failed to detect the YouTube API OAuth2 client secret file!",
-                                     self.select_custom_oauth_secret_file, title="Missing YouTube API OAuth2 Secret",
-                                     ok_text="Load custom OAuth2 client secret file", cancel_text="Use public API Keys",
+                                     self.select_custom_oauth_secret_choice_dialog,
+                                     title="Missing YouTube API OAuth2 Secret",
+                                     ok_text="Load/Create custom OAuth2 client secret file",
+                                     cancel_text="Use public API Keys",
                                      cancel_actions=self.select_public_oauth_secret, exclusive=True)
 
         # Indicate all checks ran successfully
