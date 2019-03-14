@@ -14,8 +14,9 @@ DEFAULT_ALIGNMENT = Qt.AlignCenter
 
 class SaneDialog(QDialog):
     def __init__(self, parent, title, text, ok_text, alignment=DEFAULT_ALIGNMENT, flags=Qt.WindowFlags):
-        super().__init__(parent, flags())
+        super(SaneDialog, self).__init__(parent, flags())
         self.logger = create_logger(__name__)
+        self.sane_parent = parent
 
         if not title:
             self.title = TITLE
@@ -30,7 +31,6 @@ class SaneDialog(QDialog):
         else:
             self.ok_text = ok_text
 
-        self.setWindowTitle(self.title)
         self.alignment = alignment
 
         self.ok_button = QPushButton(self)

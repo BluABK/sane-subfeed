@@ -178,13 +178,25 @@ class MainWindow(QMainWindow):
 
     def select_custom_api_keys_choice_dialog(self):
         """
-        Presents user with a choice between the two available method to create/load a custom API key file.
+        Presents user with a choice between the two available method to
+        create/load a custom API key file.
         :return:
         """
         self.confirmation_dialog("Which method do you prefer?",
                                  self.select_custom_api_keys_file, title="Select which method",
                                  ok_text="Browse for file", cancel_text="Build from string",
                                  cancel_actions=self.select_custom_api_keys_wizard, exclusive=True)
+
+    def select_custom_oauth_secret_choice_dialog(self):
+        """
+        Presents user with a choice between the two available method to
+        create/load a custom API OAuth client secret file.
+        :return:
+        """
+        self.confirmation_dialog("Which method do you prefer?",
+                                 self.select_custom_oauth_secret_file, title="Select which method",
+                                 ok_text="Browse for file", cancel_text="Build from strings",
+                                 cancel_actions=self.select_custom_oauth_secret_wizard, exclusive=True)
 
     def select_custom_api_keys_file(self):
         """
@@ -241,9 +253,9 @@ class MainWindow(QMainWindow):
         :return:
         """
         input_dialog = SaneOAuth2BuilderDialog(self, self.build_and_select_custom_api_keys_file,
-                                       title='YouTube API OAuth2 client secret file builder',
-                                       text='Enter API OAuth2 client secret values',
-                                               ok_text='Build OAuth2 client secret file')
+                                               'YouTube API OAuth2 client secret file builder',
+                                               'Enter API OAuth2 client secret values',
+                                               'Build OAuth2 client secret file')
         input_dialog.exec()
 
     def select_custom_oauth_secret_file(self):
@@ -260,8 +272,9 @@ class MainWindow(QMainWindow):
         if filename:
             self.copy_file(filename, CLIENT_SECRET_FILE)
         else:
-            self.dialog(self, "User cancelled YouTube API OAuth Client Secret file loader dialog,"
-                              "\n falling back to public key set", exclusive=True)
+            self.dialog("File loader dialog failed!", "User cancelled 'YouTube API OAuth"
+                        "\nclient secret' file loader dialog."
+                        "\n\nFalling back to public key set.", exclusive=True)
             self.logger.warning("User cancelled custom YouTube API OAuth Client Secret file loader dialog, "
                                 "falling back to public set!")
             self.select_public_oauth_secret()
