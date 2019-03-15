@@ -1,4 +1,7 @@
 Current
+- Made config text input fields actually set the the text variable to current config instead of just showing a
+  placeholder while text variable was Null (could potentially have lead to issues down the line)
+- Made config text input fields save-as-you-type instead of unintuitively requiring user to hit the return key.
 - Added config option to adjust thumbnail tile overlay width and height
   (NB: If you have enabled force AR width won't change)
 - Fixed bug where SaneInputDialog didn't auto close after OK was clicked.
