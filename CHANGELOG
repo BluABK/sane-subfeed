@@ -1,4 +1,6 @@
 Current
+- Added config option to adjust thumbnail tile overlay width and height
+  (NB: If you have enabled force AR width won't change)
 - Fixed bug where SaneInputDialog didn't auto close after OK was clicked.
 - Added startup choice between build API key and oauth from string or load from file
 - Updated startup checks to send in a cancel_action instead of needing to carry around (and update) two boolean
