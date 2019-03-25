@@ -1118,8 +1118,8 @@ class MainWindow(QMainWindow):
         else:
             dialog.show()
 
-    def confirmation_dialog(self, message, actions, title, ok_text, cancel_text, caller=None, cancel_actions=None,
-                            exclusive=False):
+    def confirmation_dialog(self, message, actions, title=None, ok_text=None, cancel_text=None, caller=None,
+                            cancel_actions=None, exclusive=False):
         """
         Prompts user for a Yes/No Confirmation where Yes results in a call for each action in actions
         :param cancel_actions: Actions to perform on cancel/no, if None it will bind to reject.

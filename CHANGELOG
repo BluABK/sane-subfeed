@@ -1,4 +1,5 @@
 Current
+- Updated MainWindow's confirmation_dialog function to make all args but message and action optional.
 - Removed debug logging for unfinished downloads when clear finished downloads button is pressed.
 - Made config text input fields actually set the the text variable to current config instead of just showing a
   placeholder while text variable was Null (could potentially have lead to issues down the line)
