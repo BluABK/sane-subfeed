@@ -23,6 +23,10 @@ WRITE_DENIED_ERROR = ["ERROR: unable to open for writing: [Errno 13] Permission 
 VIDEO_IS_GEOBLOCKED_ERRORS = ["The uploader has not made this video available in your country.",
                               "blocked it in your country",
                               "This video is not available."]
+SSL_HANDSHAKE_FAILS = ["ERROR: Unable to download webpage: <urlopen error [Errno 0] Error> "
+                       "(caused by URLError(OSError(0, 'Error')))",
+                       "ERROR: unable to download video data: <urlopen error [Errno 0] Error>",
+                       "<urlopen error [Errno 0] Error>"]
 
 DOWNLOAD_RUNNING = 0
 DOWNLOAD_FINISHED = 1
@@ -245,7 +249,10 @@ class YoutubeDownload(threading.Thread):
                     self.download_status = DOWNLOAD_FAILED
                     logger.exception("Failing download due to DownloadError exception (PermissionError)!",
                                      exc_info=dl_exc)
-
+                if str(dl_exc) in SSL_HANDSHAKE_FAILS:
+                    self.download_status = DOWNLOAD_FAILED
+                    logger.exception("Failing download due to DownloadError exception (SSL handshake failure)!",
+                                     exc_info=dl_exc)
             if self.download_status == DOWNLOAD_RUNNING:
                 logger.critical("INNER BUG: WRONG DOWNLOAD STATUS ({}) : {}".format(self.download_status, self.video))
                 logger.exception(dl_exc)
