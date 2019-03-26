@@ -1,5 +1,6 @@
 from collections import Counter
 
+import copy
 from PyQt5.QtWidgets import QGridLayout, QWidget, QMenu
 from datetime import datetime
 
@@ -25,6 +26,7 @@ class DownloadTile(QWidget):
             self.video = download_progress_listener.video
             self.download_progress_listener.updateProgress.connect(self.update_progress)
             self.download_progress_listener.finishedDownload.connect(self.finished_download)
+            self.download_progress_listener.failedDownload.connect(self.failed_download)
         elif db_download_tile:
             self.download_progress_listener = None
             self.video = db_download_tile.video
@@ -35,7 +37,7 @@ class DownloadTile(QWidget):
         self.video_downloaded = False
         self.finished = False
         self.paused = False
-        self.failed = False  # FIXME: Implement handling of failed downloads
+        self.failed = False
         self.finished_date = None
         self.started_date = None
         self.last_event = None
@@ -106,6 +108,27 @@ class DownloadTile(QWidget):
             pass
         self.logger.debug("Init done")
 
+    def retry_existing(self, download_progress_listener):
+        """
+        Retry failed video download using the existing tile
+        :param download_progress_listener:
+        :return:
+        """
+        # TODO: Complete function for a more smoother non-destructive solution than regular retry()
+        self.download_progress_listener = download_progress_listener
+
+    def retry(self):
+        """
+        Retry failed video download by adding a new tile (and then deleting self)
+        :return:
+        """
+        self.logger.warning("Retrying download (EXPERIMENTAL): {}".format(self.video))
+        # Hook into the download process at the least messy level
+        self.root.main_model.playback_grid_view_listener.tileDownloaded.emit(copy.deepcopy(self.video))
+
+        # Commit seppuku!
+        self.parent.clear_download_forced(self)
+
     def set_started_finished_on_label(self):
         if not self.started_date:
             started_date_str = "-"
@@ -160,24 +183,47 @@ class DownloadTile(QWidget):
         self.speed_value.setText("")
         self.eta_value.setText("")
 
+    def finished_download(self):
+        self.finished = True
+        self.progress_bar.setValue(1000)
+        self.progress_bar.setFormat("100.0%")
+        self.status_value.setText("Finished")
+        self.eta_value.setText("")
+        self.speed_value.setText("Was {}".format(self.speed_value.text()))
+        self.finished_date = datetime.utcnow()
+        self.set_started_finished_on_label()
+        try:
+            combined_size = self.total_bytes_video + self.total_bytes_audio
+            self.total_size_value.setText(self.determine_si_unit(combined_size))
+        except TypeError as te_exc:
+            self.logger.error("A TypeError exception occurred while combining video+audio track sizes", exc_info=te_exc)
+            self.total_size_value.setText("BUG: GitHub Issue #28")
+        self.progress_bar.finish()
+        DownloadViewListener.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
+
+    def failed_download(self):
+        self.logger.error("Failed download: {}".format(self.video))
+        self.failed = True
+        self.status_value.setText("FAILED")
+        self.eta_value.setText("")
+        self.speed_value.setText("Was {}".format(self.speed_value.text()))
+        self.finished_date = datetime.utcnow()
+        self.set_started_finished_on_label()
+        self.download_progress_listener.threading_event.clear()
+        self.progress_bar.fail()
+        DownloadViewListener.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
+
     def paused_download(self):
-        self.logger.debug5("Paused download")
+        self.logger.debug5("Paused download: {}".format(self.video))
         self.paused = True
         self.download_progress_listener.threading_event.clear()
         self.progress_bar.pause()
 
     def resumed_download(self):
-        self.logger.debug5("Resumed download")
+        self.logger.debug5("Resumed download: {}".format(self.video))
         self.paused = False
         self.download_progress_listener.threading_event.set()
         self.progress_bar.resume()
-
-    def failed_download(self):
-        self.logger.debug5("Failed download")
-        self.failed = True
-        self.download_progress_listener.threading_event.clear()
-        self.progress_bar.fail()
-        DownloadViewListener.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
 
     def determine_si_unit(self, byte_value):
         """
@@ -289,33 +335,15 @@ class DownloadTile(QWidget):
                 self.etas.append(time_str)
                 self.common_eta_calc_tick += 1
 
-    def finished_download(self):
-        self.finished = True
-        self.progress_bar.setValue(1000)
-        self.progress_bar.setFormat("100.0%")
-        self.status_value.setText("Finished")
-        self.eta_value.setText("")
-        self.speed_value.setText("Was {}".format(self.speed_value.text()))
-        self.finished_date = datetime.utcnow()
-        self.set_started_finished_on_label()
-        try:
-            combined_size = self.total_bytes_video + self.total_bytes_audio
-            self.total_size_value.setText(self.determine_si_unit(combined_size))
-        except TypeError as te_exc:
-            self.logger.error("A TypeError exception occurred while combining video+audio track sizes", exc_info=te_exc)
-            self.total_size_value.setText("BUG: GitHub Issue #28")
-        self.progress_bar.finish()
-        DownloadViewListener.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
-
     def delete_incomplete_entry(self):
         """
         Deletes an incomplete entry from the parent (DownloadView).
         :return:
         """
         message = "Are you sure you want to remove '{}' from Downloads?".format(self.video.title)
-        actions = self.parent.clear_download_forced
+        action = self.parent.clear_download_forced
         # Prompt user for a confirmation dialog which applies actions to caller if confirmed.
-        self.root.confirmation_dialog(message, actions, caller=self)
+        self.root.confirmation_dialog(message, action, caller=self)
 
     def update_progress(self, event):
         self.last_event = event
@@ -391,21 +419,48 @@ class DownloadTile(QWidget):
 
             pause_action = None
             continue_dl_action = None
+            retry_dl_action = None
+            mark_dl_failed = None
 
-            if is_paused:
+            if is_paused and not self.failed:
                 continue_dl_action = menu.addAction("Continue download")
             else:
-                if not self.finished:
+                if not self.finished and not self.failed:
                     pause_action = menu.addAction("Pause download")
+
+            if self.failed or (is_paused and self.failed):
+                retry_dl_action = menu.addAction("Retry failed download")
+
             if not self.finished:
                 delete_incomplete_entry = menu.addAction("Delete incomplete entry")
 
+            if read_config('Debug', 'debug'):
+                if not self.failed:
+                    menu.addSeparator()
+                    mark_dl_failed = menu.addAction("Mark download as FAILED")
+
             action = menu.exec_(self.mapToGlobal(event.pos()))
 
-            if not self.finished:
+            if not self.finished and not self.failed:
                 if action == pause_action and pause_action:
                     self.paused_download()
                 elif action == continue_dl_action and continue_dl_action:
                     self.resumed_download()
                 elif action == delete_incomplete_entry:
                     self.delete_incomplete_entry()
+
+            if self.failed and not self.finished:
+                if action == delete_incomplete_entry:
+                    self.delete_incomplete_entry()
+
+            if self.failed:
+                if action == retry_dl_action:
+                    self.logger.error("Implement retry failed download handling!")
+                    self.retry()  # Highly experimental, brace for impact!
+
+            if read_config('Debug', 'debug'):
+                if not self.failed:
+                    if action == mark_dl_failed:
+                        self.logger.critical("DEBUG: Marking FAILED: {}".format(self.video))
+                        # self.download_progress_listener.failedDownload.emit()
+                        self.failed_download()

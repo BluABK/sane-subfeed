@@ -1,4 +1,6 @@
 Current
+- Made DownloadView able to retry/re-add failed downloads.
+- Made video download logic able to emit failed download signals to DownloadView and set info accordingly.
 - Made downloader properly report and set failed download status to failed on pesky SSL Handshake errors (Errno 0).
 - Updated MainWindow's confirmation_dialog function to make all args but message and action optional.
 - Removed debug logging for unfinished downloads when clear finished downloads button is pressed.

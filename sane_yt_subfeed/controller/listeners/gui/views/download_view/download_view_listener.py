@@ -18,6 +18,7 @@ from sane_yt_subfeed.youtube.youtube_dl_handler import YoutubeDownload
 class DownloadProgressSignals(QObject):
     updateProgress = pyqtSignal(dict)
     finishedDownload = pyqtSignal()
+    failedDownload = pyqtSignal()
 
     def __init__(self, video, threading_event):
         super(DownloadProgressSignals, self).__init__()
@@ -104,7 +105,8 @@ class DownloadViewListener(QObject):
         UpdateVideo(video, update_existing=True,
                     finished_listeners=db_update_listeners).start()
         if use_youtube_dl:
-            download_progress_signal = DownloadViewListener.download_using_youtube_dl(video, youtube_dl_finished_listener)
+            download_progress_signal = DownloadViewListener.download_using_youtube_dl(video,
+                                                                                      youtube_dl_finished_listener)
             DownloadViewListener.static_self.newYTDLDownload.emit(download_progress_signal)
 
     @staticmethod

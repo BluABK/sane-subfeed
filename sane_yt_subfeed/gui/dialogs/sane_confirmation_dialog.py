@@ -111,9 +111,6 @@ class SaneConfirmationDialog(QDialog):
             # Do an action that doesn't depend on who called me.
             action()
 
-        # Close the dialog
-        self.close()
-
     def do_ok_actions(self):
         """
         Executes do_action one or more times if OK button is pressed.
