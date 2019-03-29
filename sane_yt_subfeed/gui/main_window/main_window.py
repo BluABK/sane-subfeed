@@ -908,8 +908,8 @@ class MainWindow(QMainWindow):
             action = self.set_qstyle
 
             self.logger.info("Adding available QStyle '{}' to '{}' menu.".format(name, menu))
-            self.add_submenu(menu, name, action, tooltip="Apply the '{}' theme.".format(name), subsubmenu=subsubmenu,
-                             qstyle=name)
+            self.add_submenu(menu, name, action, tooltip="Apply the '{}' QWidget Style.".format(name),
+                             subsubmenu=subsubmenu, q_style=name)
 
     def set_qstyle(self, q_style):
         """
