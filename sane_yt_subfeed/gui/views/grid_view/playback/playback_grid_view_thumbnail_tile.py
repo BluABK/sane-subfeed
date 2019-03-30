@@ -42,7 +42,10 @@ class PlaybackGridViewThumbnailTile(ThumbnailTile):
             else:
                 overlay = QPixmap(OVERLAY_DISCARDED_PATH)
 
-            resize_ratio = min(thumb.width() * 0.7 / thumb.width(), thumb.height() * 0.3 / thumb.height())
+            overlay_h = read_config('Gui', 'tile_overlay_height_pct', literal_eval=True) / 100
+            overlay_w = read_config('Gui', 'tile_overlay_width_pct', literal_eval=True) / 100
+            resize_ratio = min(thumb.width() * overlay_w / thumb.width(),
+                               thumb.height() * overlay_h / thumb.height())
             new_size = QSize(thumb.width() * resize_ratio, thumb.height() * resize_ratio)
             overlay = overlay.scaled(new_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             point = QPoint(thumb.width() - overlay.width(), 0)

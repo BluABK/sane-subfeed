@@ -47,6 +47,8 @@ DEFAULTS = {
         'grey_old_videos': 'False',
         'tile_pref_height': '209',
         'tile_pref_width': '209',
+        'tile_overlay_height_pct': '30',
+        'tile_overlay_width_pct': '70',
         'tooltip_pictures': 'False',
         'tooltip_picture_width': '512',
         'tooltip_picture_height': '256',

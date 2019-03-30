@@ -1,4 +1,22 @@
 Current
+- Fixed bug that prevented QtWidget styles in Window->Theme->Style from working at all.
+- Made DownloadView able to retry/re-add failed downloads.
+- Made video download logic able to emit failed download signals to DownloadView and set info accordingly.
+- Made downloader properly report and set failed download status to failed on pesky SSL Handshake errors (Errno 0).
+- Updated MainWindow's confirmation_dialog function to make all args but message and action optional.
+- Removed debug logging for unfinished downloads when clear finished downloads button is pressed.
+- Made config text input fields actually set the the text variable to current config instead of just showing a
+  placeholder while text variable was Null (could potentially have lead to issues down the line)
+- Made config text input fields save-as-you-type instead of unintuitively requiring user to hit the return key.
+- Added config option to adjust thumbnail tile overlay width and height
+  (NB: If you have enabled force AR width won't change)
+- Fixed bug where SaneInputDialog didn't auto close after OK was clicked.
+- Added startup choice between build API key and oauth from string or load from file
+- Updated startup checks to send in a cancel_action instead of needing to carry around (and update) two boolean
+  variables for whether or not public files were used.
+- Made it possible to bind actions to cancel button on SaneConfirmationDialog
+- Implemented an init_ui() in SaneDialog, giving it new purpose.
+- Made essential Sane{Confirmation,}Dialog args normal instead of kwarg
 
 v0.5.1
 - Made OAuth2 AppFlow run local server and open in browser when using GUI. This should entirely rid us of needing access

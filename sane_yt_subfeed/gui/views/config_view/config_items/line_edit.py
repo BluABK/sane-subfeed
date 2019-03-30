@@ -14,8 +14,9 @@ class GenericLineEdit(QLineEdit):
             self.setValidator(cfg_validator)
 
         self.setPlaceholderText(self.config_value)
+        self.setText(self.config_value)
 
-        self.returnPressed.connect(self.save_option)
+        self.textEdited.connect(self.save_option)
 
     def save_option(self):
         self.cfg_parent.output_set_config(self.cfg_section, self.cfg_option, self.text())

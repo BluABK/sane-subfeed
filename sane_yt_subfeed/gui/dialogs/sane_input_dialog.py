@@ -15,7 +15,23 @@ HEIGHT = 80
 
 class SaneInputDialog(QDialog):
     def __init__(self, parent, action, title=TITLE, text=TEXT, ok_text=OK, cancel_text=CANCEL, validator=None,
-                 flags=Qt.WindowFlags, placeholder=PLACEHOLDER, use_placeholder=True):
+                 flags=Qt.WindowFlags, placeholder=PLACEHOLDER, use_placeholder=True, init_ui=True):
+        """
+        Text input dialog box that does an action on the text input.
+
+        :param parent:          Parent object to bind to.
+        :param action:          Action to perform on OK/Enter.
+        :param title:           Dialog title.
+        :param text:            Dialog message body.
+        :param ok_text:         Text on OK button.
+        :param cancel_text:     Text on Cancel button.
+        :param validator:       If set, use a validator on the input field.
+        :param flags:           Qt WindowFlags.
+        :param placeholder:     Placeholder text in text input field.
+        :param use_placeholder: Whether or not to use a placeholder text.
+        :param init_ui:         Whether or not to init ui (Usually only False if
+                                inherited by a class with its own init_ui().
+        """
         super(SaneInputDialog, self).__init__(parent, flags())
         self.logger = create_logger(__name__)
         self.sane_parent = parent
@@ -31,7 +47,8 @@ class SaneInputDialog(QDialog):
         self.cancel_button = QPushButton(self)
         self.ok_button = QPushButton(self)
 
-        self.init_ui()
+        if init_ui:
+            self.init_ui()
 
     def init_ui(self):
         self.setWindowTitle(self.title)
@@ -83,6 +100,9 @@ class SaneInputDialog(QDialog):
         else:
             self.action(self.input_box.text())
             self.reset_values()
+
+            # Close dialog
+            self.close()
 
     def check_validator_state(self, *args, **kwargs):
         sender = self.sender()

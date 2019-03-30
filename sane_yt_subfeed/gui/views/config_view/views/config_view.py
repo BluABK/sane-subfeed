@@ -61,6 +61,10 @@ class ConfigViewWidget(InputSuper):
                                       tab_id='GUI')
             self.add_option_line_edit('Grid tile width (px)', 'Gui', 'tile_pref_width', cfg_validator=QIntValidator(),
                                       tab_id='GUI')
+            self.add_option_line_edit('Grid tile overlay height (%)', 'Gui', 'tile_overlay_height_pct',
+                                      cfg_validator=QIntValidator(), tab_id='GUI')
+            self.add_option_line_edit('Grid tile overlay width (%)', 'Gui', 'tile_overlay_width_pct',
+                                      cfg_validator=QIntValidator(), tab_id='GUI')
             self.add_option_checkbox('Embed thumbnails in tooltips', 'Gui', 'tooltip_pictures', tab_id='GUI')
             self.add_option_line_edit('\tTooltip picture width', 'Gui', 'tooltip_picture_width',
                                       cfg_validator=QIntValidator(), tab_id='GUI')

@@ -32,17 +32,18 @@ class DownloadView(QWidget):
         DownloadViewListener.static_self.newYTDLDownload.connect(self.new_download)
 
         DownloadViewListener.static_self.loadDBDownloadTiles.emit()
-        # # FIXME: remove and fix signals instead
-        # db_downloads = db_session.query(DBDownloadTile).filter(DBDownloadTile.cleared == false())
-        # for download in db_downloads:
-        #     self.new_download(download, emit_signal=False)
 
-    def new_download(self, download_progress_listener):
-        self.logger.info("New download signal received: {}".format(download_progress_listener.__dict__))
-        widget = DownloadTile(self, download_progress_listener)
-        DownloadViewListener.static_self.newDownloadTile.emit(DDBDownloadTile(widget))
-        self.widgets.append(widget)
-        self.sane_layout.addWidget(widget)
+    def new_download(self, download_progress_listener, widget=None):
+        if not widget:
+            self.logger.info("New download signal received: {}".format(download_progress_listener.__dict__))
+            widget = DownloadTile(self, download_progress_listener)
+            DownloadViewListener.static_self.newDownloadTile.emit(DDBDownloadTile(widget))
+            self.widgets.append(widget)
+            self.sane_layout.addWidget(widget)
+        else:
+            self.logger.info("New download retry signal "
+                             "received for existing widget: {}".format(download_progress_listener.__dict__))
+            widget.retry(download_progress_listener)
 
     def clear_finished_downloads(self):
         """
@@ -55,8 +56,6 @@ class DownloadView(QWidget):
                 widget.cleared = True
                 DownloadViewListener.static_self.updateDownloadTile.emit(DDBDownloadTile(widget))
                 widgets_to_delete.append(widget)
-            else:
-                self.logger.debug("Widget not finished: {}".format(widget.__dict__))
         while widgets_to_delete:
             widget = widgets_to_delete.pop()
             self.logger.info("Removing widget for video: {} - {}".format(widget.video.title, widget.__dict__))
@@ -72,8 +71,19 @@ class DownloadView(QWidget):
         widget.cleared = True
         DownloadViewListener.static_self.updateDownloadTile.emit(DDBDownloadTile(widget))
         self.logger.info("Forcibly removing widget for video: {} - {}".format(widget.video.title, widget.__dict__))
-        sip.delete(widget)
-        self.widgets.remove(widget)
+        try:
+            sip.delete(widget)
+            self.widgets.remove(widget)
+        except RuntimeError as re_exc:
+            if hasattr(self, 'video'):
+                cur_vid = self.video
+            else:
+                cur_vid = "Non-existent video (nullptr)"
+            if str(re_exc) == "wrapped C/C++ object of type DownloadTile has been deleted":
+                self.logger.exception("Attempted to delete a nullptr widget: {}".format(cur_vid), exc_info=re_exc)
+            else:
+                self.logger.exception("Unexpected RuntimeError on deleting widget: {}".format(cur_vid),
+                                      exc_info=re_exc)
 
     @pyqtSlot(list)
     def update_widgets(self, d_db_download_til_list):

@@ -23,6 +23,10 @@ WRITE_DENIED_ERROR = ["ERROR: unable to open for writing: [Errno 13] Permission 
 VIDEO_IS_GEOBLOCKED_ERRORS = ["The uploader has not made this video available in your country.",
                               "blocked it in your country",
                               "This video is not available."]
+SSL_HANDSHAKE_FAILS = ["ERROR: Unable to download webpage: <urlopen error [Errno 0] Error> "
+                       "(caused by URLError(OSError(0, 'Error')))",
+                       "ERROR: unable to download video data: <urlopen error [Errno 0] Error>",
+                       "<urlopen error [Errno 0] Error>"]
 
 DOWNLOAD_RUNNING = 0
 DOWNLOAD_FINISHED = 1
@@ -47,7 +51,7 @@ class YoutubeDownload(threading.Thread):
         threading.Thread.__init__(self)
         logger.debug("Created thread")
         self.video = video
-        self.listeners = finished_listeners
+        self.listeners = finished_listeners  # FIXME: Need one for failed as well?
         self.download_status = None
         self.download_progress_listener = download_progress_listener
         self.threading_event = threading_event
@@ -245,10 +249,15 @@ class YoutubeDownload(threading.Thread):
                     self.download_status = DOWNLOAD_FAILED
                     logger.exception("Failing download due to DownloadError exception (PermissionError)!",
                                      exc_info=dl_exc)
-
+                if str(dl_exc) in SSL_HANDSHAKE_FAILS:
+                    self.download_status = DOWNLOAD_FAILED
+                    logger.exception("Failing download due to DownloadError exception (SSL handshake failure)!",
+                                     exc_info=dl_exc)
             if self.download_status == DOWNLOAD_RUNNING:
-                logger.critical("INNER BUG: WRONG DOWNLOAD STATUS ({}) : {}".format(self.download_status, self.video))
+                logger.critical("Setting FAILED status for video with "
+                                "lingering DOWNLOADING status : {}".format(self.video))
                 logger.exception(dl_exc)
+                self.download_status = DOWNLOAD_FAILED
 
         except PermissionError as pe_exc:
             self.download_status = DOWNLOAD_FAILED
@@ -259,7 +268,6 @@ class YoutubeDownload(threading.Thread):
             logger.exception(e)
             pass
 
-        # self.download_status_listener = self.download_status  # TODO: IMPLEMENT failed download handling (listener)
         if self.download_status == DOWNLOAD_FINISHED:
             logger.info("Finished downloading: {}".format(self.video))
             # self.video.vid_path = os.path.join(self.youtube_folder, self.determine_filename())
@@ -276,14 +284,13 @@ class YoutubeDownload(threading.Thread):
             else:
                 logger.debug("Skipping disabled metadata embedding operation")
 
-            self.download_progress_listener.finishedDownload.emit()  # FIXME: Needs to emit failed status as well
+            self.download_progress_listener.finishedDownload.emit()
             if self.listeners:
                 for listener in self.listeners:
                     listener.emit(self.video)
         elif self.download_status == DOWNLOAD_FAILED:
             logger.error("FAILED downloading: {}".format(self.video))
-        # else:
-        #     logger.critical("OUTER BUG: WRONG DOWNLOAD STATUS ({}) : {}".format(self.download_status, self.video))
+            self.download_progress_listener.failedDownload.emit()
 
     def my_hook(self, event):
         self.download_progress_listener.updateProgress.emit(event)
