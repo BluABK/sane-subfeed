@@ -1,5 +1,4 @@
 alembic==1.0.0
-argh==0.26.2
 cachetools==2.1.0
 certifi==2018.4.16
 chardet==3.0.4
@@ -7,6 +6,7 @@ click==6.7
 configparser==3.5.0
 ffmpeg-python==0.1.16
 future==0.17.1
+# False positive unlisted req: Calls itself 'googleapiclient' when imported as lib
 google-api-python-client==1.7.3
 google-auth==1.5.0
 google-auth-httplib2==0.0.3
