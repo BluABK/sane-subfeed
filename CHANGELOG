@@ -1,4 +1,6 @@
 Current
+- Made Left mouse button action remappable (a little stop-gap pending full implementation of hotkeys, default: open in
+  default web browser)
 - Made Playback view (and implicitly downloading features) optional (default: disabled).
 - Fixed bug that prevented QtWidget styles in Window->Theme->Style from working at all.
 - Made DownloadView able to retry/re-add failed downloads.

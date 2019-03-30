@@ -1,3 +1,4 @@
+import webbrowser
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMenu, QApplication
 
@@ -13,6 +14,11 @@ from sane_yt_subfeed.log_handler import create_logger
 VIDEO_IS_LIVE_TITLE = "This video is live broadcast content!"
 VIDEO_IS_LIVE_MSG = "If you proceed to download this video is will be streamed in realtime and not finish until the" \
                     "stream ends."
+MOUSE_PRESS_OPEN_URL = 'Open URL in browser'
+MOUSE_PRESS_COPY_URL = 'Copy URL'
+MOUSE_PRESS_PLAY_URL = 'Open URL in player'
+MOUSE_PRESS_DOWNLOAD = 'Download'
+MOUSE_PRESS_DOWNLOAD_AND_COPY = 'Download & copy URL'
 
 
 class SubfeedGridViewTile(VideoTile):
@@ -94,6 +100,29 @@ class SubfeedGridViewTile(VideoTile):
     def mousePressEvent(self, QMouseEvent):
         """
         Override mousePressEvent to support mouse button actions
+        :param QMouseEvent:
+        :return:
+        """
+        mouse_press_bind = read_config('SubFeed', 'left_mouse_action', literal_eval=False)
+
+        if mouse_press_bind == MOUSE_PRESS_OPEN_URL:
+            webbrowser.open_new_tab(self.video.url_video)
+            self.mark_watched()
+        elif mouse_press_bind == MOUSE_PRESS_COPY_URL:
+            self.copy_url()
+            self.mark_watched()
+        elif mouse_press_bind == MOUSE_PRESS_PLAY_URL:
+            url_player = self.str_to_list(read_config('Player', 'url_player', literal_eval=False))
+            self.play_vid(self.video.url_video, url_player)
+        elif mouse_press_bind == MOUSE_PRESS_DOWNLOAD:
+            self.mouse_press_dl(QMouseEvent)
+        elif mouse_press_bind == MOUSE_PRESS_DOWNLOAD_AND_COPY:
+            self.copy_url()
+            self.mouse_press_dl(QMouseEvent)
+
+    def mouse_press_dl(self, QMouseEvent):
+        """
+        Download video on mousePressEvent
         :param QMouseEvent:
         :return:
         """

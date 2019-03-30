@@ -5,7 +5,7 @@ from PyQt5.QtGui import QIntValidator, QDoubleValidator, QRegExpValidator
 # Internal
 from sane_yt_subfeed.config_handler import get_options, read_config, has_section
 # import sane_yt_subfeed.gui.views.config_view.checkbox as checkbox
-from sane_yt_subfeed.gui.views.config_view.config_item_types import THUMBNAIL_QUALITIES, TT_FONT_SIZES
+from sane_yt_subfeed.gui.views.config_view.config_item_types import THUMBNAIL_QUALITIES, TT_FONT_SIZES, LEFT_MOUSE_ACTIONS
 from sane_yt_subfeed.gui.views.config_view.input_super import InputSuper
 
 HEXADECIMAL_COLOR_REGEX = '^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$'
@@ -94,6 +94,8 @@ class ConfigViewWidget(InputSuper):
             self.add_option_checkbox('Show downloaded videos', 'SubFeed', 'show_downloaded', tab_id='GUI')
             self.add_option_line_edit('Title-tile pixel size', 'GridView', 'title_tile_pixel_size',
                                       cfg_validator=QDoubleValidator(), tab_id='GUI')
+            self.add_option_combobox('Left click mouse action', 'SubFeed', 'left_mouse_action', LEFT_MOUSE_ACTIONS,
+                                     tab_id='GUI')  # FIXME: implement in hotkeys?
 
             # Section [SubSort]
             self.add_section('{}Subscription feed (sorting){}'.format(self.deco_l, self.deco_r), tab_id='GUI')

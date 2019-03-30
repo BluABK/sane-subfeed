@@ -1,5 +1,3 @@
-import os
-import subprocess
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMenu
 
@@ -51,49 +49,6 @@ class PlaybackGridViewTile(VideoTile):
             file_path = self.video.url_video
             player = read_config('Player', 'url_player', literal_eval=False)
         self.play_vid(file_path, player, mark_watched=mark_watched)
-
-    def play_vid(self, file_path, player, mark_watched=True):
-        if mark_watched:
-            self.mark_watched()
-        self.logger.info('Playing {}, with player: {}'.format(file_path, player))
-        if not os.path.isfile(file_path):
-            self.logger.warning('os.path.isfile returns False for File: {}'.format(file_path))
-        if player:
-            popen_args = player + [file_path]
-            subprocess.Popen(popen_args)
-        else:
-            subprocess.Popen([file_path], shell=True)
-
-    @staticmethod
-    def str_to_list(s):
-        """
-        Transform a space delimited string to a list of substrings.
-        Returns s as-is if False.
-        :param s:
-        :return:
-        """
-        if s:
-            return s.split(' ')
-        else:
-            return s
-
-    @staticmethod
-    def str_to_list_destructive(s):
-        """
-        Destructively transform a space delimited string to a list of substrings.
-        Does nothing If string is False.
-        :param s:
-        :return:
-        """
-        if s:
-            s = s.split(' ')
-
-    @staticmethod
-    def determine_name(name, failover_name):
-        if name:
-            return name
-        else:
-            return failover_name
 
     def contextMenuEvent(self, event):
         """

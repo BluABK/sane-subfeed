@@ -1,4 +1,7 @@
+import os
+
 import datetime
+import subprocess
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette, QPixmap
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
@@ -83,6 +86,49 @@ class VideoTile(QWidget):
         self.color_live_video()
 
         self.set_thumbnail_pixmap(video.thumbnail_path)
+
+    def play_vid(self, file_path, player, mark_watched=True):
+        if mark_watched:
+            self.mark_watched()
+        self.logger.info('Playing {}, with player: {}'.format(file_path, player))
+        if not os.path.isfile(file_path):
+            self.logger.warning('os.path.isfile returns False for File: {}'.format(file_path))
+        if player:
+            popen_args = player + [file_path]
+            subprocess.Popen(popen_args)
+        else:
+            subprocess.Popen([file_path], shell=True)
+
+    @staticmethod
+    def str_to_list(s):
+        """
+        Transform a space delimited string to a list of substrings.
+        Returns s as-is if False.
+        :param s:
+        :return:
+        """
+        if s:
+            return s.split(' ')
+        else:
+            return s
+
+    @staticmethod
+    def str_to_list_destructive(s):
+        """
+        Destructively transform a space delimited string to a list of substrings.
+        Does nothing If string is False.
+        :param s:
+        :return:
+        """
+        if s:
+            s = s.split(' ')
+
+    @staticmethod
+    def determine_name(name, failover_name):
+        if name:
+            return name
+        else:
+            return failover_name
 
     @staticmethod
     def strf_delta(tdelta, hours, days):

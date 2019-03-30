@@ -69,7 +69,8 @@ DEFAULTS = {
     },
     'SubFeed': {
         'show_downloaded': 'False',
-        'color_live_broadcast_content': 'True'
+        'color_live_broadcast_content': 'True',
+        'left_mouse_action': 'Open URL in browser'
     },
     'DownloadView': {
         'download_tile_height': '200'
