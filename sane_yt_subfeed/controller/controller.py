@@ -24,20 +24,20 @@ class Controller:
 
         start_with_stored_videos = read_config('Debug', 'start_with_stored_videos')
 
-        model = MainModel([], vid_limit)
+        main_model = MainModel([], vid_limit)
         if start_with_stored_videos:
-            model.update_subfeed_videos_from_db()
+            main_model.update_subfeed_videos_from_db()
         else:
-            model.update_subfeed_videos_from_remote()
+            main_model.update_subfeed_videos_from_remote()
 
-        model.update_playback_videos_from_db()
+        main_model.update_playback_videos_from_db()
 
         self.logger.info(
-            "Created MainModel: len(subscription_feed) = {}, vid_limit = {}".format(len(model.subfeed_videos),
+            "Created MainModel: len(subscription_feed) = {}, vid_limit = {}".format(len(main_model.subfeed_videos),
                                                                                     vid_limit))
 
         self.logger.info("Created QApplication({})".format(sys.argv))
-        window = MainWindow(app, model)
+        window = MainWindow(app, main_model)
         window.show()
         self.logger.info("Executing Qt Application")
         app.exec_()

@@ -14,7 +14,8 @@ BREEZE_LIGHT_FILENAME = 'light.qss'
 
 THEMES_LIST = [None, BREEZE_LIGHT, BREEZE_DARK]
 QSTYLES_AVAILABLE = {}
-
+qsf = QStyleFactory()
 # Populate the QStyle dict
-for style in QStyleFactory.keys():
-    QSTYLES_AVAILABLE[style] = QStyleFactory.create(style)
+for style in qsf.keys():
+    QSTYLES_AVAILABLE[style] = qsf.create(style)
+del qsf
