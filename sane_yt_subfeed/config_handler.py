@@ -95,6 +95,7 @@ DEFAULTS = {
         'img_threads': '200',
     },
     'Play': {
+        'enabled': 'False',
         'yt_file_path': "",
         'disable_dir_listener': 'False',
         'use_url_as_path': 'False',

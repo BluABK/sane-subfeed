@@ -424,8 +424,9 @@ class MainWindow(QMainWindow):
 
         # Add Views/CentralWidgets
         self.central_widget.addWidget(self.subfeed_grid_view)
-        self.central_widget.addWidget(self.playback_grid_view)
-        self.central_widget.addWidget(self.download_view)
+        if read_config('Play', 'enabled'):
+            self.central_widget.addWidget(self.playback_grid_view)
+            self.central_widget.addWidget(self.download_view)
         self.central_widget.addWidget(self.list_detailed_view)
         if read_config('Debug', 'show_unimplemented_gui'):
             self.central_widget.addWidget(self.list_tiled_view)
@@ -440,13 +441,14 @@ class MainWindow(QMainWindow):
         self.central_widget = QStackedWidget()
         self.setCentralWidget(self.central_widget)
 
-        self.subfeed_grid_view = GridScrollArea(self, self.main_model)
-        self.playback_grid_view = GridScrollArea(self, self.main_model)
-        self.subfeed_grid_view.set_view(SubfeedGridView(self.subfeed_grid_view, self, self.main_model), SUBFEED_VIEW_ID)
-        self.playback_grid_view.set_view(PlaybackGridView(self.playback_grid_view, self, self.main_model),
-                                         PLAYBACK_VIEW_ID)
+        if read_config('Play', 'enabled'):
+            self.playback_grid_view = GridScrollArea(self, self.main_model)
+            self.playback_grid_view.set_view(PlaybackGridView(self.playback_grid_view, self, self.main_model),
+                                             PLAYBACK_VIEW_ID)
+            self.download_view = DownloadScrollArea(self, self.main_model)
 
-        self.download_view = DownloadScrollArea(self, self.main_model)
+        self.subfeed_grid_view = GridScrollArea(self, self.main_model)
+        self.subfeed_grid_view.set_view(SubfeedGridView(self.subfeed_grid_view, self, self.main_model), SUBFEED_VIEW_ID)
 
         self.hotkeys_view = ConfigWindow(self)
         self.hotkeys_view.setWidget(HotkeysViewWidget(self.hotkeys_view, self,
@@ -585,13 +587,14 @@ class MainWindow(QMainWindow):
                                                                               literal_eval=HOTKEYS_EVAL),
                                                          tooltip='View subscription feed as a grid',
                                                          icon=SUBFEED_VIEW_ICON, widget=self.subfeed_grid_view)
-        self.views['PlaybackGridView'] = self.add_submenu('&View', 'Playback feed', self.set_current_widget,
-                                                          shortcut=read_config('View', 'playback',
-                                                                               custom_ini=HOTKEYS_INI,
-                                                                               literal_eval=HOTKEYS_EVAL),
-                                                          tooltip='View downloaded videos as a grid',
-                                                          widget=self.playback_grid_view,
-                                                          icon=PLAYBACK_VIEW_ICON)
+        if read_config('Play', 'enabled'):
+            self.views['PlaybackGridView'] = self.add_submenu('&View', 'Playback feed', self.set_current_widget,
+                                                              shortcut=read_config('View', 'playback',
+                                                                                   custom_ini=HOTKEYS_INI,
+                                                                                   literal_eval=HOTKEYS_EVAL),
+                                                              tooltip='View downloaded videos as a grid',
+                                                              widget=self.playback_grid_view,
+                                                              icon=PLAYBACK_VIEW_ICON)
         self.views['SubfeedDetailedListView'] = self.add_submenu('&View', 'Detailed List', self.set_current_widget,
                                                                  shortcut=read_config('View', 'detailed_list',
                                                                                       custom_ini=HOTKEYS_INI,
@@ -599,11 +602,14 @@ class MainWindow(QMainWindow):
                                                                  tooltip='View subscription feed as a detailed list',
                                                                  icon=DETAILED_LIST_VIEW_ICON,
                                                                  widget=self.list_detailed_view)
-        self.views['DownloadView'] = self.add_submenu('&View', 'Downloads', self.set_current_widget,
-                                                      shortcut=read_config('View', 'download', custom_ini=HOTKEYS_INI,
-                                                                           literal_eval=HOTKEYS_EVAL),
-                                                      tooltip='Shows in progress downloads', icon=DOWNLOAD_VIEW_ICON,
-                                                      widget=self.download_view)
+        if read_config('Play', 'enabled'):
+            self.views['DownloadView'] = self.add_submenu('&View', 'Downloads', self.set_current_widget,
+                                                          shortcut=read_config('View', 'download',
+                                                                               custom_ini=HOTKEYS_INI,
+                                                                               literal_eval=HOTKEYS_EVAL),
+                                                          tooltip='Shows in progress downloads',
+                                                          icon=DOWNLOAD_VIEW_ICON,
+                                                          widget=self.download_view)
         self.views['SubscriptionsDetailedListView'] = self.add_submenu('&View', 'Subscriptions',
                                                                        self.set_current_widget,
                                                                        shortcut=read_config('View', 'subscriptions',
@@ -691,9 +697,11 @@ class MainWindow(QMainWindow):
         toolbar = Toolbar(self)
         self.addToolBar(toolbar)
         toolbar.addAction(self.views['SubFeedGridView'])
-        toolbar.addAction(self.views['PlaybackGridView'])
+        if read_config('Play', 'enabled'):
+            toolbar.addAction(self.views['PlaybackGridView'])
         toolbar.addAction(self.views['SubfeedDetailedListView'])
-        toolbar.addAction(self.views['DownloadView'])
+        if read_config('Play', 'enabled'):
+            toolbar.addAction(self.views['DownloadView'])
         toolbar.addAction(self.views['ConfigView'])
         if read_config('Debug', 'show_unimplemented_gui'):  # FIXME: Implement SubfeedTiledListView
             toolbar.addAction(self.views['SubfeedTiledListView'])

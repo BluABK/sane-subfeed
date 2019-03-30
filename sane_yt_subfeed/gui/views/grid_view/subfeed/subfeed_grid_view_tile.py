@@ -35,7 +35,10 @@ class SubfeedGridViewTile(VideoTile):
         mark_as_live_content_submenu = QMenu(self)
         mark_as_live_content_submenu.setTitle("Mark as liveBroadcastContent")
         copy_url_action = menu.addAction("Copy link")
-        downloaded_item_action = menu.addAction("Copy link and download")
+        if read_config('Play', 'enabled'):
+            downloaded_item_action = menu.addAction("Copy link and download")
+        else:
+            downloaded_item_action = 'DISABLED'
         discard_item_action = menu.addAction("Dismiss video")
 
         menu.addMenu(mark_as_live_content_submenu)

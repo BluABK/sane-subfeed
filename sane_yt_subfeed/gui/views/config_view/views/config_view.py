@@ -87,6 +87,7 @@ class ConfigViewWidget(InputSuper):
             self.add_section('{}Grid Views{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
             self.add_option_checkbox('Show watched videos', 'GridView', 'show_watched', tab_id='GUI')
             self.add_option_checkbox('Show dismissed videos', 'GridView', 'show_dismissed', tab_id='GUI')
+            self.add_option_checkbox('Enable Playback view (and download support)', 'Play', 'enabled', tab_id='GUI')
 
             # Section [SubFeed]
             self.add_section('{}Subscription feed{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
@@ -101,24 +102,25 @@ class ConfigViewWidget(InputSuper):
             self.add_option_checkbox('Pin livestreams', 'SubSort', 'pin_live_broadcast_content', tab_id='GUI')
 
             # Section [DownloadView]
-            self.add_section('{}Downloads view{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
-            self.add_option_line_edit('Download view tile height', 'DownloadView', 'download_tile_height',
-                                      cfg_validator=QIntValidator(), tab_id='GUI')
+            if read_config('Play', 'enabled'):
+                self.add_section('{}Downloads view{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
+                self.add_option_line_edit('Download view tile height', 'DownloadView', 'download_tile_height',
+                                          cfg_validator=QIntValidator(), tab_id='GUI')
 
             # Section [Play]
-            self.add_section('{}Playback feed{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
-            self.add_option_line_edit('YouTube video directory', 'Play', 'yt_file_path', tab_id='GUI')
-            self.add_option_checkbox('Disable directory listener (inotify)', 'Play', 'disable_dir_listener',
-                                     tab_id='GUI')
-            self.add_option_checkbox('Use URL as path', 'Play', 'use_url_as_path', tab_id='GUI')
-            self.add_option_line_edit('Default watch priority', 'Play', 'default_watch_prio',
-                                      cfg_validator=QIntValidator(),
-                                      tab_id='GUI')
-            # Section [PlaySort]
-            self.add_section('{}Playback feed (sorting){}'.format(self.deco_l, self.deco_r), tab_id='GUI')
-            self.add_option_checkbox('Sort by ascending date', 'PlaySort', 'ascending_date', tab_id='GUI')
-            self.add_option_checkbox('Sort by channel', 'PlaySort', 'by_channel', tab_id='GUI')
-
+            if read_config('Play', 'enabled'):
+                self.add_section('{}Playback feed{}'.format(self.deco_l, self.deco_r), tab_id='GUI')
+                self.add_option_line_edit('YouTube video directory', 'Play', 'yt_file_path', tab_id='GUI')
+                self.add_option_checkbox('Disable directory listener (inotify)', 'Play', 'disable_dir_listener',
+                                         tab_id='GUI')
+                self.add_option_checkbox('Use URL as path', 'Play', 'use_url_as_path', tab_id='GUI')
+                self.add_option_line_edit('Default watch priority', 'Play', 'default_watch_prio',
+                                          cfg_validator=QIntValidator(),
+                                          tab_id='GUI')
+                # Section [PlaySort]
+                self.add_section('{}Playback feed (sorting){}'.format(self.deco_l, self.deco_r), tab_id='GUI')
+                self.add_option_checkbox('Sort by ascending date', 'PlaySort', 'ascending_date', tab_id='GUI')
+                self.add_option_checkbox('Sort by channel', 'PlaySort', 'by_channel', tab_id='GUI')
 
         # Section [Debug]
         elif self.tab_id == 'Debug':

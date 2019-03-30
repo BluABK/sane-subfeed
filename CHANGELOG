@@ -1,4 +1,5 @@
 Current
+- Made Playback view (and implicitly downloading features) optional (default: disabled).
 - Fixed bug that prevented QtWidget styles in Window->Theme->Style from working at all.
 - Made DownloadView able to retry/re-add failed downloads.
 - Made video download logic able to emit failed download signals to DownloadView and set info accordingly.
