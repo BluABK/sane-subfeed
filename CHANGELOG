@@ -1,4 +1,6 @@
 Current
+- Fixed issue with log-to-file feature spawning a new file handler instance for each create_logger() call
+  (3000+ file descriptors).
 - Made Left mouse button action remappable (a little stop-gap pending full implementation of hotkeys, default: open in
   default web browser)
 - Made Playback view (and implicitly downloading features) optional (default: disabled).
