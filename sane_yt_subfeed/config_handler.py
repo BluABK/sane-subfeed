@@ -1,4 +1,5 @@
 import ast
+import copy
 import os
 from configparser import ConfigParser, NoSectionError, NoOptionError
 from shutil import copyfile
@@ -202,7 +203,13 @@ DEFAULTS_HOTKEYS = {
 if not os.path.exists(SAMPLE_PATH):
     config_sample_parser = ConfigParser()
     for section in DEFAULTS:
-        config_sample_parser[section] = DEFAULTS[section]
+        if section == 'Database':
+            # Mask database location so it's not included in sample ini file
+            modified_section = copy.deepcopy(DEFAULTS[section])
+            modified_section['location'] = '<path>/permanents.db'
+            config_sample_parser[section] = modified_section
+        else:
+            config_sample_parser[section] = DEFAULTS[section]
     with open(SAMPLE_PATH, 'w') as config_sample_file:
         config_sample_parser.write(config_sample_file)
 
