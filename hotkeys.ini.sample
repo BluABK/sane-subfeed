@@ -1,13 +1,14 @@
 [Global]
+preferences = Ctrl+P
 hotkeys = F2
 quit = Ctrl+Q
 copy_all_urls = Ctrl+D
 refresh_feed = Ctrl+R
 refresh_feed_deep = Ctrl+T
 reload_subslist = Ctrl+L
-test_channels =
-manual_dir_search =
-manual_thumb_dl =
+test_channels = 
+manual_dir_search = 
+manual_thumb_dl = 
 manual_db_grab = Ctrl+E
 download_video_by_url = Ctrl+O
 show_usage_history = Ctrl+H
@@ -20,7 +21,6 @@ detailed_list = Ctrl+3
 download = Ctrl+4
 subscriptions = Ctrl+5
 tiled_list = Ctrl+9
-config = Ctrl+P
 
 [Subfeed]
 download = LeftButton
@@ -32,3 +32,4 @@ mark_watched = Alt+LeftButton
 play = MouseLeftButton
 ascending_sort_toggle = Ctrl+A
 by_channel_sort_toggle = Ctrl+B
+

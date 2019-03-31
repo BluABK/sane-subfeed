@@ -194,6 +194,22 @@ DEFAULTS_HOTKEYS = {
     }
 }
 
+# Create sample config if none exists
+if not os.path.exists(SAMPLE_PATH):
+    config_sample_parser = ConfigParser()
+    for section in DEFAULTS:
+        config_sample_parser[section] = DEFAULTS[section]
+    with open(SAMPLE_PATH, 'w') as config_sample_file:
+        config_sample_parser.write(config_sample_file)
+
+# Create sample hotkeys config if none exists
+if not os.path.exists(SAMPLE_HOTKEYS_PATH):
+    config_hotkeys_sample_parser = ConfigParser()
+    for section in DEFAULTS_HOTKEYS:
+        config_hotkeys_sample_parser[section] = DEFAULTS_HOTKEYS[section]
+    with open(SAMPLE_HOTKEYS_PATH, 'w') as config_hotkeys_sample_file:
+        config_hotkeys_sample_parser.write(config_hotkeys_sample_file)
+
 
 def read_config(section, option, literal_eval=True, custom_ini=None):
     """
