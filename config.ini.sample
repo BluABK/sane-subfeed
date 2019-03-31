@@ -137,3 +137,7 @@ use_socket_log = False
 log_level = 1
 logging_port = 19996
 
+[Database]
+type = sqlite:///
+location = /home/bluabk/PycharmProjects/sane-subfeed/sane_yt_subfeed/resources/permanents.db
+

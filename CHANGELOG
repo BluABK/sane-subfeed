@@ -1,4 +1,5 @@
 Current
+- Made Database type and location customisable from config (default type: sqlite).
 - Sample configuration files are now generated if none already exist.
 - Fixed issue with log-to-file feature spawning a new file handler instance for each create_logger() call
   (3000+ file descriptors).

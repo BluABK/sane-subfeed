@@ -153,6 +153,10 @@ DEFAULTS = {
         'use_socket_log': 'False',
         'log_level': '1',
         'logging_port': '19996'
+    },
+    'Database': {
+        'type': 'sqlite:///',
+        'location': os.path.join(OS_PATH, 'resources', 'permanents.db')
     }
 }
 
