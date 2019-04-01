@@ -1,4 +1,8 @@
 Current
+- Made "Download" tab not show on startup if Playback view is disabled.
+- Created del_tab and add_tab (and refactored add_tabs accordingly) in ConfigViewTabs.
+- Moved Views to their own "Views" tab in ConfigView.
+- Removed obsolete tab_id kwarg from InputSuper (ConfigView).
 - Mask database location from being written to generated sample config.
 - Made Database type and location customisable from config (default type: sqlite).
 - Sample configuration files are now generated if none already exist.

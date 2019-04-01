@@ -51,7 +51,7 @@ class InputSuper(QWidget):
         self.tabs.addTab(tab, name)
         self.tab_index[name] = tab
 
-    def add_section(self, name, tab_id=None):
+    def add_section(self, name):
         """
         Add a section to the ConfigView layout and increment grid offset.
         :return:
@@ -63,10 +63,9 @@ class InputSuper(QWidget):
         self.section_count += 1
         self.offset += 1
 
-    def add_option_checkbox(self, description, cfg_section, cfg_option, tab_id=None):
+    def add_option_checkbox(self, description, cfg_section, cfg_option):
         """
         Add an option w/ value to the ConfigView layout and increment the grid offset.
-        :param tab_id:
         :param cfg_option:
         :param cfg_section:
         :param description:
@@ -80,11 +79,10 @@ class InputSuper(QWidget):
 
         return value  # Needed for connected listeners etc
 
-    def add_option_line_edit(self, description, cfg_section, cfg_option, cfg_validator=None, tab_id=None):
+    def add_option_line_edit(self, description, cfg_section, cfg_option, cfg_validator=None):
         """
         Add an option w/ text value to the ConfigView layout and increment the grid offset.
         :param cfg_validator:
-        :param tab_id:
         :param cfg_option:
         :param cfg_section:
         :param description:
@@ -98,10 +96,9 @@ class InputSuper(QWidget):
 
         return value  # Needed for connected listeners etc
 
-    def add_option_inactive(self, description, cfg_section, cfg_option, tab_id=None):
+    def add_option_inactive(self, description, cfg_section, cfg_option):
         """
         Add an option w/ UNEDITABLE value to the ConfigView layout and increment the grid offset.
-        :param tab_id:
         :param cfg_option:
         :param cfg_section:
         :param description:
@@ -115,12 +112,11 @@ class InputSuper(QWidget):
 
         return value  # Needed for connected listeners etc
 
-    def add_option_info(self, left_text, right_text, tab_id=None):
+    def add_option_info(self, left_text, right_text):
         """
         Add flavourtext in the ConfigView option column and increment the grid offset.
         :param right_text: optional flavourtext
         :param left_text: optional flavourtext
-        :param tab_id:
         :return:
         """
 
@@ -133,10 +129,9 @@ class InputSuper(QWidget):
         # if left_text or right_text:
         self.offset += 1
 
-    def add_option_combobox(self, description, cfg_section, cfg_option, items, tab_id=None):
+    def add_option_combobox(self, description, cfg_section, cfg_option, items):
         """
         Add an option w/ value to the ConfigView layout and increment the grid offset.
-        :param tab_id:
         :param items:
         :param cfg_option:
         :param cfg_section:
@@ -154,12 +149,11 @@ class InputSuper(QWidget):
 
         return value  # Needed for connected listeners etc
 
-    def add_option_button(self, name, description, cfg_section, cfg_option, tooltip=None, clear=False, tab_id=None):
+    def add_option_button(self, name, description, cfg_section, cfg_option, tooltip=None, clear=False):
         """
         Add an option w/ value to the ConfigView layout and increment the grid offset.
         :param name:
         :param clear:
-        :param tab_id:
         :param items:
         :param cfg_option:
         :param cfg_section:

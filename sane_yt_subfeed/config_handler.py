@@ -377,7 +377,7 @@ def get_size(custom_ini=None, incl_sections=False):
 
 def set_config(section, option, value, custom_ini=None):
     """
-    Sets the givenm option's value
+    Sets the given option's value
     :param custom_ini:
     :param section:
     :param option:
