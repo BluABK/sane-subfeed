@@ -1,4 +1,7 @@
 Current
+- Config checkboxes now support multiple functions where some don't have kwargs.
+- Toggle for playback and download feature and debug mode now toggles the menubar and toolbar items as well.
+- Created function to respawn menubar and toolbar in MainWindow (useful when config has changed to reflect hiding items)
 - Extended GenericConfigCheckBox's function(**kwargs) capability to include lists of functions (and/or lists of kwargs).
 - Added functionality for tabs to be inserted at their predetermined position instead of at end of row, and made it the
   default.

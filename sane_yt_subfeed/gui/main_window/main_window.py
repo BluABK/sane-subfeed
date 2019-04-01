@@ -436,6 +436,22 @@ class MainWindow(QMainWindow):
         self.central_widget.addWidget(self.config_view)
         self.central_widget.setCurrentWidget(self.subfeed_grid_view)
 
+    def respawn_menubar_and_toolbar(self):
+        """
+        Deletes and recreates menubar and toolbar.
+        :return:
+        """
+        # Temporarily delete all the menus
+        for menu_name in self.menus.keys():
+            self.menubar.removeAction(self.menus[menu_name].menuAction())
+        self.menus.clear()
+        # Add it back w/o these views (due to read_config)
+        self.menubar = self.add_menus()
+        # Temporarily delete the Toolbar
+        self.removeToolBar(self.toolbar)
+        # Add it back w/o these views (due to read_config)
+        self.toolbar = self.add_toolbar()
+
     # Init UI Helpers
     def setup_views(self):
         self.central_widget = QStackedWidget()

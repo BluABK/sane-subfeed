@@ -43,7 +43,11 @@ class GenericConfigCheckBox(QCheckBox):
             # There's separate kwargs for each action
             if type(kwargs) is list:
                 for act, kwg in zip(actions, kwargs):
-                    act(**kwg)
+                    # There's a valid kwargs item
+                    if kwg is not None:
+                        act(**kwg)
+                    else:
+                        act()
             # There's shared kwargs for each action
             elif kwargs:
                 for act in actions:
