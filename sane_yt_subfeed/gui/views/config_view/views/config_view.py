@@ -65,7 +65,7 @@ class ConfigViewWidget(InputSuper):
         Initialize UI.
         :return:
         """
-        self.logger.info("Initializing UI: ConfigViewWidget")
+        self.logger.info("Initializing UI: ConfigViewWidget: {}".format(self.tab_id))
 
     def add_config_tab_gui(self):
         self.add_option_checkbox('Hide downloaded videos from feed', 'Gui',
@@ -102,8 +102,8 @@ class ConfigViewWidget(InputSuper):
         self.add_option_checkbox('Show watched videos', 'GridView', 'show_watched')
         self.add_option_checkbox('Show dismissed videos', 'GridView', 'show_dismissed')
         self.add_option_checkbox('Enable Playback view (and download support)', 'Play', 'enabled',
-                                 checked_action=self.config_view_tabs.add_tab, checked_kwargs={'tab': 'Download'},
-                                 unchecked_action=self.config_view_tabs.del_tab, unchecked_kwargs={'tab': 'Download'})
+                                 checked_actions=self.config_view_tabs.add_tab, checked_kwargs={'tab': 'Download'},
+                                 unchecked_actions=self.config_view_tabs.del_tab, unchecked_kwargs={'tab': 'Download'})
 
         # Section [SubFeed]
         self.add_section('{}Subscription feed{}'.format(self.deco_l, self.deco_r))
@@ -234,5 +234,5 @@ class ConfigViewWidget(InputSuper):
     def add_config_tab_advanced(self):
         self.add_option_checkbox('Launch GUI', 'Gui', 'launch_gui', disabled=True)
         self.add_option_checkbox('Debug mode', 'Debug', 'debug',
-                                 checked_action=self.config_view_tabs.add_tab, checked_kwargs={'tab': 'Debug'},
-                                 unchecked_action=self.config_view_tabs.del_tab, unchecked_kwargs={'tab': 'Debug'})
+                                 checked_actions=self.config_view_tabs.add_tab, checked_kwargs={'tab': 'Debug'},
+                                 unchecked_actions=self.config_view_tabs.del_tab, unchecked_kwargs={'tab': 'Debug'})

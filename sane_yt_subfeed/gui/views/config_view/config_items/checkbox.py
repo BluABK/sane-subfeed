@@ -9,7 +9,7 @@ from sane_yt_subfeed.config_handler import set_config
 # ######################################################################## #
 
 class GenericConfigCheckBox(QCheckBox):
-    def __init__(self, parent, description, cfg_section, cfg_option, checked_action=None, unchecked_action=None,
+    def __init__(self, parent, description, cfg_section, cfg_option, checked_actions=None, unchecked_actions=None,
                  checked_kwargs=None, unchecked_kwargs=None):
         """
         Generic Config Checkbox that can be checked or not checked. It also takes optional action functions.
@@ -17,10 +17,10 @@ class GenericConfigCheckBox(QCheckBox):
         :param description:
         :param cfg_section:
         :param cfg_option:
-        :param checked_action:   Function to call when box gets checked.
-        :param unchecked_action: Function to call when box gets unchecked.
-        :param checked_kwargs    Keyword arguments (dict) to send in checked action calls.
-        :param unchecked_kwargs  Keyword arguments (dict) to send in unchecked action calls.
+        :param checked_actions:   Functions to call when box gets checked. (can be list or single function)
+        :param unchecked_actions: Functions to call when box gets unchecked. (can be list or single function)
+        :param checked_kwargs    Keyword arguments (dict) to send in checked action calls. (can be list of kwargs)
+        :param unchecked_kwargs  Keyword arguments (dict) to send in unchecked action calls. (can be list of kwargs)
         """
         super(QCheckBox, self).__init__(parent=parent)
         self.cfg_parent = parent
@@ -29,27 +29,43 @@ class GenericConfigCheckBox(QCheckBox):
         self.cfg_option = cfg_option
         self.checked_kwargs = checked_kwargs
         self.unchecked_kwargs = unchecked_kwargs
-        if checked_action:
-            self.checked_action = checked_action
-        if unchecked_action:
-            self.unchecked_action = unchecked_action
+        self.checked_actions = checked_actions
+        self.unchecked_actions = unchecked_actions
 
         self.setCheckState(2 if self.cfg_parent.input_read_config(cfg_section, cfg_option) else 0)
 
         self.stateChanged.connect(self.save_option)
 
+    @staticmethod
+    def do_actions(actions, kwargs):
+        # There's Multiple actions
+        if type(actions) is list:
+            # There's separate kwargs for each action
+            if type(kwargs) is list:
+                for act, kwg in zip(actions, kwargs):
+                    act(**kwg)
+            # There's shared kwargs for each action
+            elif kwargs:
+                for act in actions:
+                    act(**kwargs)
+            # There's no kwargs
+            else:
+                for act in actions:
+                    act()
+
+        # There's only one action
+        elif actions:
+            # There's kwargs
+            if kwargs:
+                actions(**kwargs)
+            # There's no kwargs
+            else:
+                actions()
+
     def save_option(self, state):
         if state == Qt.Checked:
             set_config(self.cfg_section, self.cfg_option, 'True')
-            if self.checked_action:
-                if self.checked_kwargs:
-                    self.checked_action(**self.checked_kwargs)
-                else:
-                    self.checked_action()
+            self.do_actions(self.checked_actions, self.checked_kwargs)
         else:
             set_config(self.cfg_section, self.cfg_option, 'False')
-            if self.unchecked_action:
-                if self.unchecked_kwargs:
-                    self.unchecked_action(**self.unchecked_kwargs)
-                else:
-                    self.unchecked_action()
+            self.do_actions(self.unchecked_actions, self.unchecked_kwargs)

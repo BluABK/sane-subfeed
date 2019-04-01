@@ -1,4 +1,5 @@
 Current
+- Extended GenericConfigCheckBox's function(**kwargs) capability to include lists of functions (and/or lists of kwargs).
 - Added functionality for tabs to be inserted at their predetermined position instead of at end of row, and made it the
   default.
 - Made Debug tab in ConfigView spawn and despawn when enable Debug option is checked/unchecked.
