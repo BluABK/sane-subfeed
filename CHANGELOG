@@ -1,4 +1,7 @@
 Current
+- Split ConfigView's populate_options into one function per tab, which allows for more fine grained adding/populating
+  in future.
+- Moved settings for enabling debug mode and GUI to a new "Advanced" tab in ConfigView.
 - Made "Download" tab not show on startup if Playback view is disabled.
 - Created del_tab and add_tab (and refactored add_tabs accordingly) in ConfigViewTabs.
 - Moved Views to their own "Views" tab in ConfigView.

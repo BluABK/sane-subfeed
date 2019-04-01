@@ -7,7 +7,7 @@ from sane_yt_subfeed.gui.views.config_view.config_scroll_area import ConfigScrol
 from sane_yt_subfeed.gui.views.config_view.views.config_view import ConfigViewWidget
 
 CONFIG_TABS = ["GUI", "Views", "Model", "Requests", "Thumbnails", "Threading", "Download", "Media player",
-               "Default Application", "Logging", "Debug"]
+               "Default Application", "Logging", "Debug", "Advanced"]
 
 
 class ConfigViewTabs(QTabWidget):
@@ -56,7 +56,10 @@ class ConfigViewTabs(QTabWidget):
         :return:
         """
         for tab in tabs:
+            # Don't add tabs if explicitly disabled.
             if tab == 'Download' and not read_config('Play', 'enabled'):
-                # Playback view and downloading capabilities are disabled, skip it.
                 continue
+            elif tab == 'Debug' and not read_config('Debug', 'debug'):
+                continue
+
             self.add_tab(tab)

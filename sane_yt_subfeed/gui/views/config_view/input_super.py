@@ -63,9 +63,10 @@ class InputSuper(QWidget):
         self.section_count += 1
         self.offset += 1
 
-    def add_option_checkbox(self, description, cfg_section, cfg_option):
+    def add_option_checkbox(self, description, cfg_section, cfg_option, disabled=False):
         """
         Add an option w/ value to the ConfigView layout and increment the grid offset.
+        :param disabled: Sets disabled status if True.
         :param cfg_option:
         :param cfg_section:
         :param description:
@@ -73,6 +74,8 @@ class InputSuper(QWidget):
         """
         option = QLabel(description)
         value = GenericConfigCheckBox(self, description, cfg_section, cfg_option)
+        if disabled:
+            value.setDisabled(True)
         self.layout.addWidget(option, self.offset, 0)
         self.layout.addWidget(value, self.offset, 1)
         self.offset += 1
