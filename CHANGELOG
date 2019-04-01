@@ -1,4 +1,7 @@
 Current
+- Made Debug tab in ConfigView spawn and despawn when enable Debug option is checked/unchecked.
+- Made Download tab in ConfigView spawn and despawn when enable PlaybackView option is checked/unchecked.
+- Implemented ability for GenericConfigCheckBox to take checked/unchecked action functions and kwargs.
 - Split ConfigView's populate_options into one function per tab, which allows for more fine grained adding/populating
   in future.
 - Moved settings for enabling debug mode and GUI to a new "Advanced" tab in ConfigView.

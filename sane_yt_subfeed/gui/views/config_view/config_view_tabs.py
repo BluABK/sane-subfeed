@@ -30,7 +30,7 @@ class ConfigViewTabs(QTabWidget):
         """
         if tab not in self.tabs.keys():
             new_csa_tab = ConfigScrollArea(self)
-            tab_widget = ConfigViewWidget(new_csa_tab, self.sane_parent, tab)
+            tab_widget = ConfigViewWidget(self, new_csa_tab, self.sane_parent, tab)
             new_csa_tab.set_view(tab_widget)
             self.tabs[tab] = new_csa_tab
             self.addTab(new_csa_tab, tab)

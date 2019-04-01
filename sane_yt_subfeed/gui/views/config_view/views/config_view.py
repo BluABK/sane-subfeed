@@ -23,13 +23,14 @@ class ConfigViewWidget(InputSuper):
     deco_l = ""
     deco_r = ""
 
-    def __init__(self, parent, root, tab_id):
+    def __init__(self, config_view_tabs, parent, root, tab_id):
         """
         A GUI Widget that reads and sets config.ini settings
         :param parent:
         """
         super().__init__(parent, root)
         self.tab_id = tab_id
+        self.config_view_tabs = config_view_tabs
 
         # Populate options for the given tab
         if self.tab_id == 'GUI':
@@ -100,7 +101,9 @@ class ConfigViewWidget(InputSuper):
         self.add_section('{}Grid Views{}'.format(self.deco_l, self.deco_r))
         self.add_option_checkbox('Show watched videos', 'GridView', 'show_watched')
         self.add_option_checkbox('Show dismissed videos', 'GridView', 'show_dismissed')
-        self.add_option_checkbox('Enable Playback view (and download support)', 'Play', 'enabled')
+        self.add_option_checkbox('Enable Playback view (and download support)', 'Play', 'enabled',
+                                 checked_action=self.config_view_tabs.add_tab, checked_kwargs={'tab': 'Download'},
+                                 unchecked_action=self.config_view_tabs.del_tab, unchecked_kwargs={'tab': 'Download'})
 
         # Section [SubFeed]
         self.add_section('{}Subscription feed{}'.format(self.deco_l, self.deco_r))
@@ -230,4 +233,6 @@ class ConfigViewWidget(InputSuper):
 
     def add_config_tab_advanced(self):
         self.add_option_checkbox('Launch GUI', 'Gui', 'launch_gui', disabled=True)
-        self.add_option_checkbox('Debug mode', 'Debug', 'debug')
+        self.add_option_checkbox('Debug mode', 'Debug', 'debug',
+                                 checked_action=self.config_view_tabs.add_tab, checked_kwargs={'tab': 'Debug'},
+                                 unchecked_action=self.config_view_tabs.del_tab, unchecked_kwargs={'tab': 'Debug'})
