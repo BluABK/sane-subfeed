@@ -12,7 +12,14 @@ CONFIG_TABS = ["GUI", "Views", "Model", "Requests", "Thumbnails", "Threading", "
 
 class ConfigViewTabs(QTabWidget):
 
-    def __init__(self, parent, icon: QIcon = None):
+    def __init__(self, parent, icon: QIcon = None, enforce_position=True):
+        """
+        Config View Tabs
+        :param parent:
+        :param icon:
+        :param enforce_position: If True (default) insert tabs at their predetermined position,
+                                 else add them at the end of the row/list.
+        """
         super(ConfigViewTabs, self).__init__()
         self.sane_parent = parent
         self.logger = create_logger(__name__)
@@ -20,6 +27,7 @@ class ConfigViewTabs(QTabWidget):
             self.setWindowIcon(icon)
         self.setWindowTitle('Preferences')
         self.tabs = {}
+        self.enforce_position = enforce_position
         self.add_tabs(CONFIG_TABS)
 
     def add_tab(self, tab: str):
@@ -33,7 +41,12 @@ class ConfigViewTabs(QTabWidget):
             tab_widget = ConfigViewWidget(self, new_csa_tab, self.sane_parent, tab)
             new_csa_tab.set_view(tab_widget)
             self.tabs[tab] = new_csa_tab
-            self.addTab(new_csa_tab, tab)
+            if self.enforce_position:
+                # Insert tab at the position predetermined by CONFIG_TABS list.
+                self.insertTab(CONFIG_TABS.index(tab), new_csa_tab, tab)
+            else:
+                # Append tab to end of tabs.
+                self.addTab(new_csa_tab, tab)
         else:
             self.logger.error("Attempted to add already existing config tab: {}".format(tab))
 
