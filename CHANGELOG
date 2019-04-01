@@ -1,4 +1,5 @@
 Current
+- Removed mysterious hide_downloaded setting from GUI config (and MainWindowListener) that seemingly did nothing.
 - Fixed bug where despawned Central Widgets were not respawning properly, leading it segfaults.
 - Config checkboxes now support multiple functions where some don't have kwargs.
 - Toggle for playback and download feature and debug mode now toggles the menubar and toolbar items as well.

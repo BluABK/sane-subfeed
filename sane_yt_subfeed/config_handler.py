@@ -42,7 +42,6 @@ DEFAULTS = {
     },
     'Gui': {
         'launch_gui': 'True',
-        'hide_downloaded': 'True',
         'grid_view_x': '6',
         'grid_view_y': '5',
         'grey_old_videos': 'False',

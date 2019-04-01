@@ -70,8 +70,6 @@ class ConfigViewWidget(InputSuper):
         self.logger.info("Initializing UI: ConfigViewWidget: {}".format(self.tab_id))
 
     def add_config_tab_gui(self):
-        self.add_option_checkbox('Hide downloaded videos from feed', 'Gui',
-                                 'hide_downloaded')
         self.add_option_line_edit('Grid view X', 'Gui', 'grid_view_x', cfg_validator=QIntValidator())
         self.add_option_line_edit('Grid view Y', 'Gui', 'grid_view_y', cfg_validator=QIntValidator())
         self.add_option_checkbox('Grey background on old (1d+) videos', 'Gui', 'grey_old_videos')
