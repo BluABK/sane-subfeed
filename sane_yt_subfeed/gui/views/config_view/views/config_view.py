@@ -105,11 +105,17 @@ class ConfigViewWidget(InputSuper):
         self.add_option_checkbox('Show dismissed videos', 'GridView', 'show_dismissed')
         self.add_option_checkbox('Enable Playback view (and download support)', 'Play', 'enabled',
                                  checked_actions=[self.config_view_tabs.add_tab,
-                                                  self.root.respawn_menubar_and_toolbar],
-                                 checked_kwargs=[{'tab': 'Download'}, None],
+                                                  self.root.respawn_menubar_and_toolbar,
+                                                  self.root.add_central_widget_playback,
+                                                  self.root.add_central_widget_download,
+                                                  self.root.setup_views],
+                                 checked_kwargs=[{'tab': 'Download'}, None, None, None, None],
                                  unchecked_actions=[self.config_view_tabs.del_tab,
-                                                    self.root.respawn_menubar_and_toolbar],
-                                 unchecked_kwargs=[{'tab': 'Download'}, None])
+                                                    self.root.respawn_menubar_and_toolbar,
+                                                    self.root.del_central_widget_playback,
+                                                    self.root.del_central_widget_download,
+                                                    self.root.setup_views],
+                                 unchecked_kwargs=[{'tab': 'Download'}, None, None, None, None])
 
         # Section [SubFeed]
         self.add_section('{}Subscription feed{}'.format(self.deco_l, self.deco_r))

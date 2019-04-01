@@ -423,18 +423,67 @@ class MainWindow(QMainWindow):
         self.statusBar().addPermanentWidget(DbStateIcon(self.toolbar, self.main_model))
 
         # Add Views/CentralWidgets
-        self.central_widget.addWidget(self.subfeed_grid_view)
+        self.add_central_widget_subfeed()
         if read_config('Play', 'enabled'):
-            self.central_widget.addWidget(self.playback_grid_view)
-            self.central_widget.addWidget(self.download_view)
-        self.central_widget.addWidget(self.list_detailed_view)
+            self.add_central_widget_playback()
+            self.add_central_widget_download()
+        self.add_central_widget_list_detailed()
         if read_config('Debug', 'show_unimplemented_gui'):
-            self.central_widget.addWidget(self.list_tiled_view)
-        self.central_widget.addWidget(self.subscriptions_view)
+            self.add_central_widget_list_tiled()
+        self.add_central_widget_subs()
         if read_config('Debug', 'show_unimplemented_gui'):
-            self.central_widget.addWidget(self.about_view)
-        self.central_widget.addWidget(self.config_view)
+            self.add_central_widget_about()
+        self.add_central_widget_config()
+
         self.central_widget.setCurrentWidget(self.subfeed_grid_view)
+
+    def add_central_widget_subfeed(self):
+        self.central_widget.addWidget(self.subfeed_grid_view)
+
+    def add_central_widget_playback(self):
+        self.central_widget.addWidget(self.playback_grid_view)
+
+    def add_central_widget_download(self):
+        self.central_widget.addWidget(self.download_view)
+
+    def add_central_widget_list_detailed(self):
+        self.central_widget.addWidget(self.list_detailed_view)
+
+    def add_central_widget_list_tiled(self):
+        self.central_widget.addWidget(self.list_tiled_view)
+
+    def add_central_widget_subs(self):
+        self.central_widget.addWidget(self.subscriptions_view)
+
+    def add_central_widget_about(self):
+        self.central_widget.addWidget(self.about_view)
+
+    def add_central_widget_config(self):
+        self.central_widget.addWidget(self.config_view)
+
+    def del_central_widget_subfeed(self):
+        self.central_widget.removeWidget(self.subfeed_grid_view)
+
+    def del_central_widget_playback(self):
+        self.central_widget.removeWidget(self.playback_grid_view)
+
+    def del_central_widget_download(self):
+        self.central_widget.removeWidget(self.download_view)
+
+    def del_central_widget_list_detailed(self):
+        self.central_widget.removeWidget(self.list_detailed_view)
+
+    def del_central_widget_list_tiled(self):
+        self.central_widget.removeWidget(self.list_tiled_view)
+
+    def del_central_widget_subs(self):
+        self.central_widget.removeWidget(self.subscriptions_view)
+
+    def del_central_widget_about(self):
+        self.central_widget.removeWidget(self.about_view)
+
+    def del_central_widget_config(self):
+        self.central_widget.removeWidget(self.config_view)
 
     def respawn_menubar_and_toolbar(self):
         """
@@ -454,27 +503,43 @@ class MainWindow(QMainWindow):
 
     # Init UI Helpers
     def setup_views(self):
-        self.central_widget = QStackedWidget()
-        self.setCentralWidget(self.central_widget)
+        """
+        Sets up the CentralWidget Views if they don't already exist.
+        :return:
+        """
+        if not self.central_widget:
+            self.central_widget = QStackedWidget()
+            self.setCentralWidget(self.central_widget)
 
         if read_config('Play', 'enabled'):
-            self.playback_grid_view = GridScrollArea(self, self.main_model)
-            self.playback_grid_view.set_view(PlaybackGridView(self.playback_grid_view, self, self.main_model),
-                                             PLAYBACK_VIEW_ID)
-            self.download_view = DownloadScrollArea(self, self.main_model)
+            if not self.playback_grid_view:
+                self.playback_grid_view = GridScrollArea(self, self.main_model)
+                self.playback_grid_view.set_view(PlaybackGridView(self.playback_grid_view, self, self.main_model),
+                                                 PLAYBACK_VIEW_ID)
+            if not self.download_view:
+                self.download_view = DownloadScrollArea(self, self.main_model)
 
-        self.subfeed_grid_view = GridScrollArea(self, self.main_model)
-        self.subfeed_grid_view.set_view(SubfeedGridView(self.subfeed_grid_view, self, self.main_model), SUBFEED_VIEW_ID)
+        if not self.subfeed_grid_view:
+            self.subfeed_grid_view = GridScrollArea(self, self.main_model)
+            self.subfeed_grid_view.set_view(SubfeedGridView(self.subfeed_grid_view, self, self.main_model),
+                                            SUBFEED_VIEW_ID)
 
-        self.hotkeys_view = ConfigWindow(self)
-        self.hotkeys_view.setWidget(HotkeysViewWidget(self.hotkeys_view, self,
-                                                      icon=QIcon(os.path.join(ICONS_PATH, HOTKEYS_ICON))))
-        self.config_view = ConfigViewTabs(self, icon=QIcon(os.path.join(ICONS_PATH, CONFIG_ICON)))
+        if not self.hotkeys_view:
+            self.hotkeys_view = ConfigWindow(self)
+            self.hotkeys_view.setWidget(HotkeysViewWidget(self.hotkeys_view, self,
+                                                          icon=QIcon(os.path.join(ICONS_PATH, HOTKEYS_ICON))))
 
-        self.list_detailed_view = SubfeedDetailedListView(self)
-        self.list_tiled_view = SubfeedTiledListView(self)
-        self.subscriptions_view = SubscriptionsDetailedListView(self)
-        self.about_view = AboutView(self)
+        if not self.config_view:
+            self.config_view = ConfigViewTabs(self, icon=QIcon(os.path.join(ICONS_PATH, CONFIG_ICON)))
+
+        if not self.list_detailed_view:
+            self.list_detailed_view = SubfeedDetailedListView(self)
+        if not self.list_tiled_view:
+            self.list_tiled_view = SubfeedTiledListView(self)
+        if not self.subscriptions_view:
+            self.subscriptions_view = SubscriptionsDetailedListView(self)
+        if not self.about_view:
+            self.about_view = AboutView(self)
 
     # --- Menu
     def add_menus(self):
