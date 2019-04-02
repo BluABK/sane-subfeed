@@ -114,12 +114,14 @@ class ConfigViewWidget(InputSuper):
                                                     self.root.del_central_widget_download,
                                                     self.root.setup_views],
                                  unchecked_kwargs=[{'tab': 'Download'}, None, None, None, None])
+        self.add_option_line_edit('Elided title text modifier (title-width * modifier)',
+                                  'GridView', 'elided_text_modifier', cfg_validator=QDoubleValidator())
+        self.add_option_line_edit('Title pixel size modifier (title-height * modifier)',
+                                  'GridView', 'title_tile_pixel_size', cfg_validator=QDoubleValidator())
 
         # Section [SubFeed]
         self.add_section('{}Subscription feed{}'.format(self.deco_l, self.deco_r))
         self.add_option_checkbox('Show downloaded videos', 'SubFeed', 'show_downloaded')
-        self.add_option_line_edit('Title-tile pixel size', 'GridView', 'title_tile_pixel_size',
-                                  cfg_validator=QDoubleValidator())
         # FIXME: implement in hotkeys?
         self.add_option_combobox('Left click mouse action', 'SubFeed', 'left_mouse_action', LEFT_MOUSE_ACTIONS)
 
