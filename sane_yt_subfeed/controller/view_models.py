@@ -1,4 +1,5 @@
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import QThread, Qt
+from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtWidgets import QProgressBar
 from sqlalchemy import asc, desc, false, or_
 from sqlalchemy.dialects import postgresql
@@ -212,6 +213,9 @@ class MainModel:
         :return:
         """
         self.status_bar_progress = QProgressBar(parent=parent)
+        palette = QPalette(self.status_bar_progress.palette())
+        palette.setColor(QPalette.Highlight, QColor(24, 68, 91).lighter(200))
+        self.status_bar_progress.setPalette(palette)
         self.status_bar_listener = ProgressBarListener(self, self.status_bar_progress)
         self.status_bar_thread = QThread()
         self.status_bar_thread.setObjectName('status_bar_thread')
