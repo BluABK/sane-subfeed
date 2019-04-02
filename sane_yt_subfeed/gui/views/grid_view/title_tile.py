@@ -12,30 +12,25 @@ class TitleTile(QLabel):
         QLabel.__init__(self, text)
         self.parent = parent
 
+        # Extract the left, top, right, and bottom margins used around the layout
         margins = self.parent.layout.getContentsMargins()
-        self.setFixedSize(self.parent.width() - margins[0] - margins[2], (self.parent.height() - 4 * margins[3]) * 0.18)
+        fixed_size_modifier = 0.18  # was 0.18
+        self.setFixedSize(self.parent.width() - margins[0] - margins[2],
+                          (self.parent.height() - 4 * margins[3]) * fixed_size_modifier)
 
         self.setWordWrap(True)
         self.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
 
-        # t_font = QFont()
         t_font = self.font()
         t_font.setWeight(QFont.DemiBold)
         t_font.setStyleHint(QFont.Helvetica)
         t_font.setFixedPitch(True)
-        # t_font.setPixelSize(5)
         t_font.setPixelSize(self.height() * read_config('GridView', 'title_tile_pixel_size'))
         self.setFont(t_font)
 
     def update_font(self):
         metrics = QFontMetrics(self.font())
-        elided = metrics.elidedText(self.parent.video.title, Qt.ElideRight, self.width() * 1.8)
+        # If the string text is wider than width, return an elided version of the string
+        elided_modifier = read_config('GridView', 'elided_text_modifier_title')  # old: 1.8, new: 2.0
+        elided = metrics.elidedText(self.text(), Qt.ElideRight, self.width() * elided_modifier)
         self.setText(elided)
-
-    # def detect_and_resize_utf8(self, text):
-
-    # def resizeEvent(self, *args, **kwargs):
-    #     margins = self.parent.layout.getContentsMargins()
-    #     prev_h = (self.parent.height() - (4 * margins[1] + 4 * margins[3])) * 0.6
-    #     self.setGeometry(margins[0], prev_h + (2 * margins[1] + margins[3]), self.parent.width() - 2 * margins[2],
-    #                      (self.parent.height() - (4 * margins[1] + 4 * margins[3])) * 0.2)

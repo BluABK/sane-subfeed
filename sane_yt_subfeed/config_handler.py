@@ -1,4 +1,5 @@
 import ast
+import copy
 import os
 from configparser import ConfigParser, NoSectionError, NoOptionError
 from shutil import copyfile
@@ -41,7 +42,6 @@ DEFAULTS = {
     },
     'Gui': {
         'launch_gui': 'True',
-        'hide_downloaded': 'True',
         'grid_view_x': '6',
         'grid_view_y': '5',
         'grey_old_videos': 'False',
@@ -65,11 +65,20 @@ DEFAULTS = {
     'GridView': {
         'show_watched': 'False',
         'show_dismissed': 'False',
-        'title_tile_pixel_size': '0.40'
+        'title_tile_pixel_size': '0.40',
+        'elided_text_modifier_title': '1.75',
+        'elided_text_modifier_channel': '0.95',
+        'elided_text_modifier_date': '0.95',
+        'timedelta_format': '$HH:$MM:$SS ago',
+        'timedelta_format_days': '$d days, $HH:$MM:$SS ago',
+        'timedelta_format_months': '$m months, $d d, $HH:$MM:$SS ago',
+        'timedelta_format_years': '${yd}y, ${m}m, ${d}d, $HH:$MM:$SS ago',
+        'timedelta_format_decades': '${decades}dc, ${yd}y, ${m}m, ${d}d, $HH:$MM:$SS ago'
     },
     'SubFeed': {
         'show_downloaded': 'False',
-        'color_live_broadcast_content': 'True'
+        'color_live_broadcast_content': 'True',
+        'left_mouse_action': 'Open URL in browser'
     },
     'DownloadView': {
         'download_tile_height': '200'
@@ -95,6 +104,7 @@ DEFAULTS = {
         'img_threads': '200',
     },
     'Play': {
+        'enabled': 'False',
         'yt_file_path': "",
         'disable_dir_listener': 'False',
         'use_url_as_path': 'False',
@@ -151,6 +161,10 @@ DEFAULTS = {
         'use_socket_log': 'False',
         'log_level': '1',
         'logging_port': '19996'
+    },
+    'Database': {
+        'type': 'sqlite:///',
+        'location': os.path.join(OS_PATH, 'resources', 'permanents.db')
     }
 }
 
@@ -191,6 +205,28 @@ DEFAULTS_HOTKEYS = {
         'by_channel_sort_toggle': 'Ctrl+B'
     }
 }
+
+# Create sample config if none exists
+if not os.path.exists(SAMPLE_PATH):
+    config_sample_parser = ConfigParser()
+    for section in DEFAULTS:
+        if section == 'Database':
+            # Mask database location so it's not included in sample ini file
+            modified_section = copy.deepcopy(DEFAULTS[section])
+            modified_section['location'] = '<path>/permanents.db'
+            config_sample_parser[section] = modified_section
+        else:
+            config_sample_parser[section] = DEFAULTS[section]
+    with open(SAMPLE_PATH, 'w') as config_sample_file:
+        config_sample_parser.write(config_sample_file)
+
+# Create sample hotkeys config if none exists
+if not os.path.exists(SAMPLE_HOTKEYS_PATH):
+    config_hotkeys_sample_parser = ConfigParser()
+    for section in DEFAULTS_HOTKEYS:
+        config_hotkeys_sample_parser[section] = DEFAULTS_HOTKEYS[section]
+    with open(SAMPLE_HOTKEYS_PATH, 'w') as config_hotkeys_sample_file:
+        config_hotkeys_sample_parser.write(config_hotkeys_sample_file)
 
 
 def read_config(section, option, literal_eval=True, custom_ini=None):
@@ -348,7 +384,7 @@ def get_size(custom_ini=None, incl_sections=False):
 
 def set_config(section, option, value, custom_ini=None):
     """
-    Sets the givenm option's value
+    Sets the given option's value
     :param custom_ini:
     :param section:
     :param option:

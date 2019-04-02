@@ -7,6 +7,11 @@ from logging.handlers import SocketHandler
 
 from sane_yt_subfeed.config_handler import read_config
 
+LOG_FILE_HANDLER = None
+LOG_FILE = 'debug.log'
+# create formatter and add it to the handlers
+FORMATTER = logging.Formatter(u'%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
 """
 Default Logging levels
 CRITICAL 	50
@@ -34,13 +39,13 @@ OS_PATH = os.path.dirname(__file__)
 LOGDIR = os.path.join(OS_PATH, 'logs')
 
 if read_config('Logging', 'use_socket_log'):
-    log = logging.getLogger('r')
+    log_socket_instance = logging.getLogger('r')
     log_level = read_config('Logging', 'log_level')
-    log.setLevel(log_level)  # to send all records to cutelog
+    log_socket_instance.setLevel(log_level)  # to send all records to socket logger
 
     port = read_config('Logging', 'logging_port')
     socket_handler = SocketHandler('127.0.0.1', port)  # default listening address
-    log.addHandler(socket_handler)
+    log_socket_instance.addHandler(socket_handler)
 
 # Add custom logging levels
 logging.addLevelName(DEBUG2_LEVEL_NUM, "DEBUG2")
@@ -195,39 +200,74 @@ logging.Logger.debug9 = debug9
 logging.Logger.spam = spam
 
 
-def create_logger(facility, logfile='debug.log'):
+def create_logger_socket(facility):
     """
-    Creates a logger function based on the logging library
-    :param facility:    Name of what's calling logger.
-    :param logfile:     File to log to (default: 'debug.log')
+    Create and return a a logging instance that logs to socket.
+    :param facility:
     :return:
     """
+    return log_socket_instance.getChild(facility)
+
+
+def create_file_handler(log_file=LOG_FILE, formatter=FORMATTER):
+    """
+    Creates *the* (singular) file handler for logging to text file.
+
+    File handler needs to be global and a singular instance,
+    to avoid spamming FDs for each create_logger() call.
+    :param log_file:
+    :param formatter:
+    :return:
+    """
+    global LOG_FILE_HANDLER
+    # Only create one instance of the file handler
+    if not read_config('Logging', 'use_socket_log') and LOG_FILE_HANDLER is None:
+        LOG_FILE_HANDLER = logging.FileHandler(os.path.join(LOGDIR, log_file), encoding="UTF-8")
+        LOG_FILE_HANDLER.setLevel(logging.DEBUG)
+        LOG_FILE_HANDLER.setFormatter(formatter)
+
+
+def create_logger_file(facility, formatter=FORMATTER):
+    """
+    Create and return a a logging instance that logs to file.
+    :param facility:
+    :param formatter:
+    :return:
+    """
+    global LOG_FILE_HANDLER
+    log_file_instance = logging.getLogger(facility)
+
+    log_file_instance.setLevel(logging.DEBUG)
+    # create file handler which logs even debug messages
+    if not os.path.exists(LOGDIR):
+        os.makedirs(LOGDIR)
+
+    # create console handler with a higher log level
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.ERROR)
+    # patch the default logging formatter to use unicode format string
+    logging._defaultFormatter = logging.Formatter(u"%(message)s")
+    ch.setFormatter(formatter)
+
+    # add the handlers to the logger
+    log_file_instance.addHandler(LOG_FILE_HANDLER)
+    log_file_instance.addHandler(ch)
+
+    return log_file_instance
+
+
+def create_logger(facility):
+    """
+    Creates a logger function based on the logging library
+    :param facility:     Name of what's calling logger.
+    :return:
+    """
+    create_file_handler()
     # create logger
     if read_config('Logging', 'use_socket_log'):
-        return log.getChild(facility)
+        return create_logger_socket(facility)
     else:
-        log_instance = logging.getLogger(facility)
-
-        log_instance.setLevel(logging.DEBUG)
-        # create file handler which logs even debug messages
-        if not os.path.exists(LOGDIR):
-            os.makedirs(LOGDIR)
-        fh = logging.FileHandler(os.path.join(LOGDIR, logfile), encoding="UTF-8")
-        fh.setLevel(logging.DEBUG)
-        # create console handler with a higher log level
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.ERROR)
-        # patch the default logging formatter to use unicode format string
-        logging._defaultFormatter = logging.Formatter(u"%(message)s")
-        # create formatter and add it to the handlers
-        formatter = logging.Formatter(u'%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        fh.setFormatter(formatter)
-        ch.setFormatter(formatter)
-        # add the handlers to the logger
-        log_instance.addHandler(fh)
-        log_instance.addHandler(ch)
-
-        return log_instance
+        return create_logger_file(facility)
 
 
 # Default logger facility

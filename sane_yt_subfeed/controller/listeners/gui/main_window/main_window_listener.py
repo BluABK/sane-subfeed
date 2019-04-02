@@ -46,13 +46,7 @@ class MainWindowListener(QObject):
         :return:
         """
         self.logger.info("Reloading subfeed")
-        hide_downloaded = read_config('Gui', 'hide_downloaded')
-        if hide_downloaded:
-            self.model.update_subfeed_videos_from_remote(refresh_type=refresh_type)
-            # self.model.grid_view_listener.hiddenVideosChanged.emit()
-        else:
-            self.model.update_subfeed_videos_from_remote(refresh_type=refresh_type)
-            self.logger.error('NOT IMPLEMENTED: disabled hide_downloaded')
+        self.model.update_subfeed_videos_from_remote(refresh_type=refresh_type)
 
         # Attempt to force garbage collection to close unnecessary sockets
         gc.collect()

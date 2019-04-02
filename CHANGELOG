@@ -1,4 +1,38 @@
 Current
+- Fixed issue #5 (Launched players would quit along with Sane) by pre-pending 'nohup' to Popen arguments (if Linux).
+- Changed timedelta formatting delimiter from % to $ due to shortcomings in ConfigParser (%% is an escaped percent sign,
+  so config parser finds it, but it doesn't actually do anything, but % isn't a valid string interpolation. so it fails.
+- Made video uploaded timedelta format customisable, and changed to use relativedelta with a string.Template to have
+  strftime-esque formatting (it only allows for [a-z], so had to go with repeating letters instead of dash.
+- Made GridView elided text values customisable.
+- Fixed GridView text bleeding out of frame (length-wise, height cut-off issue is still unresolved).
+- Made elided title text modifier customisable and moved out of place 'title pixel size' item in ConfigView.
+- Removed mysterious hide_downloaded setting from GUI config (and MainWindowListener) that seemingly did nothing.
+- Fixed bug where despawned Central Widgets were not respawning properly, leading it segfaults.
+- Config checkboxes now support multiple functions where some don't have kwargs.
+- Toggle for playback and download feature and debug mode now toggles the menubar and toolbar items as well.
+- Created function to respawn menubar and toolbar in MainWindow (useful when config has changed to reflect hiding items)
+- Extended GenericConfigCheckBox's function(**kwargs) capability to include lists of functions (and/or lists of kwargs).
+- Added functionality for tabs to be inserted at their predetermined position instead of at end of row, and made it the
+  default.
+- Made Debug tab in ConfigView spawn and despawn when enable Debug option is checked/unchecked.
+- Made Download tab in ConfigView spawn and despawn when enable PlaybackView option is checked/unchecked.
+- Implemented ability for GenericConfigCheckBox to take checked/unchecked action functions and kwargs.
+- Split ConfigView's populate_options into one function per tab, which allows for more fine grained adding/populating
+  in future.
+- Moved settings for enabling debug mode and GUI to a new "Advanced" tab in ConfigView.
+- Made "Download" tab not show on startup if Playback view is disabled.
+- Created del_tab and add_tab (and refactored add_tabs accordingly) in ConfigViewTabs.
+- Moved Views to their own "Views" tab in ConfigView.
+- Removed obsolete tab_id kwarg from InputSuper (ConfigView).
+- Mask database location from being written to generated sample config.
+- Made Database type and location customisable from config (default type: sqlite).
+- Sample configuration files are now generated if none already exist.
+- Fixed issue with log-to-file feature spawning a new file handler instance for each create_logger() call
+  (3000+ file descriptors).
+- Made Left mouse button action remappable (a little stop-gap pending full implementation of hotkeys, default: open in
+  default web browser)
+- Made Playback view (and implicitly downloading features) optional (default: disabled).
 - Fixed bug that prevented QtWidget styles in Window->Theme->Style from working at all.
 - Made DownloadView able to retry/re-add failed downloads.
 - Made video download logic able to emit failed download signals to DownloadView and set info accordingly.

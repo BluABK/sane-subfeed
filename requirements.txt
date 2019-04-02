@@ -1,12 +1,13 @@
 alembic==1.0.0
-argh==0.26.2
 cachetools==2.1.0
 certifi==2018.4.16
 chardet==3.0.4
 click==6.7
 configparser==3.5.0
 ffmpeg-python==0.1.16
+# future is pulled by ffmpeg-python
 future==0.17.1
+# False positive unlisted req: Calls itself 'googleapiclient' when imported as lib
 google-api-python-client==1.7.3
 google-auth==1.5.0
 google-auth-httplib2==0.0.3
@@ -28,7 +29,7 @@ PyYAML==4.2b4
 requests==2.21.0
 requests-oauthlib==1.0.0
 rsa==3.4.2
--e git+git@github.com:BluABK/sane-subfeed.git@f165de62cf16d343f388dce64a61de29545847fb#egg=Sane_Subscription_Feed
+#-e git+git@github.com:BluABK/sane-subfeed.git@f165de62cf16d343f388dce64a61de29545847fb#egg=Sane_Subscription_Feed
 six==1.11.0
 SQLAlchemy==1.2.10
 tqdm==4.23.4
