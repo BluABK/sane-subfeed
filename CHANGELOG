@@ -1,4 +1,5 @@
 Current
+- Fixed issue #5 (Launched players would quit along with Sane) by pre-pending 'nohup' to Popen arguments (if Linux).
 - Changed timedelta formatting delimiter from % to $ due to shortcomings in ConfigParser (%% is an escaped percent sign,
   so config parser finds it, but it doesn't actually do anything, but % isn't a valid string interpolation. so it fails.
 - Made video uploaded timedelta format customisable, and changed to use relativedelta with a string.Template to have
