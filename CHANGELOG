@@ -1,4 +1,7 @@
 Current
+- Tweaked Elided text modifier for video title to perfection (if text is bolded or otherwise it will cut off a little
+  sooner than this perfection, but that's why it's been made user configurable).
+- Explicitly set progress bars to blue instead of assuming it would be the default (varies with QStyle and QPalette).
 - Fixed issue #5 (Launched players would quit along with Sane) by pre-pending 'nohup' to Popen arguments (if Linux).
 - Changed timedelta formatting delimiter from % to $ due to shortcomings in ConfigParser (%% is an escaped percent sign,
   so config parser finds it, but it doesn't actually do anything, but % isn't a valid string interpolation. so it fails.

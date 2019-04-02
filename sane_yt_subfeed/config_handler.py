@@ -66,7 +66,7 @@ DEFAULTS = {
         'show_watched': 'False',
         'show_dismissed': 'False',
         'title_tile_pixel_size': '0.40',
-        'elided_text_modifier_title': '1.75',
+        'elided_text_modifier_title': '1.7368421',
         'elided_text_modifier_channel': '0.95',
         'elided_text_modifier_date': '0.95',
         'timedelta_format': '$HH:$MM:$SS ago',
