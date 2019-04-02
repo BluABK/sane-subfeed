@@ -5,6 +5,8 @@ import subprocess
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette, QPixmap
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
+from dateutil.relativedelta import relativedelta
+from string import Template
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VIDEO_KIND_LIVE, \
@@ -15,6 +17,10 @@ from sane_yt_subfeed.gui.views.grid_view.title_tile import TitleTile
 from sane_yt_subfeed.history_handler import update_plaintext_history
 from sane_yt_subfeed.log_handler import logger, create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import resize_thumbnail
+
+
+class DeltaTemplate(Template):
+    delimiter = "%"
 
 
 class VideoTile(QWidget):
@@ -79,10 +85,11 @@ class VideoTile(QWidget):
             self.channel_widget.setText("{} | {}".format(video.channel_title, grab_method))
         else:
             self.channel_widget.setText(self.video.channel_title)
+            self.channel_widget.update_font()
 
-        vid_age = datetime.datetime.utcnow() - self.video.date_published
-        self.date_widget.setText(self.strf_delta(vid_age, "{hours}:{minutes}:{seconds}", "{days} days "))
-        self.color_old_video(vid_age)
+        self.date_widget.setText(self.strf_delta(self.video.date_published))
+        self.date_widget.update_font()
+        self.color_old_video(self.video.date_published)
         self.color_live_video()
 
         self.set_thumbnail_pixmap(video.thumbnail_path)
@@ -131,16 +138,41 @@ class VideoTile(QWidget):
             return failover_name
 
     @staticmethod
-    def strf_delta(tdelta, hours, days):
-        d = {}
-        d["hours"], rem = divmod(tdelta.seconds, 3600)
-        d["minutes"], d["seconds"] = divmod(rem, 60)
-        if int(tdelta.days) > 0:
-            return_string = "{}{}".format(days.format(days=tdelta.days), hours.format(**d))
-        else:
-            return_string = "{}".format(hours.format(**d))
+    def strf_delta(date_published, fmt=None):
+        tdelta = relativedelta(date_published, datetime.datetime.utcnow())
+        d = {
+            'decadesdecades': "{0:02d}".format(int(abs(tdelta.years / 10))),
+            'decades': int(abs(tdelta.years) / 10),
+            'ydyd': "{0:02d}".format(abs(tdelta.years)),
+            'yd': abs(tdelta.years),
+            'mm': "{0:02d}".format(abs(tdelta.months)),
+            'm': abs(tdelta.months),
+            'dd': "{0:02d}".format(abs(tdelta.days)),
+            'd': abs(tdelta.days),
+            'HH': "{0:02d}".format(abs(tdelta.hours)),
+            'H': abs(tdelta.hours),
+            'MM': "{0:02d}".format(abs(tdelta.minutes)),
+            'M': abs(tdelta.minutes),
+            'SS': "{0:02d}".format(abs(tdelta.seconds)),
+            'S': abs(tdelta.seconds),
+            'f': abs(tdelta.microseconds)
+        }
 
-        return return_string
+        if fmt is None:
+            if int(abs(tdelta.years)) > 10:
+                fmt = read_config('GridView', 'timedelta_format_decades', literal_eval=False)
+            elif int(abs(tdelta.years)) > 1:
+                fmt = read_config('GridView', 'timedelta_format_years', literal_eval=False)
+            elif int(abs(tdelta.months)) > 1:
+                fmt = read_config('GridView', 'timedelta_format_months', literal_eval=False)
+            elif int(abs(tdelta.days)) > 1:
+                fmt = read_config('GridView', 'timedelta_format_days', literal_eval=False)
+            else:
+                fmt = read_config('GridView', 'timedelta_format', literal_eval=False)
+
+        t = DeltaTemplate(fmt)
+
+        return t.substitute(**d)
 
     def color_palette(self, color, role=QPalette.Window, log_facility=None, log_msg=""):
         """
@@ -161,15 +193,16 @@ class VideoTile(QWidget):
         self.setAutoFillBackground(True)
         self.setPalette(palette)
 
-    def color_old_video(self, vid_age, days=1):
+    def color_old_video(self, date_published, days=1):
         """
         Colors the QPalette background element of a video grey if it is older than days (default: 1)
 
         :param days:
-        :param vid_age:
+        :param date_published:
         :return:
         """
         if read_config('Gui', 'grey_old_videos'):
+            vid_age = datetime.datetime.utcnow() - date_published
             if vid_age > datetime.timedelta(days):
                 self.color_palette(Qt.lightGray)
             else:

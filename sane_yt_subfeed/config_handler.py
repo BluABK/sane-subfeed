@@ -66,7 +66,14 @@ DEFAULTS = {
         'show_watched': 'False',
         'show_dismissed': 'False',
         'title_tile_pixel_size': '0.40',
-        'elided_text_modifier': '2.0'
+        'elided_text_modifier_title': '1.75',
+        'elided_text_modifier_channel': '0.95',
+        'elided_text_modifier_date': '0.95',
+        'timedelta_format': '%HH:%MM:%SS ago',
+        'timedelta_format_days': '%d days, %HH:%MM:%SS ago',
+        'timedelta_format_months': '%m months, %d d, %HH:%MM:%SS ago',
+        'timedelta_format_years': '%{yd}y, %{m}m, %{d}d, %HH:%MM:%SS ago',
+        'timedelta_format_decades': '%{decades}dc, %{yd}y, %{m}m, %{d}d, %HH:%MM:%SS ago'
     },
     'SubFeed': {
         'show_downloaded': 'False',

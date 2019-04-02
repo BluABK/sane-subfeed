@@ -1,4 +1,8 @@
 Current
+- Made video uploaded timedelta format customisable, and changed to use relativedelta with a string.Template to have
+  strftime-esque formatting (it only allows for [a-z], so had to go with repeating letters instead of dash.
+- Made GridView elided text values customisable.
+- Fixed GridView text bleeding out of frame (length-wise, height cut-off issue is still unresolved).
 - Made elided title text modifier customisable and moved out of place 'title pixel size' item in ConfigView.
 - Removed mysterious hide_downloaded setting from GUI config (and MainWindowListener) that seemingly did nothing.
 - Fixed bug where despawned Central Widgets were not respawning properly, leading it segfaults.
