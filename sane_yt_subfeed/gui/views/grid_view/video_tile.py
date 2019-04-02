@@ -1,3 +1,5 @@
+import sys
+
 import os
 
 import datetime
@@ -102,9 +104,19 @@ class VideoTile(QWidget):
             self.logger.warning('os.path.isfile returns False for File: {}'.format(file_path))
         if player:
             popen_args = player + [file_path]
-            subprocess.Popen(popen_args)
+            if sys.platform.startswith('linux'):
+                popen_args.insert(0, 'nohup')
+                subprocess.Popen(popen_args, preexec_fn=os.setpgrp, stdout=subprocess.DEVNULL,
+                                 stderr=subprocess.DEVNULL)
+            else:
+                subprocess.Popen(popen_args)
         else:
-            subprocess.Popen([file_path], shell=True)
+            if sys.platform.startswith('linux'):
+                subprocess.Popen([file_path], preexec_fn=os.setpgrp, shell=True,
+                                 creationflags=subprocess.CREATE_NEW_CONSOLE,
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            else:
+                subprocess.Popen([file_path], shell=True)
 
     @staticmethod
     def str_to_list(s):
