@@ -1,4 +1,6 @@
 Current
+- Changed timedelta formatting delimiter from % to $ due to shortcomings in ConfigParser (%% is an escaped percent sign,
+  so config parser finds it, but it doesn't actually do anything, but % isn't a valid string interpolation. so it fails.
 - Made video uploaded timedelta format customisable, and changed to use relativedelta with a string.Template to have
   strftime-esque formatting (it only allows for [a-z], so had to go with repeating letters instead of dash.
 - Made GridView elided text values customisable.

@@ -20,7 +20,7 @@ from sane_yt_subfeed.youtube.thumbnail_handler import resize_thumbnail
 
 
 class DeltaTemplate(Template):
-    delimiter = "%"
+    delimiter = "$"
 
 
 class VideoTile(QWidget):
