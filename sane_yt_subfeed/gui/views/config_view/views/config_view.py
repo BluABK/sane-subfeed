@@ -232,6 +232,7 @@ class ConfigViewWidget(InputSuper):
         # Section [Youtube-dl]
         if 'youtube_dl' in sys.modules:
             self.add_option_checkbox('Use youtube-dl?', 'Youtube-dl', 'use_youtube_dl')
+
             # Section [Youtube-dl_proxies]
             _counter = 1
             for proxy in get_options('Youtube-dl_proxies'):
