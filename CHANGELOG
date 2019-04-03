@@ -1,4 +1,6 @@
 Current
+- Added toolbar icon size modifier for use on High DPI displays.
+- Implemented actions and kwargs bindings in GenericLineEdit.
 - Tweaked Elided text modifier for video title to perfection (if text is bolded or otherwise it will cut off a little
   sooner than this perfection, but that's why it's been made user configurable).
 - Explicitly set progress bars to blue instead of assuming it would be the default (varies with QStyle and QPalette).
