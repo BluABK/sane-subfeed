@@ -162,8 +162,7 @@ DEFAULTS = {
         'logging_port': '19996'
     },
     'Database': {
-        'type': 'sqlite:///',
-        'location': os.path.join(OS_PATH, 'resources', 'permanents.db')
+        'url': 'sqlite:///{}'.format(os.path.join(OS_PATH, 'resources', 'permanents.db'))
     }
 }
 
@@ -210,9 +209,9 @@ if not os.path.exists(SAMPLE_PATH):
     config_sample_parser = ConfigParser()
     for section in DEFAULTS:
         if section == 'Database':
-            # Mask database location so it's not included in sample ini file
+            # Mask database path so it's not included in sample ini file
             modified_section = copy.deepcopy(DEFAULTS[section])
-            modified_section['location'] = '<path>/permanents.db'
+            modified_section['url'] = 'sqlite:///<path>/permanents.db'
             config_sample_parser[section] = modified_section
         else:
             config_sample_parser[section] = DEFAULTS[section]

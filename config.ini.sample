@@ -144,6 +144,5 @@ log_level = 1
 logging_port = 19996
 
 [Database]
-type = sqlite:///
-location = <path>/permanents.db
+url = sqlite:///<path>/permanents.db
 

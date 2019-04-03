@@ -306,4 +306,5 @@ class ConfigViewWidget(InputSuper):
         self.add_option_checkbox('Disable tooltips', 'Debug', 'disable_tooltips', restart_check=False)
         self.add_option_line_edit('Grid view X', 'Gui', 'grid_view_x', cfg_validator=QIntValidator())
         self.add_option_line_edit('Grid view Y', 'Gui', 'grid_view_y', cfg_validator=QIntValidator())
+        self.add_option_line_edit('Database URL', 'Database', 'url')
         self.add_option_info_restart_required()
