@@ -8,11 +8,13 @@ THEME_PATH = os.path.join(RESOURCES_PATH, 'themes')
 BREEZE_ROOT = os.path.join(THEME_PATH, 'breeze')
 BREEZE_LIGHT = os.path.join(BREEZE_ROOT, 'light.qss')
 BREEZE_DARK = os.path.join(BREEZE_ROOT, 'dark.qss')
+BREEZE_LIGHT_WINDOWS_MOD = os.path.join(BREEZE_ROOT, 'light-windows-mod.qss')
+BREEZE_DARK_WINDOWS_MOD = os.path.join(BREEZE_ROOT, 'dark-windows-mod.qss')
 
-BREEZE_DARK_FILENAME = 'dark.qss'
-BREEZE_LIGHT_FILENAME = 'light.qss'
+THEMES_AVAILABLE = {'linux': [None, BREEZE_LIGHT, BREEZE_DARK],
+                    'windows': [None, BREEZE_LIGHT_WINDOWS_MOD, BREEZE_DARK_WINDOWS_MOD]
+                    }
 
-THEMES_LIST = [None, BREEZE_LIGHT, BREEZE_DARK]
 QSTYLES_AVAILABLE = {}
 qsf = QStyleFactory()
 # Populate the QStyle dict

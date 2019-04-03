@@ -1,4 +1,6 @@
 Current
+- Added in stock BreezeStyleSheets and made them load instead of the windows modded ones if you're on Linux. Also added
+  a missing README.md.
 - Added toolbar icon size modifier for use on High DPI displays.
 - Implemented actions and kwargs bindings in GenericLineEdit.
 - Tweaked Elided text modifier for video title to perfection (if text is bolded or otherwise it will cut off a little

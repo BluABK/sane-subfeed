@@ -38,7 +38,7 @@
 QToolTip
 {
     background-color: black;
-    color: black;
+    color: white;
     padding: 0.5ex;
 }
 
@@ -252,8 +252,7 @@ QMenu::icon
 
 QMenu::item
 {
-    /* padding: 0.5ex 3ex 0.5ex 3ex; */
-    padding: 0.5ex 3ex 0.5ex 10ex;
+    padding: 0.5ex 3ex 0.5ex 3ex;
     margin-left: 0.5ex;
     border: 0.1ex solid transparent; /* reserve space for selection border */
 }
@@ -1196,13 +1195,15 @@ QTreeView::branch:!has-children:!has-siblings:adjoins-item
 QTreeView::branch:has-children:!has-siblings:closed,
 QTreeView::branch:closed:has-children:has-siblings
 {
-    border-image: url(:/light/branch-closed.svg);
+    border-image: url(:/light/stylesheet-branch-end-closed.svg) 0;
+    image: url(:/light/branch_closed.svg);
 }
 
 QTreeView::branch:open:has-children:!has-siblings,
 QTreeView::branch:open:has-children:has-siblings
 {
-    border-image: url(:/light/branch-open.svg);
+    border-image: url(:/light/stylesheet-branch-end-open.svg) 0;
+    image: url(:/light/branch_open.svg);
 }
 
 QTableView::item,
@@ -1529,7 +1530,7 @@ QProgressBar:horizontal
     border: 0.1ex solid #EFF0F1;
     border-radius: 0.3ex;
     height: 0.5ex;
-    text-align: center;
+    text-align: right;
     margin-top: 0.5ex;
     margin-bottom: 0.5ex;
     margin-right: 5ex;
