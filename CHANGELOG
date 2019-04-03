@@ -1,4 +1,5 @@
 Current
+- Made youtube-dl an optional dependency, and removed tqdm entirely.
 - Added in stock BreezeStyleSheets and made them load instead of the windows modded ones if you're on Linux. Also added
   a missing README.md.
 - Added toolbar icon size modifier for use on High DPI displays.

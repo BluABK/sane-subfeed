@@ -120,7 +120,7 @@ class ConfigViewWidget(InputSuper):
                                                     self.root.setup_views],
                                  unchecked_kwargs=[{'tab': 'Download'}, None, None, None, None])
         self.add_option_line_edit('Elided channel title text modifier (title-width * modifier)',
-                                  'GridView', 'elided_text_modifier_title', cfg_validator=QDoubleValidator())
+                                  'GridView', 'elided_text_modifier_channel', cfg_validator=QDoubleValidator())
         self.add_option_line_edit('Elided video title text modifier (title-width * modifier)',
                                   'GridView', 'elided_text_modifier_title', cfg_validator=QDoubleValidator())
         self.add_option_line_edit('Elided date text modifier (title-width * modifier)',
@@ -232,19 +232,18 @@ class ConfigViewWidget(InputSuper):
         # Section [Youtube-dl]
         if 'youtube_dl' in sys.modules:
             self.add_option_checkbox('Use youtube-dl?', 'Youtube-dl', 'use_youtube_dl')
+            # Section [Youtube-dl_proxies]
+            _counter = 1
+            for proxy in get_options('Youtube-dl_proxies'):
+                self.add_option_line_edit('Geoblock proxy #{}'.format(_counter), 'Youtube-dl_proxies', proxy)
+                _counter += 1
         else:
             self.add_option_checkbox('Use youtube-dl?<br/>'
                                      '<b><font color=#EF6262>MODULE UNAVAILABLE! (Is it installed?)</font></b>',
                                      'Youtube-dl', 'use_youtube_dl', disabled=True)
 
-        # Section [Youtube-dl_proxies]
-        _counter = 1
-        for proxy in get_options('Youtube-dl_proxies'):
-            self.add_option_line_edit('Geoblock proxy #{}'.format(_counter), 'Youtube-dl_proxies', proxy)
-            _counter += 1
-
         # Section [Youtube-dl_opts]
-        if has_section('Youtube-dl_opts'):
+        if has_section('Youtube-dl_opts') and 'youtube_dl' in sys.modules:
             if len(get_options('Youtube-dl_opts')) > 0:
                 self.add_section('Youtube-DL options overrides (Config file only)')
                 for option in get_options('Youtube-dl_opts'):
