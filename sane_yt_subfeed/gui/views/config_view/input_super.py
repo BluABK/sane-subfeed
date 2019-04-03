@@ -71,8 +71,8 @@ class InputSuper(QWidget):
         :param cfg_option:
         :param cfg_section:
         :param description:
-        :param checked_action:   Function to call when box gets checked.
-        :param unchecked_action: Function to call when box gets unchecked.
+        :param checked_actions:   Function to call when box gets checked.
+        :param unchecked_actions: Function to call when box gets unchecked.
         :param checked_kwargs    Keyword arguments (dict) to send in checked action calls.
         :param unchecked_kwargs  Keyword arguments (dict) to send in unchecked action calls.
         :return:
@@ -89,17 +89,24 @@ class InputSuper(QWidget):
 
         return value  # Needed for connected listeners etc
 
-    def add_option_line_edit(self, description, cfg_section, cfg_option, cfg_validator=None):
+    def add_option_line_edit(self, description, cfg_section, cfg_option, cfg_validator=None, disabled=False,
+                             actions=None, actions_kwargs=None):
         """
         Add an option w/ text value to the ConfigView layout and increment the grid offset.
+        :param disabled: Sets disabled status if True.
         :param cfg_validator:
         :param cfg_option:
         :param cfg_section:
         :param description:
+        :param actions:   Function to call when line gets edited.
+        :param actions_kwargs    Keyword arguments (dict) to send in checked action calls.
         :return:
         """
         option = QLabel(description)
-        value = GenericLineEdit(self, description, cfg_section, cfg_option, cfg_validator=cfg_validator)
+        value = GenericLineEdit(self, description, cfg_section, cfg_option, cfg_validator=cfg_validator,
+                                actions=actions, actions_kwargs=actions_kwargs)
+        if disabled:
+            value.setDisabled(True)
         self.layout.addWidget(option, self.offset, 0)
         self.layout.addWidget(value, self.offset, 1)
         self.offset += 1
