@@ -30,11 +30,10 @@ class PlaybackGridViewThumbnailTile(ThumbnailTile):
         :return:
         """
         # Overlay conditions
-        url_as_path = read_config('Play', 'use_url_as_path')
         watched = read_config('GridView', 'show_watched') and self.parent.video.watched
         discarded = read_config('GridView', 'show_dismissed') and self.parent.video.discarded
 
-        if ((not self.parent.video.vid_path) and not url_as_path) or watched or discarded:
+        if (not self.parent.video.vid_path) or watched or discarded:
             if not self.parent.video.vid_path:
                 overlay = QPixmap(OVERLAY_NO_FILE_PATH)
             elif self.parent.video.watched:

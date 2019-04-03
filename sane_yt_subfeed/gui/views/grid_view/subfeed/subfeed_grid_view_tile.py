@@ -1,5 +1,6 @@
 import webbrowser
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QMenu, QApplication
 
 from sane_yt_subfeed.config_handler import read_config
@@ -38,15 +39,86 @@ class SubfeedGridViewTile(VideoTile):
         """
         # Context Menu
         menu = QMenu(self)
-        mark_as_live_content_submenu = QMenu(self)
-        mark_as_live_content_submenu.setTitle("Mark as liveBroadcastContent")
+
+        # FIXME: Add a loop that lets you define infinite players in config (see download proxy list method)
+        alternative_player1 = self.str_to_list(read_config('Player', 'alternative_player1', literal_eval=False))
+        alternative_player2 = self.str_to_list(read_config('Player', 'alternative_player2', literal_eval=False))
+        alternative_player3 = self.str_to_list(read_config('Player', 'alternative_player3', literal_eval=False))
+        alternative_player4 = self.str_to_list(read_config('Player', 'alternative_player4', literal_eval=False))
+        alternative_player5 = self.str_to_list(read_config('Player', 'alternative_player5', literal_eval=False))
+        alternative_player6 = self.str_to_list(read_config('Player', 'alternative_player6', literal_eval=False))
+        alternative_player7 = self.str_to_list(read_config('Player', 'alternative_player7', literal_eval=False))
+        alternative_player8 = self.str_to_list(read_config('Player', 'alternative_player8', literal_eval=False))
+        alternative_player9 = self.str_to_list(read_config('Player', 'alternative_player9', literal_eval=False))
+        alternative_player10 = self.str_to_list(read_config('Player', 'alternative_player10', literal_eval=False))
+        alternative_player1_action = None
+        alternative_player2_action = None
+        alternative_player3_action = None
+        alternative_player4_action = None
+        alternative_player5_action = None
+        alternative_player6_action = None
+        alternative_player7_action = None
+        alternative_player8_action = None
+        alternative_player9_action = None
+        alternative_player10_action = None
+
         copy_url_action = menu.addAction("Copy link")
         if read_config('Play', 'enabled'):
             downloaded_item_action = menu.addAction("Copy link and download")
         else:
             downloaded_item_action = 'DISABLED'
         discard_item_action = menu.addAction("Dismiss video")
+        watch_item_action = menu.addAction("Mark watched")
+        play_wo_action = menu.addAction("Play w/o mark watched")
 
+        if alternative_player1:
+            alternative_player1_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player1_name', literal_eval=False),
+                                    "Play with alternative player 1"))
+        if alternative_player2:
+            alternative_player2_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player2_name', literal_eval=False),
+                                    "Play with alternative player 2"))
+        if alternative_player3:
+            alternative_player3_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player3_name', literal_eval=False),
+                                    "Play with alternative player 3"))
+        if alternative_player4:
+            alternative_player4_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player4_name', literal_eval=False),
+                                    "Play with alternative player 4"))
+        if alternative_player5:
+            alternative_player5_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player5_name', literal_eval=False),
+                                    "Play with alternative player 5"))
+        if alternative_player6:
+            alternative_player6_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player6_name', literal_eval=False),
+                                    "Play with alternative player 6"))
+        if alternative_player7:
+            alternative_player7_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player7_name', literal_eval=False),
+                                    "Play with alternative player 7"))
+        if alternative_player8:
+            alternative_player8_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player8_name', literal_eval=False),
+                                    "Play with alternative player 8"))
+        if alternative_player9:
+            alternative_player9_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player9_name', literal_eval=False),
+                                    "Play with alternative player 9"))
+        if alternative_player10:
+            alternative_player10_action = menu.addAction(
+                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player10_name', literal_eval=False),
+                                    "Play with alternative player 10"))
+
+        url_player_action = menu.addAction(
+            self.determine_name(read_config('PlayerFriendlyName', 'url_player_name', literal_eval=False),
+                                "Open in web browser"))
+
+        # Submenu
+        mark_as_live_content_submenu = QMenu(self)
+        mark_as_live_content_submenu.setTitle("Mark as liveBroadcastContent")
         menu.addMenu(mark_as_live_content_submenu)
         mark_premiere_action = mark_as_live_content_submenu.addAction("Mark as Premiere")
         mark_livestream_upcoming_action = mark_as_live_content_submenu.addAction("Mark as Scheduled livestream")
@@ -69,6 +141,33 @@ class SubfeedGridViewTile(VideoTile):
             self.mark_downloaded()
         elif action == discard_item_action:
             self.mark_discarded()
+        elif action == watch_item_action:
+            self.mark_watched()
+        elif action == play_wo_action:
+            self.open_in_player(self.video.url_video, mark_watched=False, isfile=False)
+        elif action == alternative_player1_action and alternative_player1_action:
+            self.open_in_player(self.video.url_video, player=alternative_player1, isfile=False)
+        elif action == alternative_player2_action and alternative_player2_action:
+            self.open_in_player(self.video.url_video, player=alternative_player2, isfile=False)
+        elif action == alternative_player3_action and alternative_player3_action:
+            self.open_in_player(self.video.url_video, player=alternative_player3, isfile=False)
+        elif action == alternative_player4_action and alternative_player4_action:
+            self.open_in_player(self.video.url_video, player=alternative_player4, isfile=False)
+        elif action == alternative_player5_action and alternative_player5_action:
+            self.open_in_player(self.video.url_video, player=alternative_player5, isfile=False)
+        elif action == alternative_player6_action and alternative_player6_action:
+            self.open_in_player(self.video.url_video, player=alternative_player6, isfile=False)
+        elif action == alternative_player7_action and alternative_player7_action:
+            self.open_in_player(self.video.url_video, player=alternative_player7, isfile=False)
+        elif action == alternative_player8_action and alternative_player8_action:
+            self.open_in_player(self.video.url_video, player=alternative_player8, isfile=False)
+        elif action == alternative_player9_action and alternative_player9_action:
+            self.open_in_player(self.video.url_video, player=alternative_player9, isfile=False)
+        elif action == alternative_player10_action and alternative_player10_action:
+            self.open_in_player(self.video.url_video, player=alternative_player10, isfile=False)
+        elif action == url_player_action:
+            self.open_in_browser()
+
         elif action == mark_premiere_action:
             self.mark_premiere()
         elif action == mark_livestream_upcoming_action:
@@ -97,47 +196,41 @@ class SubfeedGridViewTile(VideoTile):
             if action == debug_log_video_obj:
                 self.logger.debug(self.video.__dict__)
 
-    def mousePressEvent(self, QMouseEvent):
+    def mousePressEvent(self, event: QMouseEvent):
         """
         Override mousePressEvent to support mouse button actions
-        :param QMouseEvent:
-        :return:
-        """
-        mouse_press_bind = read_config('SubFeed', 'left_mouse_action', literal_eval=False)
-
-        if mouse_press_bind == MOUSE_PRESS_OPEN_URL:
-            webbrowser.open_new_tab(self.video.url_video)
-            self.mark_watched()
-        elif mouse_press_bind == MOUSE_PRESS_COPY_URL:
-            self.copy_url()
-            self.mark_watched()
-        elif mouse_press_bind == MOUSE_PRESS_PLAY_URL:
-            url_player = self.str_to_list(read_config('Player', 'url_player', literal_eval=False))
-            self.play_vid(self.video.url_video, url_player)
-        elif mouse_press_bind == MOUSE_PRESS_DOWNLOAD:
-            self.mouse_press_dl(QMouseEvent)
-        elif mouse_press_bind == MOUSE_PRESS_DOWNLOAD_AND_COPY:
-            self.copy_url()
-            self.mouse_press_dl(QMouseEvent)
-
-    def mouse_press_dl(self, QMouseEvent):
-        """
-        Download video on mousePressEvent
-        :param QMouseEvent:
+        :param event:
         :return:
         """
         if self.video.kind == VIDEO_KIND_VOD:
-            if QMouseEvent.button() == Qt.MidButton:
-                self.mark_discarded()
-            elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
+            if event.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
                 self.logger.error("Not Implemented: Select video")
-            elif QMouseEvent.button() == Qt.LeftButton:
-                self.mark_downloaded()
+            elif event.button() == Qt.LeftButton:
+                left_button_rebind = read_config('SubFeed', 'left_mouse_action', literal_eval=False)
+
+                if left_button_rebind == MOUSE_PRESS_OPEN_URL:
+                    self.open_in_browser()
+                elif left_button_rebind == MOUSE_PRESS_COPY_URL:
+                    self.copy_url(mark_watched=True)
+                elif left_button_rebind == MOUSE_PRESS_PLAY_URL:
+                    url_player = self.str_to_list(read_config('Player', 'default_player', literal_eval=False))
+                    self.open_in_player(self.video.url_video, url_player)
+                elif left_button_rebind == MOUSE_PRESS_DOWNLOAD:
+                    self.mark_downloaded()
+                elif left_button_rebind == MOUSE_PRESS_DOWNLOAD_AND_COPY:
+                    self.copy_url()
+                    self.mark_downloaded()
+
+            elif event.button() == Qt.MidButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
+                self.decrease_prio()
+            elif event.button() == Qt.MidButton:
+                self.mark_discarded()
+
         elif self.video.kind == VIDEO_KIND_LIVE or self.video.kind == VIDEO_KIND_LIVE_SCHEDULED \
                 or self.video.kind == VIDEO_KIND_PREMIERE:
-            if QMouseEvent.button() == Qt.MidButton:
+            if event.button() == Qt.MidButton:
                 self.mark_discarded()
-            elif QMouseEvent.button() == Qt.LeftButton:
+            elif event.button() == Qt.LeftButton:
                 self.root.confirmation_dialog(VIDEO_IS_LIVE_MSG, self.mark_downloaded, title=VIDEO_IS_LIVE_TITLE,
                                               ok_text="Yes, stream it.",
                                               cancel_text="Abort, abort, ABORT!")

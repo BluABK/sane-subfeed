@@ -1,4 +1,17 @@
 Current
+- Moved get_default_player from playback to super (VideoTile).
+- Cleaned up keyboard modifiers code a bit.
+- Fixed bad function signatures.
+- Made player an optional kwarg in open_in_player()
+- Refactored some strings.
+- Deprecated and deleted config_play_video function.
+- Made Subfeed context menu options on par with Playback's (alt players etc, mark watched, play w/o mark watched, etc...).
+- Fixed buggy implementation of mousePressEvent in Subfeed that listened to *all* mouse events, not just LeftButton (whoops!).
+- Added Playback's MidButton decrease_prio/mark_downloaded functionality to Subfeed.
+- Created a function open_in_browser that properly opens a url in the web browser.
+- Added some pydoc here and there.
+- Made open_in_player compatible with being served URLs as well as file paths.
+- Deprecated and deleted 'use_url_as_path' config hotfix.
 - Added "restart may be required" signifier to config options w/o bindings.
 - Fixed bug where timedelta years weren't subtracted by 10 when showing decades.
 - Made youtube-dl an optional dependency, and removed tqdm entirely.

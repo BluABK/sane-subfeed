@@ -107,7 +107,6 @@ DEFAULTS = {
         'enabled': 'False',
         'yt_file_path': "",
         'disable_dir_listener': 'False',
-        'use_url_as_path': 'False',
         'default_watch_prio': '10'
     },
     'Youtube-dl': {
