@@ -56,7 +56,8 @@ DEFAULTS = {
         'keep_thumb_ar': 'True',
         'enable_auto_copy_to_clipboard': 'False',
         'bgcolor': "",
-        'darkmode_icons': 'False'
+        'darkmode_icons': 'False',
+        'toolbar_icon_size_modifier': '1'
     },
     'Theme': {
         'last_style': "",

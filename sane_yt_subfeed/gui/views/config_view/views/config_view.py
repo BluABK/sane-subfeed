@@ -95,6 +95,9 @@ class ConfigViewWidget(InputSuper):
         self.add_option_button('Clear bgcolor', 'Clears the background color setting ', 'Gui', 'bgcolor',
                                tooltip='(required due to validator shenanigans)', clear=True)
         self.add_option_checkbox('Use darkmode icon set', 'Gui', 'darkmode_icons')
+        self.add_option_line_edit('Toolbar icon size modifier (Useful on High DPI displays)',
+                                  'Gui', 'toolbar_icon_size_modifier', actions=[self.root.update_toolbar_size,
+                                                                                self.root.respawn_menubar_and_toolbar])
 
     def add_config_tab_views(self):
         # Section [GridView]
