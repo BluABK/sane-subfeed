@@ -226,10 +226,9 @@ def resize_thumbnail(img_path, maxwidth, maxheight, out=True):
     """
     if img_path is None:
         img_path = THUMBNAIL_NA_PATH
-        # if out:
-        #     return Image.open(os.path.join(OS_PATH, '..', 'resources', 'quality404.jpg'))
-        # else:
-        #     return os.path.join(OS_PATH, '..', 'resources', 'quality404.jpg')
+    outdir = os.path.join(THUMBNAILS_PATH, 'resized')
+    if not os.path.isdir(outdir):
+        os.makedirs(outdir)
 
     im = Image.open(img_path)
     resize_ratio = min(maxwidth / im.width, maxheight / im.height)
@@ -237,7 +236,7 @@ def resize_thumbnail(img_path, maxwidth, maxheight, out=True):
     try:
         im.thumbnail(new_size, Image.BICUBIC)
         if out:
-            outfile_path = os.path.join(THUMBNAILS_PATH, 'resized', img_path[-15:])
+            outfile_path = os.path.join(outdir, img_path[-15:])
             im.save(outfile_path)
             return outfile_path
         elif out is False:

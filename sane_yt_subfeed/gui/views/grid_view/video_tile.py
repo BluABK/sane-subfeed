@@ -293,7 +293,7 @@ class VideoTile(QWidget):
                 thumb_height = read_config('Gui', 'tooltip_picture_height')
                 resized_thumb = resize_thumbnail(self.video.thumbnail_path, thumb_width, thumb_height)
 
-                self.setToolTip("<{} style='text-align:center;'><img src={} style='float:below'>{}: {}</{}>".format(
+                self.setToolTip("<{} style='text-align:center;'><img src={} style='float:below'><br/>{}: {}</{}>".format(
                     text_element, resized_thumb, self.video.channel_title, self.video.title, text_element))
             else:
                 self.setToolTip("{}: {}".format(self.video.channel_title, self.video.title))

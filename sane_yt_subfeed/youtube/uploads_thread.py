@@ -78,7 +78,7 @@ class GetUploadsThread(threading.Thread):
                 self.videos.extend(return_videos)
 
             else:
-                use_playlist_items = read_config('Debug', 'use_playlistItems')
+                use_playlist_items = read_config('Debug', 'use_playlistitems')
                 if use_playlist_items:
                     list_uploaded_videos(self.youtube, self.videos, self.playlist_id, self.list_pages)
                 else:
