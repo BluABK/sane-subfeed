@@ -1,7 +1,5 @@
 import datetime
 import threading
-from timeit import default_timer
-from tqdm import tqdm
 
 from sane_yt_subfeed.settings import mutable_settings
 from sane_yt_subfeed.controller.controller import Controller
@@ -56,15 +54,13 @@ def run_channels_test():
     test_threads = []
     results = []
     logger.info("Channels Test: Starting miss and pages tests")
-    for subscription, youtube_key in tqdm(zip(subscriptions, youtube_keys),
-                                          desc="Starting miss and pages tests",
-                                          total=len(subscriptions)):
+    for subscription, youtube_key in (subscriptions, youtube_keys):
         test = RunTestsThreaded(subscription, youtube_key, results)
         test.start()
         test_threads.append(test)
 
     logger.info("Channels Test: Waiting for test threads")
-    for thread in tqdm(test_threads, desc="Waiting for test threads"):
+    for thread in test_threads:
         thread.join()
 
     for result in results:

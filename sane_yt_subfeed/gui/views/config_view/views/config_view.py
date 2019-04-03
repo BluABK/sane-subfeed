@@ -195,7 +195,6 @@ class ConfigViewWidget(InputSuper):
         self.add_option_line_edit('Channel limit', 'Debug', 'channels_limit', cfg_validator=QIntValidator())
         self.add_option_checkbox('Use playlistItems', 'Debug', 'use_playlistitems')
         self.add_option_checkbox('Disable tooltips', 'Debug', 'disable_tooltips')
-        self.add_option_checkbox('Disable tqdm (cli)', 'Debug', 'disable_tqdm')
         self.add_option_checkbox('Show channel grab methods', 'Debug', 'show_grab_method')
         self.add_option_checkbox('Show unimplemented GUI elements', 'Debug', 'show_unimplemented_gui')
         self.add_option_checkbox('Display all Exceptions', 'Debug', 'display_all_exceptions')

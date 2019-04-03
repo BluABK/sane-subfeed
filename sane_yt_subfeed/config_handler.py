@@ -34,7 +34,6 @@ DEFAULTS = {
         'start_with_stored_videos': 'False',
         'channels_limit': '-1',
         'use_playlistitems': 'True',
-        'disable_tqdm': 'True',
         'disable_tooltips': 'False',
         'show_grab_method': 'False',
         'show_unimplemented_gui': 'False',

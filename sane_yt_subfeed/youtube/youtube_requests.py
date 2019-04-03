@@ -1,6 +1,5 @@
 from googleapiclient.errors import HttpError
 from sqlalchemy import or_
-from tqdm import tqdm
 
 from sane_yt_subfeed.authentication import youtube_auth_oauth
 from sane_yt_subfeed.config_handler import read_config
@@ -302,8 +301,7 @@ def get_remote_subscriptions(youtube_oauth):
         subscription_list_response = subscription_list_request.execute()
 
         # Grab information about each subscription page
-        for page in tqdm(subscription_list_response['items'], desc="Adding and updating channels by page",
-                         disable=read_config('Debug', 'disable_tqdm')):
+        for page in subscription_list_response['items']:
             # Get channel
             channel_response = channels_list(youtube_oauth, part='contentDetails',
                                              id=page['snippet']['resourceId']['channelId'])
