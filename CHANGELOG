@@ -1,4 +1,5 @@
 Current
+- Made config inform about which options require restart. Also: rearranged some options.
 - Fixed broken thumbnail tooltip feature.
 - Moved get_default_player from playback to super (VideoTile).
 - Cleaned up keyboard modifiers code a bit.

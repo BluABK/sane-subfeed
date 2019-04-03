@@ -163,10 +163,11 @@ class InputSuper(QWidget):
         # Only increment offset if widgets were actually added
         self.offset += 1
 
-    def add_option_combobox(self, description, cfg_section, cfg_option, items, restart_check=True):
+    def add_option_combobox(self, description, cfg_section, cfg_option, items, restart_check=True, disabled=False):
         """
         Add an option w/ value to the ConfigView layout and increment the grid offset.
-        :param restart_check: If set to false, don't check if a restart (may) be required for this option.
+        :param disabled:        Sets disabled status if True.
+        :param restart_check:   If set to false, don't check if a restart (may) be required for this option.
         :param items:
         :param cfg_option:
         :param cfg_section:
@@ -180,6 +181,8 @@ class InputSuper(QWidget):
             description = "{} {}".format(description, RESTART_REQUIRED_SIGNIFIER)
         option = QLabel(description)
         value = GenericConfigComboBox(self, description, cfg_section, cfg_option, formated_items)
+        if disabled:
+            value.setDisabled(True)
         self.layout.addWidget(option, self.offset, 0)
         self.layout.addWidget(value, self.offset, 1)
         self.offset += 1
