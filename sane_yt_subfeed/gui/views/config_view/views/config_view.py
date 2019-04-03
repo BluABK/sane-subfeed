@@ -1,4 +1,6 @@
 # PyQt5
+import sys
+
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QIntValidator, QDoubleValidator, QRegExpValidator
 
@@ -229,7 +231,12 @@ class ConfigViewWidget(InputSuper):
 
     def add_config_tab_download(self):
         # Section [Youtube-dl]
-        self.add_option_checkbox('Use youtube-dl?', 'Youtube-dl', 'use_youtube_dl')
+        if 'youtube_dl' in sys.modules:
+            self.add_option_checkbox('Use youtube-dl?', 'Youtube-dl', 'use_youtube_dl')
+        else:
+            self.add_option_checkbox('Use youtube-dl?<br/>'
+                                     '<b><font color=#EF6262>MODULE UNAVAILABLE! (Is it installed?)</font></b>',
+                                     'Youtube-dl', 'use_youtube_dl', disabled=True)
 
         # Section [Youtube-dl_proxies]
         _counter = 1
