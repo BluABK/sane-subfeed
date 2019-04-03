@@ -213,11 +213,11 @@ class VideoTile(QWidget):
                 # Update years in relation to decade
                 d['yd'] = d['yd'] - 10
                 d['ydyd'] = "{0:02d}".format(abs(d['yd']))
-            elif int(abs(tdelta.years)) > 1:
+            elif int(abs(tdelta.years)) > 0:
                 fmt = read_config('GridView', 'timedelta_format_years', literal_eval=False)
-            elif int(abs(tdelta.months)) > 1:
+            elif int(abs(tdelta.months)) > 0:
                 fmt = read_config('GridView', 'timedelta_format_months', literal_eval=False)
-            elif int(abs(tdelta.days)) > 1:
+            elif int(abs(tdelta.days)) > 0:
                 fmt = read_config('GridView', 'timedelta_format_days', literal_eval=False)
             else:
                 fmt = read_config('GridView', 'timedelta_format', literal_eval=False)
