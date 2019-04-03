@@ -9,8 +9,7 @@ from sane_yt_subfeed.config_handler import get_options, read_config, has_section
 from sane_yt_subfeed.gui.views.config_view.config_item_types import THUMBNAIL_QUALITIES, TT_FONT_SIZES, \
     LEFT_MOUSE_ACTIONS
 from sane_yt_subfeed.gui.views.config_view.input_super import InputSuper
-
-HEXADECIMAL_COLOR_REGEX = '^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$'
+from sane_yt_subfeed.constants import HEXADECIMAL_COLOR_REGEX
 
 
 class ConfigViewWidget(InputSuper):
@@ -100,6 +99,7 @@ class ConfigViewWidget(InputSuper):
         self.add_option_line_edit('Toolbar icon size modifier (Useful on High DPI displays)',
                                   'Gui', 'toolbar_icon_size_modifier', actions=[self.root.update_toolbar_size,
                                                                                 self.root.respawn_menubar_and_toolbar])
+        self.add_option_info_restart_required()
 
     def add_config_tab_views(self):
         # Section [GridView]
@@ -188,6 +188,7 @@ class ConfigViewWidget(InputSuper):
             self.add_section('{}Playback feed (sorting){}'.format(self.deco_l, self.deco_r))
             self.add_option_checkbox('Sort by ascending date', 'PlaySort', 'ascending_date')
             self.add_option_checkbox('Sort by channel', 'PlaySort', 'by_channel')
+        self.add_option_info_restart_required()
 
     def add_config_tab_debug(self):
         self.add_option_checkbox('Cache subscriptions', 'Debug', 'cached_subs')
@@ -198,10 +199,12 @@ class ConfigViewWidget(InputSuper):
         self.add_option_checkbox('Show channel grab methods', 'Debug', 'show_grab_method')
         self.add_option_checkbox('Show unimplemented GUI elements', 'Debug', 'show_unimplemented_gui')
         self.add_option_checkbox('Display all Exceptions', 'Debug', 'display_all_exceptions')
+        self.add_option_info_restart_required()
 
     def add_config_tab_model(self):
         self.add_option_line_edit('Videos to load by default', 'Model', 'loaded_videos',
                                   cfg_validator=QIntValidator())
+        self.add_option_info_restart_required()
 
     def add_config_tab_requests(self):
         self.add_option_checkbox('Use tests', 'Requests', 'use_tests')
@@ -214,6 +217,7 @@ class ConfigViewWidget(InputSuper):
                                   cfg_validator=QIntValidator())
         self.add_option_line_edit('Filter videos older than (days)', 'Requests', 'filter_videos_days_old',
                                   cfg_validator=QIntValidator())
+        self.add_option_info_restart_required()
 
     def add_config_tab_thumbnails(self):
         self.add_option_checkbox('Force download best quality, based on prioritised list',
@@ -223,10 +227,12 @@ class ConfigViewWidget(InputSuper):
         self.add_option_combobox('3. Priority', 'Thumbnails', '2', THUMBNAIL_QUALITIES)
         self.add_option_combobox('4. Priority', 'Thumbnails', '3', THUMBNAIL_QUALITIES)
         self.add_option_combobox('5. Priority', 'Thumbnails', '4', THUMBNAIL_QUALITIES)
+        self.add_option_info_restart_required()
 
     def add_config_tab_threading(self):
         self.add_option_line_edit('Image/thumbnail download thread limit', 'Threading', 'img_threads',
                                   cfg_validator=QIntValidator())
+        self.add_option_info_restart_required()
 
     def add_config_tab_download(self):
         # Section [Youtube-dl]
@@ -255,6 +261,7 @@ class ConfigViewWidget(InputSuper):
         self.add_option_checkbox('Prefer ffmpeg?', 'Postprocessing', 'prefer_ffmpeg')
         self.add_option_line_edit('ffmpeg location', 'Postprocessing', 'ffmpeg_location')
         self.add_option_checkbox('Embed metadata?', 'Postprocessing', 'embed_metadata')
+        self.add_option_info_restart_required()
 
     def add_config_tab_mediaplayer(self):
         # Section [Player]
@@ -268,9 +275,11 @@ class ConfigViewWidget(InputSuper):
             if "alternative_player" in alt_player:
                 self.add_option_line_edit('Alternative Player #{}'.format(_counter), 'Player', alt_player)
                 _counter += 1
+        self.add_option_info_restart_required()
 
     def add_config_tab_default_apps(self):
         self.add_option_line_edit('Image viewer', 'DefaultApp', 'Image')
+        self.add_option_info_restart_required()
 
     def add_config_tab_logging(self):
         self.add_option_checkbox('Use socket instead of file', 'Logging', 'use_socket_log')
@@ -285,6 +294,7 @@ class ConfigViewWidget(InputSuper):
         self.add_option_info('0\t NOT SET', None)
         self.add_option_line_edit('Log level', 'Logging', 'log_level', cfg_validator=QIntValidator())
         self.add_option_line_edit('Port', 'Logging', 'logging_port', cfg_validator=QIntValidator())
+        self.add_option_info_restart_required()
 
     def add_config_tab_advanced(self):
         self.add_option_checkbox('Launch GUI', 'Gui', 'launch_gui', disabled=True)
@@ -295,3 +305,4 @@ class ConfigViewWidget(InputSuper):
                                  unchecked_actions=[self.config_view_tabs.del_tab,
                                                     self.root.respawn_menubar_and_toolbar],
                                  unchecked_kwargs=[{'tab': 'Debug'}, None])
+        self.add_option_info_restart_required()
