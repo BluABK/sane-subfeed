@@ -1,4 +1,5 @@
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QApplication, QMenu
 
 from sane_yt_subfeed.config_handler import read_config
@@ -20,35 +21,20 @@ class PlaybackGridViewTile(VideoTile):
     def init_thumbnail_tile(self):
         return PlaybackGridViewThumbnailTile(self)
 
-    def mousePressEvent(self, QMouseEvent):  # FIXME: Make mouse hotkeys based on hotkeys.ini
+    def mousePressEvent(self, event: QMouseEvent):  # FIXME: Make mouse hotkeys based on hotkeys.ini
         """
         Override mousePressEvent to support mouse button actions
-        :param QMouseEvent:
+        :param event:
         :return:
         """
-        if QMouseEvent.button() == Qt.MidButton:
+        if event.button() == Qt.MidButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
             self.decrease_prio()
-        elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ControlModifier:
-            self.decrease_prio()
-        elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.AltModifier:
+        elif event.button() == Qt.MidButton:
             self.mark_discarded()
-        elif QMouseEvent.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ShiftModifier:
-            self.config_play_video(self.video.vid_path, self.get_default_player(), mark_watched=False)
-        elif QMouseEvent.button() == Qt.LeftButton:
-            self.config_play_video(self.video.vid_path, self.get_default_player())
-
-    def get_default_player(self):
-        config_default_player = self.str_to_list(read_config('Player', 'default_player', literal_eval=False))
-        if config_default_player:
-            return config_default_player
-        else:
-            return None
-
-    def config_play_video(self, file_path, player, mark_watched=True):
-        if read_config('Play', 'use_url_as_path'):
-            file_path = self.video.url_video
-            player = read_config('Player', 'url_player', literal_eval=False)
-        self.play_vid(file_path, player, mark_watched=mark_watched)
+        if event.button() == Qt.LeftButton and QApplication.keyboardModifiers() == Qt.ShiftModifier:
+            self.open_in_player(self.video.vid_path, mark_watched=False)
+        elif event.button() == Qt.LeftButton:
+            self.open_in_player(self.video.vid_path)
 
     def contextMenuEvent(self, event):
         """
@@ -69,7 +55,6 @@ class PlaybackGridViewTile(VideoTile):
         alternative_player8 = self.str_to_list(read_config('Player', 'alternative_player8', literal_eval=False))
         alternative_player9 = self.str_to_list(read_config('Player', 'alternative_player9', literal_eval=False))
         alternative_player10 = self.str_to_list(read_config('Player', 'alternative_player10', literal_eval=False))
-        url_player = self.str_to_list(read_config('Player', 'url_player', literal_eval=False))
         alternative_player1_action = None
         alternative_player2_action = None
         alternative_player3_action = None
@@ -129,10 +114,10 @@ class PlaybackGridViewTile(VideoTile):
 
         url_player_action = menu.addAction(
             self.determine_name(read_config('PlayerFriendlyName', 'url_player_name', literal_eval=False),
-                                "Play with url player"))
+                                "Open in web browser"))
 
         if not self.video.vid_path:
-            download_video = menu.addAction("Download video")
+            download_video = menu.addAction("Re-download missing video")
         else:
             download_video = None
 
@@ -143,6 +128,7 @@ class PlaybackGridViewTile(VideoTile):
             menu.addSeparator()
             debug_log_video_obj = menu.addAction("Send to logger")
 
+        # Context menu action logic
         action = menu.exec_(self.mapToGlobal(event.pos()))
         if action == copy_url_action:
             self.copy_url()
@@ -151,29 +137,29 @@ class PlaybackGridViewTile(VideoTile):
         elif action == watch_item_action:
             self.mark_watched()
         elif action == play_wo_action:
-            self.config_play_video(self.video.vid_path, self.get_default_player(), mark_watched=False)
+            self.open_in_player(self.video.vid_path, mark_watched=False)
         elif action == alternative_player1_action and alternative_player1_action:
-            self.play_vid(self.video.vid_path, alternative_player1)
+            self.open_in_player(self.video.vid_path, player=alternative_player1)
         elif action == alternative_player2_action and alternative_player2_action:
-            self.play_vid(self.video.vid_path, alternative_player2)
+            self.open_in_player(self.video.vid_path, player=alternative_player2)
         elif action == alternative_player3_action and alternative_player3_action:
-            self.play_vid(self.video.vid_path, alternative_player3)
+            self.open_in_player(self.video.vid_path, player=alternative_player3)
         elif action == alternative_player4_action and alternative_player4_action:
-            self.play_vid(self.video.vid_path, alternative_player4)
+            self.open_in_player(self.video.vid_path, player=alternative_player4)
         elif action == alternative_player5_action and alternative_player5_action:
-            self.play_vid(self.video.vid_path, alternative_player5)
+            self.open_in_player(self.video.vid_path, player=alternative_player5)
         elif action == alternative_player6_action and alternative_player6_action:
-            self.play_vid(self.video.vid_path, alternative_player6)
+            self.open_in_player(self.video.vid_path, player=alternative_player6)
         elif action == alternative_player7_action and alternative_player7_action:
-            self.play_vid(self.video.vid_path, alternative_player7)
+            self.open_in_player(self.video.vid_path, player=alternative_player7)
         elif action == alternative_player8_action and alternative_player8_action:
-            self.play_vid(self.video.vid_path, alternative_player8)
+            self.open_in_player(self.video.vid_path, player=alternative_player8)
         elif action == alternative_player9_action and alternative_player9_action:
-            self.play_vid(self.video.vid_path, alternative_player9)
+            self.open_in_player(self.video.vid_path, player=alternative_player9)
         elif action == alternative_player10_action and alternative_player10_action:
-            self.play_vid(self.video.vid_path, alternative_player10)
+            self.open_in_player(self.video.vid_path, player=alternative_player10)
         elif action == url_player_action:
-            self.play_vid(self.video.url_video, url_player)
+            self.open_in_browser()
         elif download_video and action == download_video:
             self.mark_downloaded()
         elif action == open_thumbnail_file:
@@ -188,7 +174,7 @@ class PlaybackGridViewTile(VideoTile):
             if action == debug_log_video_obj:
                 self.logger.debug(self.video.__dict__)
 
-    def color_old_video(self, vid_age):
+    def color_old_video(self, vid_age, days=1):
         pass
 
     def mark_discarded(self):

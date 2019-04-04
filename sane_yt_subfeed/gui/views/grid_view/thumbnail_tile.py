@@ -21,8 +21,6 @@ class ThumbnailTile(QLabel):
 
         margins = self.parent.layout.getContentsMargins()
         self.setFixedSize(self.parent.width() - margins[0] - margins[2], (self.parent.height() - 4 * margins[3]) * 0.6)
-        # self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        # self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
     def setPixmap(self, p):
         """

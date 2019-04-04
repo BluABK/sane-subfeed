@@ -34,11 +34,11 @@ DEFAULTS = {
         'start_with_stored_videos': 'False',
         'channels_limit': '-1',
         'use_playlistitems': 'True',
-        'disable_tqdm': 'True',
         'disable_tooltips': 'False',
         'show_grab_method': 'False',
         'show_unimplemented_gui': 'False',
-        'display_all_exceptions': 'False'
+        'display_all_exceptions': 'False',
+        'color_tile_elements': 'False'
     },
     'Gui': {
         'launch_gui': 'True',
@@ -56,7 +56,8 @@ DEFAULTS = {
         'keep_thumb_ar': 'True',
         'enable_auto_copy_to_clipboard': 'False',
         'bgcolor': "",
-        'darkmode_icons': 'False'
+        'darkmode_icons': 'False',
+        'toolbar_icon_size_modifier': '1'
     },
     'Theme': {
         'last_style': "",
@@ -65,10 +66,17 @@ DEFAULTS = {
     'GridView': {
         'show_watched': 'False',
         'show_dismissed': 'False',
-        'title_tile_pixel_size': '0.40',
-        'elided_text_modifier_title': '1.75',
+        'elided_text_modifier_title': '0.87',
+        'title_tile_pixel_size_modifier': '0.29',
         'elided_text_modifier_channel': '0.95',
+        'title_tile_max_height_modifier': '0.21',
+        'channel_title_tile_pixel_size_modifier': '0.85',
+        'channel_title_tile_max_height_modifier': '0.08',
         'elided_text_modifier_date': '0.95',
+        'date_tile_pixel_size_modifier': '0.85',
+        'date_tile_max_height_modifier': '0.08',
+        'title_tile_font_weight': 'Bold',
+        'elided_text_unicode_weight_modifier': '0.0075',
         'timedelta_format': '$HH:$MM:$SS ago',
         'timedelta_format_days': '$d days, $HH:$MM:$SS ago',
         'timedelta_format_months': '$m months, $d d, $HH:$MM:$SS ago',
@@ -107,7 +115,6 @@ DEFAULTS = {
         'enabled': 'False',
         'yt_file_path': "",
         'disable_dir_listener': 'False',
-        'use_url_as_path': 'False',
         'default_watch_prio': '10'
     },
     'Youtube-dl': {
@@ -163,8 +170,7 @@ DEFAULTS = {
         'logging_port': '19996'
     },
     'Database': {
-        'type': 'sqlite:///',
-        'location': os.path.join(OS_PATH, 'resources', 'permanents.db')
+        'url': 'sqlite:///{}'.format(os.path.join(OS_PATH, 'resources', 'permanents.db'))
     }
 }
 
@@ -211,9 +217,9 @@ if not os.path.exists(SAMPLE_PATH):
     config_sample_parser = ConfigParser()
     for section in DEFAULTS:
         if section == 'Database':
-            # Mask database location so it's not included in sample ini file
+            # Mask database path so it's not included in sample ini file
             modified_section = copy.deepcopy(DEFAULTS[section])
-            modified_section['location'] = '<path>/permanents.db'
+            modified_section['url'] = 'sqlite:///<path>/permanents.db'
             config_sample_parser[section] = modified_section
         else:
             config_sample_parser[section] = DEFAULTS[section]

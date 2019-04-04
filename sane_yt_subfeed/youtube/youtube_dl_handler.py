@@ -3,16 +3,22 @@ from __future__ import unicode_literals
 import datetime
 import os
 import threading
-from youtube_dl import YoutubeDL
-from youtube_dl.utils import DownloadError
 
-from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.config_handler import read_config, get_options
-from sane_yt_subfeed.postprocessor.ffmpeg import SaneFFmpegPostProcessor, SaneFFmpegMetadataPP, SaneFFmpegMergerPP, \
-    SaneFFmpegPostProcessorError
-
+from sane_yt_subfeed import create_logger
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 logger = create_logger(__name__)
+try:
+    YOUTUBE_DL_AVAILABLE = True
+    from youtube_dl import YoutubeDL
+    from youtube_dl.utils import DownloadError
+    from sane_yt_subfeed.postprocessor.ffmpeg import \
+        SaneFFmpegPostProcessor, SaneFFmpegMetadataPP, SaneFFmpegMergerPP, SaneFFmpegPostProcessorError
+
+except ModuleNotFoundError as module_exc:
+    YOUTUBE_DL_AVAILABLE = False
+
+
 
 VIDEO_FORMATS = ['mp4', 'flv', 'ogg', 'webm', 'mkv', 'avi', 'ts']
 AUDIO_MERGE_FAILS = ["Could not write header for output file #0 (incorrect codec parameters ?): Invalid argument",
@@ -48,6 +54,9 @@ class MyLogger(object):
 # FIXME: because of formating string, for channel, it can't do batch dl
 class YoutubeDownload(threading.Thread):
     def __init__(self, video, threading_event, finished_listeners=None, download_progress_listener=None):
+        if not YOUTUBE_DL_AVAILABLE:
+            logger.error("Youtube-DL handler was called, but no youtube_dl module exists, aborting init!")
+            return
         threading.Thread.__init__(self)
         logger.debug("Created thread")
         self.video = video

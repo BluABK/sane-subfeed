@@ -9,7 +9,8 @@ import traceback
 import json
 from PyQt5.QtCore import QFile, QTextStream, QRegExp
 from PyQt5.QtGui import QIcon, QRegExpValidator
-from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QStackedWidget, QStyleFactory, QFileDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QStackedWidget, QStyleFactory, QFileDialog, QStyle, \
+    QProxyStyle
 from subprocess import check_output
 
 # Project internal libs
@@ -30,7 +31,7 @@ from sane_yt_subfeed.gui.main_window.db_state import DbStateIcon
 from sane_yt_subfeed.gui.main_window.toolbar import Toolbar
 from sane_yt_subfeed.gui.main_window.toolbar_action import SaneToolBarAction
 from sane_yt_subfeed.gui.themes import themes
-from sane_yt_subfeed.gui.themes.themes import THEMES_LIST, QSTYLES_AVAILABLE
+from sane_yt_subfeed.gui.themes.themes import THEMES_AVAILABLE, QSTYLES_AVAILABLE
 from sane_yt_subfeed.gui.views.about_view.about_view import AboutView
 from sane_yt_subfeed.gui.views.config_view.config_view_tabs import ConfigViewTabs
 from sane_yt_subfeed.gui.views.config_view.config_window import ConfigWindow
@@ -101,6 +102,18 @@ ABOUT_ICON = 'about.png'
 QMAINWINDOW_DIMENSIONS = [770, 700]
 
 
+class EnbiggenedToolbarStyle(QProxyStyle):
+    pass
+
+    def pixelMetric(self, QStyle_PixelMetric, option=None, widget=None):
+        if QStyle_PixelMetric == QStyle.PM_ToolBarIconSize:
+            return QProxyStyle.pixelMetric(self,
+                                           QStyle_PixelMetric, option,
+                                           widget) * read_config('Gui', 'toolbar_icon_size_modifier')
+        else:
+            return QProxyStyle.pixelMetric(self, QStyle_PixelMetric, option, widget)
+
+
 class MainWindow(QMainWindow):
     # noinspection PyArgumentList
     def __init__(self, app: QApplication, main_model: MainModel, dimensions=None, position=None):
@@ -116,7 +129,10 @@ class MainWindow(QMainWindow):
         # Set the exception hook to be wrapped by the Exception Handler
         sys.excepthook = self.exceptionHandler.handler
 
-        self.themes_list = THEMES_LIST
+        if sys.platform.startswith('linux'):
+            self.themes_list = THEMES_AVAILABLE['linux']
+        else:
+            self.themes_list = THEMES_AVAILABLE['windows']
         self.bgcolor = read_config('Gui', 'bgcolor', literal_eval=False)
         self.darkmode = read_config('Gui', 'darkmode_icons')
 
@@ -145,6 +161,8 @@ class MainWindow(QMainWindow):
         # Declare theming
         self.current_theme = None
         self.current_theme_idx = 0
+        self.current_style = None
+        self.update_toolbar_size()
         self.hotkey_ctrl_down = False
 
         # Declare MainWindow things
@@ -968,10 +986,11 @@ class MainWindow(QMainWindow):
             theme_stream = QTextStream(theme_file)
             self.app.setStyleSheet(theme_stream.readAll())
             set_config('Theme', 'last_theme', theme)
+            self.current_theme = theme
         else:
             self.app.setStyle(QStyleFactory.create(theme))
             set_config('Theme', 'last_style', theme)
-        self.current_theme = theme
+            self.current_style = theme
 
     def set_theme_native(self):
         """
@@ -981,10 +1000,16 @@ class MainWindow(QMainWindow):
         self.set_theme(None)
 
     def set_theme_breeze_dark(self):
-        self.set_theme(themes.BREEZE_DARK)
+        if sys.platform.startswith('linux'):
+            self.set_theme(themes.BREEZE_DARK)
+        else:  # Windows
+            self.set_theme(themes.BREEZE_DARK_WINDOWS_MOD)
 
     def set_theme_breeze_light(self):
-        self.set_theme(themes.BREEZE_LIGHT)
+        if sys.platform.startswith('linux'):
+            self.set_theme(themes.BREEZE_LIGHT)
+        else:  # Windows
+            self.set_theme(themes.BREEZE_LIGHT_WINDOWS_MOD)
 
     def add_available_qstyles_to_menu(self, menu, subsubmenu=False):
         """
@@ -1007,6 +1032,16 @@ class MainWindow(QMainWindow):
         :return:
         """
         self.set_theme(q_style, stylesheet=False)
+
+    def update_toolbar_size(self):
+        """
+        Sets toolbar enbiggened qstyle
+        :param q_style:
+        :return:
+        """
+        source_style = 'Fusion'  # self.current_style
+        enbiggened_style = EnbiggenedToolbarStyle(self.current_style)
+        self.setStyle(enbiggened_style)
 
     def cycle_themes(self):
         """

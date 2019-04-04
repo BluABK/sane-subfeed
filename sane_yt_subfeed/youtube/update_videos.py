@@ -1,7 +1,6 @@
 import re
 from datetime import timedelta
 from googleapiclient.errors import HttpError
-from tqdm import tqdm
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NORMAL_REFRESH, \
@@ -59,8 +58,7 @@ def refresh_uploads(progress_bar_listener=None, add_to_max=0,
         progress_bar_listener.setMaximum.emit(2 * len(subscriptions) + add_to_max)
 
     channels_limit = read_config('Debug', 'channels_limit')
-    for channel, youtube in tqdm(zip(subscriptions, youtube_keys), desc="Creating video update threads",
-                                 disable=read_config('Debug', 'disable_tqdm')):
+    for channel, youtube in zip(subscriptions, youtube_keys):
         thread = GetUploadsThread(thread_increment, youtube, channel.id, channel.playlist_id, videos, search_pages[0],
                                   search_pages[1], deep_search=deep_search)
         thread_list.append(thread)
@@ -72,7 +70,7 @@ def refresh_uploads(progress_bar_listener=None, add_to_max=0,
     if progress_bar_listener:
         progress_bar_listener.setText.emit('Starting video update threads')
 
-    for t in tqdm(thread_list, desc="Starting video update threads", disable=read_config('Debug', 'disable_tqdm')):
+    for t in thread_list:
         if progress_bar_listener:
             progress_bar_listener.updateProgress.emit()
         t.start()
@@ -81,7 +79,7 @@ def refresh_uploads(progress_bar_listener=None, add_to_max=0,
         progress_bar_listener.setText.emit('Waiting for video update threads')
 
     exceptions = []
-    for t in tqdm(thread_list, desc="Waiting for video update threads", disable=read_config('Debug', 'disable_tqdm')):
+    for t in thread_list:
         if progress_bar_listener:
             progress_bar_listener.updateProgress.emit()
         try:
@@ -156,14 +154,13 @@ def generate_keys(key_number):
     threads = []
 
     logger.info("Starting key generation threads.")
-    for _ in tqdm(range(key_number), desc="Starting key generation threads",
-                  disable=read_config('Debug', 'disable_tqdm')):
+    for _ in range(key_number):
         t = GenerateKeys(keys)
         t.start()
         threads.append(t)
 
     logger.info("Waiting for key generation threads.")
-    for t in tqdm(threads, desc="Waiting for key generation threads", disable=read_config('Debug', 'disable_tqdm')):
+    for t in threads:
         t.join()
     return keys
 

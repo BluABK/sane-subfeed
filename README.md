@@ -26,6 +26,10 @@ This code is primarily tested on the following platforms:
 *   Python 3.6 and above: `pip install -r requirements.txt`
 *   Python 3.5 and below: `pip install -r requirements-py35.txt` _(NB: Will likely be deprecated in near future)_
 
+### 2a. Optional requirements:
+youtube-dl and watchdog (video directory monitoring)
+*   Any Python version:  `pip install -r optional-requirements.txt`
+
 ### 3. Set up OAuth and API keys (pick _one_ option).
 OAuth is required for access to your own youtube account (like retrieving subscriptions list). 
 For anything else API keys is usually what gets used.

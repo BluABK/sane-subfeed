@@ -8,7 +8,6 @@ import threading
 import urllib3
 from PIL import Image  # Image cropping (black barred thumbs, issue #11)
 from PIL import ImageChops
-from tqdm import tqdm
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.log_handler import create_logger
@@ -77,15 +76,14 @@ def download_thumbnails_threaded(input_vid_list, progress_listener=None):
 
     logger.info(
         "Starting thumbnail download threads for {} videos in {} threads".format(len(input_vid_list), len(vid_list)))
-    for vid_list_chunk in tqdm(vid_list, desc="Starting thumbnail threads",
-                               disable=read_config('Debug', 'disable_tqdm')):
+    for vid_list_chunk in vid_list:
         t = DownloadThumbnail(vid_list_chunk, force_dl_best=force_dl_best, progress_listener=progress_listener)
         thread_list.append(t)
         t.start()
         counter += 1
         if progress_listener:
             progress_listener.updateProgress.emit()
-    for t in tqdm(thread_list, desc="Waiting on thumbnail threads", disable=read_config('Debug', 'disable_tqdm')):
+    for t in thread_list:
         t.join()
 
 
@@ -228,10 +226,9 @@ def resize_thumbnail(img_path, maxwidth, maxheight, out=True):
     """
     if img_path is None:
         img_path = THUMBNAIL_NA_PATH
-        # if out:
-        #     return Image.open(os.path.join(OS_PATH, '..', 'resources', 'quality404.jpg'))
-        # else:
-        #     return os.path.join(OS_PATH, '..', 'resources', 'quality404.jpg')
+    outdir = os.path.join(THUMBNAILS_PATH, 'resized')
+    if not os.path.isdir(outdir):
+        os.makedirs(outdir)
 
     im = Image.open(img_path)
     resize_ratio = min(maxwidth / im.width, maxheight / im.height)
@@ -239,7 +236,7 @@ def resize_thumbnail(img_path, maxwidth, maxheight, out=True):
     try:
         im.thumbnail(new_size, Image.BICUBIC)
         if out:
-            outfile_path = os.path.join(THUMBNAILS_PATH, 'resized', img_path[-15:])
+            outfile_path = os.path.join(outdir, img_path[-15:])
             im.save(outfile_path)
             return outfile_path
         elif out is False:

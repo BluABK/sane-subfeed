@@ -4,6 +4,7 @@ import os
 
 import datetime
 import subprocess
+import webbrowser
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette, QPixmap
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
@@ -60,6 +61,13 @@ class VideoTile(QWidget):
 
         self.set_video(video)
 
+        if read_config('Debug', 'color_tile_elements'):
+            self.color_palette(Qt.black)
+            self.thumbnail_widget.setStyleSheet("QLabel { background-color : darkMagenta}")
+            self.title_widget.setStyleSheet("QLabel { background-color : crimson}")
+            self.channel_widget.setStyleSheet("QLabel { background-color : darkGreen}")
+            self.date_widget.setStyleSheet("QLabel { background-color : gray}")
+
     def init_thumbnail_tile(self):
         raise ValueError("ThumbnailTile initialised from VideoTile, not subclass!")
 
@@ -96,14 +104,55 @@ class VideoTile(QWidget):
 
         self.set_thumbnail_pixmap(video.thumbnail_path)
 
-    def play_vid(self, file_path, player, mark_watched=True):
+    def get_default_player(self):
+        """
+        Returns the default media player.
+        :return:
+        """
+        config_default_player = self.str_to_list(read_config('Player', 'default_player', literal_eval=False))
+        if config_default_player:
+            return config_default_player
+        else:
+            return None
+
+    def open_in_player(self, path, player=None, mark_watched=True, isfile=True):
+        """
+        Opens a video (defined by path) in a given media player
+        :param isfile:          If False path is an url, skip os existence checks.
+        :param path:            Can be file path or URL.
+        :param player:          Absolute path to a media player application.
+        :param mark_watched:    Whether or not to mark video as watched.
+        :return:
+        """
+        if not player:
+            player = self.get_default_player()
         if mark_watched:
             self.mark_watched()
-        self.logger.info('Playing {}, with player: {}'.format(file_path, player))
-        if not os.path.isfile(file_path):
-            self.logger.warning('os.path.isfile returns False for File: {}'.format(file_path))
+        self.logger.info('Playing {}, with player: {}'.format(path, player))
+        if isfile and not os.path.isfile(path):
+            self.logger.warning('os.path.isfile returns False for File: {}'.format(path))
         if player:
-            popen_args = player + [file_path]
+            popen_args = player + [path]
+            if sys.platform.startswith('linux'):
+                popen_args.insert(0, 'nohup')
+                subprocess.Popen(popen_args, preexec_fn=os.setpgrp, stdout=subprocess.DEVNULL,
+                                 stderr=subprocess.DEVNULL)
+            else:
+                subprocess.Popen(popen_args)
+
+    def open_in_browser(self, mark_watched=True):
+        """
+        Opens the video URL in a web browser, if none is specified it will guess the default
+        using the webbrowser module.
+        :param mark_watched: Whether or not to mark video as watched.
+        :return:
+        """
+        if mark_watched:
+            self.mark_watched()
+        self.logger.info('Playing {}, in web browser'.format(self.video))
+        specific_browser = read_config('Player', 'url_player', literal_eval=False)
+        if specific_browser:
+            popen_args = [specific_browser, self.video.url_video]
             if sys.platform.startswith('linux'):
                 popen_args.insert(0, 'nohup')
                 subprocess.Popen(popen_args, preexec_fn=os.setpgrp, stdout=subprocess.DEVNULL,
@@ -111,12 +160,7 @@ class VideoTile(QWidget):
             else:
                 subprocess.Popen(popen_args)
         else:
-            if sys.platform.startswith('linux'):
-                subprocess.Popen([file_path], preexec_fn=os.setpgrp, shell=True,
-                                 creationflags=subprocess.CREATE_NEW_CONSOLE,
-                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            else:
-                subprocess.Popen([file_path], shell=True)
+            webbrowser.open_new_tab(self.video.url_video)
 
     @staticmethod
     def str_to_list(s):
@@ -173,11 +217,14 @@ class VideoTile(QWidget):
         if fmt is None:
             if int(abs(tdelta.years)) > 10:
                 fmt = read_config('GridView', 'timedelta_format_decades', literal_eval=False)
-            elif int(abs(tdelta.years)) > 1:
+                # Update years in relation to decade
+                d['yd'] = d['yd'] - 10
+                d['ydyd'] = "{0:02d}".format(abs(d['yd']))
+            elif int(abs(tdelta.years)) > 0:
                 fmt = read_config('GridView', 'timedelta_format_years', literal_eval=False)
-            elif int(abs(tdelta.months)) > 1:
+            elif int(abs(tdelta.months)) > 0:
                 fmt = read_config('GridView', 'timedelta_format_months', literal_eval=False)
-            elif int(abs(tdelta.days)) > 1:
+            elif int(abs(tdelta.days)) > 0:
                 fmt = read_config('GridView', 'timedelta_format_days', literal_eval=False)
             else:
                 fmt = read_config('GridView', 'timedelta_format', literal_eval=False)
@@ -253,16 +300,18 @@ class VideoTile(QWidget):
                 thumb_height = read_config('Gui', 'tooltip_picture_height')
                 resized_thumb = resize_thumbnail(self.video.thumbnail_path, thumb_width, thumb_height)
 
-                self.setToolTip("<{} style='text-align:center;'><img src={} style='float:below'>{}: {}</{}>".format(
+                self.setToolTip("<{} style='text-align:center;'><img src={} style='float:below'><br/>{}: {}</{}>".format(
                     text_element, resized_thumb, self.video.channel_title, self.video.title, text_element))
             else:
                 self.setToolTip("{}: {}".format(self.video.channel_title, self.video.title))
 
-    def copy_url(self):
+    def copy_url(self, mark_watched=False):
         """
         Copy selected video URL(s) to clipboard
         :return:
         """
+        if mark_watched:
+            self.mark_watched()
         self.clipboard.setText(self.video.url_video)
         self.status_bar.showMessage('Copied URL to clipboard: {}'.format(self.video))
 

@@ -2,6 +2,7 @@ import sys
 
 # FIXME: imp*
 # from sane_yt_subfeed.controller.listeners import *
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication
 
 from sane_yt_subfeed.config_handler import read_config
@@ -17,6 +18,8 @@ class Controller:
         self.logger = create_logger(__name__)
 
     def run(self):
+        # Enable Qt built-in High DPI scaling attribute (must be set *before* creating a QApplication!)
+        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
         app = QApplication(sys.argv)
 
         self.logger.info("Running Controller instance")

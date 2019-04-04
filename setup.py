@@ -28,7 +28,6 @@ setup(
         'rsa>=3.4.2',
         'six>=1.11.0',
         'SQLAlchemy>=1.2.9',
-        'tqdm>=4.23.4',     # FIXME: Should be optional/extras
         'uritemplate>=3.0.0',
         'urllib3>=1.23'
     ],

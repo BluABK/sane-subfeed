@@ -1,4 +1,43 @@
 Current
+
+v0.6.0
+- Added attrib original_text in VideoTile elements to save the unedited text before ellison overwrites it forever.
+- Tuned all the pixel size, ellison and max size values to work with the new VideoTime system.
+- Made all the new max size and ellison settings configurable.
+- Fixed ellison inconsistency and mismatch issues by creating a function get_unicode_weight which calculates a
+  "width-weight" for unicode characters, and then that weight is subtracted from the ellison modifier.
+- Changed VideoTile sizing logic to use a maximum size instead of fixed size, which fixed the issue with QLabel text
+  going OOB.
+- Added debug tile coloring for padding debug.
+- Made channel title and date text pixel size configurable
+- Made title text weight configurable (Normal, DemiBold, Bold).
+- Merged configurable database type and location into one single option 'url'.
+- Fixed bug where timestamp wouldn't show the correct level, due to accidentally being offset by 1.
+- Made config inform about which options require restart. Also: rearranged some options.
+- Fixed broken thumbnail tooltip feature.
+- Moved get_default_player from playback to super (VideoTile).
+- Cleaned up keyboard modifiers code a bit.
+- Fixed bad function signatures.
+- Made player an optional kwarg in open_in_player()
+- Refactored some strings.
+- Deprecated and deleted config_play_video function.
+- Made Subfeed context menu options on par with Playback's (alt players etc, mark watched, play w/o mark watched, etc...).
+- Fixed buggy implementation of mousePressEvent in Subfeed that listened to *all* mouse events, not just LeftButton (whoops!).
+- Added Playback's MidButton decrease_prio/mark_downloaded functionality to Subfeed.
+- Created a function open_in_browser that properly opens a url in the web browser.
+- Added some pydoc here and there.
+- Made open_in_player compatible with being served URLs as well as file paths.
+- Deprecated and deleted 'use_url_as_path' config hotfix.
+- Added "restart may be required" signifier to config options w/o bindings.
+- Fixed bug where timedelta years weren't subtracted by 10 when showing decades.
+- Made youtube-dl an optional dependency, and removed tqdm entirely.
+- Added in stock BreezeStyleSheets and made them load instead of the windows modded ones if you're on Linux. Also added
+  a missing README.md.
+- Added toolbar icon size modifier for use on High DPI displays.
+- Implemented actions and kwargs bindings in GenericLineEdit.
+- Tweaked Elided text modifier for video title to perfection (if text is bolded or otherwise it will cut off a little
+  sooner than this perfection, but that's why it's been made user configurable).
+- Explicitly set progress bars to blue instead of assuming it would be the default (varies with QStyle and QPalette).
 - Fixed issue #5 (Launched players would quit along with Sane) by pre-pending 'nohup' to Popen arguments (if Linux).
 - Changed timedelta formatting delimiter from % to $ due to shortcomings in ConfigParser (%% is an escaped percent sign,
   so config parser finds it, but it doesn't actually do anything, but % isn't a valid string interpolation. so it fails.
