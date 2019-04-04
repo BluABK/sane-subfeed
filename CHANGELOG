@@ -1,4 +1,6 @@
 Current
+
+v0.6.0
 - Added attrib original_text in VideoTile elements to save the unedited text before ellison overwrites it forever.
 - Tuned all the pixel size, ellison and max size values to work with the new VideoTime system.
 - Made all the new max size and ellison settings configurable.
