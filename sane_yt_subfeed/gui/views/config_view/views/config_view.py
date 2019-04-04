@@ -7,7 +7,7 @@ from PyQt5.QtGui import QIntValidator, QDoubleValidator, QRegExpValidator
 # Internal
 from sane_yt_subfeed.config_handler import get_options, read_config, has_section
 from sane_yt_subfeed.gui.views.config_view.config_item_types import THUMBNAIL_QUALITIES, TT_FONT_SIZES, \
-    LEFT_MOUSE_ACTIONS
+    LEFT_MOUSE_ACTIONS, TILE_TITLE_FONT_WEIGHTS
 from sane_yt_subfeed.gui.views.config_view.input_super import InputSuper
 from sane_yt_subfeed.constants import HEXADECIMAL_COLOR_REGEX
 
@@ -115,14 +115,21 @@ class ConfigViewWidget(InputSuper):
                                                     self.root.del_central_widget_download,
                                                     self.root.setup_views],
                                  unchecked_kwargs=[{'tab': 'Download'}, None, None, None, None])
-        self.add_option_line_edit('Elided channel title text modifier (title-width * modifier)',
+        self.add_option_line_edit('Elided channel title text modifier',
                                   'GridView', 'elided_text_modifier_channel', cfg_validator=QDoubleValidator())
-        self.add_option_line_edit('Elided video title text modifier (title-width * modifier)',
+        self.add_option_line_edit('Elided video title text modifier',
                                   'GridView', 'elided_text_modifier_title', cfg_validator=QDoubleValidator())
-        self.add_option_line_edit('Elided date text modifier (title-width * modifier)',
+        self.add_option_line_edit('Elided date text modifier',
                                   'GridView', 'elided_text_modifier_date', cfg_validator=QDoubleValidator())
-        self.add_option_line_edit('Title pixel size modifier (title-height * modifier)',
-                                  'GridView', 'title_tile_pixel_size', cfg_validator=QDoubleValidator())
+        self.add_option_line_edit('Video title pixel size modifier',
+                                  'GridView', 'title_tile_pixel_size_modifier', cfg_validator=QDoubleValidator())
+        self.add_option_line_edit('Channel title pixel size modifier',
+                                  'GridView', 'channel_title_tile_pixel_size_modifier',
+                                  cfg_validator=QDoubleValidator())
+        self.add_option_line_edit('Date pixel size modifier',
+                                  'GridView', 'date_tile_pixel_size_modifier', cfg_validator=QDoubleValidator())
+        self.add_option_combobox('Tile title text font weight', 'GridView', 'title_tile_font_weight',
+                                 TILE_TITLE_FONT_WEIGHTS)
 
         self.add_option_line_edit('Date format for: videos uploaded'
                                   ' less than a day ago', 'GridView', 'timedelta_format')
@@ -190,6 +197,7 @@ class ConfigViewWidget(InputSuper):
         self.add_option_checkbox('Show channel grab methods', 'Debug', 'show_grab_method')
         self.add_option_checkbox('Show unimplemented GUI elements', 'Debug', 'show_unimplemented_gui')
         self.add_option_checkbox('Display all Exceptions', 'Debug', 'display_all_exceptions', restart_check=False)
+        self.add_option_checkbox('Color video tile elements', 'Debug', 'color_tile_elements')
         self.add_option_info_restart_required()
 
     def add_config_tab_model(self):

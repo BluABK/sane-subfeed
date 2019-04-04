@@ -61,6 +61,13 @@ class VideoTile(QWidget):
 
         self.set_video(video)
 
+        if read_config('Debug', 'color_tile_elements'):
+            self.color_palette(Qt.black)
+            self.thumbnail_widget.setStyleSheet("QLabel { background-color : darkMagenta}")
+            self.title_widget.setStyleSheet("QLabel { background-color : crimson}")
+            self.channel_widget.setStyleSheet("QLabel { background-color : darkGreen}")
+            self.date_widget.setStyleSheet("QLabel { background-color : gray}")
+
     def init_thumbnail_tile(self):
         raise ValueError("ThumbnailTile initialised from VideoTile, not subclass!")
 

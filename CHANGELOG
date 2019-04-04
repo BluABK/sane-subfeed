@@ -1,4 +1,7 @@
 Current
+- Added debug tile coloring for padding debug.
+- Made channel title and date text pixel size configurable
+- Made title text weight configurable (Normal, DemiBold, Bold).
 - Merged configurable database type and location into one single option 'url'.
 - Fixed bug where timestamp wouldn't show the correct level, due to accidentally being offset by 1.
 - Made config inform about which options require restart. Also: rearranged some options.

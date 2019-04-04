@@ -37,7 +37,8 @@ DEFAULTS = {
         'disable_tooltips': 'False',
         'show_grab_method': 'False',
         'show_unimplemented_gui': 'False',
-        'display_all_exceptions': 'False'
+        'display_all_exceptions': 'False',
+        'color_tile_elements': 'False'
     },
     'Gui': {
         'launch_gui': 'True',
@@ -65,10 +66,13 @@ DEFAULTS = {
     'GridView': {
         'show_watched': 'False',
         'show_dismissed': 'False',
-        'title_tile_pixel_size': '0.40',
+        'title_tile_pixel_size_modifier': '0.40',
+        'channel_title_tile_pixel_size_modifier': '0.92',
+        'date_tile_pixel_size_modifier': '0.92',
         'elided_text_modifier_title': '1.7368421',
         'elided_text_modifier_channel': '0.95',
         'elided_text_modifier_date': '0.95',
+        'title_tile_font_weight': '2',
         'timedelta_format': '$HH:$MM:$SS ago',
         'timedelta_format_days': '$d days, $HH:$MM:$SS ago',
         'timedelta_format_months': '$m months, $d d, $HH:$MM:$SS ago',
