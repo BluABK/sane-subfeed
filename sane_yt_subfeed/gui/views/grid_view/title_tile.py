@@ -21,9 +21,6 @@ class TitleTile(QLabel):
         self.setWordWrap(True)
         self.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
 
-        self.update_font()
-
-    def update_font(self):
         t_font = self.font()
         t_font.setWeight(TILE_TITLE_FONT_WEIGHTS_MAP[read_config('GridView', 'title_tile_font_weight')])
         t_font.setStyleHint(QFont.Helvetica)
@@ -31,14 +28,24 @@ class TitleTile(QLabel):
         t_font.setPixelSize(self.height() * read_config('GridView', 'title_tile_pixel_size_modifier'))
         self.setFont(t_font)
 
+        self.setText(text)
+
+    def elide_text(self, p_str):
         metrics = QFontMetrics(self.font())
         # If the string text is wider than width, return an elided version of the string
-        elided_modifier = read_config('GridView', 'elided_text_modifier_title')  # old: 1.8, new: 2.0
-
+        elided_modifier = read_config('GridView', 'elided_text_modifier_title')
         unicode_weight_modifier = read_config('GridView', 'elided_text_unicode_weight_modifier')
 
         # Non-ASCII needs to be elided at an earlier width.
-        elided_modifier -= get_unicode_weight(self.original_text, unicode_weight_modifier)
+        elided_modifier -= get_unicode_weight(p_str, unicode_weight_modifier)
 
-        elided = metrics.elidedText(self.original_text, Qt.ElideRight, self.width() * elided_modifier)
-        self.setText(elided)
+        elided = metrics.elidedText(p_str, Qt.ElideRight, self.width() * elided_modifier)
+
+        return elided
+
+    def setText(self, p_str, elided=True):
+        self.original_text = p_str
+        if elided:
+            p_str = self.elide_text(p_str)
+
+        super().setText(p_str)

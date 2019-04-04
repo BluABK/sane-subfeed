@@ -82,7 +82,6 @@ class VideoTile(QWidget):
     def set_video(self, video):
         self.video = video
         self.set_tool_tip()
-        self.title_widget.update_font()
 
         show_grab_method = read_config('Debug', 'show_grab_method')
         if show_grab_method:
@@ -95,10 +94,8 @@ class VideoTile(QWidget):
             self.channel_widget.setText("{} | {}".format(video.channel_title, grab_method))
         else:
             self.channel_widget.setText(self.video.channel_title)
-            self.channel_widget.update_font()
 
         self.date_widget.setText(self.strf_delta(self.video.date_published))
-        self.date_widget.update_font()
         self.color_old_video(self.video.date_published)
         self.color_live_video()
 

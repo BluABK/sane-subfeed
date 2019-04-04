@@ -1,4 +1,6 @@
 Current
+- Changed broken update_font to an elide_text function and made VideoTile classes override setText to make ellison
+  default.
 
 v0.6.0
 - Added attrib original_text in VideoTile elements to save the unedited text before ellison overwrites it forever.
