@@ -19,6 +19,7 @@ disable_tooltips = False
 show_grab_method = False
 show_unimplemented_gui = False
 display_all_exceptions = False
+color_tile_elements = False
 
 [Gui]
 launch_gui = True
@@ -46,10 +47,17 @@ last_theme =
 [GridView]
 show_watched = False
 show_dismissed = False
-title_tile_pixel_size = 0.40
-elided_text_modifier_title = 1.7368421
+elided_text_modifier_title = 0.87
+title_tile_pixel_size_modifier = 0.29
 elided_text_modifier_channel = 0.95
+title_tile_max_height_modifier = 0.21
+channel_title_tile_pixel_size_modifier = 0.85
+channel_title_tile_max_height_modifier = 0.08
 elided_text_modifier_date = 0.95
+date_tile_pixel_size_modifier = 0.85
+date_tile_max_height_modifier = 0.08
+title_tile_font_weight = 2
+elided_text_unicode_weight_modifier = 0.0075
 timedelta_format = $HH:$MM:$SS ago
 timedelta_format_days = $d days, $HH:$MM:$SS ago
 timedelta_format_months = $m months, $d d, $HH:$MM:$SS ago

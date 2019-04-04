@@ -1,4 +1,11 @@
 Current
+- Added attrib original_text in VideoTile elements to save the unedited text before ellison overwrites it forever.
+- Tuned all the pixel size, ellison and max size values to work with the new VideoTime system.
+- Made all the new max size and ellison settings configurable.
+- Fixed ellison inconsistency and mismatch issues by creating a function get_unicode_weight which calculates a
+  "width-weight" for unicode characters, and then that weight is subtracted from the ellison modifier.
+- Changed VideoTile sizing logic to use a maximum size instead of fixed size, which fixed the issue with QLabel text
+  going OOB.
 - Added debug tile coloring for padding debug.
 - Made channel title and date text pixel size configurable
 - Made title text weight configurable (Normal, DemiBold, Bold).
