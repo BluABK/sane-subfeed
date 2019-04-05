@@ -1,4 +1,12 @@
 Current
+
+v0.6.1
+- Removed no longer necessary pixel size hacks from config.
+- Made VideoTile element line height configurable.
+- Reworked VideoTile element QLabel ellison logic; QLabel width * modifier (0.28) * lines.
+- Reworked VideoTile element QLabel height logic; Set height equal to line amount and add some newline
+  spacing for unicode.
+- Changed VideoTile layout from VBox to Grid, because grid is not plagued by forced padding between all items.
 - Changed broken update_font to an elide_text function and made VideoTile classes override setText to make ellison
   default.
 

@@ -7,7 +7,7 @@ import subprocess
 import webbrowser
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette, QPixmap
-from PyQt5.QtWidgets import QWidget, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QLabel
 from dateutil.relativedelta import relativedelta
 from string import Template
 
@@ -44,25 +44,36 @@ class VideoTile(QWidget):
         self.pref_width = read_config('Gui', 'tile_pref_width')
         self.setFixedSize(self.pref_width, self.pref_height)
 
-        self.layout = QVBoxLayout()
-        self.layout.setContentsMargins(0, 0, 0, 4)
+        self.layout = QGridLayout()
+        self.layout.setSpacing(0)  # Don't use Qt's "global padding" spacing.
+        self.layout.setAlignment(Qt.AlignTop)
+        # Make sure layout items don't overlap
+        self.layout.setContentsMargins(0, 0, 0, 0)
+
         self.thumbnail_widget = self.init_thumbnail_tile()
-        self.layout.addWidget(self.thumbnail_widget)
-
         self.title_widget = TitleTile(video.title, self)
-        self.layout.addWidget(self.title_widget)
         self.channel_widget = ChannelTile(video.channel_title, self)
-        self.layout.addWidget(self.channel_widget)
-
         self.date_widget = DateTile('', self)
+
+        # Use a blank QLabel as spacer item for increased control of spacing (avoids global padding).
+        spacer = QLabel()
+        spacer.setFixedHeight(read_config('GridView', 'tile_line_spacing'))
+
+        # Add widgets to layout
+        self.layout.addWidget(self.thumbnail_widget)
+        self.layout.addWidget(self.title_widget)
+        self.layout.addWidget(spacer)
+        self.layout.addWidget(self.channel_widget)
+        self.layout.addWidget(spacer)
         self.layout.addWidget(self.date_widget)
 
         self.setLayout(self.layout)
 
+        # Add video on the layout/tile.
         self.set_video(video)
 
         if read_config('Debug', 'color_tile_elements'):
-            self.color_palette(Qt.black)
+            self.color_palette(Qt.green)
             self.thumbnail_widget.setStyleSheet("QLabel { background-color : darkMagenta}")
             self.title_widget.setStyleSheet("QLabel { background-color : crimson}")
             self.channel_widget.setStyleSheet("QLabel { background-color : darkGreen}")

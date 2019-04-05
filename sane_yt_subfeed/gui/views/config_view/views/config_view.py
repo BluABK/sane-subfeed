@@ -117,35 +117,30 @@ class ConfigViewWidget(InputSuper):
                                  unchecked_kwargs=[{'tab': 'Download'}, None, None, None, None])
         self.add_option_line_edit('Title elided text multiplier',
                                   'GridView', 'elided_text_modifier_title', cfg_validator=QDoubleValidator())
-        self.add_option_line_edit('Title pixel size multiplier',
-                                  'GridView', 'title_tile_pixel_size_modifier', cfg_validator=QDoubleValidator())
-        self.add_option_line_edit('Title max height multiplier',
-                                  'GridView', 'title_tile_max_height_modifier',
-                                  cfg_validator=QDoubleValidator())
-
+        self.add_option_line_edit('Title lines to display', 'GridView', 'tile_title_lines',
+                                  cfg_validator=QIntValidator())
+        self.add_option_combobox('Title text font weight', 'GridView', 'title_tile_font_weight',
+                                 TILE_TITLE_FONT_WEIGHTS)
+        self.add_option_info(None, None)  # Line spacer
         self.add_option_line_edit('Channel elided text multiplier',
                                   'GridView', 'elided_text_modifier_channel', cfg_validator=QDoubleValidator())
-        self.add_option_line_edit('Channel pixel size multiplier',
-                                  'GridView', 'channel_title_tile_pixel_size_modifier',
-                                  cfg_validator=QDoubleValidator())
-        self.add_option_line_edit('Channel max height multiplier',
-                                  'GridView', 'channel_title_tile_max_height_modifier',
-                                  cfg_validator=QDoubleValidator())
-
+        self.add_option_line_edit('Channel Title lines to display', 'GridView', 'tile_channel_lines',
+                                  cfg_validator=QIntValidator())
+        self.add_option_info(None, None)  # Line spacer
         self.add_option_line_edit('Date elided text multiplier',
                                   'GridView', 'elided_text_modifier_date', cfg_validator=QDoubleValidator())
-        self.add_option_line_edit('Date pixel size multiplier',
-                                  'GridView', 'date_tile_pixel_size_modifier', cfg_validator=QDoubleValidator())
-        self.add_option_line_edit('Date max height multiplier',
-                                  'GridView', 'date_tile_max_height_modifier',
-                                  cfg_validator=QDoubleValidator())
-
-        self.add_option_line_edit('Elided text UTF-8 weight modifier', 'GridView',
+        self.add_option_line_edit('Date lines to display', 'GridView', 'tile_date_lines',
+                                  cfg_validator=QIntValidator())
+        self.add_option_info(None, None)  # Line spacer
+        self.add_option_line_edit('Line spacing for tile elements<br/>'
+                                  '(tip: decrement this if you increment lines)', 'GridView', 'tile_line_spacing',
+                                  QDoubleValidator())
+        self.add_option_line_edit('Unicode line height offset (UTF > ASCII linebreaks)', 'GridView',
+                                  'tile_unicode_line_height_offset', cfg_validator=QDoubleValidator())
+        self.add_option_line_edit('Elided text UTF-8 weight modifier<br/>'
+                                  '(Set this to 0 if using phantomstyle)', 'GridView',
                                   'elided_text_unicode_weight_modifier', cfg_validator=QDoubleValidator())
-
-        self.add_option_combobox('Tile title text font weight', 'GridView', 'title_tile_font_weight',
-                                 TILE_TITLE_FONT_WEIGHTS)
-
+        self.add_option_info(None, None)  # Line spacer
         self.add_option_line_edit('Date format for: videos uploaded'
                                   ' less than a day ago', 'GridView', 'timedelta_format')
         self.add_option_line_edit('Date format for: videos uploaded'
