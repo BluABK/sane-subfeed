@@ -1,4 +1,5 @@
 Current
+- Moved plaintext_history_handler into handlers package.
 - Moved default_application_handler into handlers package.
 - Made pickle load callers handle and log ModuleNotFound (happens when restructuring) and unexpected exceptions.
 - Moved more path constants out of classes and into absolute_paths.

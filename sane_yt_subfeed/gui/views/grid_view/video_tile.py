@@ -17,7 +17,7 @@ from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VID
 from sane_yt_subfeed.gui.views.grid_view.labels.channel_label import ChannelLabel
 from sane_yt_subfeed.gui.views.grid_view.labels.date_label import DateLabel
 from sane_yt_subfeed.gui.views.grid_view.labels.title_label import TitleLabel
-from sane_yt_subfeed.plaintext_history_handler import update_plaintext_history
+from sane_yt_subfeed.handlers.plaintext_history_handler import update_plaintext_history
 from sane_yt_subfeed.log_handler import logger, create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import resize_thumbnail
 
