@@ -3,7 +3,7 @@ import shutil  # For file copying
 from PyQt5 import QtCore
 
 from sane_yt_subfeed.database.orm import init_db
-from sane_yt_subfeed.history_handler import HISTORY_FILEPATH
+from sane_yt_subfeed.plaintext_history_handler import HISTORY_FILEPATH
 from sane_yt_subfeed.log_handler import create_logger
 
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
