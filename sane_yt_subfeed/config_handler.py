@@ -35,7 +35,6 @@ DEFAULTS = {
         'channels_limit': '-1',
         'use_playlistitems': 'True',
         'disable_tooltips': 'False',
-        'show_grab_method': 'False',
         'show_unimplemented_gui': 'False',
         'display_all_exceptions': 'False',
         'color_tile_elements': 'False'

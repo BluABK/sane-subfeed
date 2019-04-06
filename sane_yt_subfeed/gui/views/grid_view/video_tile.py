@@ -94,17 +94,7 @@ class VideoTile(QWidget):
         self.video = video
         self.set_tool_tip()
 
-        show_grab_method = read_config('Debug', 'show_grab_method')
-        if show_grab_method:
-            grab_method = ''
-            grab_methods = video.grab_methods
-            if len(grab_methods) > 0:
-                grab_method = grab_methods[0]
-                for grab in grab_methods[1:]:
-                    grab_method = '{}, {}'.format(grab_method, grab)
-            self.channel_label.setText("{} | {}".format(video.channel_title, grab_method))
-        else:
-            self.channel_label.setText(self.video.channel_title)
+        self.channel_label.setText(self.video.channel_title)
 
         self.date_label.setText(self.strf_delta(self.video.date_published))
         self.color_old_video(self.video.date_published)

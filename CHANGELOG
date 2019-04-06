@@ -1,4 +1,5 @@
 Current
+- Removed deprecated show_grab_method debug option and code.
 - Made Title, Channel and Date VideoTile labels part of a class VideoTileLabel to avoid excessively redundant code.
 
 v0.6.1
