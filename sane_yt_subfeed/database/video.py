@@ -7,7 +7,7 @@ from sane_yt_subfeed.database.detached_models.video_d import VideoD
 # from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VIDEO_KIND_LIVE, \
 #     VIDEO_KIND_LIVE_SCHEDULED, VIDEO_KIND_PREMIERE
 from sane_yt_subfeed.database.orm import PermanentBase
-from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
+from sane_yt_subfeed.constants import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 
 
 class Video(PermanentBase):  # FIXME: PickleTypes should probably be replaced by actual tables
