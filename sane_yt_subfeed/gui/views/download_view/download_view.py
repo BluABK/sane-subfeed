@@ -6,7 +6,7 @@ from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_
 from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
 from sane_yt_subfeed.gui.views.download_view.buttons.buttons_tile import ButtonsTile
 from sane_yt_subfeed.gui.views.download_view.download_tile import DownloadTile
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 
 class DownloadView(QWidget):

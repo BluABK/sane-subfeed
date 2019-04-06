@@ -7,7 +7,7 @@ from sqlalchemy import or_, and_
 from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 from sane_yt_subfeed.main import run_with_gui, run_channels_test, run_with_cli, cli_refresh_and_print_subfeed
 from sane_yt_subfeed.youtube.update_videos import load_keys
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions

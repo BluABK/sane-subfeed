@@ -45,7 +45,7 @@ from sane_yt_subfeed.gui.views.grid_view.playback.playback_grid_view import Play
 from sane_yt_subfeed.gui.views.grid_view.subfeed.subfeed_grid_view import SubfeedGridView
 from sane_yt_subfeed.gui.views.tiled_list_view.subfeed.subfeed_tiled_list_view import SubfeedTiledListView
 from sane_yt_subfeed.handlers.plaintext_history_handler import get_plaintext_history
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 # Constants
 

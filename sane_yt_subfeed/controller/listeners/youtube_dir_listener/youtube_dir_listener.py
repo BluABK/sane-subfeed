@@ -10,7 +10,7 @@ from sane_yt_subfeed.controller.dir_handler import VidEventHandler, CheckYoutube
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideo
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded, THUMBNAILS_PATH
 from sane_yt_subfeed.youtube.update_videos import load_keys
 from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_videos

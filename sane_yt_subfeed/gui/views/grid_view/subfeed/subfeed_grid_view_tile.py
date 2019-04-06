@@ -9,7 +9,7 @@ from sane_yt_subfeed.gui.views.grid_view.subfeed.subfeed_grid_thumbnail_tile imp
 from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
 from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VIDEO_KIND_LIVE, \
     VIDEO_KIND_LIVE_SCHEDULED, VIDEO_KIND_PREMIERE
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 VIDEO_IS_LIVE_TITLE = "This video is live broadcast content!"
 VIDEO_IS_LIVE_MSG = "If you proceed to download this video is will be streamed in realtime and not finish until the" \

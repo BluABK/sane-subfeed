@@ -1,7 +1,7 @@
 import datetime
 
 from sane_yt_subfeed.absolute_paths import HISTORY_FILE_PATH
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 logger = create_logger(__name__)
 

@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import *
 
 from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.database.write_operations import UpdateVideo
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 
 class ExtendedQLabel(QLabel):

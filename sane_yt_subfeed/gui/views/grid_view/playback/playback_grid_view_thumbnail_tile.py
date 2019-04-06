@@ -4,7 +4,7 @@ from PyQt5.QtGui import QPixmap
 from sane_yt_subfeed.absolute_paths import OVERLAY_NO_FILE_PATH, OVERLAY_WATCHED_PATH, OVERLAY_DISCARDED_PATH
 from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.gui.views.grid_view.thumbnail_tile import ThumbnailTile
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 
 class PlaybackGridViewThumbnailTile(ThumbnailTile):

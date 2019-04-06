@@ -10,7 +10,7 @@ from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownl
 from sane_yt_subfeed.gui.views.download_view.download_thumbnail import DownloadThumbnailWidget
 from sane_yt_subfeed.gui.views.download_view.progress_bar import DownloadProgressBar
 from sane_yt_subfeed.gui.views.download_view.small_label import SmallLabel
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 
 class DownloadTile(QWidget):

@@ -12,7 +12,7 @@ from PIL import ImageChops
 from sane_yt_subfeed.absolute_paths import THUMBNAILS_PATH, THUMBNAIL_404_PATH, THUMBNAIL_NA_PATH, \
     THUMBNAILS_RESIZED_PATH
 from sane_yt_subfeed.handlers.config_handler import read_config
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/

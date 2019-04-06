@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout
 
 # Project internal libs
 from sane_yt_subfeed.absolute_paths import ABOUT_IMG_PATH
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 
 class ExtendedQLabel(QLabel):

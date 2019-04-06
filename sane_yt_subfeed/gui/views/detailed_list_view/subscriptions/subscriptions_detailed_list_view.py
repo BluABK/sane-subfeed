@@ -2,7 +2,7 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView
 
 from sane_yt_subfeed.handlers.config_handler import read_config
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
 
 

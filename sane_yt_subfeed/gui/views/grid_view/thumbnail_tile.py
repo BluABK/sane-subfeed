@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QLabel
 
 from sane_yt_subfeed.absolute_paths import THUMBNAIL_NA_PATH
 from sane_yt_subfeed.handlers.config_handler import read_config
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 
 class ThumbnailTile(QLabel):

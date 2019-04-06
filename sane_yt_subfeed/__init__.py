@@ -3,7 +3,7 @@ from PyQt5 import QtCore
 
 from sane_yt_subfeed.absolute_paths import HISTORY_FILE_PATH, LOG_DIR
 from sane_yt_subfeed.database.orm import init_db
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 logger = create_logger(__name__)
 logger.info("Initializing...")

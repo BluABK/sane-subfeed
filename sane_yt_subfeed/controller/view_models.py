@@ -21,7 +21,7 @@ from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, r
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread
 from sane_yt_subfeed.exceptions.sane_aborted_operation import SaneAbortedOperation
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
 
 

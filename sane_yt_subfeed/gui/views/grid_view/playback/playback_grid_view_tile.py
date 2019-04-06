@@ -7,7 +7,7 @@ from sane_yt_subfeed.handlers.default_application_handler import open_with_defau
 from sane_yt_subfeed.gui.dialogs.sane_text_view_dialog import SaneTextViewDialog
 from sane_yt_subfeed.gui.views.grid_view.playback.playback_grid_view_thumbnail_tile import PlaybackGridViewThumbnailTile
 from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 
 class PlaybackGridViewTile(VideoTile):

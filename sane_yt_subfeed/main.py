@@ -5,7 +5,7 @@ from sane_yt_subfeed.settings import mutable_settings
 from sane_yt_subfeed.controller.controller import Controller
 from sane_yt_subfeed.database.models import Test
 from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 from sane_yt_subfeed.youtube.update_videos import refresh_uploads, load_keys
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions, list_uploaded_videos_search, \
     list_uploaded_videos_page
