@@ -3,14 +3,8 @@ import time
 import os
 import pickle
 
+from sane_yt_subfeed.absolute_paths import YOUTUBE_RESOURCE_OAUTH_PICKLE, PICKLE_PATH, YOUTUBE_RESOURCE_KEYS_PICKLE
 from sane_yt_subfeed.log_handler import create_logger
-
-OS_PATH = os.path.dirname(__file__)
-
-PICKLE_PATH = os.path.join(OS_PATH, 'resources', 'pickles')
-
-YOUTUBE_RESOURCE_OAUTH_PICKLE = os.path.join(PICKLE_PATH, 'youtube_oauth.pkl')
-YOUTUBE_RESOURCE_KEYS_PICKLE = os.path.join(PICKLE_PATH, 'youtube_auth_keys.pkl')
 
 logger = create_logger(__name__)
 

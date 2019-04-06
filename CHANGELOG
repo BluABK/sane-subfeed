@@ -1,4 +1,5 @@
 Current
+- Moved pickle_handler into handlers package.
 - Moved (Youtube auth) generate_keys into youtube folder.
 - Moved (YouTube API) authentication into youtube folder.
 - Removed deprecated show_grab_method debug option and code.
