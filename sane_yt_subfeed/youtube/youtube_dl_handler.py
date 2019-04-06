@@ -4,7 +4,7 @@ import datetime
 import os
 import threading
 
-from sane_yt_subfeed.config_handler import read_config, get_options
+from sane_yt_subfeed.handlers.config_handler import read_config, get_options
 from sane_yt_subfeed import create_logger
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 logger = create_logger(__name__)

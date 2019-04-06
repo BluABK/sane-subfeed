@@ -4,7 +4,7 @@ import copy
 from PyQt5.QtWidgets import QGridLayout, QWidget, QMenu
 from datetime import datetime
 
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
 from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
 from sane_yt_subfeed.gui.views.download_view.download_thumbnail import DownloadThumbnailWidget

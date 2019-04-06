@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel
 
-from sane_yt_subfeed.config_handler import read_config, set_config
+from sane_yt_subfeed.handlers.config_handler import read_config, set_config
 from sane_yt_subfeed.gui.views.config_view.config_items.button import GenericConfigPushButton
 from sane_yt_subfeed.gui.views.config_view.config_items.checkbox import GenericConfigCheckBox
 from sane_yt_subfeed.gui.views.config_view.config_items.combobox import GenericConfigComboBox

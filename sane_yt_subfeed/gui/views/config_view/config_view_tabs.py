@@ -2,7 +2,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QTabWidget
 
 from sane_yt_subfeed import create_logger
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.gui.views.config_view.config_scroll_area import ConfigScrollArea
 from sane_yt_subfeed.gui.views.config_view.views.config_view import ConfigViewWidget
 

@@ -16,7 +16,7 @@ from subprocess import check_output
 # Project internal libs
 # from sane_yt_subfeed import debug_functions
 from sane_yt_subfeed.absolute_paths import ICONS_PATH, VERSION_PATH
-from sane_yt_subfeed.config_handler import read_config, set_config
+from sane_yt_subfeed.handlers.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import SUBFEED_VIEW_ID, PLAYBACK_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel

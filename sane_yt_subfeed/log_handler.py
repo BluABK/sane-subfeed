@@ -5,7 +5,7 @@ import logging
 import os
 from logging.handlers import SocketHandler
 
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 
 LOG_FILE_HANDLER = None
 LOG_FILE = 'debug.log'

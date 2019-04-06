@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt, QSize, QPoint, QRect
 from PyQt5.QtGui import QPainter, QPixmap, QBrush, QColor, QPen, QFont
 from PyQt5.QtWidgets import QLabel
 
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.log_handler import create_logger
 
 OS_PATH = os.path.dirname(__file__)

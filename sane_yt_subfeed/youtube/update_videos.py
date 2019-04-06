@@ -2,7 +2,7 @@ import re
 from datetime import timedelta
 from googleapiclient.errors import HttpError
 
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NORMAL_REFRESH, \
     LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.exceptions.sane_aborted_operation import SaneAbortedOperation

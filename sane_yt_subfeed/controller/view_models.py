@@ -1,10 +1,10 @@
-from PyQt5.QtCore import QThread, Qt
+from PyQt5.QtCore import QThread
 from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtWidgets import QProgressBar
 from sqlalchemy import asc, desc, false, or_
 from sqlalchemy.dialects import postgresql
 
-from sane_yt_subfeed.config_handler import read_config, set_config
+from sane_yt_subfeed.handlers.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.database.database_listener import DatabaseListener
 from sane_yt_subfeed.controller.listeners.gui.main_window.main_window_listener import MainWindowListener
 from sane_yt_subfeed.controller.listeners.gui.progress_bar.progress_bar_listener import ProgressBarListener

@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel
 from dateutil.relativedelta import relativedelta
 from string import Template
 
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VIDEO_KIND_LIVE, \
     VIDEO_KIND_LIVE_SCHEDULED, VIDEO_KIND_PREMIERE
 from sane_yt_subfeed.gui.views.grid_view.labels.channel_label import ChannelLabel

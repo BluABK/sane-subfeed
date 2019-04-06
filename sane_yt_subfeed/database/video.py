@@ -1,7 +1,7 @@
 import datetime
 from sqlalchemy import Boolean, DateTime, Column, Integer, String, Interval
 
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.database.decorators import TextPickleType
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 # from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VIDEO_KIND_LIVE, \

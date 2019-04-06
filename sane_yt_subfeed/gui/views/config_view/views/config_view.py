@@ -5,7 +5,7 @@ from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QIntValidator, QDoubleValidator, QRegExpValidator
 
 # Internal
-from sane_yt_subfeed.config_handler import get_options, read_config, has_section
+from sane_yt_subfeed.handlers.config_handler import get_options, read_config, has_section
 from sane_yt_subfeed.gui.views.config_view.config_item_types import THUMBNAIL_QUALITIES, TT_FONT_SIZES, \
     LEFT_MOUSE_ACTIONS, TILE_TITLE_FONT_WEIGHTS
 from sane_yt_subfeed.gui.views.config_view.input_super import InputSuper

@@ -7,7 +7,7 @@ from googleapiclient.discovery import build
 from oauthlib.oauth2 import MissingCodeError
 
 from sane_yt_subfeed.absolute_paths import KEYS_FILE, CLIENT_SECRET_FILE
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.settings import mutable_settings
 

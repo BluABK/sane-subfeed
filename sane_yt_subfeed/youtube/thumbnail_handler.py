@@ -9,7 +9,7 @@ import urllib3
 from PIL import Image  # Image cropping (black barred thumbs, issue #11)
 from PIL import ImageChops
 
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.log_handler import create_logger
 
 OS_PATH = os.path.dirname(__file__)

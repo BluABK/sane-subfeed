@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt, QSize, QPoint
 from PyQt5.QtGui import QPixmap
 
 from sane_yt_subfeed.absolute_paths import ICONS_PATH, RESOURCES_PATH
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.gui.views.grid_view.thumbnail_tile import ThumbnailTile
 from sane_yt_subfeed.log_handler import create_logger
 

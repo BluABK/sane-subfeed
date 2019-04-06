@@ -4,7 +4,7 @@ import click
 import datetime
 from sqlalchemy import or_, and_
 
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.log_handler import create_logger
