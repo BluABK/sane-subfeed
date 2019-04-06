@@ -1,4 +1,7 @@
 Current
+- Moved more path constants out of classes and into absolute_paths.
+- Moved misplaced logdir up to the project root level (was in sources root).
+- Refactored lots of manual OS_PATH cases to use absolute_paths instead.
 - Fixed config_handler OS_PATH pointing at wrong level after move.
 - Fixed orphaned settings import of ROOT_PATH in main_window (due to abs path move).
 - Moved history_handler into handlers package and renamed with suffix 'plaintext'.

@@ -1,18 +1,11 @@
-import os
 from PyQt5.QtCore import Qt, QSize, QPoint
 from PyQt5.QtGui import QPixmap
 
-from sane_yt_subfeed.absolute_paths import ICONS_PATH, RESOURCES_PATH
+from sane_yt_subfeed.absolute_paths import OVERLAY_DOWNLOADED_PATH, OVERLAY_WATCHED_PATH, OVERLAY_DISCARDED_PATH, \
+    OVERLAY_MISSED_PATH, OVERLAY_NEW_PATH
 from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.gui.views.grid_view.thumbnail_tile import ThumbnailTile
 from sane_yt_subfeed.log_handler import create_logger
-
-OVERLAY_NEW_PATH = os.path.join(ICONS_PATH, 'new_vid.png')
-OVERLAY_MISSED_PATH = os.path.join(ICONS_PATH, 'missed_vid.png')
-OVERLAY_DOWNLOADED_PATH = os.path.join(ICONS_PATH, 'downloaded_vid.png')
-OVERLAY_DISCARDED_PATH = os.path.join(ICONS_PATH, 'dismissed.png')
-OVERLAY_WATCHED_PATH = os.path.join(ICONS_PATH, 'watched.png')
-THUMBNAIL_NA_PATH = os.path.join(RESOURCES_PATH, 'thumbnail_na.png')
 
 
 class SubfeedGridViewThumbnailTile(ThumbnailTile):

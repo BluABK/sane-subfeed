@@ -1,15 +1,10 @@
-import os
 from PyQt5.QtCore import Qt, QSize, QPoint, QRect
 from PyQt5.QtGui import QPainter, QPixmap, QBrush, QColor, QPen, QFont
 from PyQt5.QtWidgets import QLabel
 
+from sane_yt_subfeed.absolute_paths import THUMBNAIL_NA_PATH
 from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.log_handler import create_logger
-
-OS_PATH = os.path.dirname(__file__)
-OVERLAY_NEW_PATH = os.path.join(OS_PATH, '..', '..', 'icons', 'new_vid.png')
-OVERLAY_MISSED_PATH = os.path.join(OS_PATH, '..', '..', 'icons', 'missed_vid.png')
-THUMBNAIL_NA_PATH = os.path.join(OS_PATH, '..', '..', '..', 'resources', 'thumbnail_na.png')
 
 
 class ThumbnailTile(QLabel):
@@ -85,4 +80,4 @@ class ThumbnailTile(QLabel):
         :param thumb:
         :return:
         """
-        pass
+        raise ValueError("Implement add_overlay in inherited class!")

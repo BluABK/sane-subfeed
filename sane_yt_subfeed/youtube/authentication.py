@@ -1,7 +1,6 @@
 import apiclient
 import httplib2
 import json
-import os
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from oauthlib.oauth2 import MissingCodeError
@@ -12,8 +11,6 @@ from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.settings import mutable_settings
 
 logger = create_logger(__name__)
-
-OS_PATH = os.path.dirname(__file__)
 
 SCOPES = ['https://www.googleapis.com/auth/youtube.readonly']
 

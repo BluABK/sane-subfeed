@@ -5,6 +5,7 @@ import logging
 import os
 from logging.handlers import SocketHandler
 
+from sane_yt_subfeed.absolute_paths import LOG_DIR
 from sane_yt_subfeed.handlers.config_handler import read_config
 
 LOG_FILE_HANDLER = None
@@ -34,9 +35,6 @@ DEBUG7_LEVEL_NUM = 4
 DEBUG8_LEVEL_NUM = 3
 DEBUG9_LEVEL_NUM = 2
 SPAM_LEVEL_NUM = 1
-
-OS_PATH = os.path.dirname(__file__)
-LOGDIR = os.path.join(OS_PATH, 'logs')
 
 if read_config('Logging', 'use_socket_log'):
     log_socket_instance = logging.getLogger('r')
@@ -222,7 +220,7 @@ def create_file_handler(log_file=LOG_FILE, formatter=FORMATTER):
     global LOG_FILE_HANDLER
     # Only create one instance of the file handler
     if not read_config('Logging', 'use_socket_log') and LOG_FILE_HANDLER is None:
-        LOG_FILE_HANDLER = logging.FileHandler(os.path.join(LOGDIR, log_file), encoding="UTF-8")
+        LOG_FILE_HANDLER = logging.FileHandler(os.path.join(LOG_DIR, log_file), encoding="UTF-8")
         LOG_FILE_HANDLER.setLevel(logging.DEBUG)
         LOG_FILE_HANDLER.setFormatter(formatter)
 
@@ -239,8 +237,8 @@ def create_logger_file(facility, formatter=FORMATTER):
 
     log_file_instance.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
-    if not os.path.exists(LOGDIR):
-        os.makedirs(LOGDIR)
+    if not os.path.exists(LOG_DIR):
+        os.makedirs(LOG_DIR)
 
     # create console handler with a higher log level
     ch = logging.StreamHandler()

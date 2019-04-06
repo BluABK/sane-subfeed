@@ -4,12 +4,8 @@ import os
 from configparser import ConfigParser, NoSectionError, NoOptionError
 from shutil import copyfile
 
-from sane_yt_subfeed.absolute_paths import ROOT_PATH
-
-CONFIG_PATH = os.path.join(ROOT_PATH, '..', 'config.ini')
-CONFIG_HOTKEYS_PATH = os.path.join(ROOT_PATH, '..', 'hotkeys.ini')
-SAMPLE_HOTKEYS_PATH = os.path.join(ROOT_PATH, '..', 'hotkeys.ini.sample')
-SAMPLE_PATH = os.path.join(ROOT_PATH, '..', 'config.ini.sample')
+from sane_yt_subfeed.absolute_paths import CONFIG_PATH, SAMPLE_PATH, CONFIG_HOTKEYS_PATH, \
+    SAMPLE_HOTKEYS_PATH, DATABASE_PATH
 
 parser = None
 default_parser = ConfigParser()
@@ -169,7 +165,7 @@ DEFAULTS = {
         'logging_port': '19996'
     },
     'Database': {
-        'url': 'sqlite:///{}'.format(os.path.join(ROOT_PATH, 'resources', 'permanents.db'))
+        'url': 'sqlite:///{}'.format(DATABASE_PATH)
     }
 }
 

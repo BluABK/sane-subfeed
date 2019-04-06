@@ -14,8 +14,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QStackedWidget, QSt
 from subprocess import check_output
 
 # Project internal libs
-# from sane_yt_subfeed import debug_functions
-from sane_yt_subfeed.absolute_paths import ROOT_PATH, ICONS_PATH, VERSION_PATH
+from sane_yt_subfeed.absolute_paths import ICONS_PATH, VERSION_PATH, KEYS_FILE, CLIENT_SECRET_FILE, KEYS_PULIC_FILE, \
+    CLIENT_SECRET_PUBLIC_FILE
 from sane_yt_subfeed.handlers.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import SUBFEED_VIEW_ID, PLAYBACK_VIEW_ID
@@ -49,10 +49,6 @@ from sane_yt_subfeed.log_handler import create_logger
 
 # Constants
 
-CLIENT_SECRET_FILE = os.path.join(ROOT_PATH, 'resources', 'client_secret.json')
-CLIENT_SECRET_PUBLIC_FILE = os.path.join(ROOT_PATH, "resources", "client_secret_public.json")
-KEYS_FILE = os.path.join(ROOT_PATH, 'resources', 'keys.json')
-KEYS_PULIC_FILE = os.path.join(ROOT_PATH, "resources", "keys_public.json")
 HOTKEYS_EVAL = False
 HOTKEYS_INI = 'hotkeys'
 YOUTUBE_URL_REGEX = QRegExp('(http[s]?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/[^ ]+')
