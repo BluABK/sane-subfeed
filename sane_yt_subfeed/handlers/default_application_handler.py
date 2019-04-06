@@ -21,9 +21,6 @@ def is_image(file_path):
     return False
 
 
-# def determine_filetype(file_path):
-
-
 def open_with_default_application(file_path):
     """
     Determines and launches file with its default application: Image
