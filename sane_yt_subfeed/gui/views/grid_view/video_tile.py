@@ -7,16 +7,16 @@ import subprocess
 import webbrowser
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette, QPixmap
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QLabel
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel
 from dateutil.relativedelta import relativedelta
 from string import Template
 
 from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VIDEO_KIND_LIVE, \
     VIDEO_KIND_LIVE_SCHEDULED, VIDEO_KIND_PREMIERE
-from sane_yt_subfeed.gui.views.grid_view.channel_tile import ChannelTile
-from sane_yt_subfeed.gui.views.grid_view.date_tile import DateTile
-from sane_yt_subfeed.gui.views.grid_view.title_tile import TitleTile
+from sane_yt_subfeed.gui.views.grid_view.labels.channel_label import ChannelLabel
+from sane_yt_subfeed.gui.views.grid_view.labels.date_label import DateLabel
+from sane_yt_subfeed.gui.views.grid_view.labels.title_label import TitleLabel
 from sane_yt_subfeed.history_handler import update_plaintext_history
 from sane_yt_subfeed.log_handler import logger, create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import resize_thumbnail
@@ -50,22 +50,22 @@ class VideoTile(QWidget):
         # Make sure layout items don't overlap
         self.layout.setContentsMargins(0, 0, 0, 0)
 
-        self.thumbnail_widget = self.init_thumbnail_tile()
-        self.title_widget = TitleTile(video.title, self)
-        self.channel_widget = ChannelTile(video.channel_title, self)
-        self.date_widget = DateTile('', self)
+        self.thumbnail_label = self.init_thumbnail_tile()
+        self.title_label = TitleLabel(video.title, self)
+        self.channel_label = ChannelLabel(video.channel_title, self)
+        self.date_label = DateLabel('', self)
 
         # Use a blank QLabel as spacer item for increased control of spacing (avoids global padding).
-        spacer = QLabel()
-        spacer.setFixedHeight(read_config('GridView', 'tile_line_spacing'))
+        spacer_label = QLabel()
+        spacer_label.setFixedHeight(read_config('GridView', 'tile_line_spacing'))
 
-        # Add widgets to layout
-        self.layout.addWidget(self.thumbnail_widget)
-        self.layout.addWidget(self.title_widget)
-        self.layout.addWidget(spacer)
-        self.layout.addWidget(self.channel_widget)
-        self.layout.addWidget(spacer)
-        self.layout.addWidget(self.date_widget)
+        # Add labels to layout
+        self.layout.addWidget(self.thumbnail_label)
+        self.layout.addWidget(self.title_label)
+        self.layout.addWidget(spacer_label)
+        self.layout.addWidget(self.channel_label)
+        self.layout.addWidget(spacer_label)
+        self.layout.addWidget(self.date_label)
 
         self.setLayout(self.layout)
 
@@ -74,10 +74,10 @@ class VideoTile(QWidget):
 
         if read_config('Debug', 'color_tile_elements'):
             self.color_palette(Qt.green)
-            self.thumbnail_widget.setStyleSheet("QLabel { background-color : darkMagenta}")
-            self.title_widget.setStyleSheet("QLabel { background-color : crimson}")
-            self.channel_widget.setStyleSheet("QLabel { background-color : darkGreen}")
-            self.date_widget.setStyleSheet("QLabel { background-color : gray}")
+            self.thumbnail_label.setStyleSheet("QLabel { background-color : darkMagenta}")
+            self.title_label.setStyleSheet("QLabel { background-color : crimson}")
+            self.channel_label.setStyleSheet("QLabel { background-color : darkGreen}")
+            self.date_label.setStyleSheet("QLabel { background-color : gray}")
 
     def init_thumbnail_tile(self):
         raise ValueError("ThumbnailTile initialised from VideoTile, not subclass!")
@@ -87,7 +87,7 @@ class VideoTile(QWidget):
         Runs
         :return:
         """
-        self.thumbnail_widget.setPixmap(QPixmap(thumbnail_path))
+        self.thumbnail_label.setPixmap(QPixmap(thumbnail_path))
         self.update()
 
     def set_video(self, video):
@@ -102,11 +102,11 @@ class VideoTile(QWidget):
                 grab_method = grab_methods[0]
                 for grab in grab_methods[1:]:
                     grab_method = '{}, {}'.format(grab_method, grab)
-            self.channel_widget.setText("{} | {}".format(video.channel_title, grab_method))
+            self.channel_label.setText("{} | {}".format(video.channel_title, grab_method))
         else:
-            self.channel_widget.setText(self.video.channel_title)
+            self.channel_label.setText(self.video.channel_title)
 
-        self.date_widget.setText(self.strf_delta(self.video.date_published))
+        self.date_label.setText(self.strf_delta(self.video.date_published))
         self.color_old_video(self.video.date_published)
         self.color_live_video()
 

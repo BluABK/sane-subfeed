@@ -1,4 +1,5 @@
 Current
+- Made Title, Channel and Date VideoTile labels part of a class VideoTileLabel to avoid excessively redundant code.
 
 v0.6.1
 - Removed no longer necessary pixel size hacks from config.
