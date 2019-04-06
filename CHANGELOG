@@ -1,4 +1,5 @@
 Current
+- Made pickle load callers handle and log ModuleNotFound (happens when restructuring) and unexpected exceptions.
 - Moved more path constants out of classes and into absolute_paths.
 - Moved misplaced logdir up to the project root level (was in sources root).
 - Refactored lots of manual OS_PATH cases to use absolute_paths instead.

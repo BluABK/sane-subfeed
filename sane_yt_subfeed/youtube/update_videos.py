@@ -134,16 +134,25 @@ def load_keys(number_of_keys):
     youtube_keys = []
     try:
         youtube_keys = load_youtube_resource_keys()
-    except FileNotFoundError:
-        logger.info("load_youtube_resource_keys() gave 404 error. Generating new youtube key builds.")
-        print("\nGenerating youtube key builds:")
+    except FileNotFoundError as file404_exc:
+        logger.info("load_youtube_resource_keys() gave 404 error. Generating new youtube key builds.",
+                    exc_info=file404_exc)
+        youtube_keys.extend(generate_keys(number_of_keys))
+        save_youtube_resource_keys(youtube_keys)
+    except ModuleNotFoundError as mod404_exc:
+        logger.info("load_youtube_resource_keys() gave ModuleNotFoundError error. Generating new youtube key builds.",
+                    exc_info=mod404_exc)
+        youtube_keys.extend(generate_keys(number_of_keys))
+        save_youtube_resource_keys(youtube_keys)
+    except Exception as exc:
+        logger.info("load_youtube_resource_keys() gave Unexpected exception error. Generating new youtube key builds.",
+                    exc_info=exc)
         youtube_keys.extend(generate_keys(number_of_keys))
         save_youtube_resource_keys(youtube_keys)
 
     diff = number_of_keys - len(youtube_keys)
     if diff > 0:
         logger.info("Generating diff youtube key builds.")
-        print("\nGenerating diff youtube key builds:")
         youtube_keys.extend(generate_keys(diff))
         save_youtube_resource_keys(youtube_keys)
     return youtube_keys

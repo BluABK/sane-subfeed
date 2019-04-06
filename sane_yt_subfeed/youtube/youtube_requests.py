@@ -346,8 +346,25 @@ def get_remote_subscriptions_cached_oauth():
     try:
         youtube_oauth = load_youtube_resource_oauth()
         temp_subscriptions = get_remote_subscriptions(youtube_oauth)
-    except FileNotFoundError:
-        logger.warning("Loading of cached OAuth: File not found. Requesting new OAuth from user.")
+    except FileNotFoundError as file404_exc:
+        logger.warning("Loading of cached OAuth: File not found. Requesting new OAuth from user.", exc_info=file404_exc)
+        youtube_oauth = youtube_auth_oauth()
+        if youtube_oauth is None:
+            logger.critical("Failed to authenticate YouTube API OAuth2!")
+            return None
+        save_youtube_resource_oauth(youtube_oauth)
+        temp_subscriptions = get_remote_subscriptions(youtube_oauth)
+    except ModuleNotFoundError as mod404_exc:
+        logger.warning("Loading of cached OAuth: Module not found. Requesting new OAuth from user.",
+                       exc_info=mod404_exc)
+        youtube_oauth = youtube_auth_oauth()
+        if youtube_oauth is None:
+            logger.critical("Failed to authenticate YouTube API OAuth2!")
+            return None
+        save_youtube_resource_oauth(youtube_oauth)
+        temp_subscriptions = get_remote_subscriptions(youtube_oauth)
+    except Exception as exc:
+        logger.warning("Loading of cached OAuth: Unexpected exception. Requesting new OAuth from user.", exc_info=exc)
         youtube_oauth = youtube_auth_oauth()
         if youtube_oauth is None:
             logger.critical("Failed to authenticate YouTube API OAuth2!")
