@@ -6,7 +6,7 @@ from sane_yt_subfeed.config_handler import read_config
 from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NORMAL_REFRESH, \
     LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.exceptions.sane_aborted_operation import SaneAbortedOperation
-from sane_yt_subfeed.generate_keys import GenerateKeys
+from sane_yt_subfeed.youtube.generate_keys import GenerateKeys
 from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.pickle_handler import load_youtube_resource_keys, save_youtube_resource_keys
 from sane_yt_subfeed.youtube.uploads_thread import GetUploadsThread
