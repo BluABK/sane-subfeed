@@ -11,7 +11,7 @@ from sane_yt_subfeed.handlers.log_handler import create_logger
 from sane_yt_subfeed.main import run_with_gui, run_channels_test, run_with_cli, cli_refresh_and_print_subfeed
 from sane_yt_subfeed.youtube.update_videos import load_keys
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
-import sane_yt_subfeed.print_functions as print_functions
+from sane_yt_subfeed.cli import print_functions
 import sane_yt_subfeed.youtube as youtube
 
 exceptions = []

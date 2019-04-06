@@ -10,7 +10,7 @@ from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.write_operations import engine_execute_first, engine_execute, delete_sub_not_in_list
 from sane_yt_subfeed.handlers.log_handler import create_logger
 from sane_yt_subfeed.handlers.pickle_handler import load_youtube_resource_oauth, save_youtube_resource_oauth
-from sane_yt_subfeed.print_functions import remove_empty_kwargs
+from sane_yt_subfeed.cli.print_functions import remove_empty_kwargs
 from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VIDEO_KIND_LIVE, \
     VIDEO_KIND_LIVE_SCHEDULED
 
