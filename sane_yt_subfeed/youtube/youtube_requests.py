@@ -1,8 +1,7 @@
 from googleapiclient.errors import HttpError
 from sqlalchemy import or_
 
-from sane_yt_subfeed.authentication import youtube_auth_oauth
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.youtube.authentication import youtube_auth_oauth
 from sane_yt_subfeed.database.detached_models.video_d import VideoD, GRAB_METHOD_SEARCH, GRAB_METHOD_LIST, \
     GRAB_METHOD_VIDEOS
 from sane_yt_subfeed.database.engine_statements import update_channel_from_remote, get_channel_by_id_stmt
@@ -13,7 +12,7 @@ from sane_yt_subfeed.log_handler import create_logger
 from sane_yt_subfeed.pickle_handler import load_youtube_resource_oauth, save_youtube_resource_oauth
 from sane_yt_subfeed.print_functions import remove_empty_kwargs
 from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VIDEO_KIND_LIVE, \
-    VIDEO_KIND_LIVE_SCHEDULED, VIDEO_KIND_PREMIERE
+    VIDEO_KIND_LIVE_SCHEDULED
 
 YOUTUBE_URL = "https://www.youtube.com/"
 YOUTUBE_PARM_VIDEO = "watch?v="
