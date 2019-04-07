@@ -1,4 +1,6 @@
 Current
+- Hotfix: disabled elision by default and instead explicitly using it during init only, due to VideoTileLabel.width()
+  changing drastically later on.
 - Deleted deprecated debug_functions and cli arg --debug_open_1k_fds that was used for "too many file descriptors"
   debugging.
 - Moved log_handler into handlers package.

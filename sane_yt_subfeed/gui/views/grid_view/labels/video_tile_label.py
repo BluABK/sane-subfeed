@@ -60,7 +60,7 @@ class VideoTileLabel(QLabel):
         self.setFont(t_font)
 
         # Finally, set the text string.
-        self.setText(text)
+        self.setText(text, elided=True)
 
     def elide_text(self, p_str):
         """
@@ -81,10 +81,9 @@ class VideoTileLabel(QLabel):
 
         # If the string text is wider than width, return an elided version of the string
         elided = metrics.elidedText(p_str, Qt.ElideRight, self.width() * elided_modifier * lines)
-
         return elided
 
-    def setText(self, p_str, elided=True):
+    def setText(self, p_str, elided=False):
         """
         Override parent's function to explicitly set ellison, then call parent.
         :param p_str:   Text.
@@ -92,6 +91,8 @@ class VideoTileLabel(QLabel):
         """
         self.original_text = p_str
         if elided:
+            # FIXME: When called outside of init the width changes drastically, thus causing earlier and earlier cutoff.
+            # Therefore elided=False by default, for now. Github issue #39
             p_str = self.elide_text(p_str)
 
         # Call parent to set modified text the standard way.

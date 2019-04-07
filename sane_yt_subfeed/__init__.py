@@ -13,12 +13,14 @@ OS_PATH = os.path.dirname(__file__)
 PICKLE_PATH = os.path.join(OS_PATH, 'resources', 'pickles')
 THUMBNAIL_PATH = os.path.join(OS_PATH, 'resources', 'thumbnails')
 
+# Required on windows (w/ virtualenv)
 PYQT_PATH = os.path.join(OS_PATH, '..', 'env', 'Lib', 'site-packages', 'PyQt5', 'Qt', 'plugins')
 PYQT_PATH2 = os.path.join(OS_PATH, 'env', 'Lib', 'site-packages', 'PyQt5', 'Qt', 'plugins')
 
 QtCore.QCoreApplication.addLibraryPath(PYQT_PATH)
 QtCore.QCoreApplication.addLibraryPath(PYQT_PATH2)
 
+# Initialize database
 init_db()
 
 # Make sure dirs exists on startup
