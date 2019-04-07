@@ -2,6 +2,7 @@ import datetime
 import threading
 from sqlalchemy import desc, asc
 
+from sane_yt_subfeed.database.category import Category
 from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.controller.listeners.database.database_listener import DatabaseListener
 from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NORMAL_REFRESH, \
@@ -193,3 +194,9 @@ def get_videos_by_ids(video_ids):
     DatabaseListener.static_instance.finishRead.emit(threading.get_ident())
     return_videos = Video.to_video_ds(db_videos)
     return return_videos
+
+
+# def get_categories():
+#     DatabaseListener.static_instance.startRead.emit(threading.get_ident())
+#     for category in
+#     db_categories = engine.execute(Category.__table__.select())

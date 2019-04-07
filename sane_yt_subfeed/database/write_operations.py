@@ -1,6 +1,7 @@
 import threading
 
 from sane_yt_subfeed.controller.listeners.database.database_listener import DatabaseListener
+from sane_yt_subfeed.database.category import Category
 from sane_yt_subfeed.database.db_download_tile import DBDownloadTile
 from sane_yt_subfeed.database.engine_statements import update_video_statement_full, get_video_by_vidd_stmt, insert_item, \
     get_video_ids_by_video_ids_stmt, update_extra_information_stmt, update_video_stmt, update_channel_from_remote
@@ -236,6 +237,20 @@ def update_event_download_tile(download_tile):
     lock.acquire()
     stmt = DBDownloadTile.__table__.update().where(DBDownloadTile.video_id == download_tile.video.video_id).values({
         'last_event': download_tile.last_event})
+    engine.execute(stmt)
+    lock.release()
+
+
+def update_category(category):
+    lock.acquire()
+    stmt = Category.__table__.update().where(Category.id == category.id).values({
+        'name': category.name,
+        'color': category.color,
+        'enabled': category.enabled,
+        'icon': category.icon,
+        'primary_videos': category.primary_videos,
+        'videos': category.videos,
+        'channels': category.channels})
     engine.execute(stmt)
     lock.release()
 
