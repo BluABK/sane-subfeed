@@ -618,7 +618,7 @@ class MainWindow(QMainWindow):
                                                                 signal=self.main_model.main_window_listener.refreshVideos,
                                                                 args=(LISTENER_SIGNAL_NORMAL_REFRESH,))
 
-        self.add_submenu('&Function', 'Reload Subscriptions &List',
+        self.add_submenu('&Function', 'Fetch &List of Subscribed Channels',
                          self.main_model.main_window_listener.refreshSubs.emit,
                          shortcut=read_config('Global', 'reload_subslist', custom_ini=HOTKEYS_INI,
                                               literal_eval=HOTKEYS_EVAL),
