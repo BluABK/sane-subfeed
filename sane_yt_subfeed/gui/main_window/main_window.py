@@ -628,7 +628,7 @@ class MainWindow(QMainWindow):
         self.add_submenu('&Function', 'Deep refresh of feed', self.emit_signal_with_set_args,
                          shortcut=read_config('Global', 'refresh_feed_deep', custom_ini=HOTKEYS_INI,
                                               literal_eval=HOTKEYS_EVAL),
-                         tooltip='Deed refresh the subscription feed', icon=REFRESH_SUBFEED_DEEP_ICON,
+                         tooltip='Deep refresh the subscription feed', icon=REFRESH_SUBFEED_DEEP_ICON,
                          signal=self.main_model.main_window_listener.refreshVideos,
                          args=(LISTENER_SIGNAL_DEEP_REFRESH,))
 
