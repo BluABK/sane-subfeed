@@ -1,21 +1,24 @@
 import time
 
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, QObject
 
 from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.database.db_category import DBCategory
+from sane_yt_subfeed.database.orm import db_session
+from sane_yt_subfeed.database.write_operations import lock
+from sane_yt_subfeed.gui.widgets.category_widget import CategoryWidget
 
 
-class CategoryListener:
+class CategoryListener(QObject):
     static_self = None
 
     # Define signals
-    add = pyqtSignal(DBCategory)
-    remove = pyqtSignal(DBCategory)
+    add = pyqtSignal(CategoryWidget)
+    remove = pyqtSignal(CategoryWidget)
     assign = pyqtSignal(list)           # [Category, Video].
     unassign = pyqtSignal(list)         # [Category, Video].
-    rename = pyqtSignal(str)            # New Category name.
+    rename = pyqtSignal(list)           # [Category, name].
     set_color = pyqtSignal(str)         # [Category, Color (hexadecimal)]
     enabled = pyqtSignal(bool)
 
@@ -42,24 +45,39 @@ class CategoryListener:
         while True:
             time.sleep(0.2)
 
-    def new_category(self, category):
+    @staticmethod
+    def new_category(category_widget: CategoryWidget):
+        """
+        Takes a Category object/QWidget which it uses to create a DBCategory Object,
+        which is then written to DB.
+        :param category_widget:
+        :return:
+        """
+        lock.acquire()
+        # FIXME: add check if already exists here.
+
+        new_category_column = DBCategory(category_widget)
+        db_session.add(new_category_column)
+        db_session.commit()
+
+        db_session.remove()
+        lock.release()
+
+    def remove_category(self, category_widget: CategoryWidget):
         pass
 
-    def remove_category(self, category):
+    def assign_category(self, category_widget: CategoryWidget, video):
         pass
 
-    def assign_category(self, category, video):
+    def unassign_category(self, category_widget: CategoryWidget, video):
         pass
 
-    def unassign_category(self, category, video):
+    def rename_category(self, category_widget: CategoryWidget, new_name):
         pass
 
-    def rename_category(self, category, new_name):
+    def set_category_color(self, category_widget: CategoryWidget, color):
         pass
 
-    def set_category_color(self, category, color):
-        pass
-
-    def set_category_enabled_status(self, category, boolean):
+    def set_category_enabled_status(self, category_widget: CategoryWidget, boolean):
         pass
 
