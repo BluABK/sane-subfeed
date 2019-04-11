@@ -16,6 +16,7 @@ from subprocess import check_output
 # Project internal libs
 from sane_yt_subfeed.absolute_paths import ICONS_PATH, VERSION_PATH, KEYS_FILE, CLIENT_SECRET_FILE, KEYS_PULIC_FILE, \
     CLIENT_SECRET_PUBLIC_FILE
+from sane_yt_subfeed.gui.views.category_manager_view.category_manager_view import CategoryManagerView
 from sane_yt_subfeed.handlers.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import SUBFEED_VIEW_ID, PLAYBACK_VIEW_ID
@@ -151,6 +152,7 @@ class MainWindow(QMainWindow):
         self.hotkeys_view = None
         self.list_detailed_view = None
         self.list_tiled_view = None
+        self.category_manager_view = None
         self.about_view = None
 
         # Declare theming
@@ -446,6 +448,7 @@ class MainWindow(QMainWindow):
         self.add_central_widget_subs()
         if read_config('Debug', 'show_unimplemented_gui'):
             self.add_central_widget_about()
+            self.add_central_widget_category_manager_view()
         self.add_central_widget_config()
 
         self.central_widget.setCurrentWidget(self.subfeed_grid_view)
@@ -464,6 +467,9 @@ class MainWindow(QMainWindow):
 
     def add_central_widget_list_tiled(self):
         self.central_widget.addWidget(self.list_tiled_view)
+
+    def add_central_widget_category_manager_view(self):
+        self.central_widget.addWidget(self.category_manager_view)
 
     def add_central_widget_subs(self):
         self.central_widget.addWidget(self.subscriptions_view)
@@ -553,6 +559,8 @@ class MainWindow(QMainWindow):
             self.subscriptions_view = SubscriptionsDetailedListView(self)
         if not self.about_view:
             self.about_view = AboutView(self)
+        if not self.category_manager_view:
+            self.category_manager_view = CategoryManagerView(self)
 
     # --- Menu
     def add_menus(self):
@@ -726,6 +734,10 @@ class MainWindow(QMainWindow):
                                                                   tooltip='View subscription feed as a tiled list',
                                                                   icon=SUBFEED_TILED_LIST_VIEW_ICON,
                                                                   widget=self.list_tiled_view)
+
+            self.views['CategoryManagerView'] = self.add_submenu('&View', 'Category Manager', self.set_current_widget,
+                                                                  tooltip='Manage categories',
+                                                                  widget=self.category_manager_view)
 
     def add_menu_window(self, menubar):
         """

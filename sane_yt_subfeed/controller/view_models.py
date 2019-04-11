@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QProgressBar
 from sqlalchemy import asc, desc, false, or_
 from sqlalchemy.dialects import postgresql
 
+from sane_yt_subfeed.controller.listeners.gui.category_listener import CategoryListener
 from sane_yt_subfeed.handlers.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.database.database_listener import DatabaseListener
 from sane_yt_subfeed.controller.listeners.gui.main_window.main_window_listener import MainWindowListener
@@ -97,6 +98,12 @@ class MainModel:
         self.download_thread.setObjectName('download_thread')
         self.download_handler.moveToThread(self.download_thread)
         self.download_thread.start()
+
+        self.category_listener = CategoryListener(self)
+        self.category_listener_thread = QThread()
+        self.category_listener.setObjectName('category_listener_thread')
+        self.category_listener.moveToThread(self.category_listener_thread)
+        self.category_listener_thread.start()
 
         if read_config("Play", "yt_file_path", literal_eval=False):
             self.yt_dir_listener = YoutubeDirListener(self)

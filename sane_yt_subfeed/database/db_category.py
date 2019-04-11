@@ -63,7 +63,7 @@ class DBCategory(PermanentBase):
         Update table values from a given category object.
         :return:
         """
-        self.id = category.id
+        # self.id = category.id
         self.name = category.name
         self.color = category.color
         self.enabled = category.enabled

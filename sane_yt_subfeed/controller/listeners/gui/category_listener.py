@@ -3,7 +3,6 @@ import time
 from PyQt5.QtCore import pyqtSignal, QObject
 
 from sane_yt_subfeed import create_logger
-from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.database.db_category import DBCategory
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.write_operations import lock
@@ -22,8 +21,9 @@ class CategoryListener(QObject):
     set_color = pyqtSignal(str)         # [Category, Color (hexadecimal)]
     enabled = pyqtSignal(bool)
 
-    def __init__(self, main_model: MainModel):
+    def __init__(self, main_model):
         super(CategoryListener, self).__init__()
+        CategoryListener.static_self = self
         self.logger = create_logger(__name__ + ".CategoryListener")
 
         self.main_model = main_model
@@ -47,6 +47,7 @@ class CategoryListener(QObject):
 
     @staticmethod
     def new_category(category_widget: CategoryWidget):
+        pass
         """
         Takes a Category object/QWidget which it uses to create a DBCategory Object,
         which is then written to DB.
