@@ -10,7 +10,7 @@ DEFAULT_CATEGORIES = {
 CATEGORIES = []
 
 
-class Category:
+class CategoryObj:
     def __init__(self, name, color):
         self.id = len(CATEGORIES)
         self.name = name
@@ -53,7 +53,7 @@ class Category:
 # Set up some default categories
 def add_default_categories():
     for category, color in DEFAULT_CATEGORIES.items():
-        Category(category, color)
+        CategoryObj(category, color)
 
 
 if __name__ == "__main__":

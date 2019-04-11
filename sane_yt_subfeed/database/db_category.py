@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from sane_yt_subfeed.database.orm import PermanentBase, db_session
 
 
-class Category(PermanentBase):
+class DBCategory(PermanentBase):
     """
     Category for a video.
 
