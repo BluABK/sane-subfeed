@@ -26,6 +26,9 @@ def init_db():
     # import all modules here that might define models so that
     # they will be registered properly on the metadata.  Otherwise
     # you will have to import them first before calling init_db()
+    import sane_yt_subfeed.database.models
+    import sane_yt_subfeed.database.video
+    import sane_yt_subfeed.database.db_download_tile
     PermanentBase.metadata.create_all(bind=engine)
     logger.info("Initialised DB (PermanentBase.metadata.create_all(bind=engine))")
 
