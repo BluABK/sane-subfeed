@@ -230,6 +230,19 @@ if not os.path.exists(SAMPLE_HOTKEYS_PATH):
         config_hotkeys_sample_parser.write(config_hotkeys_sample_file)
 
 
+def create_config_file(file_path, template: dict):
+    """
+    Creates a config file in file_path using the given template dict.
+    :param file_path:
+    :param template:
+    :return:
+    """
+    cfg_parser = ConfigParser()
+    cfg_parser.read_dict(template)
+    with open(file_path, 'w') as config_file:
+        cfg_parser.write(config_file)
+
+
 def read_config(section, option, literal_eval=True, custom_ini=None):
     """
     Reads a configuration file (INI format)
@@ -257,7 +270,7 @@ def read_config(section, option, literal_eval=True, custom_ini=None):
 
     if literal_eval:
         if not os.path.exists(config_path):
-            copyfile(sample_path, config_path)
+            create_config_file(config_path, DEFAULTS)
         try:
             value = parser.get(section, option)
         except (NoSectionError, NoOptionError):
@@ -271,7 +284,7 @@ def read_config(section, option, literal_eval=True, custom_ini=None):
             return ast.literal_eval(defaults[section][option])
     else:
         if not os.path.exists(config_path):
-            copyfile(sample_path, config_path)
+            create_config_file(config_path, DEFAULTS)
         try:
             value = parser.get(section, option)
         except (NoSectionError, NoOptionError):
