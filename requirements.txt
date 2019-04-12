@@ -21,8 +21,8 @@ pathtools==0.1.2
 Pillow==5.2.0
 pyasn1==0.4.3
 pyasn1-modules==0.2.2
-PyQt5==5.11.2
-PyQt5-sip==4.19.11
+PyQt5>=5.11.2
+PyQt5-sip>=4.19.11
 python-dateutil==2.7.3
 python-editor==1.0.3
 PyYAML==4.2b4
