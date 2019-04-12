@@ -192,7 +192,8 @@ DEFAULTS_HOTKEYS = {
         'detailed_list': 'Ctrl+3',
         'download': 'Ctrl+4',
         'subscriptions': 'Ctrl+5',
-        'tiled_list': 'Ctrl+9'
+        'tiled_list': 'Ctrl+9',
+        'config': 'Ctrl+P'
     },
     'Subfeed': {
         'download': 'LeftButton',
