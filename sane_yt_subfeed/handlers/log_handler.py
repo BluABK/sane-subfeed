@@ -220,7 +220,17 @@ def create_file_handler(log_file=LOG_FILE, formatter=FORMATTER):
     global LOG_FILE_HANDLER
     # Only create one instance of the file handler
     if not read_config('Logging', 'use_socket_log') and LOG_FILE_HANDLER is None:
-        LOG_FILE_HANDLER = logging.FileHandler(os.path.join(LOG_DIR, log_file), encoding="UTF-8")
+        logfile_path = os.path.join(LOG_DIR, log_file)
+
+        # Make sure logs dir exists, if not create it.
+        if not os.path.isdir(LOG_DIR):
+            os.makedirs(LOG_DIR)
+
+        # Make sure logfile exists, if not create it.
+        if not os.path.isfile(logfile_path):
+            open(logfile_path, 'a').close()
+
+        LOG_FILE_HANDLER = logging.FileHandler(logfile_path, encoding="UTF-8")
         LOG_FILE_HANDLER.setLevel(logging.DEBUG)
         LOG_FILE_HANDLER.setFormatter(formatter)
 
