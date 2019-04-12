@@ -29,6 +29,7 @@ def init_db():
     import sane_yt_subfeed.database.models
     import sane_yt_subfeed.database.video
     import sane_yt_subfeed.database.db_download_tile
+    import sane_yt_subfeed.database.db_category
     PermanentBase.metadata.create_all(bind=engine)
     logger.info("Initialised DB (PermanentBase.metadata.create_all(bind=engine))")
 
