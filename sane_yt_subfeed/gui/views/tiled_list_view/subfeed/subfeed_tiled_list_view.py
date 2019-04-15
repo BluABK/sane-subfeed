@@ -1,20 +1,10 @@
-import os
 from PyQt5.QtGui import *
 # TODO: Easier to work with wildcard imports from PyQt, fix afterwards
 from PyQt5.QtWidgets import *
 
-from sane_yt_subfeed.absolute_paths import ICONS_PATH
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.database.write_operations import UpdateVideo
-from sane_yt_subfeed.log_handler import create_logger
-
-# from PyQt5.QtWidgets import QWidget, QMessageBox, qApp, \
-#     QMenu, QGridLayout, QLabel, QVBoxLayout, QLineEdit, QHBoxLayout
-# from PyQt5.QtGui import QPixmap, QPainter
-# from sqlalchemy import desc
-
-# Constants
-DUMMY_ICO_PATH = os.path.join(ICONS_PATH, 'dummies')
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 
 class ExtendedQLabel(QLabel):

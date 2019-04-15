@@ -1,8 +1,8 @@
 import datetime
 
 from sane_yt_subfeed import create_logger
-from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.settings import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
+from sane_yt_subfeed.handlers.config_handler import read_config
+from sane_yt_subfeed.constants import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 
 GRAB_METHOD_LIST = 'list()'
 GRAB_METHOD_SEARCH = 'search()'

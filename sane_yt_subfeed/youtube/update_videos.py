@@ -2,13 +2,13 @@ import re
 from datetime import timedelta
 from googleapiclient.errors import HttpError
 
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.controller.static_controller_vars import LISTENER_SIGNAL_NORMAL_REFRESH, \
     LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.exceptions.sane_aborted_operation import SaneAbortedOperation
-from sane_yt_subfeed.generate_keys import GenerateKeys
-from sane_yt_subfeed.log_handler import create_logger
-from sane_yt_subfeed.pickle_handler import load_youtube_resource_keys, save_youtube_resource_keys
+from sane_yt_subfeed.youtube.generate_keys import GenerateKeys
+from sane_yt_subfeed.handlers.log_handler import create_logger
+from sane_yt_subfeed.handlers.pickle_handler import load_youtube_resource_keys, save_youtube_resource_keys
 from sane_yt_subfeed.youtube.uploads_thread import GetUploadsThread
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions, get_videos_result
 
@@ -134,16 +134,25 @@ def load_keys(number_of_keys):
     youtube_keys = []
     try:
         youtube_keys = load_youtube_resource_keys()
-    except FileNotFoundError:
-        logger.info("load_youtube_resource_keys() gave 404 error. Generating new youtube key builds.")
-        print("\nGenerating youtube key builds:")
+    except FileNotFoundError as file404_exc:
+        logger.info("load_youtube_resource_keys() gave 404 error. Generating new youtube key builds.",
+                    exc_info=file404_exc)
+        youtube_keys.extend(generate_keys(number_of_keys))
+        save_youtube_resource_keys(youtube_keys)
+    except ModuleNotFoundError as mod404_exc:
+        logger.info("load_youtube_resource_keys() gave ModuleNotFoundError error. Generating new youtube key builds.",
+                    exc_info=mod404_exc)
+        youtube_keys.extend(generate_keys(number_of_keys))
+        save_youtube_resource_keys(youtube_keys)
+    except Exception as exc:
+        logger.info("load_youtube_resource_keys() gave Unexpected exception error. Generating new youtube key builds.",
+                    exc_info=exc)
         youtube_keys.extend(generate_keys(number_of_keys))
         save_youtube_resource_keys(youtube_keys)
 
     diff = number_of_keys - len(youtube_keys)
     if diff > 0:
         logger.info("Generating diff youtube key builds.")
-        print("\nGenerating diff youtube key builds:")
         youtube_keys.extend(generate_keys(diff))
         save_youtube_resource_keys(youtube_keys)
     return youtube_keys

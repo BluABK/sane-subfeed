@@ -4,7 +4,7 @@ import os
 import subprocess
 
 from sane_yt_subfeed import create_logger
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 
 OPEN_FILE_HANDLERS_LINUX = ['xdg-open', 'gnome-open']
 IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', ]
@@ -19,9 +19,6 @@ def is_image(file_path):
         if file_path.endswith(ext):
             return True
     return False
-
-
-# def determine_filetype(file_path):
 
 
 def open_with_default_application(file_path):

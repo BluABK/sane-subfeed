@@ -1,6 +1,6 @@
 import runpy
 
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 if __name__ == "__main__":
     logger = create_logger(__name__)

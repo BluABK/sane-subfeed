@@ -3,16 +3,29 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QFontMetrics
 from PyQt5.QtWidgets import QLabel
 
-from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.gui.views.config_view.config_item_types import TILE_TITLE_FONT_WEIGHTS_MAP
+from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.utils import get_unicode_weight
+from sane_yt_subfeed.gui.views.config_view.config_item_types import TILE_TITLE_FONT_WEIGHTS_MAP
 
 
-class TitleTile(QLabel):
+class VideoTileLabel(QLabel):
 
-    def __init__(self, text, parent):
+    def __init__(self, text, parent, cfg_lines_entry, cfg_elided_mod_entry, cfg_font_weight=None):
+        """
+        Video tile label (superclass).
+        :param text:                    String to put on QLabel.
+        :param parent:                  Parent ptr.
+        :param cfg_lines_entry:         Config [section, option] entry for lines of text to show.
+        :param cfg_elided_mod_entry:    Config [section, option] entry for elided text modifier.
+        :param cfg_font_weight:         Config [section, option] entry for font weight (optional).
+        """
         QLabel.__init__(self, text)
         self.parent = parent
+
+        # Set label type independent config entries
+        self.cfg_lines_entry: list = cfg_lines_entry
+        self.cfg_elided_mod_entry: list = cfg_elided_mod_entry
+        self.cfg_font_weight: list = cfg_font_weight
 
         # Elided overwrites the original, so we need to keep a copy.
         self.original_text = text
@@ -22,12 +35,13 @@ class TitleTile(QLabel):
 
         # Set up font.
         t_font: QFont = self.font()
-        t_font.setWeight(TILE_TITLE_FONT_WEIGHTS_MAP[read_config('GridView', 'title_tile_font_weight')])
         t_font.setStyleHint(QFont.Helvetica)  # FIXME: Make font configurable
+        if cfg_font_weight:
+            t_font.setWeight(TILE_TITLE_FONT_WEIGHTS_MAP[read_config(*cfg_font_weight)])
         t_font.setFixedPitch(True)
 
         # Lines of text to show (determines height of title text item).
-        lines = read_config('GridView', 'tile_title_lines')
+        lines = read_config(*self.cfg_lines_entry)
 
         # Offset the unicode because it has tall characters and its line spacing is thus larger than ASCII's.
         #
@@ -38,15 +52,15 @@ class TitleTile(QLabel):
         # Set height equal to lines and add some newline spacing for unicode.
         self.setFixedHeight((metrics.height() * lines) + (unicode_height_offset * lines))
 
-        # Set alignment and enable word wrapping so the text newlines instead of continuing OOB.
+        # Set alignment and enable word wrapping so the text newlines instead of continuing OOB
         self.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.setWordWrap(True)
 
-        # Set own font to the new modified one.
+        # Apply modified font.
         self.setFont(t_font)
 
         # Finally, set the text string.
-        self.setText(text)
+        self.setText(text, elided=True)
 
     def elide_text(self, p_str):
         """
@@ -58,8 +72,8 @@ class TitleTile(QLabel):
         metrics = QFontMetrics(self.font())
 
         # Get latest configurable values
-        elided_modifier = read_config('GridView', 'elided_text_modifier_title')
-        lines = read_config('GridView', 'tile_title_lines')
+        elided_modifier = read_config(*self.cfg_elided_mod_entry)
+        lines = read_config(*self.cfg_lines_entry)
         unicode_weight_modifier = read_config('GridView', 'elided_text_unicode_weight_modifier')
 
         # Non-ASCII needs to be elided at an earlier width.
@@ -67,10 +81,9 @@ class TitleTile(QLabel):
 
         # If the string text is wider than width, return an elided version of the string
         elided = metrics.elidedText(p_str, Qt.ElideRight, self.width() * elided_modifier * lines)
-
         return elided
 
-    def setText(self, p_str, elided=True):
+    def setText(self, p_str, elided=False):
         """
         Override parent's function to explicitly set ellison, then call parent.
         :param p_str:   Text.
@@ -78,6 +91,8 @@ class TitleTile(QLabel):
         """
         self.original_text = p_str
         if elided:
+            # FIXME: When called outside of init the width changes drastically, thus causing earlier and earlier cutoff.
+            # Therefore elided=False by default, for now. Github issue #39
             p_str = self.elide_text(p_str)
 
         # Call parent to set modified text the standard way.

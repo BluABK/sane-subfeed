@@ -1,4 +1,24 @@
 Current
+- Hotfix: disabled elision by default and instead explicitly using it during init only, due to VideoTileLabel.width()
+  changing drastically later on.
+- Deleted deprecated debug_functions and cli arg --debug_open_1k_fds that was used for "too many file descriptors"
+  debugging.
+- Moved log_handler into handlers package.
+- Moved plaintext_history_handler into handlers package.
+- Moved default_application_handler into handlers package.
+- Made pickle load callers handle and log ModuleNotFound (happens when restructuring) and unexpected exceptions.
+- Moved more path constants out of classes and into absolute_paths.
+- Moved misplaced logdir up to the project root level (was in sources root).
+- Refactored lots of manual OS_PATH cases to use absolute_paths instead.
+- Fixed config_handler OS_PATH pointing at wrong level after move.
+- Fixed orphaned settings import of ROOT_PATH in main_window (due to abs path move).
+- Moved history_handler into handlers package and renamed with suffix 'plaintext'.
+- Moved config_handler into handlers package.
+- Moved pickle_handler into handlers package.
+- Moved (Youtube auth) generate_keys into youtube folder.
+- Moved (YouTube API) authentication into youtube folder.
+- Removed deprecated show_grab_method debug option and code.
+- Made Title, Channel and Date VideoTile labels part of a class VideoTileLabel to avoid excessively redundant code.
 
 v0.6.1
 - Removed no longer necessary pixel size hacks from config.

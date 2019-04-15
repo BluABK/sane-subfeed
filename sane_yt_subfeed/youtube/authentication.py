@@ -1,22 +1,17 @@
 import apiclient
 import httplib2
 import json
-import os
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from oauthlib.oauth2 import MissingCodeError
 
-from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.absolute_paths import KEYS_FILE, CLIENT_SECRET_FILE
+from sane_yt_subfeed.handlers.config_handler import read_config
+from sane_yt_subfeed.handlers.log_handler import create_logger
 from sane_yt_subfeed.settings import mutable_settings
 
-# FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 logger = create_logger(__name__)
 
-OS_PATH = os.path.dirname(__file__)
-
-CLIENT_SECRET_FILE = os.path.join(OS_PATH, 'resources', 'client_secret.json')
-KEYS_FILE = os.path.join(OS_PATH, 'resources', 'keys.json')
 SCOPES = ['https://www.googleapis.com/auth/youtube.readonly']
 
 API_SERVICE_NAME = 'youtube'

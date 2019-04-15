@@ -1,9 +1,9 @@
 import threading
 
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_search, list_uploaded_videos, \
     list_uploaded_videos_videos
 

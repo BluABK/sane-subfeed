@@ -1,10 +1,9 @@
-import gc
 import time
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QPalette
 
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 
 class ProgressBarListener(QObject):

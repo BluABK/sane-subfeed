@@ -1,16 +1,15 @@
-import webbrowser
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QMenu, QApplication
 
-from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.default_application_handler import open_with_default_application
+from sane_yt_subfeed.handlers.config_handler import read_config
+from sane_yt_subfeed.handlers.default_application_handler import open_with_default_application
 from sane_yt_subfeed.gui.dialogs.sane_text_view_dialog import SaneTextViewDialog
 from sane_yt_subfeed.gui.views.grid_view.subfeed.subfeed_grid_thumbnail_tile import SubfeedGridViewThumbnailTile
 from sane_yt_subfeed.gui.views.grid_view.video_tile import VideoTile
 from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VIDEO_KIND_LIVE, \
     VIDEO_KIND_LIVE_SCHEDULED, VIDEO_KIND_PREMIERE
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 VIDEO_IS_LIVE_TITLE = "This video is live broadcast content!"
 VIDEO_IS_LIVE_MSG = "If you proceed to download this video is will be streamed in realtime and not finish until the" \

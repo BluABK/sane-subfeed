@@ -25,7 +25,7 @@ from youtube_dl.utils import (
 )
 
 from sane_yt_subfeed import create_logger
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 
 EXT_TO_OUT_FORMATS = {
     'aac': 'adts',

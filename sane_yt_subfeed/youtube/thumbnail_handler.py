@@ -9,12 +9,11 @@ import urllib3
 from PIL import Image  # Image cropping (black barred thumbs, issue #11)
 from PIL import ImageChops
 
-from sane_yt_subfeed.config_handler import read_config
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.absolute_paths import THUMBNAILS_PATH, THUMBNAIL_404_PATH, THUMBNAIL_NA_PATH, \
+    THUMBNAILS_RESIZED_PATH
+from sane_yt_subfeed.handlers.config_handler import read_config
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
-OS_PATH = os.path.dirname(__file__)
-THUMBNAILS_PATH = os.path.join(OS_PATH, '..', 'resources', 'thumbnails')
-THUMBNAIL_NA_PATH = os.path.join(OS_PATH, '..', 'resources', 'thumbnail_na.png')
 
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 logger = create_logger(__name__)
@@ -207,7 +206,7 @@ def quality_404_check(img):
     :param img:
     :return: True if given image equals YouTube's 404 image
     """
-    img_404 = Image.open(os.path.join(OS_PATH, '..', 'resources', 'quality404.jpg'))
+    img_404 = Image.open(THUMBNAIL_404_PATH)
     img_cmp = Image.open(img)
     check = ImageChops.difference(img_cmp, img_404).getbbox() is None
     return check
@@ -226,7 +225,7 @@ def resize_thumbnail(img_path, maxwidth, maxheight, out=True):
     """
     if img_path is None:
         img_path = THUMBNAIL_NA_PATH
-    outdir = os.path.join(THUMBNAILS_PATH, 'resized')
+    outdir = THUMBNAILS_RESIZED_PATH
     if not os.path.isdir(outdir):
         os.makedirs(outdir)
 

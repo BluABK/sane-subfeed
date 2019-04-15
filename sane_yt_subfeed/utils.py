@@ -11,7 +11,7 @@ def get_unicode_weight(text, unicode_weight_modifier):
         if c == '「' or c == '」':
             # Weight extreme-width edge cases more than regular UTF-8
             unicode_weight += 16 * unicode_weight_modifier
-        elif not c.isascii():
+        elif ord(c) > 128:
             unicode_weight += unicode_weight_modifier
 
     return unicode_weight

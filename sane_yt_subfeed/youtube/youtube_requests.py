@@ -1,19 +1,18 @@
 from googleapiclient.errors import HttpError
 from sqlalchemy import or_
 
-from sane_yt_subfeed.authentication import youtube_auth_oauth
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.youtube.authentication import youtube_auth_oauth
 from sane_yt_subfeed.database.detached_models.video_d import VideoD, GRAB_METHOD_SEARCH, GRAB_METHOD_LIST, \
     GRAB_METHOD_VIDEOS
 from sane_yt_subfeed.database.engine_statements import update_channel_from_remote, get_channel_by_id_stmt
 from sane_yt_subfeed.database.models import Channel
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.write_operations import engine_execute_first, engine_execute, delete_sub_not_in_list
-from sane_yt_subfeed.log_handler import create_logger
-from sane_yt_subfeed.pickle_handler import load_youtube_resource_oauth, save_youtube_resource_oauth
-from sane_yt_subfeed.print_functions import remove_empty_kwargs
+from sane_yt_subfeed.handlers.log_handler import create_logger
+from sane_yt_subfeed.handlers.pickle_handler import load_youtube_resource_oauth, save_youtube_resource_oauth
+from sane_yt_subfeed.cli.print_functions import remove_empty_kwargs
 from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VIDEO_KIND_LIVE, \
-    VIDEO_KIND_LIVE_SCHEDULED, VIDEO_KIND_PREMIERE
+    VIDEO_KIND_LIVE_SCHEDULED
 
 YOUTUBE_URL = "https://www.youtube.com/"
 YOUTUBE_PARM_VIDEO = "watch?v="
@@ -347,8 +346,25 @@ def get_remote_subscriptions_cached_oauth():
     try:
         youtube_oauth = load_youtube_resource_oauth()
         temp_subscriptions = get_remote_subscriptions(youtube_oauth)
-    except FileNotFoundError:
-        logger.warning("Loading of cached OAuth: File not found. Requesting new OAuth from user.")
+    except FileNotFoundError as file404_exc:
+        logger.warning("Loading of cached OAuth: File not found. Requesting new OAuth from user.", exc_info=file404_exc)
+        youtube_oauth = youtube_auth_oauth()
+        if youtube_oauth is None:
+            logger.critical("Failed to authenticate YouTube API OAuth2!")
+            return None
+        save_youtube_resource_oauth(youtube_oauth)
+        temp_subscriptions = get_remote_subscriptions(youtube_oauth)
+    except ModuleNotFoundError as mod404_exc:
+        logger.warning("Loading of cached OAuth: Module not found. Requesting new OAuth from user.",
+                       exc_info=mod404_exc)
+        youtube_oauth = youtube_auth_oauth()
+        if youtube_oauth is None:
+            logger.critical("Failed to authenticate YouTube API OAuth2!")
+            return None
+        save_youtube_resource_oauth(youtube_oauth)
+        temp_subscriptions = get_remote_subscriptions(youtube_oauth)
+    except Exception as exc:
+        logger.warning("Loading of cached OAuth: Unexpected exception. Requesting new OAuth from user.", exc_info=exc)
         youtube_oauth = youtube_auth_oauth()
         if youtube_oauth is None:
             logger.critical("Failed to authenticate YouTube API OAuth2!")

@@ -1,4 +1,3 @@
-import gc
 import time
 
 import datetime
@@ -6,12 +5,12 @@ import os
 from PyQt5.QtCore import *
 from watchdog.observers import Observer
 
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.controller.dir_handler import VidEventHandler, CheckYoutubeFolderForNew
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideo
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded, THUMBNAILS_PATH
 from sane_yt_subfeed.youtube.update_videos import load_keys
 from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_videos

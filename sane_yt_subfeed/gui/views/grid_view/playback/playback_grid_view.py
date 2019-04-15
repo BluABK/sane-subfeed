@@ -1,7 +1,7 @@
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.gui.views.grid_view.grid_view import GridView
 from sane_yt_subfeed.gui.views.grid_view.playback.playback_grid_view_tile import PlaybackGridViewTile
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 
 class PlaybackGridView(GridView):

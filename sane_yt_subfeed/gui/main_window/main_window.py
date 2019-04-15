@@ -14,9 +14,9 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QStackedWidget, QSt
 from subprocess import check_output
 
 # Project internal libs
-# from sane_yt_subfeed import debug_functions
-from sane_yt_subfeed.absolute_paths import ICONS_PATH, VERSION_PATH
-from sane_yt_subfeed.config_handler import read_config, set_config
+from sane_yt_subfeed.absolute_paths import ICONS_PATH, VERSION_PATH, KEYS_FILE, CLIENT_SECRET_FILE, KEYS_PULIC_FILE, \
+    CLIENT_SECRET_PUBLIC_FILE
+from sane_yt_subfeed.handlers.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import SUBFEED_VIEW_ID, PLAYBACK_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
@@ -44,16 +44,11 @@ from sane_yt_subfeed.gui.views.grid_view.grid_scroll_area import GridScrollArea
 from sane_yt_subfeed.gui.views.grid_view.playback.playback_grid_view import PlaybackGridView
 from sane_yt_subfeed.gui.views.grid_view.subfeed.subfeed_grid_view import SubfeedGridView
 from sane_yt_subfeed.gui.views.tiled_list_view.subfeed.subfeed_tiled_list_view import SubfeedTiledListView
-from sane_yt_subfeed.history_handler import get_plaintext_history
-from sane_yt_subfeed.log_handler import create_logger
-from sane_yt_subfeed.settings import ROOT_PATH
+from sane_yt_subfeed.handlers.plaintext_history_handler import get_plaintext_history
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 # Constants
 
-CLIENT_SECRET_FILE = os.path.join(ROOT_PATH, 'resources', 'client_secret.json')
-CLIENT_SECRET_PUBLIC_FILE = os.path.join(ROOT_PATH, "resources", "client_secret_public.json")
-KEYS_FILE = os.path.join(ROOT_PATH, 'resources', 'keys.json')
-KEYS_PULIC_FILE = os.path.join(ROOT_PATH, "resources", "keys_public.json")
 HOTKEYS_EVAL = False
 HOTKEYS_INI = 'hotkeys'
 YOUTUBE_URL_REGEX = QRegExp('(http[s]?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/[^ ]+')
@@ -623,7 +618,7 @@ class MainWindow(QMainWindow):
                                                                 signal=self.main_model.main_window_listener.refreshVideos,
                                                                 args=(LISTENER_SIGNAL_NORMAL_REFRESH,))
 
-        self.add_submenu('&Function', 'Reload Subscriptions &List',
+        self.add_submenu('&Function', 'Fetch &List of Subscribed Channels',
                          self.main_model.main_window_listener.refreshSubs.emit,
                          shortcut=read_config('Global', 'reload_subslist', custom_ini=HOTKEYS_INI,
                                               literal_eval=HOTKEYS_EVAL),
@@ -633,7 +628,7 @@ class MainWindow(QMainWindow):
         self.add_submenu('&Function', 'Deep refresh of feed', self.emit_signal_with_set_args,
                          shortcut=read_config('Global', 'refresh_feed_deep', custom_ini=HOTKEYS_INI,
                                               literal_eval=HOTKEYS_EVAL),
-                         tooltip='Deed refresh the subscription feed', icon=REFRESH_SUBFEED_DEEP_ICON,
+                         tooltip='Deep refresh the subscription feed', icon=REFRESH_SUBFEED_DEEP_ICON,
                          signal=self.main_model.main_window_listener.refreshVideos,
                          args=(LISTENER_SIGNAL_DEEP_REFRESH,))
 

@@ -1,15 +1,11 @@
 # std libs
-import os
 from PyQt5.QtGui import QPixmap, QPainter
 # PyQt5 libs
 from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout
 
 # Project internal libs
-from sane_yt_subfeed.log_handler import create_logger
-
-# Constants
-OS_PATH = os.path.dirname(__file__)
-IMG_PATH = os.path.join(OS_PATH, 'images')
+from sane_yt_subfeed.absolute_paths import ABOUT_IMG_PATH
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 
 class ExtendedQLabel(QLabel):
@@ -55,9 +51,8 @@ class AboutView(QWidget):
         # textbox = QTextEdit()
         layout = QVBoxLayout()
         self.setLayout(layout)
-        img_filename = os.path.join(IMG_PATH, 'about.png')
-        img = ExtendedQLabel(self, img_filename)
-        img.set_image(img_filename)
+        img = ExtendedQLabel(self, ABOUT_IMG_PATH)
+        img.set_image(ABOUT_IMG_PATH)
         # img.show()
         self.q_labels.append(img)
         layout.addWidget(img)

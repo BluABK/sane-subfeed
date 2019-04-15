@@ -1,16 +1,9 @@
 import time
 
-import os
 import pickle
 
-from sane_yt_subfeed.log_handler import create_logger
-
-OS_PATH = os.path.dirname(__file__)
-
-PICKLE_PATH = os.path.join(OS_PATH, 'resources', 'pickles')
-
-YOUTUBE_RESOURCE_OAUTH_PICKLE = os.path.join(PICKLE_PATH, 'youtube_oauth.pkl')
-YOUTUBE_RESOURCE_KEYS_PICKLE = os.path.join(PICKLE_PATH, 'youtube_auth_keys.pkl')
+from sane_yt_subfeed.absolute_paths import YOUTUBE_RESOURCE_OAUTH_PICKLE, YOUTUBE_RESOURCE_KEYS_PICKLE
+from sane_yt_subfeed.handlers.log_handler import create_logger
 
 logger = create_logger(__name__)
 
@@ -80,10 +73,9 @@ def load_youtube_resource_keys():
     Loads Pickled YouTube API-Key Authenticated Resource objects from file.
     :return:
     """
-    path = os.path.join(PICKLE_PATH, 'youtube_auth_keys.pkl')
     logger.info("Loading YouTube API-Key Authenticated Resource objects pickle from {}".format(
         YOUTUBE_RESOURCE_KEYS_PICKLE))
-    return load_pickle(path)
+    return load_pickle(YOUTUBE_RESOURCE_KEYS_PICKLE)
 
 
 def save_youtube_resource_keys(youtube_list):

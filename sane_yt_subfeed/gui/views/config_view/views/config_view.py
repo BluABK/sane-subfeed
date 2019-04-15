@@ -5,7 +5,7 @@ from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QIntValidator, QDoubleValidator, QRegExpValidator
 
 # Internal
-from sane_yt_subfeed.config_handler import get_options, read_config, has_section
+from sane_yt_subfeed.handlers.config_handler import get_options, read_config, has_section
 from sane_yt_subfeed.gui.views.config_view.config_item_types import THUMBNAIL_QUALITIES, TT_FONT_SIZES, \
     LEFT_MOUSE_ACTIONS, TILE_TITLE_FONT_WEIGHTS
 from sane_yt_subfeed.gui.views.config_view.input_super import InputSuper
@@ -204,7 +204,6 @@ class ConfigViewWidget(InputSuper):
         self.add_option_info_restart_required()
 
     def add_config_tab_debug(self):
-        self.add_option_checkbox('Show channel grab methods', 'Debug', 'show_grab_method')
         self.add_option_checkbox('Show unimplemented GUI elements', 'Debug', 'show_unimplemented_gui')
         self.add_option_checkbox('Display all Exceptions', 'Debug', 'display_all_exceptions', restart_check=False)
         self.add_option_checkbox('Color video tile elements', 'Debug', 'color_tile_elements')

@@ -4,15 +4,14 @@ import click
 import datetime
 from sqlalchemy import or_, and_
 
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 from sane_yt_subfeed.main import run_with_gui, run_channels_test, run_with_cli, cli_refresh_and_print_subfeed
 from sane_yt_subfeed.youtube.update_videos import load_keys
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
-import sane_yt_subfeed.print_functions as print_functions
-import sane_yt_subfeed.debug_functions as debug_functions
+from sane_yt_subfeed.cli import print_functions
 import sane_yt_subfeed.youtube as youtube
 
 exceptions = []
@@ -29,12 +28,11 @@ LEGACY_EXCEPTION_HANDLER = False
 @click.option(u'--print_downloaded_videos', is_flag=True)
 @click.option(u'--print_watched_videos', is_flag=True)
 @click.option(u'--print_discarded_videos', is_flag=True)
-@click.option(u'--debug_open_1k_fds', is_flag=True)
 @click.option(u'--print_playlist_items', is_flag=False)
 @click.option(u'--print_playlist_items_url_only', is_flag=True)
 @click.command()
 def cli(no_gui, test_channels, update_watch_prio, set_watched_day, refresh_and_print_subfeed, print_subscriptions,
-        print_watched_videos, print_discarded_videos, print_downloaded_videos, debug_open_1k_fds, print_playlist_items,
+        print_watched_videos, print_discarded_videos, print_downloaded_videos, print_playlist_items,
         print_playlist_items_url_only):
     logger = create_logger(__name__)
     if update_watch_prio:
@@ -76,9 +74,6 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day, refresh_and_p
     if print_downloaded_videos:
         videos = db_session.query(Video).filter(and_(Video.downloaded is True, (Video.vid_path.isnot(None)))).all()
         print_functions.print_videos(videos, path_only=True)
-    if debug_open_1k_fds:
-        debug_functions.open_1000_file_descriptors()
-        run_with_gui()
     if print_playlist_items:
         youtube_auth_resource = load_keys(1)[0]
         playlist_video_items = []

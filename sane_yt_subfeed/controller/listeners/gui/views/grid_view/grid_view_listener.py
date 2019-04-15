@@ -1,12 +1,10 @@
-import time
+from PyQt5.QtCore import QObject, pyqtSlot
 
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
-
-from sane_yt_subfeed.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config
 # from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideo
-from sane_yt_subfeed.log_handler import create_logger
+from sane_yt_subfeed.handlers.log_handler import create_logger
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 # import sane_yt_subfeed.controller.listeners.gui.views.grid_view.static_grid_view_listener as static_grid_view_listener
 
