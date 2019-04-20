@@ -42,18 +42,28 @@ class VideoTile(QWidget):
 
         self.pref_height = read_config('Gui', 'tile_pref_height')
         self.pref_width = read_config('Gui', 'tile_pref_width')
-        self.setFixedSize(self.pref_width, self.pref_height)
 
         self.layout = QGridLayout()
         self.layout.setSpacing(0)  # Don't use Qt's "global padding" spacing.
         self.layout.setAlignment(Qt.AlignTop)
         # Make sure layout items don't overlap
         self.layout.setContentsMargins(0, 0, 0, 0)
-
+        
+        total_height = 0
         self.thumbnail_label = self.init_thumbnail_tile()
-        self.title_label = TitleLabel(video.title, self)
-        self.channel_label = ChannelLabel(video.channel_title, self)
-        self.date_label = DateLabel('', self)
+        total_height += self.thumbnail_label.height()
+        if read_config('GridView', 'tile_title_lines') != 0:
+            self.title_label = TitleLabel(video.title, self)
+            total_height += self.title_label.height()
+        if read_config('GridView', 'tile_channel_lines') != 0:
+            self.channel_label = ChannelLabel(video.channel_title, self)
+            total_height += self.channel_label.height()
+        if read_config('GridView', 'tile_date_lines') != 0:
+            self.date_label = DateLabel('', self)
+            total_height += self.date_label.height()
+
+        self.setFixedWidth(self.pref_width)
+        self.setMaximumHeight(max(self.pref_height, total_height))
 
         # Use a blank QLabel as spacer item for increased control of spacing (avoids global padding).
         spacer_label = QLabel()
@@ -61,11 +71,14 @@ class VideoTile(QWidget):
 
         # Add labels to layout
         self.layout.addWidget(self.thumbnail_label)
-        self.layout.addWidget(self.title_label)
-        self.layout.addWidget(spacer_label)
-        self.layout.addWidget(self.channel_label)
-        self.layout.addWidget(spacer_label)
-        self.layout.addWidget(self.date_label)
+        if read_config('GridView', 'tile_title_lines') != 0:
+            self.layout.addWidget(self.title_label)
+            self.layout.addWidget(spacer_label)
+        if read_config('GridView', 'tile_channel_lines') != 0:
+            self.layout.addWidget(self.channel_label)
+            self.layout.addWidget(spacer_label)
+        if read_config('GridView', 'tile_date_lines') != 0:
+            self.layout.addWidget(self.date_label)
 
         self.setLayout(self.layout)
 
@@ -77,7 +90,8 @@ class VideoTile(QWidget):
             self.thumbnail_label.setStyleSheet("QLabel { background-color : darkMagenta}")
             self.title_label.setStyleSheet("QLabel { background-color : crimson}")
             self.channel_label.setStyleSheet("QLabel { background-color : darkGreen}")
-            self.date_label.setStyleSheet("QLabel { background-color : gray}")
+            if read_config('GridView', 'tile_date_lines') != 0:
+                self.date_label.setStyleSheet("QLabel { background-color : gray}")
 
     def init_thumbnail_tile(self):
         raise ValueError("ThumbnailTile initialised from VideoTile, not subclass!")
@@ -94,9 +108,10 @@ class VideoTile(QWidget):
         self.video = video
         self.set_tool_tip()
 
-        self.channel_label.setText(self.video.channel_title)
-
-        self.date_label.setText(self.strf_delta(self.video.date_published))
+        if read_config('GridView', 'tile_channel_lines') != 0:
+            self.channel_label.setText(self.video.channel_title)
+        if read_config('GridView', 'tile_date_lines') != 0:
+            self.date_label.setText(self.strf_delta(self.video.date_published))
         self.color_old_video(self.video.date_published)
         self.color_live_video()
 
@@ -234,7 +249,6 @@ class VideoTile(QWidget):
     def color_palette(self, color, role=QPalette.Window, log_facility=None, log_msg=""):
         """
         Colors a given palette.
-        :param palette:
         :param color: A Qt color integer
         :param role: Which QPalette role to apply color to (default: background)
         :param log_facility: if set, log to this facility
