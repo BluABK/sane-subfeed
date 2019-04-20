@@ -28,7 +28,7 @@ DEFAULTS = {
     'Debug': {
         'debug': 'False',
         'cached_subs': 'True',
-        'start_with_stored_videos': 'False',
+        'start_with_stored_videos': 'True',
         'channels_limit': '-1',
         'use_playlistitems': 'True',
         'disable_tooltips': 'False',
@@ -58,6 +58,12 @@ DEFAULTS = {
     'Theme': {
         'last_style': "",
         'last_theme': ""
+    },
+    'Fonts': {
+        'video_title_font': 'Helvetica,12,-1,0,75,0,0,0,0,0,Bold',
+        'video_channel_font': 'Helvetica,12,-1,0,50,0,0,0,0,0,Regular',
+        'video_time_font': 'Helvetica,12,-1,0,50,0,0,0,0,0,Regular',
+        'video_thumbnail_overlay_font': 'Helvetica,10,-1,0,50,0,0,0,0,0,Regular'
     },
     'GridView': {
         'show_watched': 'False',
