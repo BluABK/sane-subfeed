@@ -43,6 +43,7 @@ class ElidedLabel(QLabel):
         self.setFixedHeight((metrics.height() * lines) + (unicode_height_offset * lines))
 
         # Set alignment and enable word wrapping so the text newlines instead of continuing OOB
+        self.setAlignment(QtCore.Qt.AlignTop)
         self.setWordWrap(True)
 
         # Apply modified font.

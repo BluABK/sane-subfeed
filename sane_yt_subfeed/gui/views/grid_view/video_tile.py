@@ -65,6 +65,7 @@ class VideoTile(QWidget):
 
         # Add labels to layout
         self.layout.addWidget(self.thumbnail_label)
+        self.layout.addWidget(spacer_label)
         if read_config('GridView', 'tile_title_lines') != 0:
             self.layout.addWidget(self.title_label)
             self.layout.addWidget(spacer_label)
