@@ -49,21 +49,15 @@ class VideoTile(QWidget):
         # Make sure layout items don't overlap
         self.layout.setContentsMargins(0, 0, 0, 0)
         
-        total_height = 0
         self.thumbnail_label = self.init_thumbnail_tile()
-        total_height += self.thumbnail_label.height()
         if read_config('GridView', 'tile_title_lines') != 0:
             self.title_label = TitleLabel(video.title, self)
-            total_height += self.title_label.height()
         if read_config('GridView', 'tile_channel_lines') != 0:
             self.channel_label = ChannelLabel(video.channel_title, self)
-            total_height += self.channel_label.height()
         if read_config('GridView', 'tile_date_lines') != 0:
             self.date_label = DateLabel('', self)
-            total_height += self.date_label.height()
 
         self.setFixedWidth(self.pref_width)
-        self.setMaximumHeight(max(self.pref_height, total_height))
 
         # Use a blank QLabel as spacer item for increased control of spacing (avoids global padding).
         spacer_label = QLabel()
