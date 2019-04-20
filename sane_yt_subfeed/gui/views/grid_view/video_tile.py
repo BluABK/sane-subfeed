@@ -45,7 +45,7 @@ class VideoTile(QWidget):
 
         self.layout = QGridLayout()
         self.layout.setSpacing(0)  # Don't use Qt's "global padding" spacing.
-        self.layout.setAlignment(Qt.AlignTop)
+
         # Make sure layout items don't overlap
         self.layout.setContentsMargins(0, 0, 0, 0)
         
