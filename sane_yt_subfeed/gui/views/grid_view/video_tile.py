@@ -63,6 +63,17 @@ class VideoTile(QWidget):
         spacer_label = QLabel()
         spacer_label.setFixedHeight(read_config('GridView', 'tile_line_spacing'))
 
+        if read_config('Debug', 'color_tile_elements'):
+            self.color_palette(Qt.green)
+            self.thumbnail_label.setStyleSheet("QLabel { background-color : darkMagenta}")
+            # spacer_label.setStyleSheet("QLabel { background-color : cyan}")
+            if read_config('GridView', 'tile_channel_lines') != 0:
+                self.title_label.setStyleSheet("QLabel { background-color : crimson}")
+            if read_config('GridView', 'tile_title_lines') != 0:
+                self.channel_label.setStyleSheet("QLabel { background-color : darkGreen}")
+            if read_config('GridView', 'tile_date_lines') != 0:
+                self.date_label.setStyleSheet("QLabel { background-color : gray}")
+
         # Add labels to layout
         self.layout.addWidget(self.thumbnail_label)
         self.layout.addWidget(spacer_label)
@@ -79,14 +90,6 @@ class VideoTile(QWidget):
 
         # Add video on the layout/tile.
         self.set_video(video)
-
-        if read_config('Debug', 'color_tile_elements'):
-            self.color_palette(Qt.green)
-            self.thumbnail_label.setStyleSheet("QLabel { background-color : darkMagenta}")
-            self.title_label.setStyleSheet("QLabel { background-color : crimson}")
-            self.channel_label.setStyleSheet("QLabel { background-color : darkGreen}")
-            if read_config('GridView', 'tile_date_lines') != 0:
-                self.date_label.setStyleSheet("QLabel { background-color : gray}")
 
     def init_thumbnail_tile(self):
         raise ValueError("ThumbnailTile initialised from VideoTile, not subclass!")
