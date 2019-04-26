@@ -1,4 +1,29 @@
 Current
+- Created (and added to UI) a FontPickerButton which lets users pick fonts and displays the current font in a
+  human readable format on the button.
+- Changed default Fonts from Helvetica to Noto Sans (likely the same font)
+- Made all font read_config entries non-literal eval (i.e. read as string).
+- Added utils function for checking if a string contains unicode.
+- Removed size limit from TextPickleType due to lack of support.
+    - PostgreSQL doesn't seem to support strings with any length limit at all.
+- Added some if coverage in debug tile colouring.
+- ElidedLabel is now aligned to top and added spacer between thumb and title.
+- Removed redundant (and also problematic) layout alignments.
+- Removed maximum height sizing logic from VideoTile.
+- Made Title, Channel and Date text fields optional if cfg lines == 0.
+- Changed VideoTile sizing from fixed size to fixed width and max height.
+- Changed ThumbnailTile sizing from fixed size to minimum width (scaled).
+- Refactor renamed (and moved) VideoTileLabel to ElidedLabel.
+- Changed start with stored videos to True by default.
+- Changed VideoTileLabel font handling from plaintext to QFont.fromString.
+- Added accidentally omitted config hotkey to defaults and sample config.
+- Fixed critical DB creation failure bug introduced in commit 2da05b2 (Caused by IDE refactor move).
+- Made PyYAML dependency in requirements.txt >= instead of ==.
+- Made sample cfg/hotkeys if not exist use the new create_config_file function.
+- Replaced copyfile(sample, cfg) with func that uses DEFAULTS dict directly.
+- Made log_handler automatically create missing dirs and files.
+- Made PyQt5 pip requirements >= instead of forcing specific version.
+- Renamed subs list reload item, so it's harder to confuse with subfeed refresh.
 - Hotfix: disabled elision by default and instead explicitly using it during init only, due to VideoTileLabel.width()
   changing drastically later on.
 - Deleted deprecated debug_functions and cli arg --debug_open_1k_fds that was used for "too many file descriptors"
