@@ -38,20 +38,10 @@ class ConfigViewWidget(InputSuper):
             self.add_config_tab_views()
         elif self.tab_id == 'Debug' and read_config('Debug', 'debug'):
             self.add_config_tab_debug()
-        elif self.tab_id == 'Model':
-            self.add_config_tab_model()
-        elif self.tab_id == 'Requests':
-            self.add_config_tab_requests()
-        elif self.tab_id == 'Thumbnails':
-            self.add_config_tab_thumbnails()
-        elif self.tab_id == 'Threading':
-            self.add_config_tab_threading()
         elif self.tab_id == 'Download' and read_config('Play', 'enabled'):
             self.add_config_tab_download()
-        elif self.tab_id == 'Media player':
-            self.add_config_tab_mediaplayer()
-        elif self.tab_id == 'Default Application':
-            self.add_config_tab_default_apps()
+        elif self.tab_id == 'Apps && Players':
+            self.add_config_tab_apps()
         elif self.tab_id == "Time && Date":
             self.add_config_tab_datetime()
         elif self.tab_id == 'Logging':
@@ -69,6 +59,8 @@ class ConfigViewWidget(InputSuper):
         self.logger.info("Initializing UI: ConfigViewWidget: {}".format(self.tab_id))
 
     def add_config_tab_gui(self):
+        self.add_option_line_edit('Videos to load by default', 'Model', 'loaded_videos',
+                                  cfg_validator=QIntValidator())
         self.add_option_checkbox('Grey background on old (1d+) videos', 'Gui', 'grey_old_videos')
         self.add_option_line_edit('Grid tile height (px)', 'Gui', 'tile_pref_height', cfg_validator=QIntValidator())
         self.add_option_line_edit('Grid tile width (px)', 'Gui', 'tile_pref_width', cfg_validator=QIntValidator())
@@ -168,8 +160,6 @@ class ConfigViewWidget(InputSuper):
         # Section [Play]
         if read_config('Play', 'enabled'):
             self.add_section('{}Playback feed{}'.format(self.deco_l, self.deco_r))
-            self.add_option_line_edit('YouTube video directory', 'Play', 'yt_file_path', restart_check=False)
-            self.add_option_checkbox('Disable directory listener (inotify)', 'Play', 'disable_dir_listener')
             self.add_option_line_edit('Default watch priority', 'Play', 'default_watch_prio',
                                       cfg_validator=QIntValidator(), restart_check=False)
             # Section [PlaySort]
@@ -183,38 +173,6 @@ class ConfigViewWidget(InputSuper):
         self.add_option_checkbox('Display all Exceptions', 'Debug', 'display_all_exceptions', restart_check=False)
         self.add_option_checkbox('Color video tile elements', 'Debug', 'color_tile_elements')
         self.add_option_info_restart_required()
-
-    def add_config_tab_model(self):
-        self.add_option_line_edit('Videos to load by default', 'Model', 'loaded_videos',
-                                  cfg_validator=QIntValidator())
-        self.add_option_info_restart_required()
-
-    def add_config_tab_requests(self):
-        self.add_option_checkbox('Use tests', 'Requests', 'use_tests', restart_check=False)
-        self.add_option_line_edit('Missed video limit', 'Requests', 'miss_limit',
-                                  cfg_validator=QIntValidator(), restart_check=False)
-        self.add_option_line_edit('Test pages', 'Requests', 'test_pages',
-                                  cfg_validator=QIntValidator(), restart_check=False)
-        self.add_option_line_edit('Additional list pages', 'Requests', 'extra_list_pages',
-                                  cfg_validator=QIntValidator(), restart_check=False)
-        self.add_option_line_edit('Deep search API quota limit per request (in K)', 'Requests',
-                                  'deep_search_quota_k',
-                                  cfg_validator=QIntValidator(), restart_check=False)
-        self.add_option_line_edit('Filter videos older than (days)', 'Requests', 'filter_videos_days_old',
-                                  cfg_validator=QIntValidator(), restart_check=False)
-
-    def add_config_tab_thumbnails(self):
-        self.add_option_checkbox('Force download best quality, based on prioritised list',
-                                 'Thumbnails', 'force_download_best', restart_check=False)
-        self.add_option_combobox('1. Priority', 'Thumbnails', '0', THUMBNAIL_QUALITIES, restart_check=False)
-        self.add_option_combobox('2. Priority', 'Thumbnails', '1', THUMBNAIL_QUALITIES, restart_check=False)
-        self.add_option_combobox('3. Priority', 'Thumbnails', '2', THUMBNAIL_QUALITIES, restart_check=False)
-        self.add_option_combobox('4. Priority', 'Thumbnails', '3', THUMBNAIL_QUALITIES, restart_check=False)
-        self.add_option_combobox('5. Priority', 'Thumbnails', '4', THUMBNAIL_QUALITIES, restart_check=False)
-
-    def add_config_tab_threading(self):
-        self.add_option_line_edit('Image/thumbnail download thread limit', 'Threading', 'img_threads',
-                                  cfg_validator=QIntValidator(), restart_check=False)
 
     def add_config_tab_download(self):
         # Section [Youtube-dl]
@@ -247,12 +205,12 @@ class ConfigViewWidget(InputSuper):
         if 'youtube_dl' not in sys.modules:
             self.add_option_info_restart_required()
 
-    def add_config_tab_mediaplayer(self):
-        # Section [Player]
+        self.add_option_line_edit('YouTube video directory', 'Play', 'yt_file_path', restart_check=False)
+        self.add_option_checkbox('Disable directory listener (inotify)', 'Play', 'disable_dir_listener')
+
+    def add_config_tab_apps(self):
+        self.add_section('{}Media Players{}'.format(self.deco_l, self.deco_r))
         self.add_option_line_edit('Default Media Player', 'Player', 'default_player', restart_check=False)
-        self.add_option_line_edit('Default Web Browser<br/>'
-                                  '(Uses system default if none specified)', 'Player', 'url_player',
-                                  restart_check=False)
         _counter = 1
         for alt_player in get_options('Player'):
             # if _counter == 1:  # Skip default player
@@ -263,7 +221,10 @@ class ConfigViewWidget(InputSuper):
                                           restart_check=False)
                 _counter += 1
 
-    def add_config_tab_default_apps(self):
+        self.add_section('{}Default Applications{}'.format(self.deco_l, self.deco_r))
+        self.add_option_line_edit('Default Web Browser<br/>'
+                                  '(Uses system default if none specified)', 'Player', 'url_player',
+                                  restart_check=False)
         self.add_option_line_edit('Image viewer', 'DefaultApp', 'Image', restart_check=False)
 
     def add_config_tab_datetime(self):
@@ -330,4 +291,30 @@ class ConfigViewWidget(InputSuper):
         self.add_option_line_edit('Grid view X', 'Gui', 'grid_view_x', cfg_validator=QIntValidator())
         self.add_option_line_edit('Grid view Y', 'Gui', 'grid_view_y', cfg_validator=QIntValidator())
         self.add_option_line_edit('Database URL', 'Database', 'url')
+
+        self.add_section('{}Thumbnails{}'.format(self.deco_l, self.deco_r))
+        self.add_option_checkbox('Force download best quality, based on prioritised list',
+                                 'Thumbnails', 'force_download_best', restart_check=False)
+        self.add_option_combobox('1. Priority', 'Thumbnails', '0', THUMBNAIL_QUALITIES, restart_check=False)
+        self.add_option_combobox('2. Priority', 'Thumbnails', '1', THUMBNAIL_QUALITIES, restart_check=False)
+        self.add_option_combobox('3. Priority', 'Thumbnails', '2', THUMBNAIL_QUALITIES, restart_check=False)
+        self.add_option_combobox('4. Priority', 'Thumbnails', '3', THUMBNAIL_QUALITIES, restart_check=False)
+        self.add_option_combobox('5. Priority', 'Thumbnails', '4', THUMBNAIL_QUALITIES, restart_check=False)
+        self.add_option_line_edit('Image/thumbnail download thread limit', 'Threading', 'img_threads',
+                                  cfg_validator=QIntValidator(), restart_check=False)
+
+        self.add_section('{}YouTube requests{}'.format(self.deco_l, self.deco_r))
+        self.add_option_checkbox('Use tests', 'Requests', 'use_tests', restart_check=False)
+        self.add_option_line_edit('Missed video limit', 'Requests', 'miss_limit',
+                                  cfg_validator=QIntValidator(), restart_check=False)
+        self.add_option_line_edit('Test pages', 'Requests', 'test_pages',
+                                  cfg_validator=QIntValidator(), restart_check=False)
+        self.add_option_line_edit('Additional list pages', 'Requests', 'extra_list_pages',
+                                  cfg_validator=QIntValidator(), restart_check=False)
+        self.add_option_line_edit('Deep search API quota limit per request (in K)', 'Requests',
+                                  'deep_search_quota_k',
+                                  cfg_validator=QIntValidator(), restart_check=False)
+        self.add_option_line_edit('Filter videos older than (days)', 'Requests', 'filter_videos_days_old',
+                                  cfg_validator=QIntValidator(), restart_check=False)
+
         self.add_option_info_restart_required()

@@ -1,4 +1,5 @@
 Current
+- Shuffled around various settings to lessen a wasteful amount of tabs.
 - Moved datestamp settings to its own Time & Date tab.
 - Update text ellision values to work with the VideoTile redesign.
 - Made config.ini only contain overrides instead of mirroring all defaults.
