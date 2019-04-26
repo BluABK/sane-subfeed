@@ -38,20 +38,12 @@ class ConfigViewWidget(InputSuper):
             self.add_config_tab_views()
         elif self.tab_id == 'Debug' and read_config('Debug', 'debug'):
             self.add_config_tab_debug()
-        elif self.tab_id == 'Model':
-            self.add_config_tab_model()
-        elif self.tab_id == 'Requests':
-            self.add_config_tab_requests()
-        elif self.tab_id == 'Thumbnails':
-            self.add_config_tab_thumbnails()
-        elif self.tab_id == 'Threading':
-            self.add_config_tab_threading()
         elif self.tab_id == 'Download' and read_config('Play', 'enabled'):
             self.add_config_tab_download()
-        elif self.tab_id == 'Media player':
-            self.add_config_tab_mediaplayer()
-        elif self.tab_id == 'Default Application':
-            self.add_config_tab_default_apps()
+        elif self.tab_id == 'Apps && Players':
+            self.add_config_tab_apps()
+        elif self.tab_id == "Time && Date":
+            self.add_config_tab_datetime()
         elif self.tab_id == 'Logging':
             self.add_config_tab_logging()
         elif self.tab_id == 'Advanced':
@@ -67,6 +59,8 @@ class ConfigViewWidget(InputSuper):
         self.logger.info("Initializing UI: ConfigViewWidget: {}".format(self.tab_id))
 
     def add_config_tab_gui(self):
+        self.add_option_line_edit('Videos to load by default', 'Model', 'loaded_videos',
+                                  cfg_validator=QIntValidator())
         self.add_option_checkbox('Grey background on old (1d+) videos', 'Gui', 'grey_old_videos')
         self.add_option_line_edit('Grid tile height (px)', 'Gui', 'tile_pref_height', cfg_validator=QIntValidator())
         self.add_option_line_edit('Grid tile width (px)', 'Gui', 'tile_pref_width', cfg_validator=QIntValidator())
@@ -102,6 +96,9 @@ class ConfigViewWidget(InputSuper):
         self.add_section('{}Grid Views{}'.format(self.deco_l, self.deco_r))
         self.add_option_checkbox('Show watched videos', 'GridView', 'show_watched')
         self.add_option_checkbox('Show dismissed videos', 'GridView', 'show_dismissed')
+        self.add_option_checkbox('Warn if video is SD quality', 'GridView', 'show_sd_warning', restart_check=False)
+        self.add_option_checkbox('Show if video has captions available', 'GridView', 'show_has_captions',
+                                 restart_check=False)
         self.add_option_checkbox('Enable Playback view (and download support)', 'Play', 'enabled',
                                  checked_actions=[self.config_view_tabs.add_tab,
                                                   self.root.respawn_menubar_and_toolbar,
@@ -115,18 +112,20 @@ class ConfigViewWidget(InputSuper):
                                                     self.root.del_central_widget_download,
                                                     self.root.setup_views],
                                  unchecked_kwargs=[{'tab': 'Download'}, None, None, None, None])
+        self.add_option_fontpicker('Thumbnail overlay font', 'Fonts', 'video_thumbnail_overlay_font')
+        self.add_option_fontpicker('Title font', 'Fonts', 'video_title_font')
         self.add_option_line_edit('Title elided text multiplier',
                                   'GridView', 'elided_text_modifier_title', cfg_validator=QDoubleValidator())
         self.add_option_line_edit('Title lines to display', 'GridView', 'tile_title_lines',
                                   cfg_validator=QIntValidator())
-        self.add_option_combobox('Title text font weight', 'GridView', 'title_tile_font_weight',
-                                 TILE_TITLE_FONT_WEIGHTS)
         self.add_option_info(None, None)  # Line spacer
+        self.add_option_fontpicker('Channel font', 'Fonts', 'video_channel_font')
         self.add_option_line_edit('Channel elided text multiplier',
                                   'GridView', 'elided_text_modifier_channel', cfg_validator=QDoubleValidator())
         self.add_option_line_edit('Channel Title lines to display', 'GridView', 'tile_channel_lines',
                                   cfg_validator=QIntValidator())
         self.add_option_info(None, None)  # Line spacer
+        self.add_option_fontpicker('Date font', 'Fonts', 'video_date_font')
         self.add_option_line_edit('Date elided text multiplier',
                                   'GridView', 'elided_text_modifier_date', cfg_validator=QDoubleValidator())
         self.add_option_line_edit('Date lines to display', 'GridView', 'tile_date_lines',
@@ -141,35 +140,6 @@ class ConfigViewWidget(InputSuper):
                                   '(Set this to 0 if using phantomstyle)', 'GridView',
                                   'elided_text_unicode_weight_modifier', cfg_validator=QDoubleValidator())
         self.add_option_info(None, None)  # Line spacer
-        self.add_option_line_edit('Date format for: videos uploaded'
-                                  ' less than a day ago', 'GridView', 'timedelta_format')
-        self.add_option_line_edit('Date format for: videos uploaded'
-                                  ' a day ago', 'GridView', 'timedelta_format_days')
-        self.add_option_line_edit('Date format for: videos uploaded'
-                                  ' a month ago', 'GridView', 'timedelta_format_months')
-        self.add_option_line_edit('Date format for: videos uploaded'
-                                  ' a year ago', 'GridView', 'timedelta_format_years')
-        self.add_option_line_edit('Date format for: videos uploaded'
-                                  ' a decade ago', 'GridView', 'timedelta_format_decades')
-
-        self.add_option_info('$decadesdecades', 'Decades as a zero-padded decimal number.')
-        self.add_option_info('$decades', 'Decades as a decimal number.')
-        self.add_option_info('$ydyd', '<u>Y</u>ears<u>d</u>elta as a zero-padded decimal number.')
-        self.add_option_info('$yd', '<u>Y</u>ears<u>d</u>elta as a decimal number.')
-        self.add_option_info('$mm', 'Months as a zero-padded decimal number.')
-        self.add_option_info('$m', 'Months as a decimal number.')
-        self.add_option_info('$dd', 'Days of the month as a zero-padded decimal number.')
-        self.add_option_info('$d', 'Days of the month as a decimal number.')
-        self.add_option_info('$HH', 'Hours (24-hour clock) as a zero-padded decimal number.')
-        self.add_option_info('$H', 'Hours (24-hour clock) as a decimal number.')
-        self.add_option_info('$MM', 'Minutes as a zero-padded decimal number.')
-        self.add_option_info('$M', 'Minutes as a decimal number.')
-        self.add_option_info('$SS', 'Seconds as a zero-padded decimal number.')
-        self.add_option_info('$S', 'Seconds as a decimal number.')
-        self.add_option_info('$f', 'Microseconds as a decimal number, zero-padded on the left.')
-        self.add_option_info('$%', 'A literal \'%\' character.')
-        self.add_option_info('', '')
-        self.add_option_info('Valid delimters:', '$, ${}')
 
         # Section [SubFeed]
         self.add_section('{}Subscription feed{}'.format(self.deco_l, self.deco_r))
@@ -193,8 +163,6 @@ class ConfigViewWidget(InputSuper):
         # Section [Play]
         if read_config('Play', 'enabled'):
             self.add_section('{}Playback feed{}'.format(self.deco_l, self.deco_r))
-            self.add_option_line_edit('YouTube video directory', 'Play', 'yt_file_path', restart_check=False)
-            self.add_option_checkbox('Disable directory listener (inotify)', 'Play', 'disable_dir_listener')
             self.add_option_line_edit('Default watch priority', 'Play', 'default_watch_prio',
                                       cfg_validator=QIntValidator(), restart_check=False)
             # Section [PlaySort]
@@ -208,38 +176,6 @@ class ConfigViewWidget(InputSuper):
         self.add_option_checkbox('Display all Exceptions', 'Debug', 'display_all_exceptions', restart_check=False)
         self.add_option_checkbox('Color video tile elements', 'Debug', 'color_tile_elements')
         self.add_option_info_restart_required()
-
-    def add_config_tab_model(self):
-        self.add_option_line_edit('Videos to load by default', 'Model', 'loaded_videos',
-                                  cfg_validator=QIntValidator())
-        self.add_option_info_restart_required()
-
-    def add_config_tab_requests(self):
-        self.add_option_checkbox('Use tests', 'Requests', 'use_tests', restart_check=False)
-        self.add_option_line_edit('Missed video limit', 'Requests', 'miss_limit',
-                                  cfg_validator=QIntValidator(), restart_check=False)
-        self.add_option_line_edit('Test pages', 'Requests', 'test_pages',
-                                  cfg_validator=QIntValidator(), restart_check=False)
-        self.add_option_line_edit('Additional list pages', 'Requests', 'extra_list_pages',
-                                  cfg_validator=QIntValidator(), restart_check=False)
-        self.add_option_line_edit('Deep search API quota limit per request (in K)', 'Requests',
-                                  'deep_search_quota_k',
-                                  cfg_validator=QIntValidator(), restart_check=False)
-        self.add_option_line_edit('Filter videos older than (days)', 'Requests', 'filter_videos_days_old',
-                                  cfg_validator=QIntValidator(), restart_check=False)
-
-    def add_config_tab_thumbnails(self):
-        self.add_option_checkbox('Force download best quality, based on prioritised list',
-                                 'Thumbnails', 'force_download_best', restart_check=False)
-        self.add_option_combobox('1. Priority', 'Thumbnails', '0', THUMBNAIL_QUALITIES, restart_check=False)
-        self.add_option_combobox('2. Priority', 'Thumbnails', '1', THUMBNAIL_QUALITIES, restart_check=False)
-        self.add_option_combobox('3. Priority', 'Thumbnails', '2', THUMBNAIL_QUALITIES, restart_check=False)
-        self.add_option_combobox('4. Priority', 'Thumbnails', '3', THUMBNAIL_QUALITIES, restart_check=False)
-        self.add_option_combobox('5. Priority', 'Thumbnails', '4', THUMBNAIL_QUALITIES, restart_check=False)
-
-    def add_config_tab_threading(self):
-        self.add_option_line_edit('Image/thumbnail download thread limit', 'Threading', 'img_threads',
-                                  cfg_validator=QIntValidator(), restart_check=False)
 
     def add_config_tab_download(self):
         # Section [Youtube-dl]
@@ -272,12 +208,12 @@ class ConfigViewWidget(InputSuper):
         if 'youtube_dl' not in sys.modules:
             self.add_option_info_restart_required()
 
-    def add_config_tab_mediaplayer(self):
-        # Section [Player]
+        self.add_option_line_edit('YouTube video directory', 'Play', 'yt_file_path', restart_check=False)
+        self.add_option_checkbox('Disable directory listener (inotify)', 'Play', 'disable_dir_listener')
+
+    def add_config_tab_apps(self):
+        self.add_section('{}Media Players{}'.format(self.deco_l, self.deco_r))
         self.add_option_line_edit('Default Media Player', 'Player', 'default_player', restart_check=False)
-        self.add_option_line_edit('Default Web Browser<br/>'
-                                  '(Uses system default if none specified)', 'Player', 'url_player',
-                                  restart_check=False)
         _counter = 1
         for alt_player in get_options('Player'):
             # if _counter == 1:  # Skip default player
@@ -288,8 +224,42 @@ class ConfigViewWidget(InputSuper):
                                           restart_check=False)
                 _counter += 1
 
-    def add_config_tab_default_apps(self):
+        self.add_section('{}Default Applications{}'.format(self.deco_l, self.deco_r))
+        self.add_option_line_edit('Default Web Browser<br/>'
+                                  '(Uses system default if none specified)', 'Player', 'url_player',
+                                  restart_check=False)
         self.add_option_line_edit('Image viewer', 'DefaultApp', 'Image', restart_check=False)
+
+    def add_config_tab_datetime(self):
+        self.add_option_line_edit('Date format for: videos uploaded'
+                                  ' less than a day ago', 'GridView', 'timedelta_format')
+        self.add_option_line_edit('Date format for: videos uploaded'
+                                  ' a day ago', 'GridView', 'timedelta_format_days')
+        self.add_option_line_edit('Date format for: videos uploaded'
+                                  ' a month ago', 'GridView', 'timedelta_format_months')
+        self.add_option_line_edit('Date format for: videos uploaded'
+                                  ' a year ago', 'GridView', 'timedelta_format_years')
+        self.add_option_line_edit('Date format for: videos uploaded'
+                                  ' a decade ago', 'GridView', 'timedelta_format_decades')
+
+        self.add_option_info('$decadesdecades', 'Decades as a zero-padded decimal number.')
+        self.add_option_info('$decades', 'Decades as a decimal number.')
+        self.add_option_info('$ydyd', '<u>Y</u>ears<u>d</u>elta as a zero-padded decimal number.')
+        self.add_option_info('$yd', '<u>Y</u>ears<u>d</u>elta as a decimal number.')
+        self.add_option_info('$mm', 'Months as a zero-padded decimal number.')
+        self.add_option_info('$m', 'Months as a decimal number.')
+        self.add_option_info('$dd', 'Days of the month as a zero-padded decimal number.')
+        self.add_option_info('$d', 'Days of the month as a decimal number.')
+        self.add_option_info('$HH', 'Hours (24-hour clock) as a zero-padded decimal number.')
+        self.add_option_info('$H', 'Hours (24-hour clock) as a decimal number.')
+        self.add_option_info('$MM', 'Minutes as a zero-padded decimal number.')
+        self.add_option_info('$M', 'Minutes as a decimal number.')
+        self.add_option_info('$SS', 'Seconds as a zero-padded decimal number.')
+        self.add_option_info('$S', 'Seconds as a decimal number.')
+        self.add_option_info('$f', 'Microseconds as a decimal number, zero-padded on the left.')
+        self.add_option_info('$%', 'A literal \'%\' character.')
+        self.add_option_info('', '')
+        self.add_option_info('Valid delimters:', '$, ${}')
 
     def add_config_tab_logging(self):
         self.add_option_checkbox('Use socket instead of file', 'Logging', 'use_socket_log')
@@ -324,4 +294,30 @@ class ConfigViewWidget(InputSuper):
         self.add_option_line_edit('Grid view X', 'Gui', 'grid_view_x', cfg_validator=QIntValidator())
         self.add_option_line_edit('Grid view Y', 'Gui', 'grid_view_y', cfg_validator=QIntValidator())
         self.add_option_line_edit('Database URL', 'Database', 'url')
+
+        self.add_section('{}Thumbnails{}'.format(self.deco_l, self.deco_r))
+        self.add_option_checkbox('Force download best quality, based on prioritised list',
+                                 'Thumbnails', 'force_download_best', restart_check=False)
+        self.add_option_combobox('1. Priority', 'Thumbnails', '0', THUMBNAIL_QUALITIES, restart_check=False)
+        self.add_option_combobox('2. Priority', 'Thumbnails', '1', THUMBNAIL_QUALITIES, restart_check=False)
+        self.add_option_combobox('3. Priority', 'Thumbnails', '2', THUMBNAIL_QUALITIES, restart_check=False)
+        self.add_option_combobox('4. Priority', 'Thumbnails', '3', THUMBNAIL_QUALITIES, restart_check=False)
+        self.add_option_combobox('5. Priority', 'Thumbnails', '4', THUMBNAIL_QUALITIES, restart_check=False)
+        self.add_option_line_edit('Image/thumbnail download thread limit', 'Threading', 'img_threads',
+                                  cfg_validator=QIntValidator(), restart_check=False)
+
+        self.add_section('{}YouTube requests{}'.format(self.deco_l, self.deco_r))
+        self.add_option_checkbox('Use tests', 'Requests', 'use_tests', restart_check=False)
+        self.add_option_line_edit('Missed video limit', 'Requests', 'miss_limit',
+                                  cfg_validator=QIntValidator(), restart_check=False)
+        self.add_option_line_edit('Test pages', 'Requests', 'test_pages',
+                                  cfg_validator=QIntValidator(), restart_check=False)
+        self.add_option_line_edit('Additional list pages', 'Requests', 'extra_list_pages',
+                                  cfg_validator=QIntValidator(), restart_check=False)
+        self.add_option_line_edit('Deep search API quota limit per request (in K)', 'Requests',
+                                  'deep_search_quota_k',
+                                  cfg_validator=QIntValidator(), restart_check=False)
+        self.add_option_line_edit('Filter videos older than (days)', 'Requests', 'filter_videos_days_old',
+                                  cfg_validator=QIntValidator(), restart_check=False)
+
         self.add_option_info_restart_required()

@@ -2,8 +2,6 @@ import ast
 import copy
 import os
 from configparser import ConfigParser, NoSectionError, NoOptionError
-from shutil import copyfile
-
 from sane_yt_subfeed.absolute_paths import CONFIG_PATH, SAMPLE_PATH, CONFIG_HOTKEYS_PATH, \
     SAMPLE_HOTKEYS_PATH, DATABASE_PATH
 
@@ -28,7 +26,7 @@ DEFAULTS = {
     'Debug': {
         'debug': 'False',
         'cached_subs': 'True',
-        'start_with_stored_videos': 'False',
+        'start_with_stored_videos': 'True',
         'channels_limit': '-1',
         'use_playlistitems': 'True',
         'disable_tooltips': 'False',
@@ -59,22 +57,30 @@ DEFAULTS = {
         'last_style': "",
         'last_theme': ""
     },
+    'Fonts': {
+        'video_title_font': 'Noto Sans,10,-1,0,75,0,0,0,0,0,Bold',
+        'video_channel_font': 'Noto Sans,10,-1,0,50,0,0,0,0,0,Regular',
+        'video_date_font': 'Noto Sans,10,-1,0,50,0,0,0,0,0,Regular',
+        'video_thumbnail_overlay_font': 'Noto Sans,10,-1,0,50,0,0,0,0,0,Regular'
+    },
     'GridView': {
         'show_watched': 'False',
         'show_dismissed': 'False',
-        'elided_text_modifier_title': '0.28',
-        'elided_text_modifier_channel': '0.28',
-        'elided_text_modifier_date': '0.28',
+        'show_sd_warning': 'False',
+        'show_has_captions': 'True',
+        'elided_text_modifier_title': '1',
+        'elided_text_modifier_channel': '1',
+        'elided_text_modifier_date': '1',
         'elided_text_unicode_weight_modifier': '0.0075',
         'tile_unicode_line_height_offset': '1.99',
-        'tile_line_spacing': '7',
+        'tile_line_spacing': '5',
         'tile_title_lines': '2',
         'tile_channel_lines': '1',
         'tile_date_lines': '1',
         'title_tile_font_weight': 'Bold',
         'timedelta_format': '$HH:$MM:$SS ago',
         'timedelta_format_days': '$d days, $HH:$MM:$SS ago',
-        'timedelta_format_months': '$m months, $d d, $HH:$MM:$SS ago',
+        'timedelta_format_months': '$m months, ${d}d, $HH:$MM:$SS ago',
         'timedelta_format_years': '${yd}y, ${m}m, ${d}d, $HH:$MM:$SS ago',
         'timedelta_format_decades': '${decades}dc, ${yd}y, ${m}m, ${d}d, $HH:$MM:$SS ago'
     },
@@ -244,25 +250,18 @@ def read_config(section, option, literal_eval=True, custom_ini=None):
     :param custom_ini: if set, use given custom config
     :return:
     """
-    config_path = CONFIG_PATH
-    sample_path = SAMPLE_PATH
     defaults = DEFAULTS
     parser = default_parser
     # Support multiple configs
     if custom_ini is not None:
         # logger.debug("Reading custom config: {}".format(custom_ini))
         if custom_ini == "hotkeys":
-            config_path = CONFIG_HOTKEYS_PATH
-            sample_path = SAMPLE_HOTKEYS_PATH
             defaults = DEFAULTS_HOTKEYS
             parser = hotkeys_parser
         else:
-            # logger.critical("Custom config '{}' is not defined in handler!!".format(custom_ini))
             raise ValueError("Custom config '{}' is not defined in handler!!".format(custom_ini))
 
     if literal_eval:
-        if not os.path.exists(config_path):
-            create_config_file(config_path, DEFAULTS)
         try:
             value = parser.get(section, option)
         except (NoSectionError, NoOptionError):
@@ -275,8 +274,6 @@ def read_config(section, option, literal_eval=True, custom_ini=None):
         else:
             return ast.literal_eval(defaults[section][option])
     else:
-        if not os.path.exists(config_path):
-            create_config_file(config_path, DEFAULTS)
         try:
             value = parser.get(section, option)
         except (NoSectionError, NoOptionError):

@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, QSize, QPoint, QRect
-from PyQt5.QtGui import QPainter, QPixmap, QBrush, QColor, QPen, QFont
+from PyQt5.QtGui import QPainter, QPixmap, QBrush, QColor, QPen, QFont, QFontMetrics
 from PyQt5.QtWidgets import QLabel
 
 from sane_yt_subfeed.absolute_paths import THUMBNAIL_NA_PATH
@@ -14,8 +14,7 @@ class ThumbnailTile(QLabel):
         self.parent = parent
         self.logger = create_logger(__name__ + ".ThumbnailTitle")
 
-        margins = self.parent.layout.getContentsMargins()
-        self.setFixedSize(self.parent.width() - margins[0] - margins[2], (self.parent.height() - 4 * margins[3]) * 0.6)
+        self.setMinimumWidth(self.parent.width())
 
     def setPixmap(self, p):
         """
@@ -37,38 +36,88 @@ class ThumbnailTile(QLabel):
             painter = QPainter(self)
 
             if read_config('Gui', 'keep_thumb_ar'):
-                thumb = self.p.scaled(self.width(), self.height(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                thumb = self.p.scaledToWidth(self.width(), Qt.SmoothTransformation)
+                self.setMinimumHeight(thumb.height())
                 painter.drawPixmap(0, 0, thumb)
             else:
                 thumb = self
                 painter.drawPixmap(thumb.rect(), thumb.p)
 
             # Overlay video duration on thumbnail
+            font = QFont()
+            font.fromString(read_config("Fonts", "video_thumbnail_overlay_font", literal_eval=False))
+
             pen = QPen(Qt.white)
             painter.setPen(pen)
-            point = QPoint(thumb.width() * 0.70, thumb.height() * 0.85)
-            rect = QRect(point, QSize(thumb.width() * 0.28, thumb.height() * 0.12))
+            painter.setFont(font)
+
+            duration_right_padding = 4
+            duration_bottom_padding = 8
+            
+            point = QPoint(
+                thumb.width() - duration_right_padding,
+                thumb.height() - duration_bottom_padding
+             )
+            metrics = QFontMetrics(font)
+            duration_string = format(self.parent.video.duration)
+            # Find out the width of the text
+            text_width = metrics.width(duration_string)
+            # Work out the max height the text can be
+            text_height = metrics.descent() + metrics.ascent() 
+            # Add a padding of 8px (4px on left, 4px on right) for width
+            rect_width = text_width + 8
+            # Add a padding of 4px (2px on top, 2px on bottom) for height
+            rect_height = text_height + 4
+            # Create a rectangle
+            # point starts at the bottom right so we need to use negative sizes
+            # because we need to move closer to 0,0 again
+            rect = QRect(point, QSize(-rect_width, -rect_height))
             painter.fillRect(rect, QBrush(QColor(0, 0, 0, 180)))
-            painter.drawText(rect, Qt.AlignCenter, format(self.parent.video.duration))
+            painter.drawText(rect, Qt.AlignCenter, duration_string)
 
             # Overlay captions (if any) on thumbnail    # FIXME: Replace with something better like a small icon
-            if self.parent.video.has_caption:
+            if self.parent.video.has_caption and read_config('GridView', 'show_has_captions'):
                 pen = QPen(Qt.white)
                 painter.setPen(pen)
-                point = QPoint(thumb.width() * 0.03, thumb.height() * 0.85)
-                rect = QRect(point, QSize(thumb.width() * 0.28, thumb.height() * 0.12))
+                painter.setFont(font)
+
+                captions_left_padding = 4
+                captions_bottom_padding = 8
+            
+                point = QPoint(
+                    captions_left_padding,
+                    thumb.height() - captions_bottom_padding
+                )
+                metrics = QFontMetrics(font)
+                text_width = metrics.width("captions")
+                text_height = metrics.descent() + metrics.ascent() 
+                rect_width = text_width + 8
+                rect_height = text_height + 4
+
+                rect = QRect(point, QSize(rect_width, -rect_height))
                 painter.fillRect(rect, QBrush(QColor(0, 0, 0, 180)))
                 painter.drawText(rect, Qt.AlignCenter, "captions")
 
-            if self.parent.video.definition == "sd":
+            if self.parent.video.definition == "sd" and read_config('GridView', 'show_sd_warning'):
                 pen = QPen(Qt.red)
                 painter.setPen(pen)
-                point = QPoint(thumb.width() * 0.02, thumb.height() * 0.02)
-                rect = QRect(point, QSize(thumb.width() * 0.16, thumb.height() * 0.20))
+                painter.setFont(font)
+
+                sd_left_padding = 4
+                sd_top_padding = 4
+            
+                point = QPoint(
+                    sd_left_padding,
+                    sd_top_padding
+                )
+                metrics = QFontMetrics(font)
+                text_width = metrics.width("SD")
+                text_height = metrics.descent() + metrics.ascent() 
+                rect_width = text_width + 4
+                rect_height = text_height + 4
+
+                rect = QRect(point, QSize(rect_width, rect_height))
                 painter.fillRect(rect, QBrush(QColor(0, 0, 0, 180)))
-                enlarged_font = QFont(painter.font())
-                enlarged_font.setPointSize(14)
-                painter.setFont(enlarged_font)
                 painter.drawText(rect, Qt.AlignCenter, "SD")
 
             self.add_overlay(painter, thumb)

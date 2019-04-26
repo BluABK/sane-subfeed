@@ -6,8 +6,7 @@ from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.gui.views.config_view.config_scroll_area import ConfigScrollArea
 from sane_yt_subfeed.gui.views.config_view.views.config_view import ConfigViewWidget
 
-CONFIG_TABS = ["GUI", "Views", "Model", "Requests", "Thumbnails", "Threading", "Download", "Media player",
-               "Default Application", "Logging", "Debug", "Advanced"]
+CONFIG_TABS = ["GUI", "Views", "Download", "Apps && Players", "Time && Date", "Logging", "Advanced", "Debug"]
 
 
 class ConfigViewTabs(QTabWidget):

@@ -5,40 +5,30 @@ from PyQt5.QtWidgets import QLabel
 
 from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.utils import get_unicode_weight
-from sane_yt_subfeed.gui.views.config_view.config_item_types import TILE_TITLE_FONT_WEIGHTS_MAP
 
 
-class VideoTileLabel(QLabel):
+class ElidedLabel(QLabel):
 
-    def __init__(self, text, parent, cfg_lines_entry, cfg_elided_mod_entry, cfg_font_weight=None):
+    def __init__(self, text, parent, font: QFont, cfg_lines_entry, cfg_elided_mod_entry):
         """
-        Video tile label (superclass).
+        Elided label (superclass).
         :param text:                    String to put on QLabel.
         :param parent:                  Parent ptr.
-        :param cfg_lines_entry:         Config [section, option] entry for lines of text to show.
-        :param cfg_elided_mod_entry:    Config [section, option] entry for elided text modifier.
-        :param cfg_font_weight:         Config [section, option] entry for font weight (optional).
+        :param cfg_lines_entry:         QFont font to use.
         """
         QLabel.__init__(self, text)
         self.parent = parent
+        self.setFont(font)
 
         # Set label type independent config entries
         self.cfg_lines_entry: list = cfg_lines_entry
         self.cfg_elided_mod_entry: list = cfg_elided_mod_entry
-        self.cfg_font_weight: list = cfg_font_weight
 
         # Elided overwrites the original, so we need to keep a copy.
         self.original_text = text
 
         # Get font metrics/info.
         metrics = QFontMetrics(self.font())
-
-        # Set up font.
-        t_font: QFont = self.font()
-        t_font.setStyleHint(QFont.Helvetica)  # FIXME: Make font configurable
-        if cfg_font_weight:
-            t_font.setWeight(TILE_TITLE_FONT_WEIGHTS_MAP[read_config(*cfg_font_weight)])
-        t_font.setFixedPitch(True)
 
         # Lines of text to show (determines height of title text item).
         lines = read_config(*self.cfg_lines_entry)
@@ -47,7 +37,7 @@ class VideoTileLabel(QLabel):
         #
         # If set to 2 there will be 1px clearing beneath unicode,
         # but ASCII will show 1px of its supposedly cut-off next line.
-        unicode_height_offset = read_config('GridView', 'tile_unicode_line_height_offset')  # = 1.99
+        unicode_height_offset = read_config('GridView', 'tile_unicode_line_height_offset')
 
         # Set height equal to lines and add some newline spacing for unicode.
         self.setFixedHeight((metrics.height() * lines) + (unicode_height_offset * lines))
@@ -55,9 +45,6 @@ class VideoTileLabel(QLabel):
         # Set alignment and enable word wrapping so the text newlines instead of continuing OOB
         self.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.setWordWrap(True)
-
-        # Apply modified font.
-        self.setFont(t_font)
 
         # Finally, set the text string.
         self.setText(text, elided=True)
