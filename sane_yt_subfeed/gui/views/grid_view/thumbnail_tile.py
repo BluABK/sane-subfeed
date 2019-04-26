@@ -45,7 +45,7 @@ class ThumbnailTile(QLabel):
 
             # Overlay video duration on thumbnail
             font = QFont()
-            font.fromString(read_config("Fonts", "video_thumbnail_overlay_font"))
+            font.fromString(read_config("Fonts", "video_thumbnail_overlay_font", literal_eval=False))
 
             pen = QPen(Qt.white)
             painter.setPen(pen)

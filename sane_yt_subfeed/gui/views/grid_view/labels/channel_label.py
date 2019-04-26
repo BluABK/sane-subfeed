@@ -10,7 +10,8 @@ class ChannelLabel(ElidedLabel):
 
     def __init__(self, text, parent):
         font = QFont()
-        font.fromString(read_config("Fonts", "video_channel_font"))
+        font.fromString(read_config("Fonts", "video_channel_font", literal_eval=False))
+
         ElidedLabel.__init__(self, text, parent, font, CFG_LINES_ENTRY, CFG_ELIDED_MOD_ENTRY)
 
 

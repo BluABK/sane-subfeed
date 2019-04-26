@@ -9,7 +9,7 @@ from sane_yt_subfeed.utils import get_unicode_weight
 
 class ElidedLabel(QLabel):
 
-    def __init__(self, text, parent, font, cfg_lines_entry, cfg_elided_mod_entry):
+    def __init__(self, text, parent, font: QFont, cfg_lines_entry, cfg_elided_mod_entry):
         """
         Elided label (superclass).
         :param text:                    String to put on QLabel.
@@ -37,17 +37,14 @@ class ElidedLabel(QLabel):
         #
         # If set to 2 there will be 1px clearing beneath unicode,
         # but ASCII will show 1px of its supposedly cut-off next line.
-        unicode_height_offset = read_config('GridView', 'tile_unicode_line_height_offset')  # = 1.99
+        unicode_height_offset = read_config('GridView', 'tile_unicode_line_height_offset')
 
         # Set height equal to lines and add some newline spacing for unicode.
         self.setFixedHeight((metrics.height() * lines) + (unicode_height_offset * lines))
 
         # Set alignment and enable word wrapping so the text newlines instead of continuing OOB
-        self.setAlignment(QtCore.Qt.AlignTop)
+        self.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.setWordWrap(True)
-
-        # Apply modified font.
-        # self.setFont(t_font)
 
         # Finally, set the text string.
         self.setText(text, elided=True)
