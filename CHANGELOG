@@ -1,4 +1,5 @@
 Current
+- Moved datestamp settings to its own Time & Date tab.
 - Update text ellision values to work with the VideoTile redesign.
 - Made config.ini only contain overrides instead of mirroring all defaults.
 - Created (and added to UI) a FontPickerButton which lets users pick fonts and displays the current font in a

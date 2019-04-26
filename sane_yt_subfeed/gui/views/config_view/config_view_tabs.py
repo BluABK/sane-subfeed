@@ -7,7 +7,7 @@ from sane_yt_subfeed.gui.views.config_view.config_scroll_area import ConfigScrol
 from sane_yt_subfeed.gui.views.config_view.views.config_view import ConfigViewWidget
 
 CONFIG_TABS = ["GUI", "Views", "Model", "Requests", "Thumbnails", "Threading", "Download", "Media player",
-               "Default Application", "Logging", "Debug", "Advanced"]
+               "Default Application", "Logging", "Debug", "Advanced", "Time && Date"]
 
 
 class ConfigViewTabs(QTabWidget):

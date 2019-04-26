@@ -52,6 +52,8 @@ class ConfigViewWidget(InputSuper):
             self.add_config_tab_mediaplayer()
         elif self.tab_id == 'Default Application':
             self.add_config_tab_default_apps()
+        elif self.tab_id == "Time && Date":
+            self.add_config_tab_datetime()
         elif self.tab_id == 'Logging':
             self.add_config_tab_logging()
         elif self.tab_id == 'Advanced':
@@ -143,35 +145,6 @@ class ConfigViewWidget(InputSuper):
                                   '(Set this to 0 if using phantomstyle)', 'GridView',
                                   'elided_text_unicode_weight_modifier', cfg_validator=QDoubleValidator())
         self.add_option_info(None, None)  # Line spacer
-        self.add_option_line_edit('Date format for: videos uploaded'
-                                  ' less than a day ago', 'GridView', 'timedelta_format')
-        self.add_option_line_edit('Date format for: videos uploaded'
-                                  ' a day ago', 'GridView', 'timedelta_format_days')
-        self.add_option_line_edit('Date format for: videos uploaded'
-                                  ' a month ago', 'GridView', 'timedelta_format_months')
-        self.add_option_line_edit('Date format for: videos uploaded'
-                                  ' a year ago', 'GridView', 'timedelta_format_years')
-        self.add_option_line_edit('Date format for: videos uploaded'
-                                  ' a decade ago', 'GridView', 'timedelta_format_decades')
-
-        self.add_option_info('$decadesdecades', 'Decades as a zero-padded decimal number.')
-        self.add_option_info('$decades', 'Decades as a decimal number.')
-        self.add_option_info('$ydyd', '<u>Y</u>ears<u>d</u>elta as a zero-padded decimal number.')
-        self.add_option_info('$yd', '<u>Y</u>ears<u>d</u>elta as a decimal number.')
-        self.add_option_info('$mm', 'Months as a zero-padded decimal number.')
-        self.add_option_info('$m', 'Months as a decimal number.')
-        self.add_option_info('$dd', 'Days of the month as a zero-padded decimal number.')
-        self.add_option_info('$d', 'Days of the month as a decimal number.')
-        self.add_option_info('$HH', 'Hours (24-hour clock) as a zero-padded decimal number.')
-        self.add_option_info('$H', 'Hours (24-hour clock) as a decimal number.')
-        self.add_option_info('$MM', 'Minutes as a zero-padded decimal number.')
-        self.add_option_info('$M', 'Minutes as a decimal number.')
-        self.add_option_info('$SS', 'Seconds as a zero-padded decimal number.')
-        self.add_option_info('$S', 'Seconds as a decimal number.')
-        self.add_option_info('$f', 'Microseconds as a decimal number, zero-padded on the left.')
-        self.add_option_info('$%', 'A literal \'%\' character.')
-        self.add_option_info('', '')
-        self.add_option_info('Valid delimters:', '$, ${}')
 
         # Section [SubFeed]
         self.add_section('{}Subscription feed{}'.format(self.deco_l, self.deco_r))
@@ -292,6 +265,37 @@ class ConfigViewWidget(InputSuper):
 
     def add_config_tab_default_apps(self):
         self.add_option_line_edit('Image viewer', 'DefaultApp', 'Image', restart_check=False)
+
+    def add_config_tab_datetime(self):
+        self.add_option_line_edit('Date format for: videos uploaded'
+                                  ' less than a day ago', 'GridView', 'timedelta_format')
+        self.add_option_line_edit('Date format for: videos uploaded'
+                                  ' a day ago', 'GridView', 'timedelta_format_days')
+        self.add_option_line_edit('Date format for: videos uploaded'
+                                  ' a month ago', 'GridView', 'timedelta_format_months')
+        self.add_option_line_edit('Date format for: videos uploaded'
+                                  ' a year ago', 'GridView', 'timedelta_format_years')
+        self.add_option_line_edit('Date format for: videos uploaded'
+                                  ' a decade ago', 'GridView', 'timedelta_format_decades')
+
+        self.add_option_info('$decadesdecades', 'Decades as a zero-padded decimal number.')
+        self.add_option_info('$decades', 'Decades as a decimal number.')
+        self.add_option_info('$ydyd', '<u>Y</u>ears<u>d</u>elta as a zero-padded decimal number.')
+        self.add_option_info('$yd', '<u>Y</u>ears<u>d</u>elta as a decimal number.')
+        self.add_option_info('$mm', 'Months as a zero-padded decimal number.')
+        self.add_option_info('$m', 'Months as a decimal number.')
+        self.add_option_info('$dd', 'Days of the month as a zero-padded decimal number.')
+        self.add_option_info('$d', 'Days of the month as a decimal number.')
+        self.add_option_info('$HH', 'Hours (24-hour clock) as a zero-padded decimal number.')
+        self.add_option_info('$H', 'Hours (24-hour clock) as a decimal number.')
+        self.add_option_info('$MM', 'Minutes as a zero-padded decimal number.')
+        self.add_option_info('$M', 'Minutes as a decimal number.')
+        self.add_option_info('$SS', 'Seconds as a zero-padded decimal number.')
+        self.add_option_info('$S', 'Seconds as a decimal number.')
+        self.add_option_info('$f', 'Microseconds as a decimal number, zero-padded on the left.')
+        self.add_option_info('$%', 'A literal \'%\' character.')
+        self.add_option_info('', '')
+        self.add_option_info('Valid delimters:', '$, ${}')
 
     def add_config_tab_logging(self):
         self.add_option_checkbox('Use socket instead of file', 'Logging', 'use_socket_log')
