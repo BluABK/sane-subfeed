@@ -15,3 +15,16 @@ def get_unicode_weight(text, unicode_weight_modifier):
             unicode_weight += unicode_weight_modifier
 
     return unicode_weight
+
+
+def text_has_unicode(text):
+    """
+    Determine if a text contains unicode characters.
+    :param text:
+    :return:
+    """
+    for c in text:
+        if ord(c) > 128:
+            return True
+
+    return False
