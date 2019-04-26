@@ -2,8 +2,6 @@ import ast
 import copy
 import os
 from configparser import ConfigParser, NoSectionError, NoOptionError
-from shutil import copyfile
-
 from sane_yt_subfeed.absolute_paths import CONFIG_PATH, SAMPLE_PATH, CONFIG_HOTKEYS_PATH, \
     SAMPLE_HOTKEYS_PATH, DATABASE_PATH
 
@@ -250,25 +248,18 @@ def read_config(section, option, literal_eval=True, custom_ini=None):
     :param custom_ini: if set, use given custom config
     :return:
     """
-    config_path = CONFIG_PATH
-    sample_path = SAMPLE_PATH
     defaults = DEFAULTS
     parser = default_parser
     # Support multiple configs
     if custom_ini is not None:
         # logger.debug("Reading custom config: {}".format(custom_ini))
         if custom_ini == "hotkeys":
-            config_path = CONFIG_HOTKEYS_PATH
-            sample_path = SAMPLE_HOTKEYS_PATH
             defaults = DEFAULTS_HOTKEYS
             parser = hotkeys_parser
         else:
-            # logger.critical("Custom config '{}' is not defined in handler!!".format(custom_ini))
             raise ValueError("Custom config '{}' is not defined in handler!!".format(custom_ini))
 
     if literal_eval:
-        if not os.path.exists(config_path):
-            create_config_file(config_path, DEFAULTS)
         try:
             value = parser.get(section, option)
         except (NoSectionError, NoOptionError):
@@ -281,8 +272,6 @@ def read_config(section, option, literal_eval=True, custom_ini=None):
         else:
             return ast.literal_eval(defaults[section][option])
     else:
-        if not os.path.exists(config_path):
-            create_config_file(config_path, DEFAULTS)
         try:
             value = parser.get(section, option)
         except (NoSectionError, NoOptionError):

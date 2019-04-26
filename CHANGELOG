@@ -1,4 +1,5 @@
 Current
+- Made config.ini only contain overrides instead of mirroring all defaults.
 - Created (and added to UI) a FontPickerButton which lets users pick fonts and displays the current font in a
   human readable format on the button.
 - Changed default Fonts from Helvetica to Noto Sans (likely the same font)
