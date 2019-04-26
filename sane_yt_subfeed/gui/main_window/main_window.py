@@ -599,16 +599,16 @@ class MainWindow(QMainWindow):
         :param menubar:
         :return:
         """
-        self.add_menu(menubar, '&Function')
+        self.add_menu(menubar, 'F&unction')
 
         # Set function menu triggers
-        self.add_submenu('&Function', 'Copy all URLs', self.clipboard_copy_urls,
+        self.add_submenu('F&unction', 'Copy all URLs', self.clipboard_copy_urls,
                          shortcut=read_config('Global', 'copy_all_urls', custom_ini=HOTKEYS_INI,
                                               literal_eval=HOTKEYS_EVAL),
                          tooltip='Copy URLs of all currently visible videos to clipboard', icon=COPY_ALL_URLS_ICON)
 
         # refresh_list
-        self.toolbar_items['RefreshSubFeed'] = self.add_submenu('&Function', 'Refresh Feed',
+        self.toolbar_items['RefreshSubFeed'] = self.add_submenu('F&unction', 'Refresh Feed',
                                                                 self.emit_signal_with_set_args,
                                                                 shortcut=read_config('Global', 'refresh_feed',
                                                                                      custom_ini=HOTKEYS_INI,
@@ -618,53 +618,53 @@ class MainWindow(QMainWindow):
                                                                 signal=self.main_model.main_window_listener.refreshVideos,
                                                                 args=(LISTENER_SIGNAL_NORMAL_REFRESH,))
 
-        self.add_submenu('&Function', 'Fetch &List of Subscribed Channels',
+        self.add_submenu('F&unction', 'Fetch &List of Subscribed Channels',
                          self.main_model.main_window_listener.refreshSubs.emit,
                          shortcut=read_config('Global', 'reload_subslist', custom_ini=HOTKEYS_INI,
                                               literal_eval=HOTKEYS_EVAL),
                          tooltip='Fetch a new subscriptions list', icon=RELOAD_SUBS_LIST_ICON)
 
         # FIXME: icon, shortcut(alt/shift as extra modifier to the normal refresh shortcut?)
-        self.add_submenu('&Function', 'Deep refresh of feed', self.emit_signal_with_set_args,
+        self.add_submenu('F&unction', 'Deep refresh of feed', self.emit_signal_with_set_args,
                          shortcut=read_config('Global', 'refresh_feed_deep', custom_ini=HOTKEYS_INI,
                                               literal_eval=HOTKEYS_EVAL),
                          tooltip='Deep refresh the subscription feed', icon=REFRESH_SUBFEED_DEEP_ICON,
                          signal=self.main_model.main_window_listener.refreshVideos,
                          args=(LISTENER_SIGNAL_DEEP_REFRESH,))
 
-        self.add_submenu('&Function', 'Test Channels', self.main_model.main_window_listener.testChannels.emit,
+        self.add_submenu('F&unction', 'Test Channels', self.main_model.main_window_listener.testChannels.emit,
                          tooltip='Tests the test_pages and miss_limit of channels', icon=RERUN_TEST_ICON)
 
         if self.main_model.yt_dir_listener is not None:
-            self.add_submenu('&Function', 'Manual dir search', self.main_model.yt_dir_listener.manualCheck.emit,
+            self.add_submenu('F&unction', 'Manual dir search', self.main_model.yt_dir_listener.manualCheck.emit,
                              tooltip='Starts a manual search for new videos in youtube directory',
                              icon=MANUAL_DIR_SEARCH_ICON)
 
         thumb_tooltip = 'Starts a manual download of thumbnails for videos currently in play view and sub feed'
-        self.add_submenu('&Function', 'Manual thumbnail download',
+        self.add_submenu('F&unction', 'Manual thumbnail download',
                          self.download_thumbnails_manually,
                          tooltip=thumb_tooltip, icon=MANUAL_THUMBS_DOWNLOAD_ICON)
 
-        self.add_submenu('&Function', 'Manual DB grab', self.update_from_db,
+        self.add_submenu('F&unction', 'Manual DB grab', self.update_from_db,
                          tooltip='Starts a manual grab of data for the model', icon=DATABASE_ICON,
                          shortcut=read_config('Global', 'manual_db_grab', custom_ini=HOTKEYS_INI,
                                               literal_eval=HOTKEYS_EVAL))
 
         # FIXME: icon, look more related to action
-        self.add_submenu('&Function', 'Toggle sort-by: ascending date', self.toggle_sort_by_ascending,
+        self.add_submenu('F&unction', 'Toggle sort-by: ascending date', self.toggle_sort_by_ascending,
                          tooltip='Toggles the ascending date config option, and does a manual re-grab',
                          icon=SORT_BY_ASC_DATE_ICON, shortcut=read_config('Playback', 'ascending_sort_toggle',
                                                                           custom_ini=HOTKEYS_INI,
                                                                           literal_eval=HOTKEYS_EVAL))
-        self.add_submenu('&Function', 'Toggle sort-by: channel', self.toggle_sort_by_channel,
+        self.add_submenu('F&unction', 'Toggle sort-by: channel', self.toggle_sort_by_channel,
                          tooltip='Toggles the ascending date config option, and does a manual re-grab',
                          icon=SORT_BY_CHANNEL_ICON, shortcut=read_config('Playback', 'by_channel_sort_toggle',
                                                                          custom_ini=HOTKEYS_INI,
                                                                          literal_eval=HOTKEYS_EVAL))
 
-        self.add_submenu('&Function', 'Log History 2.0', self.history_log,
+        self.add_submenu('F&unction', 'Log History 2.0', self.history_log,
                          tooltip='Send entire history to logger')
-        self.add_submenu('&Function', 'Undo', self.history_undo,
+        self.add_submenu('F&unction', 'Undo', self.history_undo,
                          tooltip='Undo previous action (if possible)',
                          icon=UNDO_ICON, shortcut=read_config('Global', 'history_undo_action',
                                                               custom_ini=HOTKEYS_INI, literal_eval=HOTKEYS_EVAL))
