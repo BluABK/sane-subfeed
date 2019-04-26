@@ -44,10 +44,10 @@ last_style =
 last_theme = 
 
 [Fonts]
-video_title_font = Helvetica,12,-1,0,75,0,0,0,0,0,Bold
-video_channel_font = Helvetica,12,-1,0,50,0,0,0,0,0,Regular
-video_time_font = Helvetica,12,-1,0,50,0,0,0,0,0,Regular
-video_thumbnail_overlay_font = Helvetica,10,-1,0,50,0,0,0,0,0,Regular
+video_title_font = Noto Sans,10,-1,0,75,0,0,0,0,0,Bold
+video_channel_font = Noto Sans,10,-1,0,50,0,0,0,0,0,Regular
+video_date_font = Noto Sans,10,-1,0,50,0,0,0,0,0,Regular
+video_thumbnail_overlay_font = Noto Sans,10,-1,0,50,0,0,0,0,0,Regular
 
 [GridView]
 show_watched = False
