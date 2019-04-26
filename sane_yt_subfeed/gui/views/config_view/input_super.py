@@ -1,7 +1,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QFontDialog
 
+from sane_yt_subfeed.gui.views.config_view.config_items.font_picker_button import FontPickerButton
 from sane_yt_subfeed.handlers.config_handler import read_config, set_config
 from sane_yt_subfeed.gui.views.config_view.config_items.button import GenericConfigPushButton
 from sane_yt_subfeed.gui.views.config_view.config_items.checkbox import GenericConfigCheckBox
@@ -104,7 +105,7 @@ class InputSuper(QWidget):
         :param cfg_section:
         :param description:
         :param actions:   Function to call when line gets edited.
-        :param actions_kwargs    Keyword arguments (dict) to send in checked action calls.
+        :param actions_kwargs:    Keyword arguments (dict) to send in checked action calls.
         :return:
         """
         if restart_check and actions is None:
@@ -119,6 +120,32 @@ class InputSuper(QWidget):
         self.offset += 1
 
         return value  # Needed for connected listeners etc
+
+    def add_option_fontpicker(self, description, cfg_section, cfg_option, disabled=False, tooltip=None,
+                              actions=None, actions_kwargs=None, restart_check=True):
+        """
+        Add an option w/ value to the ConfigView layout and increment the grid offset.
+        :param description: Description of the option.
+        :param cfg_section: Config section.
+        :param cfg_option: Config option.
+        :param disabled: Sets disabled status if True.
+        :param tooltip: String to show on tooltip.
+        :param actions: Function to call when font is selected.
+        :param actions_kwargs: Keyword arguments (dict) to send in checked action calls.
+        :param restart_check: If set to false, don't check if a restart (may) be required for this option.
+        :return:
+        """
+        if restart_check and actions is None:
+            description = "{} {}".format(description, RESTART_REQUIRED_SIGNIFIER)
+        option = QLabel(description)
+        value = FontPickerButton(self, cfg_section, cfg_option, tooltip=tooltip, actions=actions,
+                                 actions_kwargs=actions_kwargs)
+
+        if disabled:
+            value.setDisabled(True)
+        self.layout.addWidget(option, self.offset, 0)
+        self.layout.addWidget(value, self.offset, 1)
+        self.offset += 1
 
     def add_option_inactive(self, description, cfg_section, cfg_option):
         """

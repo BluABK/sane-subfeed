@@ -115,18 +115,20 @@ class ConfigViewWidget(InputSuper):
                                                     self.root.del_central_widget_download,
                                                     self.root.setup_views],
                                  unchecked_kwargs=[{'tab': 'Download'}, None, None, None, None])
+        self.add_option_fontpicker('Thumbnail overlay font', 'Fonts', 'video_thumbnail_overlay_font')
+        self.add_option_fontpicker('Title font', 'Fonts', 'video_title_font')
         self.add_option_line_edit('Title elided text multiplier',
                                   'GridView', 'elided_text_modifier_title', cfg_validator=QDoubleValidator())
         self.add_option_line_edit('Title lines to display', 'GridView', 'tile_title_lines',
                                   cfg_validator=QIntValidator())
-        self.add_option_combobox('Title text font weight', 'GridView', 'title_tile_font_weight',
-                                 TILE_TITLE_FONT_WEIGHTS)
         self.add_option_info(None, None)  # Line spacer
+        self.add_option_fontpicker('Channel font', 'Fonts', 'video_channel_font')
         self.add_option_line_edit('Channel elided text multiplier',
                                   'GridView', 'elided_text_modifier_channel', cfg_validator=QDoubleValidator())
         self.add_option_line_edit('Channel Title lines to display', 'GridView', 'tile_channel_lines',
                                   cfg_validator=QIntValidator())
         self.add_option_info(None, None)  # Line spacer
+        self.add_option_fontpicker('Date font', 'Fonts', 'video_date_font')
         self.add_option_line_edit('Date elided text multiplier',
                                   'GridView', 'elided_text_modifier_date', cfg_validator=QDoubleValidator())
         self.add_option_line_edit('Date lines to display', 'GridView', 'tile_date_lines',
