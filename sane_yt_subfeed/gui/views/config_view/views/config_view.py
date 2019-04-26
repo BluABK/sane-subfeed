@@ -96,6 +96,9 @@ class ConfigViewWidget(InputSuper):
         self.add_section('{}Grid Views{}'.format(self.deco_l, self.deco_r))
         self.add_option_checkbox('Show watched videos', 'GridView', 'show_watched')
         self.add_option_checkbox('Show dismissed videos', 'GridView', 'show_dismissed')
+        self.add_option_checkbox('Warn if video is SD quality', 'GridView', 'show_sd_warning', restart_check=False)
+        self.add_option_checkbox('Show if video has captions available', 'GridView', 'show_has_captions',
+                                 restart_check=False)
         self.add_option_checkbox('Enable Playback view (and download support)', 'Play', 'enabled',
                                  checked_actions=[self.config_view_tabs.add_tab,
                                                   self.root.respawn_menubar_and_toolbar,

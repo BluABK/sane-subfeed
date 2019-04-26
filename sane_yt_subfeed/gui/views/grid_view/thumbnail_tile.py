@@ -76,7 +76,7 @@ class ThumbnailTile(QLabel):
             painter.drawText(rect, Qt.AlignCenter, duration_string)
 
             # Overlay captions (if any) on thumbnail    # FIXME: Replace with something better like a small icon
-            if self.parent.video.has_caption:
+            if self.parent.video.has_caption and read_config('GridView', 'show_has_captions'):
                 pen = QPen(Qt.white)
                 painter.setPen(pen)
                 painter.setFont(font)
@@ -98,7 +98,7 @@ class ThumbnailTile(QLabel):
                 painter.fillRect(rect, QBrush(QColor(0, 0, 0, 180)))
                 painter.drawText(rect, Qt.AlignCenter, "captions")
 
-            if self.parent.video.definition == "sd":
+            if self.parent.video.definition == "sd" and read_config('GridView', 'show_sd_warning'):
                 pen = QPen(Qt.red)
                 painter.setPen(pen)
                 painter.setFont(font)

@@ -66,6 +66,8 @@ DEFAULTS = {
     'GridView': {
         'show_watched': 'False',
         'show_dismissed': 'False',
+        'show_sd_warning': 'False',
+        'show_has_captions': 'True',
         'elided_text_modifier_title': '1',
         'elided_text_modifier_channel': '1',
         'elided_text_modifier_date': '1',
