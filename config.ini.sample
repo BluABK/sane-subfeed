@@ -52,19 +52,21 @@ video_thumbnail_overlay_font = Noto Sans,10,-1,0,50,0,0,0,0,0,Regular
 [GridView]
 show_watched = False
 show_dismissed = False
-elided_text_modifier_title = 0.28
-elided_text_modifier_channel = 0.28
-elided_text_modifier_date = 0.28
+show_sd_warning = False
+show_has_captions = True
+elided_text_modifier_title = 1
+elided_text_modifier_channel = 1
+elided_text_modifier_date = 1
 elided_text_unicode_weight_modifier = 0.0075
 tile_unicode_line_height_offset = 1.99
-tile_line_spacing = 7
+tile_line_spacing = 5
 tile_title_lines = 2
 tile_channel_lines = 1
 tile_date_lines = 1
 title_tile_font_weight = Bold
 timedelta_format = $HH:$MM:$SS ago
 timedelta_format_days = $d days, $HH:$MM:$SS ago
-timedelta_format_months = $m months, $d d, $HH:$MM:$SS ago
+timedelta_format_months = $m months, ${d}d, $HH:$MM:$SS ago
 timedelta_format_years = ${yd}y, ${m}m, ${d}d, $HH:$MM:$SS ago
 timedelta_format_decades = ${decades}dc, ${yd}y, ${m}m, ${d}d, $HH:$MM:$SS ago
 
@@ -95,6 +97,8 @@ force_download_best = True
 
 [Threading]
 img_threads = 200
+retry_attempts = 10
+retry_delay = 1.0
 
 [Play]
 enabled = False

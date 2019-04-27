@@ -111,6 +111,8 @@ DEFAULTS = {
     },
     'Threading': {
         'img_threads': '200',
+        'retry_attempts': '10',
+        'retry_delay': '1.0'
     },
     'Play': {
         'enabled': 'False',

@@ -1,3 +1,6 @@
+Current
+- Added retry attempt handling for failed GetUploadsThread threads with configurable delay and max attempts.
+
 v0.6.2
 - Made sd warn and has-captions overlays optional (and made sd warning False by default due to recently buggy API data).
 - Changed Function menu alt-key from F to u (overlapped with File menu).
