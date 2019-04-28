@@ -42,6 +42,8 @@ class VideoTile(QWidget):
 
         self.pref_height = read_config('Gui', 'tile_pref_height')
         self.pref_width = read_config('Gui', 'tile_pref_width')
+        # NB: If you don't use a fixed size tile loading becomes glitchy as it needs to stretch to size after painting.
+        self.setFixedSize(self.pref_width, self.pref_height)
 
         self.layout = QGridLayout()
         self.layout.setSpacing(0)  # Don't use Qt's "global padding" spacing.
@@ -76,7 +78,9 @@ class VideoTile(QWidget):
 
         # Add labels to layout
         self.layout.addWidget(self.thumbnail_label)
-        self.layout.addWidget(spacer_label)
+        if read_config('GridView', 'add_thumbnail_spacer'):
+            # This should only be necessary when not using fixed size scaling for ThumbnailTile.
+            self.layout.addWidget(spacer_label)
         if read_config('GridView', 'tile_title_lines') != 0:
             self.layout.addWidget(self.title_label)
             self.layout.addWidget(spacer_label)

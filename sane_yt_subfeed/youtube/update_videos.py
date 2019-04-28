@@ -1,4 +1,5 @@
 import re
+import time
 from datetime import timedelta
 from googleapiclient.errors import HttpError
 
@@ -20,11 +21,34 @@ YT_VIDEO_URL = YOUTUBE_URL + YOUTUBE_PARM_VIDEO
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 logger = create_logger(__name__)
 
-# Thread exception lists
-refresh_ul_thread_exc_http = []
-refresh_ul_thread_exc_other = []
 
-abort = False
+def reinstantiate_thread(t):
+    """
+    Creates a new thread from an old one, and then deletes the old one and returns the new one.
+
+    This is necessary because a thread can only be started once.
+    :param t: GetUploadsThread object
+    :return: GetUploadsThread
+    """
+    # Gather necessary data from the old thread instance.
+    thread_id = t.thread_id
+    youtube = t.youtube
+    channel_id = t.channel_id
+    channel_playlist_id = t.playlist_id
+    videos = t.videos
+    list_pages = t.list_pages
+    search_pages = t.search_pages
+    deep_search = t.deep_search
+
+    # Create a new thread instance based on the old thread instance's data.
+    new_t = GetUploadsThread(thread_id, youtube, channel_id, channel_playlist_id, videos, list_pages,
+                              search_pages, deep_search=deep_search)
+
+    # Delete the old failed thread instance.
+    del t
+
+    # Return the new thread instance.
+    return new_t
 
 
 def refresh_uploads(progress_bar_listener=None, add_to_max=0,
@@ -38,7 +62,6 @@ def refresh_uploads(progress_bar_listener=None, add_to_max=0,
     :param refresh_type:
     :return:
     """
-    global abort
     thread_increment = 0
     thread_list = []
     videos = []
@@ -79,51 +102,120 @@ def refresh_uploads(progress_bar_listener=None, add_to_max=0,
         progress_bar_listener.setText.emit('Waiting for video update threads')
 
     exceptions = []
+    abort_all_threads = False
     for t in thread_list:
+        if abort_all_threads:
+            # Delete current thread (also implies all following threads)
+            del t
         if progress_bar_listener:
             progress_bar_listener.updateProgress.emit()
-        try:
-            if not abort:
-                t.join()
+
+        attempt = 1
+        joined_thread = False
+        abort_current_thread = False
+        max_attempts = read_config('Threading', 'retry_attempts')
+        while not abort_all_threads and not joined_thread:
+            if attempt <= max_attempts and not abort_current_thread:
+                failed_attempt = False
+                try:
+                    t.join()
+
+                except HttpError as exc_gapi_http_error:  # FIXME: Handle more HttpError exceptions
+                    if "HttpError 500 when requesting" in str(exc_gapi_http_error):
+                        if 'returned "Backend Error"' in str(exc_gapi_http_error):
+                            log_msg = "A Google API HttpError 500 " \
+                                      "(Backend Error) occurred in thread #{}" \
+                                      "(channel: {}, playlist: {})".format(t.thread_id, t.channel_id, t.playlist_id)
+
+                            if attempt == max_attempts:
+                                # The final attempt has failed
+                                logger.error("{}, attempt {}/{} failed! Giving up on this thread...".format(
+                                              log_msg, attempt, max_attempts),
+                                             exc_info=exc_gapi_http_error)
+                            else:
+                                # Don't abort because the job might still be mostly successful.
+                                logger.warning("{}, retrying... [{}/{}]".format(
+                                                log_msg, attempt, max_attempts),
+                                               exc_info=exc_gapi_http_error)
+
+                            # Store exceptions to lists, because raise breaks joining process and return
+                            exceptions.append(exc_gapi_http_error)
+
+                            # Re-run the failed thread job
+                            time.sleep(read_config('Threading', 'retry_delay'))
+                            t = reinstantiate_thread(t)
+                            t.start()
+                            pass
+                    else:
+                        log_msg = "(An unexpected Google API HttpError occurred in thread #{}" \
+                                  "(channel: {}, playlist: {})".format(t.thread_id, t.channel_id, t.playlist_id)
+
+                        if attempt == max_attempts:
+                            # The final attempt has failed
+                            logger.error("{}, attempt {}/{} failed! Giving up on this thread...".format(
+                                log_msg, attempt, max_attempts),
+                                exc_info=exc_gapi_http_error)
+                        else:
+                            # Don't abort because the job might still be mostly successful.
+                            logger.error("{}, "
+                                         "retrying... [{}/{}]: {}".format(
+                                          log_msg, attempt, max_attempts, str(exc_gapi_http_error)),
+                                         exc_info=exc_gapi_http_error)
+
+                        # Store exceptions to lists, because raise breaks joining process and return
+                        exceptions.append(exc_gapi_http_error)
+
+                        # Re-run the failed thread job
+                        time.sleep(read_config('Threading', 'retry_delay'))
+                        t = reinstantiate_thread(t)
+                        t.start()
+
+                    failed_attempt = True
+                    pass
+                except OSError as exc_ose:
+                    # Handle hitting the file descriptor ceiling.
+                    if "Too many open files" in str(exc_ose):
+                        logger.critical("refresh_uploads() hit fd ceiling with thread #{}. Aborting all!".format(
+                            t.thread_id), exc_info=exc_ose)
+
+                    else:
+                        logger.critical("An unexpected OSError exception occurred in thread #{}. Aborting all!".format(
+                            t.thread_id), exc_info=exc_ose)
+
+                    # Store exceptions to lists, because raise breaks joining process and return
+                    exceptions.append(exc_ose)
+
+                    # Delete current thread
+                    del t
+
+                    # Abort the entire operation since this usually means several (if not all) operations will fail.
+                    abort_all_threads = True
+                    pass
+                except Exception as exc_other:
+                    logger.critical("An unexpected exception occurred in thread #{}. Aborting all!".format(t.thread_id),
+                                    exc_info=exc_other)
+
+                    # Store exceptions to lists, because raise breaks joining process and return
+                    exceptions.append(exc_other)
+
+                    # Delete current thread
+                    del t
+
+                    # Abort the entire operation since this usually means several (if not all) operations will fail.
+                    abort_all_threads = True
+
+                    pass
+                finally:
+                    attempt += 1
+
+                if not failed_attempt:
+                    # If nothing set failed_attempt variable, assume thread joined successfully.
+                    joined_thread = True
             else:
-                # Delete thread due to abort condition being set.
+                # Delete current thread due to abort condition being set.
                 del t
-        # Store exceptions to lists, because raise breaks joining process and return
-        except HttpError as exc_gapi_http_error:  # FIXME: Handle HttpError exceptions
-            # Don't abort because the job might still be mostly successful.
-            logger.error("A Google API HttpError exception occurred in thread {}! -- !!IMPLEMENT HANDLING!!".format(
-                t.thread_id), exc_info=exc_gapi_http_error)
-            refresh_ul_thread_exc_http.append(exc_gapi_http_error)
-            pass
-        except OSError as exc_ose:
-            # Abort the entire operation since this usually means several (if not all) operations will fail.
-            abort = True
 
-            # Handle hitting the file descriptor ceiling.
-            if "Too many open files" in str(exc_ose):
-                _ = "refresh_uploads() hit fd ceiling with thread #{}! " \
-                    "Aborting job and deleting unjoined threads..".format(t.thread_id)
-                logger.critical(_, exc_info=exc_ose)
-                del t
-                exceptions.append(exc_ose)
-            else:
-                logger.critical("An *UNEXPECTED* OSError exception occurred in thread #{}!".format(t.thread_id),
-                                exc_info=exc_ose)
-                exceptions.append(exc_ose)
-                refresh_ul_thread_exc_other.append(exc_ose)  # FIXME: Is this actually used?
-                pass
-        except Exception as exc_other:
-            # Abort the entire operation since this usually means several (if not all) operations will fail.
-            abort = True
-
-            logger.critical("An *UNEXPECTED* exception occurred in thread #{}!".format(t.thread_id), exc_info=exc_other)
-
-            exceptions.append(exc_other)
-            refresh_ul_thread_exc_other.append(exc_other)  # FIXME: Is this actually used?
-            pass
-
-    if abort:
-        abort = False
+    if abort_all_threads:
         raise SaneAbortedOperation("Refresh uploads operation ABORTED due to critical exceptions.",
                                    exceptions=exceptions)
     else:

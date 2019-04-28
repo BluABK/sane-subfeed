@@ -131,6 +131,8 @@ class ConfigViewWidget(InputSuper):
         self.add_option_line_edit('Date lines to display', 'GridView', 'tile_date_lines',
                                   cfg_validator=QIntValidator())
         self.add_option_info(None, None)  # Line spacer
+        self.add_option_checkbox('Also add spacing between thumbnail and title',
+                                 'GridView', 'add_thumbnail_spacer')
         self.add_option_line_edit('Line spacing for tile elements<br/>'
                                   '(tip: decrement this if you increment lines)', 'GridView', 'tile_line_spacing',
                                   QDoubleValidator())
@@ -303,8 +305,14 @@ class ConfigViewWidget(InputSuper):
         self.add_option_combobox('3. Priority', 'Thumbnails', '2', THUMBNAIL_QUALITIES, restart_check=False)
         self.add_option_combobox('4. Priority', 'Thumbnails', '3', THUMBNAIL_QUALITIES, restart_check=False)
         self.add_option_combobox('5. Priority', 'Thumbnails', '4', THUMBNAIL_QUALITIES, restart_check=False)
+
+        self.add_section('{}Threading{}'.format(self.deco_l, self.deco_r))
         self.add_option_line_edit('Image/thumbnail download thread limit', 'Threading', 'img_threads',
                                   cfg_validator=QIntValidator(), restart_check=False)
+        self.add_option_line_edit('Max failed operation retry attempts', 'Threading', 'retry_attempts',
+                                  cfg_validator=QIntValidator(), restart_check=False)
+        self.add_option_line_edit('Failed operation retry delay (in seconds)', 'Threading', 'retry_delay',
+                                  cfg_validator=QDoubleValidator(), restart_check=False)
 
         self.add_section('{}YouTube requests{}'.format(self.deco_l, self.deco_r))
         self.add_option_checkbox('Use tests', 'Requests', 'use_tests', restart_check=False)

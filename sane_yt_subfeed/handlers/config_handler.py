@@ -73,6 +73,7 @@ DEFAULTS = {
         'elided_text_modifier_date': '1',
         'elided_text_unicode_weight_modifier': '0.0075',
         'tile_unicode_line_height_offset': '1.99',
+        'add_thumbnail_spacer': 'False',
         'tile_line_spacing': '5',
         'tile_title_lines': '2',
         'tile_channel_lines': '1',
@@ -111,6 +112,8 @@ DEFAULTS = {
     },
     'Threading': {
         'img_threads': '200',
+        'retry_attempts': '10',
+        'retry_delay': '1.0'
     },
     'Play': {
         'enabled': 'False',

@@ -14,7 +14,8 @@ class ThumbnailTile(QLabel):
         self.parent = parent
         self.logger = create_logger(__name__ + ".ThumbnailTitle")
 
-        self.setMinimumWidth(self.parent.width())
+        margins = self.parent.layout.getContentsMargins()
+        self.setFixedSize(self.parent.width() - margins[0] - margins[2], (self.parent.height() - 4 * margins[3]) * 0.6)
 
     def setPixmap(self, p):
         """
@@ -36,8 +37,7 @@ class ThumbnailTile(QLabel):
             painter = QPainter(self)
 
             if read_config('Gui', 'keep_thumb_ar'):
-                thumb = self.p.scaledToWidth(self.width(), Qt.SmoothTransformation)
-                self.setMinimumHeight(thumb.height())
+                thumb = self.p.scaled(self.width(), self.height(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
                 painter.drawPixmap(0, 0, thumb)
             else:
                 thumb = self
@@ -53,7 +53,7 @@ class ThumbnailTile(QLabel):
 
             duration_right_padding = 4
             duration_bottom_padding = 8
-            
+
             point = QPoint(
                 thumb.width() - duration_right_padding,
                 thumb.height() - duration_bottom_padding
@@ -63,7 +63,7 @@ class ThumbnailTile(QLabel):
             # Find out the width of the text
             text_width = metrics.width(duration_string)
             # Work out the max height the text can be
-            text_height = metrics.descent() + metrics.ascent() 
+            text_height = metrics.descent() + metrics.ascent()
             # Add a padding of 8px (4px on left, 4px on right) for width
             rect_width = text_width + 8
             # Add a padding of 4px (2px on top, 2px on bottom) for height
@@ -83,14 +83,14 @@ class ThumbnailTile(QLabel):
 
                 captions_left_padding = 4
                 captions_bottom_padding = 8
-            
+
                 point = QPoint(
                     captions_left_padding,
                     thumb.height() - captions_bottom_padding
                 )
                 metrics = QFontMetrics(font)
                 text_width = metrics.width("captions")
-                text_height = metrics.descent() + metrics.ascent() 
+                text_height = metrics.descent() + metrics.ascent()
                 rect_width = text_width + 8
                 rect_height = text_height + 4
 
@@ -105,14 +105,14 @@ class ThumbnailTile(QLabel):
 
                 sd_left_padding = 4
                 sd_top_padding = 4
-            
+
                 point = QPoint(
                     sd_left_padding,
                     sd_top_padding
                 )
                 metrics = QFontMetrics(font)
                 text_width = metrics.width("SD")
-                text_height = metrics.descent() + metrics.ascent() 
+                text_height = metrics.descent() + metrics.ascent()
                 rect_width = text_width + 4
                 rect_height = text_height + 4
 
