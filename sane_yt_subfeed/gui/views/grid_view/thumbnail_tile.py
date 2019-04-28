@@ -51,8 +51,8 @@ class ThumbnailTile(QLabel):
             painter.setPen(pen)
             painter.setFont(font)
 
-            duration_right_padding = 4
-            duration_bottom_padding = 8
+            duration_right_padding = read_config('GridView', 'duration_right_padding')
+            duration_bottom_padding = read_config('GridView', 'duration_bottom_padding')
 
             point = QPoint(
                 thumb.width() - duration_right_padding,
@@ -81,8 +81,8 @@ class ThumbnailTile(QLabel):
                 painter.setPen(pen)
                 painter.setFont(font)
 
-                captions_left_padding = 4
-                captions_bottom_padding = 8
+                captions_left_padding = read_config('GridView', 'captions_left_padding')
+                captions_bottom_padding = read_config('GridView', 'captions_bottom_padding')
 
                 point = QPoint(
                     captions_left_padding,

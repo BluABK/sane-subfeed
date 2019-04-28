@@ -279,7 +279,7 @@ class ConfigViewWidget(InputSuper):
         self.add_option_info_restart_required()
 
     def add_config_tab_advanced(self):
-        self.add_option_checkbox('Launch GUI', 'Gui', 'launch_gui', disabled=True)
+        self.add_section('{}General{}'.format(self.deco_l, self.deco_r))
         self.add_option_checkbox('Debug mode', 'Debug', 'debug',
                                  checked_actions=[self.config_view_tabs.add_tab,
                                                   self.root.respawn_menubar_and_toolbar],
@@ -287,15 +287,20 @@ class ConfigViewWidget(InputSuper):
                                  unchecked_actions=[self.config_view_tabs.del_tab,
                                                     self.root.respawn_menubar_and_toolbar],
                                  unchecked_kwargs=[{'tab': 'Debug'}, None])
-        self.add_option_checkbox('Cache subscriptions', 'Debug', 'cached_subs')
-        self.add_option_checkbox('Start with cached videos', 'Debug', 'start_with_stored_videos')
-        self.add_option_line_edit('Channel limit (-1 is unlimited)', 'Debug', 'channels_limit',
-                                  cfg_validator=QIntValidator(), restart_check=False)
-        self.add_option_checkbox('Use list() instead of search()', 'Debug', 'use_playlistitems', restart_check=False)
+
+        self.add_section('{}GUI{}'.format(self.deco_l, self.deco_r))
+        self.add_option_checkbox('Launch GUI', 'Gui', 'launch_gui', disabled=True)
         self.add_option_checkbox('Disable tooltips', 'Debug', 'disable_tooltips', restart_check=False)
         self.add_option_line_edit('Grid view X', 'Gui', 'grid_view_x', cfg_validator=QIntValidator())
         self.add_option_line_edit('Grid view Y', 'Gui', 'grid_view_y', cfg_validator=QIntValidator())
-        self.add_option_line_edit('Database URL', 'Database', 'url')
+        self.add_option_line_edit('Duration overlay left padding', 'GridView', 'duration_right_padding',
+                                  cfg_validator=QIntValidator())
+        self.add_option_line_edit('Duration overlay bottom padding', 'GridView', 'duration_bottom_padding',
+                                  cfg_validator=QIntValidator())
+        self.add_option_line_edit('Captions overlay left padding', 'GridView', 'captions_left_padding',
+                                  cfg_validator=QIntValidator())
+        self.add_option_line_edit('Captions overlay bottom padding', 'GridView', 'captions_bottom_padding',
+                                  cfg_validator=QIntValidator())
 
         self.add_section('{}Thumbnails{}'.format(self.deco_l, self.deco_r))
         self.add_option_checkbox('Force download best quality, based on prioritised list',
@@ -315,6 +320,9 @@ class ConfigViewWidget(InputSuper):
                                   cfg_validator=QDoubleValidator(), restart_check=False)
 
         self.add_section('{}YouTube requests{}'.format(self.deco_l, self.deco_r))
+        self.add_option_line_edit('Channel limit (-1 is unlimited)', 'Debug', 'channels_limit',
+                                  cfg_validator=QIntValidator(), restart_check=False)
+        self.add_option_checkbox('Use list() instead of search()', 'Debug', 'use_playlistitems', restart_check=False)
         self.add_option_checkbox('Use tests', 'Requests', 'use_tests', restart_check=False)
         self.add_option_line_edit('Missed video limit', 'Requests', 'miss_limit',
                                   cfg_validator=QIntValidator(), restart_check=False)
@@ -327,5 +335,12 @@ class ConfigViewWidget(InputSuper):
                                   cfg_validator=QIntValidator(), restart_check=False)
         self.add_option_line_edit('Filter videos older than (days)', 'Requests', 'filter_videos_days_old',
                                   cfg_validator=QIntValidator(), restart_check=False)
+
+        self.add_section('{}Cache{}'.format(self.deco_l, self.deco_r))
+        self.add_option_checkbox('Cache subscriptions', 'Debug', 'cached_subs')
+        self.add_option_checkbox('Start with cached videos', 'Debug', 'start_with_stored_videos')
+
+        self.add_section('{}Database{}'.format(self.deco_l, self.deco_r))
+        self.add_option_line_edit('Database URL', 'Database', 'url')
 
         self.add_option_info_restart_required()
