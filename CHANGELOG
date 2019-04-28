@@ -1,4 +1,6 @@
 Current
+- Revert ThumbnailTile and VideoTile to the old fixed size scaling due to *heavy* glitchiness and performance issues
+  when using min and max width/height.
 - Added retry attempt handling for failed GetUploadsThread threads with configurable delay and max attempts.
 
 v0.6.2

@@ -131,6 +131,8 @@ class ConfigViewWidget(InputSuper):
         self.add_option_line_edit('Date lines to display', 'GridView', 'tile_date_lines',
                                   cfg_validator=QIntValidator())
         self.add_option_info(None, None)  # Line spacer
+        self.add_option_checkbox('Also add spacing between thumbnail and title',
+                                 'GridView', 'add_thumbnail_spacer')
         self.add_option_line_edit('Line spacing for tile elements<br/>'
                                   '(tip: decrement this if you increment lines)', 'GridView', 'tile_line_spacing',
                                   QDoubleValidator())
