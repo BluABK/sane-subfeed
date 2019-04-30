@@ -5,7 +5,6 @@ from configparser import ConfigParser, NoSectionError, NoOptionError
 from sane_yt_subfeed.absolute_paths import CONFIG_PATH, SAMPLE_PATH, CONFIG_HOTKEYS_PATH, \
     SAMPLE_HOTKEYS_PATH, DATABASE_PATH
 
-parser = None
 default_parser = ConfigParser()
 default_parser.read(CONFIG_PATH)
 hotkeys_parser = ConfigParser()

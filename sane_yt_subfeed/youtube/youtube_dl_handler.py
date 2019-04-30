@@ -19,7 +19,6 @@ except ModuleNotFoundError as module_exc:
     YOUTUBE_DL_AVAILABLE = False
 
 
-
 VIDEO_FORMATS = ['mp4', 'flv', 'ogg', 'webm', 'mkv', 'avi', 'ts']
 AUDIO_MERGE_FAILS = ["Could not write header for output file #0 (incorrect codec parameters ?): Invalid argument",
                      "ERROR: Could not write header for output file #0 (incorrect codec parameters ?): Invalid argument"

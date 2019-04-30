@@ -43,7 +43,7 @@ class DownloadThumbnail(threading.Thread):
                     quality = get_best_thumbnail(video)
                     crop = False
                     if 'standard' in quality['quality'] or 'high' in quality['quality'] or 'default' in quality[
-                        'quality']:
+                       'quality']:
                         crop = True
                     download_thumb_file(thumbnail_dict['url'], vid_path, crop=crop, quality=quality['quality'])
                     if not os.path.exists(vid_path):
@@ -58,7 +58,7 @@ def get_thumbnail_path(vid):
 
 
 def download_thumbnails_threaded(input_vid_list, progress_listener=None):
-    logger = create_logger(__name__ + ".download_thumbnails_threaded")
+    download_thumbnails_threaded_logger = create_logger(__name__ + ".download_thumbnails_threaded")
 
     thread_list = []
     thread_limit = int(read_config('Threading', 'img_threads'))
@@ -73,7 +73,7 @@ def download_thumbnails_threaded(input_vid_list, progress_listener=None):
         vid_list.append(input_vid_list[i:i + chunk_size])
     counter = 0
 
-    logger.info(
+    download_thumbnails_threaded_logger.info(
         "Starting thumbnail download threads for {} videos in {} threads".format(len(input_vid_list), len(vid_list)))
     for vid_list_chunk in vid_list:
         t = DownloadThumbnail(vid_list_chunk, force_dl_best=force_dl_best, progress_listener=progress_listener)

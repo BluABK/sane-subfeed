@@ -220,6 +220,7 @@ class MainWindow(QMainWindow):
         """
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
+        # noinspection PyCallByClass
         filename, _ = QFileDialog.getOpenFileName(self, "Locate your YouTube API Keys file (usually keys.json)", "",
                                                   "All Files (*);;JSON files (*.json)", options=options)
         if filename:
@@ -291,6 +292,7 @@ class MainWindow(QMainWindow):
                                                'Build OAuth2 client secret file')
         input_dialog.exec()
 
+    # noinspection PyCallByClass
     def select_custom_oauth_secret_file(self):
         """
         Copies custom api keys file to KEYS_FILE via OpenFile dialog.

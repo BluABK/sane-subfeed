@@ -3,6 +3,7 @@ import json
 import sqlalchemy
 from sqlalchemy import TypeDecorator
 
+
 class TextPickleType(TypeDecorator):
     impl = sqlalchemy.Text()
 

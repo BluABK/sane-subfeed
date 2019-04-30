@@ -113,6 +113,7 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day, refresh_and_p
                 exc_id += 1
 
                 # Call the normal Exception hook after
+                # noinspection PyProtectedMember
                 sys._excepthook(exctype, value, traceback)
 
                 # sys.exit(1)       # Alternatively, exit
