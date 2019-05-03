@@ -34,6 +34,7 @@ class SaneExceptionHandler(QObject):
 
         # Back up the reference to the exception hook
         sys._excepthook = sys.excepthook
+        # noinspection PyProtectedMember
         self.original_excepthook = sys._excepthook
 
     def handler(self, exctype, value, traceback):

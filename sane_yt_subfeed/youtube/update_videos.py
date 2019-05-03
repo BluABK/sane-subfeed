@@ -42,7 +42,7 @@ def reinstantiate_thread(t):
 
     # Create a new thread instance based on the old thread instance's data.
     new_t = GetUploadsThread(thread_id, youtube, channel_id, channel_playlist_id, videos, list_pages,
-                              search_pages, deep_search=deep_search)
+                             search_pages, deep_search=deep_search)
 
     # Delete the old failed thread instance.
     del t

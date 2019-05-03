@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 alembic = "==1.0.0"
+beautifulsoup4 = ">=4.7.1"
 cachetools = "==2.1.0"
 certifi = "==2018.4.16"
 chardet = "==3.0.4"

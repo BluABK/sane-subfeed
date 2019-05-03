@@ -75,10 +75,6 @@ class RunTestsThreaded(threading.Thread):
     def __init__(self, subscription, youtube_key, results):
         """
         Init GetUploadsThread
-        :param thread_id:
-        :param channel:
-        :param info:
-        :param debug:
         """
         threading.Thread.__init__(self)
         self.subscription = subscription
@@ -88,7 +84,7 @@ class RunTestsThreaded(threading.Thread):
     # TODO: Handle failed requests
     def run(self):
         search_videos = []
-        list_uploaded_videos_search(self.youtube_key, self.subscription.id, search_videos, 2, live_videos=False)
+        list_uploaded_videos_search(self.youtube_key, self.subscription.id, search_videos, 2)
         playlist_videos = []
         next_page = list_uploaded_videos_page(self.youtube_key, playlist_videos, self.subscription.playlist_id)
 
