@@ -1,3 +1,5 @@
+from bs4 import BeautifulSoup
+
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QFontMetrics
@@ -18,6 +20,10 @@ class ElidedLabel(QLabel):
         """
         QLabel.__init__(self, text)
         self.parent = parent
+
+        # Unescape HTML/XML codes, if any (usually happens with youtube.search() results)
+        text = BeautifulSoup(text, "html.parser").text
+
         self.setFont(font)
 
         # Set label type independent config entries
