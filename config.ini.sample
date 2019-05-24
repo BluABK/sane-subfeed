@@ -167,3 +167,6 @@ logging_port = 19996
 [Database]
 url = sqlite:///<path>/permanents.db
 
+[Authentication]
+oauth2_local_server_port = 8080
+

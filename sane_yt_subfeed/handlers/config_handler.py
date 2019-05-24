@@ -178,6 +178,9 @@ DEFAULTS = {
     },
     'Database': {
         'url': 'sqlite:///{}'.format(DATABASE_PATH)
+    },
+    'Authentication': {
+        'oauth2_local_server_port': '8080'
     }
 }
 
