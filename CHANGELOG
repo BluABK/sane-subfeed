@@ -1,4 +1,5 @@
 Current
+- Fixed missing Authentication section in default config.
 - Added some categories and sorted settings in Advanced tab.
 - Made captions and duration overlay padding configurable and changed bottom padding to match right/left padding.
 - Revert ThumbnailTile and VideoTile to the old fixed size scaling due to *heavy* glitchiness and performance issues
