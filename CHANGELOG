@@ -1,4 +1,5 @@
 Current
+- Set VideoD.thumbnails to None on "private" videos to avoid fatal AttributeErrors.
 - Added handling of private videos that don't contain any thumbnail in the YouTube API.
 - Fixed missing Authentication section in default config.
 - Added some categories and sorted settings in Advanced tab.

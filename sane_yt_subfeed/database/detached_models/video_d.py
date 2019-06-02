@@ -88,6 +88,7 @@ class VideoD:
         else:
             self.logger.critical("No thumbnails key in snippet!")
             self.logger.error(search_item)
+            self.thumbnails = None
         self.search_item = search_item
         self.watched = False
 
