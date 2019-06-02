@@ -83,7 +83,11 @@ class VideoD:
         self.channel_id = search_item['snippet']['channelId']
 
         self.url_video = YOUTUBE_URL_BASE + YOUTUBE_URL_PART_VIDEO + self.video_id
-        self.thumbnails = search_item['snippet']['thumbnails']
+        if 'thumbnails' in search_item['snippet']:
+            self.thumbnails = search_item['snippet']['thumbnails']
+        else:
+            self.logger.critical("No thumbnails key in snippet!")
+            self.logger.error(search_item)
         self.search_item = search_item
         self.watched = False
 
