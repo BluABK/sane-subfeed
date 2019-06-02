@@ -1,4 +1,5 @@
 Current
+- Added handling of private videos that don't contain any thumbnail in the YouTube API.
 - Fixed missing Authentication section in default config.
 - Added some categories and sorted settings in Advanced tab.
 - Made captions and duration overlay padding configurable and changed bottom padding to match right/left padding.
