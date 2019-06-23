@@ -2,7 +2,7 @@
 from PyQt5.QtWidgets import *
 
 # Project internal libs
-from sane_yt_subfeed.database.read_operations import get_newest_stored_videos
+from sane_yt_subfeed.database.read_operations import get_db_videos_subfeed
 from sane_yt_subfeed.handlers.log_handler import create_logger
 
 
@@ -115,4 +115,4 @@ class SubfeedDetailedListView(QWidget):
         :return:
         """
         self.logger.info("Getting videos")
-        self.videos = get_newest_stored_videos(self.vid_limit)
+        self.videos = get_db_videos_subfeed(self.vid_limit)

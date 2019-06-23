@@ -16,8 +16,8 @@ from sane_yt_subfeed.controller.listeners.gui.views.grid_view.subfeed.subfeed_gr
 from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import PLAYBACK_VIEW_ID, SUBFEED_VIEW_ID
 from sane_yt_subfeed.controller.listeners.youtube_dir_listener.youtube_dir_listener import YoutubeDirListener
-from sane_yt_subfeed.database.read_operations import get_newest_stored_videos, refresh_and_get_newest_videos, \
-    get_best_playview_videos
+from sane_yt_subfeed.database.read_operations import get_db_videos_subfeed, refresh_and_get_newest_videos, \
+    get_db_videos_playback
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.database.write_operations import UpdateVideosThread
 from sane_yt_subfeed.exceptions.sane_aborted_operation import SaneAbortedOperation
@@ -145,6 +145,9 @@ class MainModel:
     def update_subfeed_videos_from_db(self, filtered=True):
         """
         Updates Subscription feed video list from DB.
+
+        Updates the filter with values in model and calls static database (read operation)
+        function which doesn't have direct access to the model object.
         :param filtered:
         :return:
         """
@@ -159,10 +162,10 @@ class MainModel:
             if not show_dismissed:
                 update_filter += (~Video.discarded,)
 
-            self.subfeed_videos = get_newest_stored_videos(self.videos_limit, filters=update_filter)
+            self.subfeed_videos = get_db_videos_subfeed(self.videos_limit, filters=update_filter)
             self.subfeed_grid_view_listener.videosChanged.emit()
         else:
-            self.videos = get_newest_stored_videos(self.videos_limit, filtered)
+            self.videos = get_db_videos_subfeed(self.videos_limit, filtered)
 
     def update_subfeed_videos_from_remote(self, filtered=True, refresh_type=LISTENER_SIGNAL_NORMAL_REFRESH):
         """
@@ -202,8 +205,8 @@ class MainModel:
         """
         update_filter = self.filter_playback_view_videos()
         update_sort = self.sort_playback_view_videos()
-        self.playview_videos = get_best_playview_videos(self.playview_videos_limit, filters=update_filter,
-                                                        sort_method=update_sort)
+        self.playview_videos = get_db_videos_playback(self.playview_videos_limit, filters=update_filter,
+                                                      sort_method=update_sort)
         self.playback_grid_view_listener.videosChanged.emit()
 
     def create_progressbar_on_statusbar(self, parent):
