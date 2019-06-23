@@ -209,6 +209,38 @@ def refresh_and_get_newest_videos(limit, filter_downloaded=True, filter_discarde
         # Get a list of videos by refreshing the subscription feed.
         videos = refresh_uploads(progress_bar_listener=progress_listener, add_to_max=2 * limit,
                                  refresh_type=refresh_type)
+
+        # If filters are enabled, run the videos through a filter function.
+        if filter_downloaded or filter_discarded:
+            return_list = filter_videos(videos, limit, filter_discarded=filter_discarded,
+                                        filter_downloaded=filter_downloaded)
+
+        # If no filters are enabled, simply add limit amount of videos to the list.
+        else:
+            return_list = videos[:limit]
+
+        # Check for new videos (modify list directly).
+        return_list = check_for_new(return_list, refresh_type)
+
+        # Update videos (threaded).
+        UpdateVideosThread(videos).start()
+        # Check that video list isn't empty.
+        if len(return_list) > 0:
+            # Download video thumbnails (threaded).
+            download_thumbnails_threaded(return_list, progress_listener=progress_listener)
+
+            # Get additional video information (threaded) that isn't included in the standard grab function.
+            return_list = get_extra_videos_information(return_list)
+            UpdateVideosExtraInfoThreaded(return_list).start()
+        else:
+            logger.info("Skipping thumbnails download and db update as return list is empty")
+
+        if progress_listener:
+            progress_listener.progress_bar.setVisible(False)
+            progress_listener.resetBar.emit()
+
+        return return_list
+
     except SaneAbortedOperation as exc_sao:
         # Clean up progress bar after aborted operation
         if progress_listener:
@@ -219,38 +251,7 @@ def refresh_and_get_newest_videos(limit, filter_downloaded=True, filter_discarde
     except Exception as exc_other:
         logger.critical("Unexpected exception occurred in refresh_and_get_newest_videos!", exc_info=exc_other)
 
-        pass
-
-    # If filters are enabled, run the videos through a filter function.
-    if filter_downloaded or filter_discarded:
-        return_list = filter_videos(videos, limit, filter_discarded=filter_discarded,
-                                    filter_downloaded=filter_downloaded)
-
-    # If no filters are enabled, simply add limit amount of videos to the list.
-    else:
-        return_list = videos[:limit]
-
-    # Check for new videos (modify list directly).
-    return_list = check_for_new(return_list, refresh_type)
-
-    # Update videos (threaded).
-    UpdateVideosThread(videos).start()
-    # Check that video list isn't empty.
-    if len(return_list) > 0:
-        # Download video thumbnails (threaded).
-        download_thumbnails_threaded(return_list, progress_listener=progress_listener)
-
-        # Get additional video information (threaded) that isn't included in the standard grab function.
-        return_list = get_extra_videos_information(return_list)
-        UpdateVideosExtraInfoThreaded(return_list).start()
-    else:
-        logger.info("Skipping thumbnails download and db update as return list is empty")
-
-    if progress_listener:
-        progress_listener.progress_bar.setVisible(False)
-        progress_listener.resetBar.emit()
-
-    return return_list
+        raise exc_other
 
 
 def get_vid_by_id(video_id):
