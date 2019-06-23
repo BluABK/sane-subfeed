@@ -13,28 +13,24 @@ LOG_FILE = 'debug.log'
 # create formatter and add it to the handlers
 FORMATTER = logging.Formatter(u'%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-"""
-Default Logging levels
-CRITICAL 	50
-ERROR 	    40
-WARNING 	30
-INFO 	    20
-DEBUG 	    10
-NOTSET 	    0
-"""
-
-"""
-Custom Logging levels
-"""
-DEBUG2_LEVEL_NUM = 9
-DEBUG3_LEVEL_NUM = 8
-DEBUG4_LEVEL_NUM = 7
-DEBUG5_LEVEL_NUM = 6
-DEBUG6_LEVEL_NUM = 5
-DEBUG7_LEVEL_NUM = 4
-DEBUG8_LEVEL_NUM = 3
-DEBUG9_LEVEL_NUM = 2
+# Custom Logging levels
+# Log level 0: NOTSET
 SPAM_LEVEL_NUM = 1
+DEBUG9_LEVEL_NUM = 2
+DEBUG8_LEVEL_NUM = 3
+DEBUG7_LEVEL_NUM = 4
+DEBUG6_LEVEL_NUM = 5
+DEBUG5_LEVEL_NUM = 6
+DEBUG4_LEVEL_NUM = 7
+DEBUG3_LEVEL_NUM = 8
+DEBUG2_LEVEL_NUM = 9
+# Log level 10: DEBUG
+# Log level 20: INFO
+# Leave room for possible future INFO2-5
+DB_INFO_LEVEL_NUM = 26
+# Log level 30: WARNING
+# Log level 40: ERROR
+# Log level 50: CRITICAL
 
 if read_config('Logging', 'use_socket_log'):
     log_socket_instance = logging.getLogger('r')
@@ -45,7 +41,8 @@ if read_config('Logging', 'use_socket_log'):
     socket_handler = SocketHandler('127.0.0.1', port)  # default listening address
     log_socket_instance.addHandler(socket_handler)
 
-# Add custom logging levels
+# Add custom logging levels (descending order)
+logging.addLevelName(DB_INFO_LEVEL_NUM, "DB_INFO")
 logging.addLevelName(DEBUG2_LEVEL_NUM, "DEBUG2")
 logging.addLevelName(DEBUG3_LEVEL_NUM, "DEBUG3")
 logging.addLevelName(DEBUG4_LEVEL_NUM, "DEBUG4")
@@ -55,6 +52,20 @@ logging.addLevelName(DEBUG7_LEVEL_NUM, "DEBUG7")
 logging.addLevelName(DEBUG8_LEVEL_NUM, "DEBUG8")
 logging.addLevelName(DEBUG9_LEVEL_NUM, "DEBUG9")
 logging.addLevelName(SPAM_LEVEL_NUM, "SPAM")
+
+
+def db_info(self, message, *args, **kws):
+    """
+    Custom Logging level log function: DB_INFO (Level 26)
+    :param self:
+    :param message: String to log
+    :param args: logging args
+    :param kws: logging keywords
+    :return:
+    """
+    # Yes, logger takes its '*args' as 'args'.
+    if self.isEnabledFor(DB_INFO_LEVEL_NUM):
+        self._log(DB_INFO_LEVEL_NUM, message, args, **kws)
 
 
 def debug2(self, message, *args, **kws):
@@ -187,6 +198,7 @@ def spam(self, message, *args, **kws):
 
 
 # Define logging attributes for log levels and assign them to the appropriate function
+logging.Logger.db_info = db_info
 logging.Logger.debug2 = debug2
 logging.Logger.debug3 = debug3
 logging.Logger.debug4 = debug4
