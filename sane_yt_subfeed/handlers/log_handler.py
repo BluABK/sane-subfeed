@@ -13,48 +13,39 @@ LOG_FILE = 'debug.log'
 # create formatter and add it to the handlers
 FORMATTER = logging.Formatter(u'%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-"""
-Default Logging levels
-CRITICAL 	50
-ERROR 	    40
-WARNING 	30
-INFO 	    20
-DEBUG 	    10
-NOTSET 	    0
-"""
+DEFAULT_LOG_LEVELS = [0, 10, 20, 30, 40, 50]
 
-"""
-Custom Logging levels
-"""
-DEBUG2_LEVEL_NUM = 9
-DEBUG3_LEVEL_NUM = 8
-DEBUG4_LEVEL_NUM = 7
-DEBUG5_LEVEL_NUM = 6
-DEBUG6_LEVEL_NUM = 5
-DEBUG7_LEVEL_NUM = 4
-DEBUG8_LEVEL_NUM = 3
-DEBUG9_LEVEL_NUM = 2
-SPAM_LEVEL_NUM = 1
+# Logging levels (practically) static dict.
+LOG_LEVELS = {'NOT SET': 0,
+              'SPAM': 1,
+              'DEBUG9': 2,
+              'DEBUG8': 3,
+              'DB_DEBUG': 4,
+              'DEBUG6': 5,
+              'DEBUG5': 6,
+              'DEBUG4': 7,
+              'DEBUG3': 8,
+              'DEBUG2': 9,
+              'DEBUG': 10,
+              'INFO': 20,
+              'DB_INFO': 26,
+              'WARNING': 30,
+              'ERROR': 40,
+              'CRITICAL': 50}
 
-if read_config('Logging', 'use_socket_log'):
-    log_socket_instance = logging.getLogger('r')
-    log_level = read_config('Logging', 'log_level')
-    log_socket_instance.setLevel(log_level)  # to send all records to socket logger
 
-    port = read_config('Logging', 'logging_port')
-    socket_handler = SocketHandler('127.0.0.1', port)  # default listening address
-    log_socket_instance.addHandler(socket_handler)
-
-# Add custom logging levels
-logging.addLevelName(DEBUG2_LEVEL_NUM, "DEBUG2")
-logging.addLevelName(DEBUG3_LEVEL_NUM, "DEBUG3")
-logging.addLevelName(DEBUG4_LEVEL_NUM, "DEBUG4")
-logging.addLevelName(DEBUG5_LEVEL_NUM, "DEBUG5")
-logging.addLevelName(DEBUG6_LEVEL_NUM, "DEBUG6")
-logging.addLevelName(DEBUG7_LEVEL_NUM, "DEBUG7")
-logging.addLevelName(DEBUG8_LEVEL_NUM, "DEBUG8")
-logging.addLevelName(DEBUG9_LEVEL_NUM, "DEBUG9")
-logging.addLevelName(SPAM_LEVEL_NUM, "SPAM")
+def db_info(self, message, *args, **kws):
+    """
+    Custom Logging level log function: DB_INFO (Level 26)
+    :param self:
+    :param message: String to log
+    :param args: logging args
+    :param kws: logging keywords
+    :return:
+    """
+    # Yes, logger takes its '*args' as 'args'.
+    if self.isEnabledFor(LOG_LEVELS['DB_INFO']):
+        self._log(LOG_LEVELS['DB_INFO'], message, args, **kws)
 
 
 def debug2(self, message, *args, **kws):
@@ -67,8 +58,8 @@ def debug2(self, message, *args, **kws):
     :return:
     """
     # Yes, logger takes its '*args' as 'args'.
-    if self.isEnabledFor(DEBUG2_LEVEL_NUM):
-        self._log(DEBUG2_LEVEL_NUM, message, args, **kws)
+    if self.isEnabledFor(LOG_LEVELS['DEBUG2']):
+        self._log(LOG_LEVELS['DEBUG2'], message, args, **kws)
 
 
 def debug3(self, message, *args, **kws):
@@ -81,8 +72,8 @@ def debug3(self, message, *args, **kws):
     :return:
     """
     # Yes, logger takes its '*args' as 'args'.
-    if self.isEnabledFor(DEBUG3_LEVEL_NUM):
-        self._log(DEBUG3_LEVEL_NUM, message, args, **kws)
+    if self.isEnabledFor(LOG_LEVELS['DEBUG3']):
+        self._log(LOG_LEVELS['DEBUG3'], message, args, **kws)
 
 
 def debug4(self, message, *args, **kws):
@@ -95,8 +86,8 @@ def debug4(self, message, *args, **kws):
     :return:
     """
     # Yes, logger takes its '*args' as 'args'.
-    if self.isEnabledFor(DEBUG4_LEVEL_NUM):
-        self._log(DEBUG4_LEVEL_NUM, message, args, **kws)
+    if self.isEnabledFor(LOG_LEVELS['DEBUG4']):
+        self._log(LOG_LEVELS['DEBUG4'], message, args, **kws)
 
 
 def debug5(self, message, *args, **kws):
@@ -109,8 +100,8 @@ def debug5(self, message, *args, **kws):
     :return:
     """
     # Yes, logger takes its '*args' as 'args'.
-    if self.isEnabledFor(DEBUG5_LEVEL_NUM):
-        self._log(DEBUG5_LEVEL_NUM, message, args, **kws)
+    if self.isEnabledFor(LOG_LEVELS['DEBUG5']):
+        self._log(LOG_LEVELS['DEBUG5'], message, args, **kws)
 
 
 def debug6(self, message, *args, **kws):
@@ -123,11 +114,11 @@ def debug6(self, message, *args, **kws):
     :return:
     """
     # Yes, logger takes its '*args' as 'args'.
-    if self.isEnabledFor(DEBUG6_LEVEL_NUM):
-        self._log(DEBUG6_LEVEL_NUM, message, args, **kws)
+    if self.isEnabledFor(LOG_LEVELS['DEBUG6']):
+        self._log(LOG_LEVELS['DEBUG6'], message, args, **kws)
 
 
-def debug7(self, message, *args, **kws):
+def db_debug(self, message, *args, **kws):
     """
     Custom Logging level log function: DEBUG7
     :param self:
@@ -137,8 +128,8 @@ def debug7(self, message, *args, **kws):
     :return:
     """
     # Yes, logger takes its '*args' as 'args'.
-    if self.isEnabledFor(DEBUG7_LEVEL_NUM):
-        self._log(DEBUG7_LEVEL_NUM, message, args, **kws)
+    if self.isEnabledFor(LOG_LEVELS['DB_DEBUG']):
+        self._log(LOG_LEVELS['DB_DEBUG'], message, args, **kws)
 
 
 def debug8(self, message, *args, **kws):
@@ -151,8 +142,8 @@ def debug8(self, message, *args, **kws):
     :return:
     """
     # Yes, logger takes its '*args' as 'args'.
-    if self.isEnabledFor(DEBUG8_LEVEL_NUM):
-        self._log(DEBUG8_LEVEL_NUM, message, args, **kws)
+    if self.isEnabledFor(LOG_LEVELS['DEBUG8']):
+        self._log(LOG_LEVELS['DEBUG8'], message, args, **kws)
 
 
 def debug9(self, message, *args, **kws):
@@ -165,8 +156,8 @@ def debug9(self, message, *args, **kws):
     :return:
     """
     # Yes, logger takes its '*args' as 'args'.
-    if self.isEnabledFor(DEBUG9_LEVEL_NUM):
-        self._log(DEBUG9_LEVEL_NUM, message, args, **kws)
+    if self.isEnabledFor(LOG_LEVELS['DEBUG9']):
+        self._log(LOG_LEVELS['DEBUG9'], message, args, **kws)
 
 
 def spam(self, message, *args, **kws):
@@ -182,20 +173,8 @@ def spam(self, message, *args, **kws):
     :return:
     """
     # Yes, logger takes its '*args' as 'args'.
-    if self.isEnabledFor(SPAM_LEVEL_NUM):
-        self._log(SPAM_LEVEL_NUM, message, args, **kws)
-
-
-# Define logging attributes for log levels and assign them to the appropriate function
-logging.Logger.debug2 = debug2
-logging.Logger.debug3 = debug3
-logging.Logger.debug4 = debug4
-logging.Logger.debug5 = debug5
-logging.Logger.debug6 = debug6
-logging.Logger.debug7 = debug7
-logging.Logger.debug8 = debug8
-logging.Logger.debug9 = debug9
-logging.Logger.spam = spam
+    if self.isEnabledFor(LOG_LEVELS['SPAM']):
+        self._log(LOG_LEVELS['SPAM'], message, args, **kws)
 
 
 def create_logger_socket(facility):
@@ -273,10 +252,45 @@ def create_logger(facility):
     create_file_handler()
     # create logger
     if read_config('Logging', 'use_socket_log'):
-        return create_logger_socket(facility)
+        logger_instance = create_logger_socket(facility)
     else:
-        return create_logger_file(facility)
+        logger_instance = create_logger_file(facility)
 
+    # Attach a handle to the log levels dict.
+    setattr(logger_instance, "my_log_levels", LOG_LEVELS)
+
+    return logger_instance
+
+
+if read_config('Logging', 'use_socket_log'):
+    log_socket_instance = logging.getLogger('r')
+    log_level = read_config('Logging', 'log_level')
+    log_socket_instance.setLevel(log_level)  # to send all records to socket logger
+
+    port = read_config('Logging', 'logging_port')
+    socket_handler = SocketHandler('127.0.0.1', port)  # default listening address
+    log_socket_instance.addHandler(socket_handler)
+
+# Add custom logging levels (descending order)
+for level, value in LOG_LEVELS.items():
+    if value in DEFAULT_LOG_LEVELS:
+        # Skip default levels
+        continue
+
+    # Add level name and value to static logging instance.
+    logging.addLevelName(value, level)
+
+# Define logging attributes for log levels and assign them to the appropriate function
+logging.Logger.db_info = db_info
+logging.Logger.debug2 = debug2
+logging.Logger.debug3 = debug3
+logging.Logger.debug4 = debug4
+logging.Logger.debug5 = debug5
+logging.Logger.debug6 = debug6
+logging.Logger.db_debug = db_debug
+logging.Logger.debug8 = debug8
+logging.Logger.debug9 = debug9
+logging.Logger.spam = spam
 
 # Default logger facility
 logger = create_logger('sane-subfeed')

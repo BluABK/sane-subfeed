@@ -11,6 +11,8 @@ from sane_yt_subfeed.gui.views.config_view.config_item_types import THUMBNAIL_QU
 from sane_yt_subfeed.gui.views.config_view.input_super import InputSuper
 from sane_yt_subfeed.constants import HEXADECIMAL_COLOR_REGEX
 
+STRFTIME_FORMAT_URL = "https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior"
+
 
 class ConfigViewWidget(InputSuper):
     """
@@ -233,6 +235,13 @@ class ConfigViewWidget(InputSuper):
         self.add_option_line_edit('Image viewer', 'DefaultApp', 'Image', restart_check=False)
 
     def add_config_tab_datetime(self):
+        self.add_section('{}Datetime{}'.format(self.deco_l, self.deco_r))
+        self.add_option_checkbox('Use ISO format on datetime', 'GridView', 'use_iso_datetime_format')
+        self.add_option_line_edit('ISO format separator', 'GridView', 'iso_format_separator')
+        self.add_option_line_edit('Custom Datetime format (<a href={}>strftime</a>):'.format(STRFTIME_FORMAT_URL),
+                                  'GridView', 'custom_datetime_format')
+        self.add_section('{}Timedelta{}'.format(self.deco_l, self.deco_r))
+        self.add_option_checkbox('Show timedelta instead of datetime', 'GridView', 'use_timedelta')
         self.add_option_line_edit('Date format for: videos uploaded'
                                   ' less than a day ago', 'GridView', 'timedelta_format')
         self.add_option_line_edit('Date format for: videos uploaded'
@@ -265,17 +274,11 @@ class ConfigViewWidget(InputSuper):
 
     def add_config_tab_logging(self):
         self.add_option_checkbox('Use socket instead of file', 'Logging', 'use_socket_log')
-        self.add_option_info('Value\t Level', None)
-        self.add_option_info('50\t CRITICAL', None)
-        self.add_option_info('40\t ERROR', None)
-        self.add_option_info('30\t WARNING', None)
-        self.add_option_info('20\t INFO', None)
-        self.add_option_info('10\t DEBUG', None)
-        self.add_option_info('5\t SPAM (Custom level)', None)
-        self.add_option_info('1\t All of the above', None)
-        self.add_option_info('0\t NOT SET', None)
         self.add_option_line_edit('Log level', 'Logging', 'log_level', cfg_validator=QIntValidator())
         self.add_option_line_edit('Port', 'Logging', 'logging_port', cfg_validator=QIntValidator())
+        self.add_option_info('Level\t Name', None)
+        for level, value in self.logger.my_log_levels.items():
+            self.add_option_info('{}\t{}'.format(value, level), None)
         self.add_option_info_restart_required()
 
     def add_config_tab_advanced(self):
