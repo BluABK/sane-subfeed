@@ -113,7 +113,20 @@ class VideoTile(QWidget):
         if read_config('GridView', 'tile_channel_lines') != 0:
             self.channel_label.setText(self.video.channel_title)
         if read_config('GridView', 'tile_date_lines') != 0:
-            self.date_label.setText(self.strf_delta(self.video.date_published))
+            if read_config('GridView', 'use_timedelta'):
+                self.date_label.setText(self.strf_delta(self.video.date_published))
+            else:
+                if read_config('GridView', 'use_iso_datetime_format'):
+                    separator = read_config('GridView', 'iso_format_separator', literal_eval=False)
+                    # Allow for no separator to be set.
+                    if separator.lower() == "None".lower():
+                        self.date_label.setText(self.video.date_published.isoformat())
+                    else:
+                        self.date_label.setText(self.video.date_published.isoformat(separator))
+                else:
+                    # Custom datetime format
+                    self.date_label.setText(self.video.date_published.strftime(
+                        read_config('GridView', 'custom_datetime_format', literal_eval=False)))
         self.color_old_video(self.video.date_published)
         self.color_live_video()
 
