@@ -18,7 +18,7 @@ FORMATTER = logging.Formatter(u'%(asctime)s - %(name)s - %(levelname)s - %(messa
 SPAM_LEVEL_NUM = 1
 DEBUG9_LEVEL_NUM = 2
 DEBUG8_LEVEL_NUM = 3
-DEBUG7_LEVEL_NUM = 4
+DB_DEBUG_LEVEL_NUM = 4
 DEBUG6_LEVEL_NUM = 5
 DEBUG5_LEVEL_NUM = 6
 DEBUG4_LEVEL_NUM = 7
@@ -48,7 +48,7 @@ logging.addLevelName(DEBUG3_LEVEL_NUM, "DEBUG3")
 logging.addLevelName(DEBUG4_LEVEL_NUM, "DEBUG4")
 logging.addLevelName(DEBUG5_LEVEL_NUM, "DEBUG5")
 logging.addLevelName(DEBUG6_LEVEL_NUM, "DEBUG6")
-logging.addLevelName(DEBUG7_LEVEL_NUM, "DEBUG7")
+logging.addLevelName(DB_DEBUG_LEVEL_NUM, "DB_DEBUG")
 logging.addLevelName(DEBUG8_LEVEL_NUM, "DEBUG8")
 logging.addLevelName(DEBUG9_LEVEL_NUM, "DEBUG9")
 logging.addLevelName(SPAM_LEVEL_NUM, "SPAM")
@@ -138,7 +138,7 @@ def debug6(self, message, *args, **kws):
         self._log(DEBUG6_LEVEL_NUM, message, args, **kws)
 
 
-def debug7(self, message, *args, **kws):
+def db_debug(self, message, *args, **kws):
     """
     Custom Logging level log function: DEBUG7
     :param self:
@@ -148,8 +148,8 @@ def debug7(self, message, *args, **kws):
     :return:
     """
     # Yes, logger takes its '*args' as 'args'.
-    if self.isEnabledFor(DEBUG7_LEVEL_NUM):
-        self._log(DEBUG7_LEVEL_NUM, message, args, **kws)
+    if self.isEnabledFor(DB_DEBUG_LEVEL_NUM):
+        self._log(DB_DEBUG_LEVEL_NUM, message, args, **kws)
 
 
 def debug8(self, message, *args, **kws):
@@ -204,7 +204,7 @@ logging.Logger.debug3 = debug3
 logging.Logger.debug4 = debug4
 logging.Logger.debug5 = debug5
 logging.Logger.debug6 = debug6
-logging.Logger.debug7 = debug7
+logging.Logger.db_debug = db_debug
 logging.Logger.debug8 = debug8
 logging.Logger.debug9 = debug9
 logging.Logger.spam = spam
