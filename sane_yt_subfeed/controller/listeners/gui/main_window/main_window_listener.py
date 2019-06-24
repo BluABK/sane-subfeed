@@ -1,5 +1,6 @@
 import gc
 import time
+import re
 
 from PyQt5.QtCore import *
 
@@ -11,6 +12,8 @@ from sane_yt_subfeed.youtube.update_videos import load_keys
 from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_cached_oauth, \
     list_uploaded_videos_videos, add_subscription
 
+YOUTUBE_URL_PATTERN = '(http[s]?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)?' \
+                      '([0-9A-Za-z_-]{10}[048AEIMQUYcgkosw])'
 
 class MainWindowListener(QObject):
     testChannels = pyqtSignal()
@@ -75,7 +78,8 @@ class MainWindowListener(QObject):
         :return:
         """
         self.logger.info("Fetching video: {}".format(video_url))
-        video_id = video_url.split('&')[0].split('v=')[-1]  # FIXME: Make a proper input sanitizer that handles YT IDs
+        reggie = re.match(YOUTUBE_URL_PATTERN, video_url)
+        video_id = reggie.groups()[-1]
         self.logger.debug("{} --> ID: {}".format(video_url, video_id))
         video_d = list_uploaded_videos_videos(load_keys(1)[0], [video_id], 50)[0]
         download_thumbnails_threaded([video_d])
