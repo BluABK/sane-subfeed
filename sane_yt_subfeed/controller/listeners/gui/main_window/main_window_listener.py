@@ -15,6 +15,7 @@ from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_ca
 YOUTUBE_URL_PATTERN = '(http[s]?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)?' \
                       '([0-9A-Za-z_-]{10}[048AEIMQUYcgkosw])'
 
+
 class MainWindowListener(QObject):
     testChannels = pyqtSignal()
     refreshVideos = pyqtSignal(int)
