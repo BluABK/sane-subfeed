@@ -47,6 +47,9 @@ class SaneInputDialog(QDialog):
         self.cancel_button = QPushButton(self)
         self.ok_button = QPushButton(self)
 
+        # Store relevant original values
+        self.original_background_color = self.palette().color(QPalette.Background)
+
         if init_ui:
             self.init_ui()
 
@@ -107,17 +110,16 @@ class SaneInputDialog(QDialog):
     def check_validator_state(self, *args, **kwargs):
         sender = self.sender()
         validator = sender.validator()
-        # FIXME: Throws "Could not parse stylesheet of object" in venv
-        original_background = self.palette().color(QPalette.Background)
         state = validator.validate(sender.text(), 0)[0]
         if state == QValidator.Acceptable:
             color = '#1f7f07'  # green
             self.ok_button.setDisabled(False)
         elif state == QValidator.Intermediate:
-            color = original_background
+            color = self.original_background_color
             self.ok_button.setDisabled(True)
         else:
             color = '#f6989d'  # red
             self.ok_button.setDisabled(True)
 
+        # FIXME: Throws "Could not parse stylesheet of object" in venv
         sender.setStyleSheet('QLineEdit { background-color: %s }' % color)
