@@ -51,8 +51,6 @@ from sane_yt_subfeed.handlers.log_handler import create_logger
 
 HOTKEYS_EVAL = False
 HOTKEYS_INI = 'hotkeys'
-YOUTUBE_URL_REGEX_LEGACY = QRegExp('(http[s]?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/[^ ]+')
-YOUTUBE_URL_REGEX_LEGACY.setCaseSensitivity(False)
 YOUTUBE_URL_REGEX = QRegExp('((http[s]?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[^ ]'
                             '([a-zA-Z0-9_-]{9}|[a-zA-Z0-9_-]{10}|[a-zA-Z0-9_-]{11})[048AEIMQUYcgkosw]|'
                             '([a-zA-Z0-9_-]{9}|[a-zA-Z0-9_-]{10}|[a-zA-Z0-9_-]{11})[048AEIMQUYcgkosw])')
