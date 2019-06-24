@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QValidator
+from PyQt5.QtGui import QValidator, QPalette
 from PyQt5.QtWidgets import QPushButton, QHBoxLayout, QLabel, QLineEdit, QVBoxLayout, QDialog
 
 from sane_yt_subfeed import create_logger
@@ -107,12 +107,12 @@ class SaneInputDialog(QDialog):
     def check_validator_state(self, *args, **kwargs):
         sender = self.sender()
         validator = sender.validator()
+        original_background = self.palette().color(QPalette.Background)
         state = validator.validate(sender.text(), 0)[0]
         if state == QValidator.Acceptable:
             color = '#c4df9b'  # green
         elif state == QValidator.Intermediate:
-            # color = '#fff79a' # yellow
-            color = '#ffffff'
+            color = original_background
         else:
             color = '#f6989d'  # red
 
