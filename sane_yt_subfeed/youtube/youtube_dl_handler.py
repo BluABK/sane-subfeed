@@ -4,7 +4,7 @@ import datetime
 import os
 import threading
 
-from sane_yt_subfeed.handlers.config_handler import read_config, get_options
+from sane_yt_subfeed.handlers.config_handler import read_config, get_options, get_valid_options
 from sane_yt_subfeed import create_logger
 # FIXME: module level logger not suggested: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 logger = create_logger(__name__)
@@ -64,20 +64,14 @@ class YoutubeDownload(threading.Thread):
         self.download_progress_listener = download_progress_listener
         self.threading_event = threading_event
         # FIXME: faux filename, as the application is currently not able to get final filename from youtube-dl
-        # file_name = "{channel_title} - {date} - %(title)s (%(fps)s_%(vcodec)s_%(acodec)s).%(ext)s".format(
-        #     channel_title=self.video.channel_title, date=self.video.date_published.strftime("%Y-%m-%d"))
         file_name = "%(uploader)s - {date} - %(title)s - _v-id-{id}.%(ext)s".format(
             date=self.video.date_published.strftime(
                 "%Y-%m-%d"), id=self.video.video_id)
         self.youtube_folder = read_config('Play', 'yt_file_path', literal_eval=False)
         file_path = os.path.join(self.youtube_folder, file_name)
 
-        self.proxies = []
-        for proxy_option in get_options('Youtube-dl_proxies'):
-            this_proxy_option = read_config('Youtube-dl_proxies', proxy_option, literal_eval=False).strip('"').strip(
-                "'")
-            if this_proxy_option is not "" and this_proxy_option is not None:
-                self.proxies.append(this_proxy_option)
+        # Get a list of user-defined (valid) proxies.
+        self.proxies = get_valid_options('Youtube-dl_proxies')
 
         self.ydl_opts = {
             'logger': MyLogger(),
