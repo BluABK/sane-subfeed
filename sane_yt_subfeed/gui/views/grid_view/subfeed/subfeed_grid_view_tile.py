@@ -103,7 +103,7 @@ class SubfeedGridViewTile(VideoTile):
             selected_alternative_player = alternative_players[alternative_player_actions.index(action)]
 
             # Open video in selected (alternative) player.
-            self.open_in_player(self.video.url_video, player=selected_alternative_player)
+            self.open_in_player(self.video.url_video, player=selected_alternative_player, isfile=False)
         elif action == url_player_action:
             self.open_in_browser()
 
@@ -153,7 +153,7 @@ class SubfeedGridViewTile(VideoTile):
                     self.copy_url(mark_watched=True)
                 elif left_button_rebind == MOUSE_PRESS_PLAY_URL:
                     url_player = self.str_to_list(read_config('Player', 'default_player', literal_eval=False))
-                    self.open_in_player(self.video.url_video, url_player)
+                    self.open_in_player(self.video.url_video, url_player, isfile=False)
                 elif left_button_rebind == MOUSE_PRESS_DOWNLOAD:
                     self.mark_downloaded()
                 elif left_button_rebind == MOUSE_PRESS_DOWNLOAD_AND_COPY:
