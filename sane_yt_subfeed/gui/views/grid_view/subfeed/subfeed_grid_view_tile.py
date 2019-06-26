@@ -50,7 +50,6 @@ class SubfeedGridViewTile(VideoTile):
 
         # Get a list of user-defined (valid) alternative players and their custom names.
         alternative_players = self.list_to_str_lists(get_valid_options('AlternativePlayers'))
-        self.logger.critical(alternative_players)
         alternative_names = get_valid_options('AlternativePlayerNames')
 
         # Define QActions for each user-defined alternative player.
