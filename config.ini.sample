@@ -134,31 +134,20 @@ embed_metadata = False
 
 [Player]
 default_player = 
-alternative_player1 = 
-alternative_player2 = 
-alternative_player3 = 
-alternative_player4 = 
-alternative_player5 = 
-alternative_player6 = 
-alternative_player7 = 
-alternative_player8 = 
-alternative_player9 = 
-alternative_player10 = 
 url_player = 
 
-[PlayerFriendlyName]
-default_player_name = 
-alternative_player1_name = 
-alternative_player2_name = 
-alternative_player3_name = 
-alternative_player4_name = 
-alternative_player5_name = 
-alternative_player6_name = 
-alternative_player7_name = 
-alternative_player8_name = 
-alternative_player9_name = 
-alternative_player10_name = 
+[PlayerNames]
 url_player_name = 
+
+[AlternativePlayers]
+player1 = 
+player2 = 
+player3 = 
+
+[AlternativePlayerNames]
+player1 = 
+player2 = 
+player3 = 
 
 [DefaultApp]
 image = 
