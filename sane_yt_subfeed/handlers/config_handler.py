@@ -355,7 +355,9 @@ def get_sections(custom_ini=None):
 
 def get_options(section, custom_ini=None):
     """
-    Returns config sections
+    Returns a list of ALL options (valid or not) in a given config section.
+
+    A valid option is defined as one that exists and is not a blank string.
     :return:
     """
     _parser = default_parser
@@ -374,6 +376,27 @@ def get_options(section, custom_ini=None):
             return_options = DEFAULTS[section].keys()
 
     return return_options
+
+
+def get_valid_options(config_section):
+    """
+    Returns a list of ONLY VALID options in a given config section.
+
+    A valid option is defined as one that exists and is not a blank string.
+    :param config_section:
+    :return:
+    """
+    valid_options = []
+    for proxy_option in get_options(config_section):
+        # Retrieve the config option (and strip string characters).
+        current_option = read_config(config_section, proxy_option, literal_eval=False)
+
+        # Check that the current option is valid.
+        if current_option is not "" and current_option is not None:
+            # Append the option to a list of valid options.
+            valid_options.append(current_option)
+
+    return valid_options
 
 
 def get_size(custom_ini=None, incl_sections=False):
