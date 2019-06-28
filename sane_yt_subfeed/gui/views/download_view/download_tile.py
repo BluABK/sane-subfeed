@@ -1,6 +1,8 @@
 from collections import Counter
 
 import copy
+
+from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QGridLayout, QWidget, QMenu
 from datetime import datetime
 
@@ -201,10 +203,45 @@ class DownloadTile(QWidget):
         self.progress_bar.finish()
         DownloadViewListener.static_self.updateDownloadTile.emit(DDBDownloadTile(self))
 
-    def failed_download(self):
+    def humanize_dl_error(self, e):
+        """
+        Takes an Exception and returns a more human readable string.
+        :param e:
+        :return:
+        """
+        # Strip redundant parts of string added by modules like youtube_dl
+        head, sep, tail = str(e).partition('ERROR: ')
+        if tail == '':
+            # If tail is empty, no match was found and the original string is stored in head.
+            human_readable_error = head
+        else:
+            human_readable_error = tail
+
+        if ' (caused by ' in human_readable_error:
+            head, sep, tail = human_readable_error.partition(' (caused by ')
+            human_readable_error = head
+
+        # Go through a list of known errors and humanize where needed:
+        if 'Unable to download webpage: <urlopen error [Errno 111] Connection refused>' in human_readable_error:
+            human_readable_error = "Connection refused (Errno 111). Do you have a syntax error in proxy config?"
+        # elif isinstance(e, ValueError):
+        elif 'Port out of range 0-65535' in human_readable_error:
+            human_readable_error += '. Check your proxy config.'
+
+        return human_readable_error
+
+    @pyqtSlot(Exception)
+    def failed_download(self, e):
+        """
+        How to handle a failed download.
+
+        Called by PyQtSignal connected to the download listener.
+        :return:
+        """
+        human_readable_error = self.humanize_dl_error(e)
         self.logger.error("Failed download: {}".format(self.video))
         self.failed = True
-        self.status_value.setText("FAILED")
+        self.status_value.setText("FAILED: {}".format(human_readable_error))
         self.eta_value.setText("")
         self.speed_value.setText("Was {}".format(self.speed_value.text()))
         self.finished_date = datetime.utcnow()
@@ -462,5 +499,5 @@ class DownloadTile(QWidget):
                 if not self.failed:
                     if action == mark_dl_failed:
                         self.logger.critical("DEBUG: Marking FAILED: {}".format(self.video))
-                        # self.download_progress_listener.failedDownload.emit()
-                        self.failed_download()
+                        # Send a custom Exception, due to failed_download requiring one by design (signal reasons).
+                        self.failed_download(Exception("Manually marked as failed."))

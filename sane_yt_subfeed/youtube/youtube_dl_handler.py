@@ -61,6 +61,7 @@ class YoutubeDownload(threading.Thread):
         self.video = video
         self.listeners = finished_listeners  # FIXME: Need one for failed as well?
         self.download_status = None
+        self.download_failure_exception = None
         self.download_progress_listener = download_progress_listener
         self.threading_event = threading_event
         # FIXME: faux filename, as the application is currently not able to get final filename from youtube-dl
@@ -124,9 +125,22 @@ class YoutubeDownload(threading.Thread):
                     self.download_status = DOWNLOAD_FINISHED
                     return True
             except DownloadError as dl_exc:
-                logger.warning(
-                    "Proxy {} download of geo blocked video '{}' failed.".format(proxy, self.video))
+                self.set_download_failure_exception(dl_exc)
+                logger.warning("Proxy {} download of geo blocked video '{}' failed.".format(proxy, self.video))
                 logger.exception(dl_exc)
+                self.download_status = DOWNLOAD_FAILED
+                pass
+            except ValueError as ve_exc:
+                # Catching the ValueError usually immediately throws another
+                self.set_download_failure_exception(ve_exc)
+                logger.warning("Proxy {} download of geo blocked video '{}' failed.".format(proxy, self.video))
+                logger.exception(ve_exc)
+                self.download_status = DOWNLOAD_FAILED
+                pass
+            except Exception as e:
+                self.set_download_failure_exception(e)
+                logger.warning("Proxy {} download of geo blocked video '{}' failed.".format(proxy, self.video))
+                logger.exception(e)
                 self.download_status = DOWNLOAD_FAILED
                 pass
 
@@ -188,6 +202,14 @@ class YoutubeDownload(threading.Thread):
         logger.debug(info)
         SaneFFmpegMetadataPP(SaneFFmpegPostProcessor()).run(info)
 
+    def set_download_failure_exception(self, e):
+        """
+        Updates a variable that keeps a record of the last download failure exception.
+        :param e: An Exception.
+        :return:
+        """
+        self.download_failure_exception = e
+
     def run(self):
         logger.debug("Started download thread")
         self.threading_event.wait()
@@ -198,6 +220,7 @@ class YoutubeDownload(threading.Thread):
                 ydl.download([self.video.url_video])
                 self.download_status = DOWNLOAD_FINISHED
         except DownloadError as dl_exc:
+            self.set_download_failure_exception(dl_exc)
             # If the DownloadError is a match for any of the VIDEO_IS_GEOBLOCKED_ERRORS, attempt download with proxy.
             if any(x in str(dl_exc) for x in VIDEO_IS_GEOBLOCKED_ERRORS):
                 logger.info("Video is geo blocked, retrying with proxy: {}".format(self.video))
@@ -234,6 +257,7 @@ class YoutubeDownload(threading.Thread):
                         SaneFFmpegMergerPP(SaneFFmpegPostProcessor()).run(info)
                         self.download_status = DOWNLOAD_FINISHED
                     except SaneFFmpegPostProcessorError as merge_exc:
+                        self.set_download_failure_exception(merge_exc)
                         logger.exception("Failed to merge formats", exc_info=merge_exc)
                         self.download_status = DOWNLOAD_FAILED
 
@@ -262,10 +286,12 @@ class YoutubeDownload(threading.Thread):
                 self.download_status = DOWNLOAD_FAILED
 
         except PermissionError as pe_exc:
+            self.set_download_failure_exception(pe_exc)
             self.download_status = DOWNLOAD_FAILED
             logger.exception("Failing download due to PermissionError exception!", exc_info=pe_exc)
 
         except Exception as e:
+            self.set_download_failure_exception(e)
             self.download_status = DOWNLOAD_FAILED
             logger.exception(e)
             pass
@@ -292,7 +318,7 @@ class YoutubeDownload(threading.Thread):
                     listener.emit(self.video)
         elif self.download_status == DOWNLOAD_FAILED:
             logger.error("FAILED downloading: {}".format(self.video))
-            self.download_progress_listener.failedDownload.emit()
+            self.download_progress_listener.failedDownload.emit(self.download_failure_exception)
 
     def my_hook(self, event):
         self.download_progress_listener.updateProgress.emit(event)

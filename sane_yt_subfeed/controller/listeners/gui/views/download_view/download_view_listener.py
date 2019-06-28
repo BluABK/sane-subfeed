@@ -18,7 +18,7 @@ from sane_yt_subfeed.youtube.youtube_dl_handler import YoutubeDownload
 class DownloadProgressSignals(QObject):
     updateProgress = pyqtSignal(dict)
     finishedDownload = pyqtSignal()
-    failedDownload = pyqtSignal()
+    failedDownload = pyqtSignal(Exception)
 
     def __init__(self, video, threading_event):
         super(DownloadProgressSignals, self).__init__()
