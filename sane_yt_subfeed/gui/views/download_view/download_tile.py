@@ -19,7 +19,6 @@ class DownloadTile(QWidget):
     def __init__(self, parent, download_progress_listener, db_download_tile=None, *args, **kwargs):
         super(DownloadTile, self).__init__(parent, *args, **kwargs)
         self.logger = create_logger(__name__)
-        self.logger.debug("Starting init")
         self.root = parent.root
         self.parent = parent
 
@@ -108,7 +107,7 @@ class DownloadTile(QWidget):
             self.update_from_db_tile(db_download_tile)
         else:
             pass
-        self.logger.debug("Init done")
+        self.logger.info("Added DL tile from DB: {}".format(self.video))
 
     def retry_existing(self, download_progress_listener):
         """
