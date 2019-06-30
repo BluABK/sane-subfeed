@@ -26,7 +26,10 @@ class SaneHistory(QObject):
         if len(self.items) > 0:
             ret_list = []
             for item in self.items:
-                ret_list.append(item.__str__())
+                if item.inactive:
+                    ret_list.append("{} [INACTIVE]".format(item.__str__()))
+                else:
+                    ret_list.append(item.__str__())
 
             return '\n'.join(ret_list)
 
@@ -65,6 +68,24 @@ class SaneHistory(QObject):
         self.items[index].delete()
         self.items.pop(index)
 
+    def get_last_actionable_item(self, index):
+        """
+        Recurse backwards through the history and return the first occurrence of an actionable item.
+        :param index:
+        :return:    History item or NoneType.
+        """
+        item = None
+
+        # Make sure list has items and that it is at least of index length
+        if len(self.items) > 0 and len(self.items) >= abs(index):
+            # If item is inactive, recurse backwards until an actionable one can be found.
+            if self.items[index].inactive:
+                self.get_last_actionable_item(index - 1)
+            else:
+                item = self.items[index]
+
+        return item
+
     def undo(self, index=-1):
         """
         Undoes an action in history, given there exists an anti-action to apply.
@@ -75,7 +96,13 @@ class SaneHistory(QObject):
             self.logger.warning("Was told to undo an action when there exists no history!")
             return
 
-        item = self.items[index]
+        item = self.get_last_actionable_item(index)
+
+        # Handle cases where there aren't any actionable items to undo.
+        if item is None:
+            self.logger.warning("Unable to find any actionable history items to undo. (orig index={})".format(index))
+            return
+
         # Check if the action can be undone
         if item.anti_action:
             try:
@@ -95,4 +122,8 @@ class SaneHistory(QObject):
             # FIXME: Handle redo / filter anti_action? Former pop pops the anti-action and this one pops the action
             self.pop(index)
         else:
-            self.logger.error("Was told to undo an action with no corresponding anti-action: {}".format(item))
+            # If the item has no anti-action, undo the previous item instead.
+            prev_item = index - 1
+            self.logger.info("Was told to undo an action with no corresponding anti-action: {}".format(item))
+            self.logger.info("Undoing previous entry instead")
+            self.undo(prev_item)
