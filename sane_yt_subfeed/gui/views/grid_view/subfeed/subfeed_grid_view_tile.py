@@ -122,7 +122,7 @@ class SubfeedGridViewTile(VideoTile):
             elif self.video.kind == VIDEO_KIND_LIVE:
                 self.unmark_livestream()
 
-        if action == open_thumbnail_file:
+        elif action == open_thumbnail_file:
             open_with_default_application(self.video.thumbnail_path)
         elif action == show_description_dialog:
             description_dialog = SaneTextViewDialog(self.parent, self.video.description)

@@ -500,3 +500,13 @@ class VideoTile(QWidget):
 
     def increase_prio(self):
         self.history.add(self.video, self.increase_prio, self.decrease_prio)
+
+    def delete_downloaded_data(self):
+        """
+        Deletes the downloaded data/file(s) from disk.
+        :return:
+        """
+        logger.info('Deleted downloaded data: {}'.format(self.video))
+        update_plaintext_history('Deleted downloaded data: {}'.format(self.video))
+        # Anti-Action passed as None, as you can't un-delete.
+        self.history.add(self.video, self.delete_downloaded_data, None, inactive=True)

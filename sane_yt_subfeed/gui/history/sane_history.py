@@ -48,21 +48,24 @@ class SaneHistory(QObject):
         """
         self.__log__()
 
-    def add(self, video, action, anti_action):
+    def add(self, video, action, anti_action, inactive=False):
         """
         Adds Video action to history along with an anti-action to use on an undo()
-        :param video: The video object
-        :param action: Used for accurate record keeping and possibly future redo()
+
+        :param inactive:    Item only exists for informational purposes and will be skipped in undo.
+        :param video:       The video object
+        :param action:      Used for accurate record keeping and possibly future redo()
         :param anti_action: Used for undo()
         :return:
         """
-        self.items.append(SaneHistoryItem(self, video, action=action, anti_action=anti_action))
+        self.items.append(SaneHistoryItem(self, video, action=action, anti_action=anti_action, inactive=inactive))
         self.logger.debug("Added History Item: {}".format(self.items[-1]))
 
     def pop(self, index=-1):
         """
         Pops an HistoryItem, also makes it call delete() on itself ot get picked pu by GC
-        :param index: If none given, use last item in list
+
+        :param index:       If none given, use last item in list
         :return:
         """
         self.items[index].delete()

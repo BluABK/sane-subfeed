@@ -74,6 +74,11 @@ class PlaybackGridViewTile(VideoTile):
         else:
             download_video = None
 
+        # File deletion section
+        menu.addSeparator()
+        delete_file_action = menu.addAction("Delete downloaded file")
+
+        # Metadata and related section
         menu.addSeparator()
         show_description_dialog = menu.addAction("View description")
         open_thumbnail_file = menu.addAction("View image")
@@ -101,6 +106,12 @@ class PlaybackGridViewTile(VideoTile):
             self.open_in_browser()
         elif download_video and action == download_video:
             self.mark_downloaded()
+
+        # File deletion action logic
+        elif action == delete_file_action:
+            self.delete_downloaded_data()
+
+        # Metadata action logic
         elif action == open_thumbnail_file:
             open_with_default_application(self.video.thumbnail_path)
         elif action == show_description_dialog:
@@ -155,3 +166,11 @@ class PlaybackGridViewTile(VideoTile):
     def increase_prio(self):
         self.parent.main_model.playback_grid_view_listener.increaseWatchPrio.emit(self.video)
         super().increase_prio()
+
+    def delete_downloaded_data(self):
+        """
+        Deletes the downloaded data/file(s) from disk.
+        :return:
+        """
+        self.parent.main_model.playback_grid_view_listener.tileDeleteDownloadedData.emit(self.video)
+        super().delete_downloaded_data()
