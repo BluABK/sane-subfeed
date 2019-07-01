@@ -76,7 +76,8 @@ class PlaybackGridViewTile(VideoTile):
 
         # File deletion section
         menu.addSeparator()
-        delete_file_action = menu.addAction("Delete downloaded file")
+        delete_data_action = menu.addAction("Delete downloaded data")
+        delete_and_dismiss_data_action = menu.addAction("Delete downloaded data and dismiss")
 
         # Metadata and related section
         menu.addSeparator()
@@ -108,8 +109,11 @@ class PlaybackGridViewTile(VideoTile):
             self.mark_downloaded()
 
         # File deletion action logic
-        elif action == delete_file_action:
+        elif action == delete_data_action:
             self.delete_downloaded_data()
+        elif action == delete_and_dismiss_data_action:
+            self.delete_downloaded_data()
+            self.mark_discarded()
 
         # Metadata action logic
         elif action == open_thumbnail_file:
