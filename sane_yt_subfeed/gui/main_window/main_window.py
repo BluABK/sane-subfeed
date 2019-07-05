@@ -1010,12 +1010,12 @@ class MainWindow(QMainWindow):
             theme_file = QFile(theme)
             theme_file.open(QFile.ReadOnly | QFile.Text)
             theme_stream = QTextStream(theme_file)
-            self.app.setStyleSheet(theme_stream.readAll())
+            self.setStyleSheet(theme_stream.readAll())
             set_config('Theme', 'last_theme', theme)
             self.current_theme = theme
             self.logger.info("Set theme (QStyleSheet): {}".format(theme))
         else:
-            self.app.setStyle(QStyleFactory.create(theme))
+            self.setStyle(QStyleFactory.create(theme))
             set_config('Theme', 'last_style', theme)
             self.current_style = theme
             self.logger.info("Set theme (QStylePlugin): {}".format(theme))
@@ -1101,7 +1101,8 @@ class MainWindow(QMainWindow):
         :return:
         """
         # Set image as as a QSS property (border parm added as a workaround for certain platforms)
-        self.toolbar.setStyleSheet("background-image: url({});".format(path))
+        self.toolbar.setStyleSheet(
+            "background: transparent; background-image: url({}); background-position: top right;".format(path))
         self.logger.info("Set custom toolbar image: {}".format(path))
 
     def set_custom_central_widget_image(self, path):
