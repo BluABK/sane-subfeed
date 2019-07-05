@@ -54,7 +54,10 @@ DEFAULTS = {
     },
     'Theme': {
         'last_style': "",
-        'last_theme': ""
+        'last_theme': "",
+        'custom_image': "",
+        'custom_toolbar_image': "",
+        'custom_central_widget_image': ""
     },
     'Fonts': {
         'video_title_font': 'Noto Sans,10,-1,0,75,0,0,0,0,0,Bold',
