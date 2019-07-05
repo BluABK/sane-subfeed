@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QValidator
+from PyQt5.QtGui import QValidator, QPalette
 from PyQt5.QtWidgets import QPushButton, QHBoxLayout, QLabel, QLineEdit, QVBoxLayout, QDialog
 
 from sane_yt_subfeed import create_logger
@@ -46,6 +46,9 @@ class SaneInputDialog(QDialog):
         self.validator = validator
         self.cancel_button = QPushButton(self)
         self.ok_button = QPushButton(self)
+
+        # Store relevant original values
+        self.original_background_color = self.palette().color(QPalette.Background)
 
         if init_ui:
             self.init_ui()
@@ -109,11 +112,14 @@ class SaneInputDialog(QDialog):
         validator = sender.validator()
         state = validator.validate(sender.text(), 0)[0]
         if state == QValidator.Acceptable:
-            color = '#c4df9b'  # green
+            color = '#1f7f07'  # green
+            self.ok_button.setDisabled(False)
         elif state == QValidator.Intermediate:
-            # color = '#fff79a' # yellow
-            color = '#ffffff'
+            color = self.original_background_color
+            self.ok_button.setDisabled(True)
         else:
             color = '#f6989d'  # red
+            self.ok_button.setDisabled(True)
 
+        # FIXME: Throws "Could not parse stylesheet of object" in venv
         sender.setStyleSheet('QLineEdit { background-color: %s }' % color)

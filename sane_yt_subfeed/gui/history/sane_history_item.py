@@ -4,7 +4,7 @@ from sane_yt_subfeed import create_logger
 
 
 class SaneHistoryItem(QObject):
-    def __init__(self, parent, video, action=None, anti_action=None):
+    def __init__(self, parent, video, action=None, anti_action=None, inactive=False):
         """
         Sane History Item
         :param parent: SaneHistory
@@ -20,6 +20,8 @@ class SaneHistoryItem(QObject):
         self.video = video
         self.action = action
         self.anti_action = anti_action
+        # If an item is inactive it is only there for informational purposes and will be skipped in undo.
+        self.inactive = inactive
 
     def __str__(self):
         """

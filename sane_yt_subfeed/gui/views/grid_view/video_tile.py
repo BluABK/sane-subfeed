@@ -190,8 +190,7 @@ class VideoTile(QWidget):
         else:
             webbrowser.open_new_tab(self.video.url_video)
 
-    @staticmethod
-    def str_to_list(s):
+    def str_to_list(self, s):
         """
         Transform a space delimited string to a list of substrings.
         Returns s as-is if False.
@@ -202,6 +201,19 @@ class VideoTile(QWidget):
             return s.split(' ')
         else:
             return s
+
+    def list_to_str_lists(self, l):
+        """
+        Transform a list of space delimited strings to a list of lists of substrings.
+        Returns s as-is if False.
+        :param l:
+        :return:
+        """
+        modified_list = []
+        for s in l:
+            modified_list.append(self.str_to_list(s))
+
+        return modified_list
 
     @staticmethod
     def str_to_list_destructive(s):
@@ -488,3 +500,13 @@ class VideoTile(QWidget):
 
     def increase_prio(self):
         self.history.add(self.video, self.increase_prio, self.decrease_prio)
+
+    def delete_downloaded_data(self):
+        """
+        Deletes the downloaded data/file(s) from disk.
+        :return:
+        """
+        logger.info('Deleted downloaded data: {}'.format(self.video))
+        update_plaintext_history('Deleted downloaded data: {}'.format(self.video))
+        # Anti-Action passed as None, as you can't un-delete.
+        self.history.add(self.video, self.delete_downloaded_data, None, inactive=True)

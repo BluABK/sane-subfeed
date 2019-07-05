@@ -22,6 +22,7 @@ class PlaybackGridViewListener(GridViewListener):
     tileUndiscarded = pyqtSignal(VideoD)
     tileWatched = pyqtSignal(VideoD)
     tileUnwatched = pyqtSignal(VideoD)
+    tileDeleteDownloadedData = pyqtSignal(VideoD)
     videosChanged = pyqtSignal()
     videosUpdated = pyqtSignal()
     tileDownloaded = pyqtSignal(VideoD)
@@ -57,6 +58,7 @@ class PlaybackGridViewListener(GridViewListener):
         self.tileUnwatched.connect(self.tile_unwatched)
         self.tileDiscarded.connect(self.tile_discarded)
         self.tileUndiscarded.connect(self.tile_undiscarded)
+        self.tileDeleteDownloadedData.connect(self.tile_delete_downloaded_data)
 
         # Connect own listeners
         self.tileDownloaded.connect(self.tile_downloaded)

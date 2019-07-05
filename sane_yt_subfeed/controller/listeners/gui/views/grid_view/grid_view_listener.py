@@ -1,3 +1,5 @@
+import os
+
 from PyQt5.QtCore import QObject, pyqtSlot
 
 from sane_yt_subfeed.handlers.config_handler import read_config
@@ -203,3 +205,22 @@ class GridViewListener(QObject):
             self.model.unhide_video_item(video, self.widget_id)
         self.update_and_repaint_tile(video)
 
+    @pyqtSlot(VideoD)
+    def tile_delete_downloaded_data(self, video: Video):
+        """
+        Action to take if tile has been told to delete its downloaded data.
+
+        This will delete the video file.
+        :param video:
+        :return:
+        """
+
+        # Delete downloaded video file
+        os.remove(video.vid_path)
+        self.logger.info("Deleted: {}".format(video.vid_path))
+
+        # Unset path to signal that the data isn't on disk.
+        video.vid_path = None
+
+        # Repaint the tile to reflect the action.
+        self.update_and_repaint_tile(video)

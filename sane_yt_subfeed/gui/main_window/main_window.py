@@ -7,10 +7,12 @@ import os
 import shutil
 import traceback
 import json
+
+from PyQt5 import QtCore
 from PyQt5.QtCore import QFile, QTextStream, QRegExp
-from PyQt5.QtGui import QIcon, QRegExpValidator
+from PyQt5.QtGui import QIcon, QRegExpValidator, QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QStackedWidget, QStyleFactory, QFileDialog, QStyle, \
-    QProxyStyle
+    QProxyStyle, QLabel
 from subprocess import check_output
 
 # Project internal libs
@@ -31,7 +33,7 @@ from sane_yt_subfeed.gui.main_window.db_state import DbStateIcon
 from sane_yt_subfeed.gui.main_window.toolbar import Toolbar
 from sane_yt_subfeed.gui.main_window.toolbar_action import SaneToolBarAction
 from sane_yt_subfeed.gui.themes import themes
-from sane_yt_subfeed.gui.themes.themes import THEMES_AVAILABLE, QSTYLES_AVAILABLE
+from sane_yt_subfeed.gui.themes.themes import THEMES_AVAILABLE, QSTYLES_AVAILABLE, CUSTOM_THEMES_AVAILABLE
 from sane_yt_subfeed.gui.views.about_view.about_view import AboutView
 from sane_yt_subfeed.gui.views.config_view.config_view_tabs import ConfigViewTabs
 from sane_yt_subfeed.gui.views.config_view.config_window import ConfigWindow
@@ -51,7 +53,9 @@ from sane_yt_subfeed.handlers.log_handler import create_logger
 
 HOTKEYS_EVAL = False
 HOTKEYS_INI = 'hotkeys'
-YOUTUBE_URL_REGEX = QRegExp('(http[s]?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/[^ ]+')
+YOUTUBE_URL_REGEX = QRegExp('((http[s]?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[^ ]'
+                            '([a-zA-Z0-9_-]{9}|[a-zA-Z0-9_-]{10}|[a-zA-Z0-9_-]{11})[048AEIMQUYcgkosw]|'
+                            '([a-zA-Z0-9_-]{9}|[a-zA-Z0-9_-]{10}|[a-zA-Z0-9_-]{11})[048AEIMQUYcgkosw])')
 YOUTUBE_URL_REGEX.setCaseSensitivity(False)
 QMAINWINDOW_TITLE = 'Sane Subscription Feed'
 QMAINWINDOW_ICON = 'yubbtubbz-padding.ico'
@@ -452,6 +456,23 @@ class MainWindow(QMainWindow):
 
         self.central_widget.setCurrentWidget(self.subfeed_grid_view)
 
+        # Apply custom user theme mod overrides
+        # if read_config('Theme', 'custom_style_sheet', literal_eval=False):
+        #     self.logger.info("Setting custom user stylesheet (override): {}".format(
+        #         read_config('Theme', 'custom_style_sheet', literal_eval=False)
+        #     ))
+        #     self.set_theme(read_config('Theme', 'custom_style_sheet', literal_eval=False), stylesheet=True)
+
+        if read_config('Theme', 'custom_image', literal_eval=False):
+            self.set_custom_background_image(read_config('Theme', 'custom_image', literal_eval=False))
+
+        if read_config('Theme', 'custom_toolbar_image', literal_eval=False):
+            self.set_custom_toolbar_image(read_config('Theme', 'custom_toolbar_image', literal_eval=False))
+
+        if read_config('Theme', 'custom_central_widget_image', literal_eval=False):
+            self.set_custom_central_widget_image(
+                read_config('Theme', 'custom_central_widget_image', literal_eval=False))
+
     def add_central_widget_subfeed(self):
         self.central_widget.addWidget(self.subfeed_grid_view)
 
@@ -747,6 +768,13 @@ class MainWindow(QMainWindow):
                          subsubmenu=True)
         self.add_submenu(theme_submenu, 'Breeze Dark', self.set_theme_breeze_dark, tooltip='Set theme to Breeze Dark',
                          subsubmenu=True)
+        # Custom theme support
+        for custom_theme in CUSTOM_THEMES_AVAILABLE:
+            self.logger.debug("Adding sub-submenu for Custom theme: {} {}".format(custom_theme['name'],
+                                                                                  custom_theme['path']))
+            self.add_submenu(theme_submenu, custom_theme['name'], self.set_theme,
+                             tooltip='Set theme to {}'.format(custom_theme['name']),
+                             subsubmenu=True, theme=custom_theme['path'])
         # self.add_submenu_separator('&Theme')
         # --- Style submenu
         style_submenu = self.add_menu(window_menu, 'Style')
@@ -978,16 +1006,19 @@ class MainWindow(QMainWindow):
         :return:
         """
         if stylesheet:
+            self.logger.critical(theme)
             theme_file = QFile(theme)
             theme_file.open(QFile.ReadOnly | QFile.Text)
             theme_stream = QTextStream(theme_file)
-            self.app.setStyleSheet(theme_stream.readAll())
+            self.setStyleSheet(theme_stream.readAll())
             set_config('Theme', 'last_theme', theme)
             self.current_theme = theme
+            self.logger.info("Set theme (QStyleSheet): {}".format(theme))
         else:
-            self.app.setStyle(QStyleFactory.create(theme))
+            self.setStyle(QStyleFactory.create(theme))
             set_config('Theme', 'last_style', theme)
             self.current_style = theme
+            self.logger.info("Set theme (QStylePlugin): {}".format(theme))
 
     def set_theme_native(self):
         """
@@ -1051,6 +1082,38 @@ class MainWindow(QMainWindow):
         self.current_theme_idx += 1
         self.set_theme(self.themes_list[self.current_theme_idx])
         self.logger.info("Cycled to theme: '{}'".format(self.themes_list[self.current_theme_idx]))
+
+    # Custom user mod themes (minor specific stylesheet overrides, as alternative to a full on QSS file)
+    def set_custom_background_image(self, path):
+        """
+        Sets a custom image as the QToolbar background.
+        :param path: path to image file
+        :return:
+        """
+        # Set image as as a QSS property (border parm added as a workaround for certain platforms)
+        self.setStyleSheet("background-image: url({});".format(path))
+        self.logger.info("Set custom QMainWindow background image: {}".format(path))
+
+    def set_custom_toolbar_image(self, path):
+        """
+        Sets a custom image as the QToolbar background.
+        :param path: path to image file
+        :return:
+        """
+        # Set image as as a QSS property (border parm added as a workaround for certain platforms)
+        self.toolbar.setStyleSheet(
+            "background: transparent; background-image: url({}); background-position: top right;".format(path))
+        self.logger.info("Set custom toolbar image: {}".format(path))
+
+    def set_custom_central_widget_image(self, path):
+        """
+        Sets a custom image as the central QWidget background.
+        :param path: path to image file
+        :return:
+        """
+        # Set image as as a QSS property (border parm added as a workaround for certain platforms)
+        self.central_widget.setStyleSheet("background-image: url(:{}); border: 0px".format(path))
+        self.logger.info("Set custom CentralWidget image: {}".format(path))
 
     # Menu handling
     def add_menu(self, menubar, name, submenu=False):

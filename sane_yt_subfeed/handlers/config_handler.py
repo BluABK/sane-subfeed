@@ -54,7 +54,10 @@ DEFAULTS = {
     },
     'Theme': {
         'last_style': "",
-        'last_theme': ""
+        'last_theme': "",
+        'custom_image': "",
+        'custom_toolbar_image': "",
+        'custom_central_widget_image': ""
     },
     'Fonts': {
         'video_title_font': 'Noto Sans,10,-1,0,75,0,0,0,0,0,Bold',
@@ -146,31 +149,20 @@ DEFAULTS = {
     },
     'Player': {
         'default_player': "",
-        'alternative_player1': "",
-        'alternative_player2': "",
-        'alternative_player3': "",
-        'alternative_player4': "",
-        'alternative_player5': "",
-        'alternative_player6': "",
-        'alternative_player7': "",
-        'alternative_player8': "",
-        'alternative_player9': "",
-        'alternative_player10': "",
         'url_player': ""
     },
-    'PlayerFriendlyName': {
-        'default_player_name': "",
-        'alternative_player1_name': "",
-        'alternative_player2_name': "",
-        'alternative_player3_name': "",
-        'alternative_player4_name': "",
-        'alternative_player5_name': "",
-        'alternative_player6_name': "",
-        'alternative_player7_name': "",
-        'alternative_player8_name': "",
-        'alternative_player9_name': "",
-        'alternative_player10_name': "",
+    'PlayerNames': {
         'url_player_name': ""
+    },
+    'AlternativePlayers': {
+        'player1': "",
+        'player2': "",
+        'player3': ""
+    },
+    'AlternativePlayerNames': {
+        'player1': "",
+        'player2': "",
+        'player3': ""
     },
     'DefaultApp': {
         'Image': ""
@@ -355,7 +347,9 @@ def get_sections(custom_ini=None):
 
 def get_options(section, custom_ini=None):
     """
-    Returns config sections
+    Returns a list of ALL options (valid or not) in a given config section.
+
+    A valid option is defined as one that exists and is not a blank string.
     :return:
     """
     _parser = default_parser
@@ -374,6 +368,27 @@ def get_options(section, custom_ini=None):
             return_options = DEFAULTS[section].keys()
 
     return return_options
+
+
+def get_valid_options(config_section):
+    """
+    Returns a list of ONLY VALID options in a given config section.
+
+    A valid option is defined as one that exists and is not a blank string.
+    :param config_section:
+    :return:
+    """
+    valid_options = []
+    for proxy_option in get_options(config_section):
+        # Retrieve the config option (and strip string characters).
+        current_option = read_config(config_section, proxy_option, literal_eval=False)
+
+        # Check that the current option is valid.
+        if current_option is not "" and current_option is not None:
+            # Append the option to a list of valid options.
+            valid_options.append(current_option)
+
+    return valid_options
 
 
 def get_size(custom_ini=None, incl_sections=False):

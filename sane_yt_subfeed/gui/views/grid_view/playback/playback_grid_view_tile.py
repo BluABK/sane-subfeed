@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QApplication, QMenu
 
-from sane_yt_subfeed.handlers.config_handler import read_config
+from sane_yt_subfeed.handlers.config_handler import read_config, get_valid_options
 from sane_yt_subfeed.handlers.default_application_handler import open_with_default_application
 from sane_yt_subfeed.gui.dialogs.sane_text_view_dialog import SaneTextViewDialog
 from sane_yt_subfeed.gui.views.grid_view.playback.playback_grid_view_thumbnail_tile import PlaybackGridViewThumbnailTile
@@ -44,76 +44,29 @@ class PlaybackGridViewTile(VideoTile):
         """
         menu = QMenu(self)
 
-        # FIXME: Add a loop that lets you define infinite players in config (see download proxy list method)
-        alternative_player1 = self.str_to_list(read_config('Player', 'alternative_player1', literal_eval=False))
-        alternative_player2 = self.str_to_list(read_config('Player', 'alternative_player2', literal_eval=False))
-        alternative_player3 = self.str_to_list(read_config('Player', 'alternative_player3', literal_eval=False))
-        alternative_player4 = self.str_to_list(read_config('Player', 'alternative_player4', literal_eval=False))
-        alternative_player5 = self.str_to_list(read_config('Player', 'alternative_player5', literal_eval=False))
-        alternative_player6 = self.str_to_list(read_config('Player', 'alternative_player6', literal_eval=False))
-        alternative_player7 = self.str_to_list(read_config('Player', 'alternative_player7', literal_eval=False))
-        alternative_player8 = self.str_to_list(read_config('Player', 'alternative_player8', literal_eval=False))
-        alternative_player9 = self.str_to_list(read_config('Player', 'alternative_player9', literal_eval=False))
-        alternative_player10 = self.str_to_list(read_config('Player', 'alternative_player10', literal_eval=False))
-        alternative_player1_action = None
-        alternative_player2_action = None
-        alternative_player3_action = None
-        alternative_player4_action = None
-        alternative_player5_action = None
-        alternative_player6_action = None
-        alternative_player7_action = None
-        alternative_player8_action = None
-        alternative_player9_action = None
-        alternative_player10_action = None
-
         copy_url_action = menu.addAction("Copy link")
         discard_item_action = menu.addAction("Dismiss video")
         watch_item_action = menu.addAction("Mark watched")
         play_wo_action = menu.addAction("Play w/o mark watched")
 
-        if alternative_player1:
-            alternative_player1_action = menu.addAction(
-                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player1_name', literal_eval=False),
-                                    "Play with alternative player 1"))
-        if alternative_player2:
-            alternative_player2_action = menu.addAction(
-                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player2_name', literal_eval=False),
-                                    "Play with alternative player 2"))
-        if alternative_player3:
-            alternative_player3_action = menu.addAction(
-                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player3_name', literal_eval=False),
-                                    "Play with alternative player 3"))
-        if alternative_player4:
-            alternative_player4_action = menu.addAction(
-                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player4_name', literal_eval=False),
-                                    "Play with alternative player 4"))
-        if alternative_player5:
-            alternative_player5_action = menu.addAction(
-                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player5_name', literal_eval=False),
-                                    "Play with alternative player 5"))
-        if alternative_player6:
-            alternative_player6_action = menu.addAction(
-                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player6_name', literal_eval=False),
-                                    "Play with alternative player 6"))
-        if alternative_player7:
-            alternative_player7_action = menu.addAction(
-                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player7_name', literal_eval=False),
-                                    "Play with alternative player 7"))
-        if alternative_player8:
-            alternative_player8_action = menu.addAction(
-                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player8_name', literal_eval=False),
-                                    "Play with alternative player 8"))
-        if alternative_player9:
-            alternative_player9_action = menu.addAction(
-                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player9_name', literal_eval=False),
-                                    "Play with alternative player 9"))
-        if alternative_player10:
-            alternative_player10_action = menu.addAction(
-                self.determine_name(read_config('PlayerFriendlyName', 'alternative_player10_name', literal_eval=False),
-                                    "Play with alternative player 10"))
+        # Get a list of user-defined (valid) alternative players and their custom names.
+        alternative_players = self.list_to_str_lists(get_valid_options('AlternativePlayers'))
+        alternative_names = get_valid_options('AlternativePlayerNames')
+
+        # Define QActions for each user-defined alternative player.
+        alternative_player_actions = []
+        if len(alternative_players) > 0:
+            for player_index in range(len(alternative_players)):
+                # If there are sufficient valid alternative player names use them.
+                if len(alternative_names) > player_index:
+                    alternative_player_actions.append(menu.addAction(alternative_names[player_index]))
+                # If not, use the fail-over.
+                else:
+                    alternative_player_actions.append(menu.addAction(
+                        "Play with UNNAMED alternative player {}".format(player_index)))
 
         url_player_action = menu.addAction(
-            self.determine_name(read_config('PlayerFriendlyName', 'url_player_name', literal_eval=False),
+            self.determine_name(read_config('PlayerNames', 'url_player_name', literal_eval=False),
                                 "Open in web browser"))
 
         if not self.video.vid_path:
@@ -121,6 +74,12 @@ class PlaybackGridViewTile(VideoTile):
         else:
             download_video = None
 
+        # File deletion section
+        menu.addSeparator()
+        delete_data_action = menu.addAction("Delete downloaded data")
+        delete_and_dismiss_data_action = menu.addAction("Delete downloaded data and dismiss")
+
+        # Metadata and related section
         menu.addSeparator()
         show_description_dialog = menu.addAction("View description")
         open_thumbnail_file = menu.addAction("View image")
@@ -138,30 +97,25 @@ class PlaybackGridViewTile(VideoTile):
             self.mark_watched()
         elif action == play_wo_action:
             self.open_in_player(self.video.vid_path, mark_watched=False)
-        elif action == alternative_player1_action and alternative_player1_action:
-            self.open_in_player(self.video.vid_path, player=alternative_player1)
-        elif action == alternative_player2_action and alternative_player2_action:
-            self.open_in_player(self.video.vid_path, player=alternative_player2)
-        elif action == alternative_player3_action and alternative_player3_action:
-            self.open_in_player(self.video.vid_path, player=alternative_player3)
-        elif action == alternative_player4_action and alternative_player4_action:
-            self.open_in_player(self.video.vid_path, player=alternative_player4)
-        elif action == alternative_player5_action and alternative_player5_action:
-            self.open_in_player(self.video.vid_path, player=alternative_player5)
-        elif action == alternative_player6_action and alternative_player6_action:
-            self.open_in_player(self.video.vid_path, player=alternative_player6)
-        elif action == alternative_player7_action and alternative_player7_action:
-            self.open_in_player(self.video.vid_path, player=alternative_player7)
-        elif action == alternative_player8_action and alternative_player8_action:
-            self.open_in_player(self.video.vid_path, player=alternative_player8)
-        elif action == alternative_player9_action and alternative_player9_action:
-            self.open_in_player(self.video.vid_path, player=alternative_player9)
-        elif action == alternative_player10_action and alternative_player10_action:
-            self.open_in_player(self.video.vid_path, player=alternative_player10)
+        elif action in alternative_player_actions:
+            # Get the index of action in the list of alt player actions, which corresponds with the list of alt players.
+            selected_alternative_player = alternative_players[alternative_player_actions.index(action)]
+
+            # Open video in selected (alternative) player.
+            self.open_in_player(self.video.vid_path, player=selected_alternative_player)
         elif action == url_player_action:
             self.open_in_browser()
         elif download_video and action == download_video:
             self.mark_downloaded()
+
+        # File deletion action logic
+        elif action == delete_data_action:
+            self.delete_downloaded_data()
+        elif action == delete_and_dismiss_data_action:
+            self.delete_downloaded_data()
+            self.mark_discarded()
+
+        # Metadata action logic
         elif action == open_thumbnail_file:
             open_with_default_application(self.video.thumbnail_path)
         elif action == show_description_dialog:
@@ -216,3 +170,11 @@ class PlaybackGridViewTile(VideoTile):
     def increase_prio(self):
         self.parent.main_model.playback_grid_view_listener.increaseWatchPrio.emit(self.video)
         super().increase_prio()
+
+    def delete_downloaded_data(self):
+        """
+        Deletes the downloaded data/file(s) from disk.
+        :return:
+        """
+        self.parent.main_model.playback_grid_view_listener.tileDeleteDownloadedData.emit(self.video)
+        super().delete_downloaded_data()
