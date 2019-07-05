@@ -1006,7 +1006,6 @@ class MainWindow(QMainWindow):
         :return:
         """
         if stylesheet:
-            self.logger.critical(theme)
             theme_file = QFile(theme)
             theme_file.open(QFile.ReadOnly | QFile.Text)
             theme_stream = QTextStream(theme_file)
