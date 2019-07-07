@@ -18,6 +18,7 @@ from subprocess import check_output
 # Project internal libs
 from sane_yt_subfeed.absolute_paths import ICONS_PATH, VERSION_PATH, KEYS_FILE, CLIENT_SECRET_FILE, KEYS_PULIC_FILE, \
     CLIENT_SECRET_PUBLIC_FILE
+from sane_yt_subfeed.gui.theme_handler.sane_theme_handler import SaneThemeHandler
 from sane_yt_subfeed.handlers.config_handler import read_config, set_config
 from sane_yt_subfeed.controller.listeners.listeners import LISTENER_SIGNAL_NORMAL_REFRESH, LISTENER_SIGNAL_DEEP_REFRESH
 from sane_yt_subfeed.controller.static_controller_vars import SUBFEED_VIEW_ID, PLAYBACK_VIEW_ID
@@ -32,8 +33,6 @@ from sane_yt_subfeed.gui.history.sane_history import SaneHistory
 from sane_yt_subfeed.gui.main_window.db_state import DbStateIcon
 from sane_yt_subfeed.gui.main_window.toolbar import Toolbar
 from sane_yt_subfeed.gui.main_window.toolbar_action import SaneToolBarAction
-from sane_yt_subfeed.gui.themes import themes
-from sane_yt_subfeed.gui.themes.themes import THEMES_AVAILABLE, QSTYLES_AVAILABLE, CUSTOM_THEMES_AVAILABLE
 from sane_yt_subfeed.gui.views.about_view.about_view import AboutView
 from sane_yt_subfeed.gui.views.config_view.config_view_tabs import ConfigViewTabs
 from sane_yt_subfeed.gui.views.config_view.config_window import ConfigWindow
@@ -128,13 +127,6 @@ class MainWindow(QMainWindow):
         # Set the exception hook to be wrapped by the Exception Handler
         sys.excepthook = self.exceptionHandler.handler
 
-        if sys.platform.startswith('linux'):
-            self.themes_list = THEMES_AVAILABLE['linux']
-        else:
-            self.themes_list = THEMES_AVAILABLE['windows']
-        self.bgcolor = read_config('Gui', 'bgcolor', literal_eval=False)
-        self.darkmode = read_config('Gui', 'darkmode_icons')
-
         self.clipboard = QApplication.clipboard()
         self.status_bar = self.statusBar()
 
@@ -157,11 +149,6 @@ class MainWindow(QMainWindow):
         self.list_tiled_view = None
         self.about_view = None
 
-        # Declare theming
-        self.current_theme = None
-        self.current_theme_idx = 0
-        self.current_style = None
-        self.update_toolbar_size()
         self.hotkey_ctrl_down = False
 
         # Declare MainWindow things
@@ -180,6 +167,11 @@ class MainWindow(QMainWindow):
         if self.startup_checks_status != 0:
             self.logger.critical("Something failed during startup checks (wrong status: running). Aborting!")
             exit(1)  # FIXME: qApp.quit() doesn't work until MainWindow has fully loaded for some reason..
+
+        # Theme handling is set in init_ui to avoid issues with referencing to UI elements that don't yet exist.
+        self.theme_handler = None
+        self.bgcolor = None
+        self.darkmode = None
 
         # Initialize UI
         self.init_ui()
@@ -396,27 +388,17 @@ class MainWindow(QMainWindow):
     def init_ui(self):
         self.logger.info("Initializing UI: MainWindow")
 
+        # Theme handling
+        self.theme_handler = SaneThemeHandler(self)
+        self.bgcolor = read_config('Gui', 'bgcolor', literal_eval=False)
+        self.darkmode = read_config('Gui', 'darkmode_icons')
+
+        # Set toolbar enbiggened style.
+        self.update_toolbar_size()
+
         self.determine_icons()
         # Setup the views
         self.setup_views()
-
-        # Set the (last used) theme
-        _last_theme = read_config('Theme', 'last_theme', literal_eval=False)
-        if _last_theme:
-            self.logger.info("Using 'last used' theme: {}".format(_last_theme))
-            try:
-                self.set_theme(_last_theme)
-            except Exception as exc:
-                self.logger.error("Failed setting 'last used' theme: {}".format(_last_theme), exc_info=exc)
-
-        # Set the (last used) style
-        _last_style = read_config('Theme', 'last_style', literal_eval=False)
-        if _last_style:
-            self.logger.info("Using 'last used' style: {}".format(_last_style))
-            try:
-                self.set_theme(_last_style, stylesheet=False)
-            except Exception as exc:
-                self.logger.error("Failed setting 'last used' style: {}".format(_last_style), exc_info=exc)
 
         # Add and populate menus
         self.menubar = self.add_menus()
@@ -455,23 +437,6 @@ class MainWindow(QMainWindow):
         self.add_central_widget_config()
 
         self.central_widget.setCurrentWidget(self.subfeed_grid_view)
-
-        # Apply custom user theme mod overrides
-        # if read_config('Theme', 'custom_style_sheet', literal_eval=False):
-        #     self.logger.info("Setting custom user stylesheet (override): {}".format(
-        #         read_config('Theme', 'custom_style_sheet', literal_eval=False)
-        #     ))
-        #     self.set_theme(read_config('Theme', 'custom_style_sheet', literal_eval=False), stylesheet=True)
-
-        if read_config('Theme', 'custom_image', literal_eval=False):
-            self.set_custom_background_image(read_config('Theme', 'custom_image', literal_eval=False))
-
-        if read_config('Theme', 'custom_toolbar_image', literal_eval=False):
-            self.set_custom_toolbar_image(read_config('Theme', 'custom_toolbar_image', literal_eval=False))
-
-        if read_config('Theme', 'custom_central_widget_image', literal_eval=False):
-            self.set_custom_central_widget_image(
-                read_config('Theme', 'custom_central_widget_image', literal_eval=False))
 
     def add_central_widget_subfeed(self):
         self.central_widget.addWidget(self.subfeed_grid_view)
@@ -760,25 +725,51 @@ class MainWindow(QMainWindow):
         window_menu = self.add_menu(menubar, '&Window')
         # --- Theme submenu
         theme_submenu = self.add_menu(window_menu, 'Theme')
-        self.add_submenu(theme_submenu, 'Cycle theme', self.cycle_themes, tooltip='Cycle theme', subsubmenu=True)
-        self.add_submenu(theme_submenu, 'Default', self.set_theme_native, tooltip='Set theme to system default',
+        self.add_submenu(theme_submenu, 'Cycle theme', self.theme_handler.cycle_themes, tooltip='Cycle theme',
                          subsubmenu=True)
-        self.add_submenu(theme_submenu, 'Breeze Light', self.set_theme_breeze_light,
-                         tooltip='Set theme to Breeze Light',
-                         subsubmenu=True)
-        self.add_submenu(theme_submenu, 'Breeze Dark', self.set_theme_breeze_dark, tooltip='Set theme to Breeze Dark',
-                         subsubmenu=True)
-        # Custom theme support
-        for custom_theme in CUSTOM_THEMES_AVAILABLE:
-            self.logger.debug("Adding sub-submenu for Custom theme: {} {}".format(custom_theme['name'],
-                                                                                  custom_theme['path']))
-            self.add_submenu(theme_submenu, custom_theme['name'], self.set_theme,
-                             tooltip='Set theme to {}'.format(custom_theme['name']),
-                             subsubmenu=True, theme=custom_theme['path'])
-        # self.add_submenu_separator('&Theme')
+        self.add_submenu(theme_submenu, 'Default', self.theme_handler.set_theme_native,
+                         tooltip='Set theme to system default', subsubmenu=True)
+
+        for theme in self.theme_handler.themes:
+            self.logger.info("Adding theme: {} {}".format(theme['name'],
+                                                          theme['variants'][0]['path']))
+            if len(theme['variants']) > 1:
+                theme_variant_submenu = self.add_menu(theme_submenu, theme['name'])
+                for theme_variant in theme['variants']:
+                    # Abide by specified whitelist policy if one exists.
+                    if theme_variant['platform_whitelist']:
+                        if sys.platform not in theme_variant['platform_whitelist']:
+                            self.logger.info(
+                                "\tSKIPPING (whitelist: {})'{}'"
+                                " variant submenu for theme: {} {}".format(theme_variant['platform_whitelist'],
+                                                                           theme_variant['name'],
+                                                                           theme['name'],
+                                                                           theme_variant['path']))
+                            continue
+
+                    self.logger.info("\tAdding '{}' variant submenu for theme: {} {}".format(theme_variant['name'],
+                                                                                             theme['name'],
+                                                                                             theme_variant['path']))
+                    self.add_submenu(theme_variant_submenu, theme_variant['name'], self.theme_handler.set_theme,
+                                     tooltip='Set theme to {} (variant: {})'.format(theme['name'],
+                                                                                    theme_variant['name']),
+                                     subsubmenu=True, theme=theme_variant['path'])
+            else:
+                self.logger.debug("Adding theme with no variants: {} {}".format(theme['variants'][0]['name'],
+                                                                                theme['variants'][0]['path']))
+                self.add_submenu(theme_submenu, theme['name'], self.theme_handler.set_theme,
+                                 tooltip='Set theme to {}'.format(theme['name']),
+                                 subsubmenu=True, theme=theme['variants'][0]['path'])
+
         # --- Style submenu
         style_submenu = self.add_menu(window_menu, 'Style')
-        self.add_available_qstyles_to_menu(style_submenu, subsubmenu=True)
+        # Populates the given menu with all available QStyles.
+        for name, _ in self.theme_handler.styles.items():
+            action = self.theme_handler.set_style
+
+            self.logger.info("Adding available QStyle '{}' to '{}' menu.".format(name, style_submenu))
+            self.add_submenu(style_submenu, name, action, tooltip="Apply the '{}' QWidget Style.".format(name),
+                             subsubmenu=True, style=name)
 
     def add_menu_help(self, menubar):
         """
@@ -998,121 +989,14 @@ class MainWindow(QMainWindow):
         return branch_tag
 
     # Theme handling
-    def set_theme(self, theme, stylesheet=True):
-        """
-        Applies a QStyle or QStyleSheet to the QApplication
-        :param stylesheet:
-        :param theme:
-        :return:
-        """
-        if stylesheet:
-            theme_file = QFile(theme)
-            theme_file.open(QFile.ReadOnly | QFile.Text)
-            theme_stream = QTextStream(theme_file)
-            self.setStyleSheet(theme_stream.readAll())
-            set_config('Theme', 'last_theme', theme)
-            self.current_theme = theme
-            self.logger.info("Set theme (QStyleSheet): {}".format(theme))
-        else:
-            self.setStyle(QStyleFactory.create(theme))
-            set_config('Theme', 'last_style', theme)
-            self.current_style = theme
-            self.logger.info("Set theme (QStylePlugin): {}".format(theme))
-
-    def set_theme_native(self):
-        """
-        Reset the theme to default/native.
-        :return:
-        """
-        self.set_theme(None)
-
-    def set_theme_breeze_dark(self):
-        if sys.platform.startswith('linux'):
-            self.set_theme(themes.BREEZE_DARK)
-        else:  # Windows
-            self.set_theme(themes.BREEZE_DARK_WINDOWS_MOD)
-
-    def set_theme_breeze_light(self):
-        if sys.platform.startswith('linux'):
-            self.set_theme(themes.BREEZE_LIGHT)
-        else:  # Windows
-            self.set_theme(themes.BREEZE_LIGHT_WINDOWS_MOD)
-
-    def add_available_qstyles_to_menu(self, menu, subsubmenu=False):
-        """
-        Populates the given menu with all available QStyles.
-        :param menu:
-        :param subsubmenu:
-        :return:
-        """
-        for name, _ in QSTYLES_AVAILABLE.items():
-            action = self.set_qstyle
-
-            self.logger.info("Adding available QStyle '{}' to '{}' menu.".format(name, menu))
-            self.add_submenu(menu, name, action, tooltip="Apply the '{}' QWidget Style.".format(name),
-                             subsubmenu=subsubmenu, q_style=name)
-
-    def set_qstyle(self, q_style):
-        """
-        Sets theme to a QStyle.
-        :param q_style:
-        :return:
-        """
-        self.set_theme(q_style, stylesheet=False)
-
     def update_toolbar_size(self):
         """
         Sets toolbar enbiggened qstyle
-        :param q_style:
         :return:
         """
         source_style = 'Fusion'  # self.current_style
-        enbiggened_style = EnbiggenedToolbarStyle(self.current_style)
+        enbiggened_style = EnbiggenedToolbarStyle(self.theme_handler.current_style)
         self.setStyle(enbiggened_style)
-
-    def cycle_themes(self):
-        """
-        Cycles through the available themes.
-        :return:
-        """
-        if self.current_theme_idx >= len(self.themes_list) - 1:
-            self.current_theme_idx = -1
-
-        self.current_theme_idx += 1
-        self.set_theme(self.themes_list[self.current_theme_idx])
-        self.logger.info("Cycled to theme: '{}'".format(self.themes_list[self.current_theme_idx]))
-
-    # Custom user mod themes (minor specific stylesheet overrides, as alternative to a full on QSS file)
-    def set_custom_background_image(self, path):
-        """
-        Sets a custom image as the QToolbar background.
-        :param path: path to image file
-        :return:
-        """
-        # Set image as as a QSS property (border parm added as a workaround for certain platforms)
-        self.setStyleSheet("background-image: url({});".format(path))
-        self.logger.info("Set custom QMainWindow background image: {}".format(path))
-
-    def set_custom_toolbar_image(self, path):
-        """
-        Sets a custom image as the QToolbar background.
-        :param path: path to image file
-        :return:
-        """
-        # Set image as as a QSS property (border parm added as a workaround for certain platforms)
-        self.toolbar.setStyleSheet(
-            "background: transparent; background-image: url({}); background-position: top right;".format(path))
-        self.logger.info("Set custom toolbar image: {}".format(path))
-
-    def set_custom_central_widget_image(self, path):
-        """
-        Sets a custom image as the central QWidget background.
-        :param path: path to image file
-        :return:
-        """
-        # Set image as as a QSS property (border parm added as a workaround for certain platforms)
-        self.central_widget.setStyleSheet("background-image: url(:{}); border: 0px".format(path))
-        self.logger.info("Set custom CentralWidget image: {}".format(path))
 
     # Menu handling
     def add_menu(self, menubar, name, submenu=False):
@@ -1131,19 +1015,21 @@ class MainWindow(QMainWindow):
             return self.menus[name]
 
     def add_submenu(self, menu: str, name: str, action, shortcut=None, shortcuts=None,
-                    tooltip=None, icon=None, subsubmenu=False, dummy=False, disabled=False, **kwargs):
+                    tooltip=None, icon=None, subsubmenu=False,
+                    dummy=False, disabled=False, **kwargs):
         """
         Adds a submenu to a menu with optional properties.
-        :param disabled:    Menu is disabled/greyed out.
-        :param dummy:       Menu has no action bind.
-        :param shortcuts:   Keyboard hotkey.
-        :param subsubmenu:  If True submenu is child of a parent submenu.
-        :param name:        Name to give this submenu.
-        :param icon:        Icon filename (with relative path)
-        :param tooltip:     String to show on statusbar/on-hover.
-        :param action:      Function to bind action to.
-        :param shortcut:    String on the form of '<key>+...n+key>' e.g. 'Ctrl+1'
-        :param menu:        String identifier (name) of the Menu to attach this submenu to.
+
+        :param disabled:        Menu is disabled/greyed out.
+        :param dummy:           Menu has no action bind.
+        :param shortcuts:       Keyboard hotkey.
+        :param subsubmenu:      If True submenu is child of a parent submenu.
+        :param name:            Name to give this submenu.
+        :param icon:            Icon filename (with relative path)
+        :param tooltip:         String to show on statusbar/on-hover.
+        :param action:          Function to bind action to.
+        :param shortcut:        String on the form of '<key>+...n+key>' e.g. 'Ctrl+1'
+        :param menu:            String identifier (name) of the Menu to attach this submenu to.
         :return:
         """
         if icon:
@@ -1156,8 +1042,10 @@ class MainWindow(QMainWindow):
             submenu.setShortcut(shortcut)
         elif shortcuts:
             submenu.setShortcuts(shortcuts)
+
         if tooltip:
             submenu.setStatusTip(tooltip)
+
         if subsubmenu:
             menu.addAction(submenu)
         else:
