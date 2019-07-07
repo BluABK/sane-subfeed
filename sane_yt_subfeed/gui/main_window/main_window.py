@@ -1006,6 +1006,9 @@ class MainWindow(QMainWindow):
         :return:
         """
         if stylesheet:
+            # Unset any previous stylesheets to avoid overlapping issues.
+            if theme:
+                self.set_theme_native()
             theme_file = QFile(theme)
             theme_file.open(QFile.ReadOnly | QFile.Text)
             theme_stream = QTextStream(theme_file)
