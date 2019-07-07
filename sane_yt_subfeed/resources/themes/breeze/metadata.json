@@ -1,0 +1,30 @@
+{
+  "name": "Breeze",
+  "version": null,
+  "author": "Colin Duquesnoy",
+  "editor": "Alex Huszagh",
+  "description": "This is originally a fork of QDarkStyleSheet, and is based on Breeze. BreezeDark color scheme, but is in no way affiliated with KDE.",
+  "variants":
+  [
+    {
+      "name": "Dark",
+      "path": "dark.qss",
+      "platform_whitelist": ["linux", "cygwin", "darwin"]
+    },
+    {
+      "name": "Light",
+      "path": "light.qss",
+      "platform_whitelist": ["linux", "cygwin", "darwin"]
+    },
+    {
+      "name": "Dark",
+      "path": "dark-windows-mod.qss",
+      "platform_whitelist": ["win32"]
+    },
+    {
+      "name": "Light",
+      "path": "light-windows-mod.qss",
+      "platform_whitelist": ["win32"]
+    }
+  ]
+}
