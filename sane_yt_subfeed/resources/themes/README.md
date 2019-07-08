@@ -54,4 +54,4 @@ Format:
 ```
 
   * `platform whitelist` can be `null` or a list of platforms (win32/linux/cygwin/darwin).
-  * `complied_qrc` is only relevant if you hae compiled a QRC file, if else leave it as `null`.
+  * `complied_qrc` is only relevant if you have compiled a QRC file, if else leave it as `null`.
