@@ -11,16 +11,27 @@ from sane_yt_subfeed.handlers.config_handler import set_config, read_config
 
 THEME_PATH = os.path.join(RESOURCES_PATH, 'themes')
 COMPILED_QRC_LOADED = None
+QRC_RESTART_MSG = "Compiled QRC assets are only loaded on startup. " \
+                  "<br/><br/>" \
+                  "If you pick a theme with such assets, " \
+                  "you have to restart to load its assets (images and such). " \
+                  "<br/><br/>" \
+                  "This is due to overlapping issues when " \
+                  "loading a second compiled QRC script which instantly" \
+                  "<br/>" \
+                  "makes Qt throw a SEGFAULT." \
+                  "<br/><br/>"
 
 
 class SaneThemeHandler(QObject):
 
-    def __init__(self, main_window: QMainWindow):
+    def __init__(self, main_window: QMainWindow, popup_dialog=None):
         super(SaneThemeHandler, self).__init__()
 
         self.logger = create_logger(__name__)
 
         self.main_window = main_window
+        self.popup_dialog = popup_dialog
 
         self.themes = None
         self.styles = None
@@ -155,9 +166,14 @@ class SaneThemeHandler(QObject):
 
         self.themes = themes
 
-    def update_current_theme(self, theme):
-        self.current_theme = theme
-        set_config('Theme', 'last_theme', theme)
+    def update_current_theme(self, theme_abs_path):
+        """
+        Saves the current theme variant to config and self (using its absolute path)
+        :param theme_abs_path:
+        :return:
+        """
+        self.current_theme = theme_abs_path
+        set_config('Theme', 'last_theme', theme_abs_path)
 
     def get_theme_by_root_path(self, path):
         """
@@ -217,24 +233,57 @@ class SaneThemeHandler(QObject):
             # Make sure this thing won't accidentally be run more than once (setter)
             COMPILED_QRC_LOADED = theme
 
-    def set_theme(self, theme):
+    def set_theme(self, theme_abs_path):
         """
         Applies a QStyle or QStyleSheet to the QApplication
-        :param theme: absolute filepath
+        :param theme_abs_path: absolute filepath
         :return:
         """
+        theme = None
+        variant = None
         try:
-            # Unset any previous stylesheets to avoid overlapping issues.
-            if theme:
+            # Actions to take when theme_abs_path is not None
+            if theme_abs_path:
+                # Unset any previous stylesheets to avoid overlapping issues.
                 self.set_theme_native()
-            theme_file = QFile(theme)
+
+                # Figure out the root and variant paths.
+                root_path, variant_path = os.path.split(theme_abs_path)
+
+                # Get the actual theme dict by given theme_abs_path
+                theme = self.get_theme_by_root_path(root_path)
+
+                # Get the variant
+                variant = theme['variants'][self.get_variant_index_by_path(theme, variant_path)]
+
+            theme_file = QFile(theme_abs_path)
             theme_file.open(QFile.ReadOnly | QFile.Text)
             theme_stream = QTextStream(theme_file)
             self.main_window.setStyleSheet(theme_stream.readAll())
-            self.update_current_theme(theme)
-            self.logger.info("Set theme (QStyleSheet): {}".format(theme))
+            self.update_current_theme(theme_abs_path)
+            if theme_abs_path:
+                self.logger.info("Set theme: {} (variant: {})".format(theme['name'], variant['name']))
+            else:
+                self.logger.info("Reset theme to defaults.")
         except Exception as exc:
             self.logger.error("Failed setting theme: {}".format(theme), exc_info=exc)
+
+        # Check that there exists a popup dialog action and that theme is not None
+        if self.popup_dialog is not None and theme is not None:
+
+            # Check if the new theme has a compiled QRC it wants loaded.
+            if theme['compiled_qrc']:
+
+                # Check if a compiled QRC has been loaded (to avoid NoneType in the following check).
+                if COMPILED_QRC_LOADED is not None:
+
+                    # Check if the QRC belongs to the current theme, if so no need to warn user.
+                    if theme['name'] == COMPILED_QRC_LOADED['name']:
+                        return
+
+            # If compiled QRC either isn't loaded or is loaded but doesn't belong to the new theme.
+            self.popup_dialog(title="Restart required for theme assets!", message=QRC_RESTART_MSG,
+                              exclusive=True)
 
     def set_theme_native(self):
         """
