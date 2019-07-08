@@ -389,7 +389,7 @@ class MainWindow(QMainWindow):
         self.logger.info("Initializing UI: MainWindow")
 
         # Theme handling
-        self.theme_handler = SaneThemeHandler(self)
+        self.theme_handler = SaneThemeHandler(self, popup_dialog=self.dialog)
         self.bgcolor = read_config('Gui', 'bgcolor', literal_eval=False)
         self.darkmode = read_config('Gui', 'darkmode_icons')
 
@@ -753,13 +753,13 @@ class MainWindow(QMainWindow):
                     self.add_submenu(theme_variant_submenu, theme_variant['name'], self.theme_handler.set_theme,
                                      tooltip='Set theme to {} (variant: {})'.format(theme['name'],
                                                                                     theme_variant['name']),
-                                     subsubmenu=True, theme=theme_variant['path'])
+                                     subsubmenu=True, theme_abs_path=theme_variant['path'])
             else:
                 self.logger.debug("Adding theme with no variants: {} {}".format(theme['variants'][0]['name'],
                                                                                 theme['variants'][0]['path']))
                 self.add_submenu(theme_submenu, theme['name'], self.theme_handler.set_theme,
                                  tooltip='Set theme to {}'.format(theme['name']),
-                                 subsubmenu=True, theme=theme['variants'][0]['path'])
+                                 subsubmenu=True, theme_abs_path=theme['variants'][0]['path'])
 
         # --- Style submenu
         style_submenu = self.add_menu(window_menu, 'Style')
