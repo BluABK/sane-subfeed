@@ -30,8 +30,8 @@ __pycache__
 *.pyc
 
 # Blacklist images
-*.jpg
-*.png
+sane_yt_subfeed/resources/thumbnails/*.jpg
+sane_yt_subfeed/resources/thumbnails/*.png
 
 # Whitelist Project images
 !sane_yt_subfeed/resources/icons/*
