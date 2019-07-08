@@ -1,0 +1,43 @@
+MainWindow, GridView, DownloadView, ConfigViewWidget, HotkeysViewWidget, QDialog, QPlainTextEdit {
+    background-image: url(:/img/gradient01_1080p.png);
+    background-size:cover
+}
+
+Toolbar, QMenuBar, VideoTile {
+    background: transparent;
+}
+
+QHeaderView, QTableCornerButton {
+    background-color: rgba(0, 0, 0, 35%);
+}
+
+QTableWidget {
+    background-color: rgba(0, 0, 0, 25%);
+}
+
+QLineEdit, QTabBar {
+    background-color: #1555a0;
+}
+
+QPushButton {
+    background-color: #1555a0;
+}
+
+QCheckBox, QRadioButton {
+	color: white;
+    background: transparent;
+    border-color: #1555a0;
+}
+
+QComboBox QAbstractItemView, QMenu
+{
+    background: #1555a0;
+    selection-background-color: #1773ac;
+    color: white;
+}
+
+/* Remove ugly borders for a more wholesome experience ~ */
+
+GridScrollArea, ConfigViewWidget, ConfigViewTabs, ConfigScrollArea {
+    border: 0px;
+}
