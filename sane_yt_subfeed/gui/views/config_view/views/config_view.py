@@ -192,7 +192,6 @@ class ConfigViewWidget(InputSuper):
     def add_config_tab_debug(self):
         self.add_option_checkbox('Show unimplemented GUI elements', 'Debug', 'show_unimplemented_gui')
         self.add_option_checkbox('Display all Exceptions', 'Debug', 'display_all_exceptions', restart_check=False)
-        self.add_option_checkbox('Color video tile elements', 'Debug', 'color_tile_elements')
         self.add_option_info_restart_required()
 
     def add_config_tab_download(self):
