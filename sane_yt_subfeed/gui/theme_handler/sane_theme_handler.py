@@ -56,11 +56,14 @@ class SaneThemeHandler(QObject):
 
             theme = self.get_theme_by_root_path(root_path)
 
-            # Load PyQt5 compiled QRC (if any)
-            self.load_compiled_theme_resources(theme)
+            if theme is not None:
+                # Load PyQt5 compiled QRC (if any)
+                self.load_compiled_theme_resources(theme)
 
-            # Set the theme
-            self.set_theme(last_theme)
+                # Set the theme
+                self.set_theme(last_theme)
+            else:
+                self.logger.error("Unable to restore last theme (INVALID: NoneType): {}".format(last_theme))
 
         # Set the last used style.
         last_style = read_config('Theme', 'last_style', literal_eval=False)
