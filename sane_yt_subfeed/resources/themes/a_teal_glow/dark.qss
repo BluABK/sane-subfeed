@@ -1,0 +1,52 @@
+QWidget {
+    /* Set background colour to match the header */
+    background: #171717;
+}
+
+/* Put the top part (25px) of the sliced image on menubar */
+QMenuBar {
+	background-image: url(:/img/menubar.png);
+    background-position: top right;
+}
+
+/* Put the bottom part (31px) of the sliced image on toolbar */
+QToolBar {
+    background: transparent;
+    background-image: url(:/img/toolbar.png);
+    background-position: top right;
+    border: 0;
+}
+
+/* Remove the black border between menubar and toolbar for a smoother header experience */
+QMenuBar {
+    color: #00b0b7;
+    border: 0;
+}
+
+/* Colour the menu items to fit the overall cyan theme */
+QMenuBar::item:selected {
+    background: #032c2e;
+}
+
+QMenu::item {
+    color: #00b0b7;
+}
+
+QMenu::item:selected {
+    background: #032c2e;
+}
+
+/* TODO: [WIP] Fix checkboxes & friends */
+QCheckBox {
+    /*color: #00b0b7;*/
+    color: white;
+    border-color: white;
+}
+
+QRadioButton {
+    color: #00b0b7;
+}
+
+QLineEdit {
+    background-color: #2c2c2c;
+}

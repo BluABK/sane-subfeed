@@ -1,0 +1,7 @@
+<RCC>
+  <qresource>
+    <file>img/header_full.png</file>
+    <file>img/menubar.png</file>
+    <file>img/toolbar.png</file>
+  </qresource>
+</RCC>
