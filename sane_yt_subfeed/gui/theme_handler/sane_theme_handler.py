@@ -44,7 +44,6 @@ class SaneThemeHandler(QObject):
             root_path, variant_path = os.path.split(read_config('Theme', 'last_theme', literal_eval=False))
 
             theme = self.get_theme_by_root_path(root_path)
-            # variant_index = self.get_variant_index_by_path(theme, variant_path)
 
             # Load PyQt5 compiled QRC (if any)
             self.load_compiled_theme_resources(theme)
