@@ -30,8 +30,7 @@ DEFAULTS = {
         'use_playlistitems': 'True',
         'disable_tooltips': 'False',
         'show_unimplemented_gui': 'False',
-        'display_all_exceptions': 'False',
-        'color_tile_elements': 'False'
+        'display_all_exceptions': 'False'
     },
     'Gui': {
         'launch_gui': 'True',
