@@ -1,6 +1,6 @@
 # PyQt5
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QLabel
+from PyQt5.QtGui import QIcon, QPaintEvent, QPainter
+from PyQt5.QtWidgets import QLabel, QStyleOption, QStyle
 
 # Internal
 from sane_yt_subfeed.handlers.config_handler import read_config, set_config
@@ -29,6 +29,18 @@ class HotkeysViewWidget(InputSuper):
         self.parent.setWindowTitle('Hotkey configuration')
         self.init_ui()
         self.populate_options()
+
+    def paintEvent(self, paint_event: QPaintEvent):
+        """
+        Override painEvent in order to support stylesheets.
+        :param paint_event:
+        :return:
+        """
+        style_option = QStyleOption()
+        style_option.initFrom(self)
+        painter = QPainter(self)
+        style = self.style()
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)
 
     def init_ui(self):
         """

@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import QApplication, QMenu
+from PyQt5.QtGui import QMouseEvent, QPaintEvent, QPainter
+from PyQt5.QtWidgets import QApplication, QMenu, QStyleOption, QStyle
 
 from sane_yt_subfeed.handlers.config_handler import read_config, get_valid_options
 from sane_yt_subfeed.handlers.default_application_handler import open_with_default_application
@@ -127,6 +127,18 @@ class PlaybackGridViewTile(VideoTile):
         if read_config('Debug', 'debug'):
             if action == debug_log_video_obj:
                 self.logger.debug(self.video.__dict__)
+
+    def paintEvent(self, paint_event: QPaintEvent):
+        """
+        Override painEvent in order to support stylesheets.
+        :param paint_event:
+        :return:
+        """
+        style_option = QStyleOption()
+        style_option.initFrom(self)
+        painter = QPainter(self)
+        style = self.style()
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)
 
     def color_old_video(self, vid_age, days=1):
         pass

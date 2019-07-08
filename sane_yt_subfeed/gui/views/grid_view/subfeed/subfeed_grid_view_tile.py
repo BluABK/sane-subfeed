@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import QMenu, QApplication
+from PyQt5.QtGui import QMouseEvent, QPaintEvent, QPainter
+from PyQt5.QtWidgets import QMenu, QApplication, QStyleOption, QStyle
 
 from sane_yt_subfeed.handlers.config_handler import read_config, get_valid_options
 from sane_yt_subfeed.handlers.default_application_handler import open_with_default_application
@@ -172,6 +172,18 @@ class SubfeedGridViewTile(VideoTile):
                 self.root.confirmation_dialog(VIDEO_IS_LIVE_MSG, self.mark_downloaded, title=VIDEO_IS_LIVE_TITLE,
                                               ok_text="Yes, stream it.",
                                               cancel_text="Abort, abort, ABORT!")
+
+    def paintEvent(self, paint_event: QPaintEvent):
+        """
+        Override painEvent in order to support stylesheets.
+        :param paint_event:
+        :return:
+        """
+        style_option = QStyleOption()
+        style_option.initFrom(self)
+        painter = QPainter(self)
+        style = self.style()
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)
 
     def mark_discarded(self):
         """

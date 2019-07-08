@@ -3,7 +3,89 @@ HOWTO Create A Theme
 
 ### 1. Create a QSS file
 
-QSS is Qt flavoured CSS, for examples see https://doc.qt.io/qt-5/stylesheet-examples.html
+#### Standard QSS
+
+QSS is merely Qt flavoured CSS.
+
+Examples: https://doc.qt.io/qt-5/stylesheet-examples.html
+
+Reference sheet: https://doc.qt.io/qt-5/stylesheet-reference.html
+
+#### Sane Flavoured QSS
+
+These additional custom objects are also stylable:
+
+Main window (inherits **QMainWindow**)
+* MainWindow
+
+Dialogs (inherits **QDialog**)
+* SaneDialog
+* SaneConfirmationDialog
+* SaneInputDialog
+* SaneTextViewDialog
+* SaneOAuth2BuilderDialog
+
+Scroll areas (inherits **QScrollArea**)
+* GridScrollArea
+* DownloadScrollArea
+* ConfigWindow
+* ConfigScrollArea
+
+Tab widgets (inherits **QTabWidget**)
+* ConfigViewTabs
+
+[//]: # (Abandoned for now due to override unsetting all the defaults into an unusable status)
+[//]: # (Progress bars (inherits **QProgressBar**)
+[//]: # (* DownloadProgressBar)
+
+Toolbars (inherits **QToolBar**)
+* Toolbar
+
+Views (inherits **QWidget**)
+  * GridView
+    * SubfeedGridView
+    * PlaybackGridView
+  * SubfeedTiledListView
+    * ExtendedQLabel
+  * DownloadView
+  * SubfeedDetailedListView
+  * SubscriptionsDetailedListView
+  * InputSuper
+    * ConfigViewWidget
+    * HotkeysViewWidget
+  * AboutView
+    * ExtendedQLabel
+
+Tiles (inherits **QWidget**)
+  * VideoTile
+    * SubfeedGridViewTile
+    * PlaybackGridViewTile
+  * DownloadTile
+
+Labels (inherits **QLabel**):
+  * ElidedLabel
+    * TitleLabel
+    * ChannelLabel
+    * DateLabel
+  * SmallLabel
+  * DbStateIcon
+
+Buttons (inherits **QWidget**)
+* ButtonsTile
+
+Buttons (inherits **QPushButton**)
+* ClearFinishedDownloads
+* GenericConfigPushButton
+* FontPickerButton
+
+Checkboxes (inherits **QCheckBox**)
+* GenericConfigCheckBox
+
+Combo boxes (inherits **QComboBox**)
+* GenericConfigComboBox
+
+Line editors (inherits **QLineEdit**)
+* GenericLineEdit
 
 ### 2. Define any required resources in a QRC file
 

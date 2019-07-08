@@ -1,6 +1,7 @@
 from PyQt5 import sip
 from PyQt5.QtCore import Qt, pyqtSlot
-from PyQt5.QtWidgets import QWidget, QVBoxLayout
+from PyQt5.QtGui import QPaintEvent, QPainter
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QStyleOption, QStyle
 
 from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
 from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
@@ -97,3 +98,15 @@ class DownloadView(QWidget):
             else:
                 self.logger.warning(
                     "Download tile without video, grabbed from db: {}".format(db_download_tile.__dict__))
+
+    def paintEvent(self, paint_event: QPaintEvent):
+        """
+        Override painEvent in order to support stylesheets.
+        :param paint_event:
+        :return:
+        """
+        style_option = QStyleOption()
+        style_option.initFrom(self)
+        painter = QPainter(self)
+        style = self.style()
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)
