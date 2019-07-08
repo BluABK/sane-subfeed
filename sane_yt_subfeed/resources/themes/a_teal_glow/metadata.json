@@ -1,0 +1,20 @@
+{
+  "name": "A Teal Glow",
+  "version": "2019-07-07",
+  "author": "BluABK",
+  "description": "Banner image sourced from https://addons.mozilla.org/en-US/firefox/addon/teal-glow/",
+  "compiled_qrc": "resources.py",
+  "variants":
+  [
+    {
+      "name": "Dark",
+      "path": "dark.qss",
+      "platform_whitelist": null
+    },
+    {
+      "name": "Semi-Dark",
+      "path": "semi-dark.qss",
+      "platform_whitelist": null
+    }
+  ]
+}
