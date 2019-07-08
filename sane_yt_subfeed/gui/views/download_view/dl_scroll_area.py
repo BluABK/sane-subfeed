@@ -1,5 +1,6 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QScrollArea
+from PyQt5.QtGui import QPaintEvent, QPainter
+from PyQt5.QtWidgets import QScrollArea, QStyleOption, QStyle
 
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.gui.views.download_view.download_view import DownloadView
@@ -34,7 +35,14 @@ class DownloadScrollArea(QScrollArea):
             # FIXME: do something with auto reload so that this is not needed
             self.verticalScrollBar().setValue(self.verticalScrollBar().maximum() - 1)
 
-    # def set_view(self, widget, widget_id):
-    #     self.widget_id = widget_id
-    #     self.widget = widget
-    #     self.setWidget(widget)
+    def paintEvent(self, paint_event: QPaintEvent):
+        """
+        Override painEvent in order to support stylesheets.
+        :param paint_event:
+        :return:
+        """
+        style_option = QStyleOption()
+        style_option.initFrom(self)
+        painter = QPainter(self)
+        style = self.style()
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)

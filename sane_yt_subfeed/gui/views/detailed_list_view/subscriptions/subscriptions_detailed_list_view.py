@@ -1,5 +1,6 @@
 # from PyQt5.QtGui import QListWidgetItem
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView
+from PyQt5.QtGui import QPaintEvent, QPainter
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QStyleOption, QStyle
 
 from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.handlers.log_handler import create_logger
@@ -29,6 +30,18 @@ class SubscriptionsDetailedListView(QWidget):
             self.headers = ['ID', 'Title', 'Uploaded Videos Playlist ID', 'Description', 'Subscribed on YouTube?',
                             'Force subscription?']
         self.init_ui()
+
+    def paintEvent(self, paint_event: QPaintEvent):
+        """
+        Override painEvent in order to support stylesheets.
+        :param paint_event:
+        :return:
+        """
+        style_option = QStyleOption()
+        style_option.initFrom(self)
+        painter = QPainter(self)
+        style = self.style()
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)
 
     def init_ui(self):
         """

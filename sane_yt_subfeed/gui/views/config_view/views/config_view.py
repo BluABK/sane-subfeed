@@ -2,9 +2,11 @@
 import sys
 
 from PyQt5.QtCore import QRegExp
-from PyQt5.QtGui import QIntValidator, QDoubleValidator, QRegExpValidator
+from PyQt5.QtGui import QIntValidator, QDoubleValidator, QRegExpValidator, QPaintEvent, QPainter
 
 # Internal
+from PyQt5.QtWidgets import QStyleOption, QStyle
+
 from sane_yt_subfeed.handlers.config_handler import get_options, read_config, has_section
 from sane_yt_subfeed.gui.views.config_view.config_item_types import THUMBNAIL_QUALITIES, TT_FONT_SIZES, \
     LEFT_MOUSE_ACTIONS, TILE_TITLE_FONT_WEIGHTS
@@ -52,6 +54,18 @@ class ConfigViewWidget(InputSuper):
             self.add_config_tab_advanced()
 
         self.init_ui()
+
+    def paintEvent(self, paint_event: QPaintEvent):
+        """
+        Override painEvent in order to support stylesheets.
+        :param paint_event:
+        :return:
+        """
+        style_option = QStyleOption()
+        style_option.initFrom(self)
+        painter = QPainter(self)
+        style = self.style()
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)
 
     def init_ui(self):
         """

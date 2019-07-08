@@ -3,7 +3,8 @@ from collections import Counter
 import copy
 
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QGridLayout, QWidget, QMenu
+from PyQt5.QtGui import QPaintEvent, QPainter
+from PyQt5.QtWidgets import QGridLayout, QWidget, QMenu, QStyleOption, QStyle
 from datetime import datetime
 
 from sane_yt_subfeed.handlers.config_handler import read_config
@@ -500,3 +501,15 @@ class DownloadTile(QWidget):
                         self.logger.critical("DEBUG: Marking FAILED: {}".format(self.video))
                         # Send a custom Exception, due to failed_download requiring one by design (signal reasons).
                         self.failed_download(Exception("Manually marked as failed."))
+
+    def paintEvent(self, paint_event: QPaintEvent):
+        """
+        Override painEvent in order to support stylesheets.
+        :param paint_event:
+        :return:
+        """
+        style_option = QStyleOption()
+        style_option.initFrom(self)
+        painter = QPainter(self)
+        style = self.style()
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)

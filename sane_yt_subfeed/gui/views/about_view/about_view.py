@@ -1,7 +1,7 @@
 # std libs
-from PyQt5.QtGui import QPixmap, QPainter
+from PyQt5.QtGui import QPixmap, QPainter, QPaintEvent
 # PyQt5 libs
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QStyleOption, QStyle
 
 # Project internal libs
 from sane_yt_subfeed.absolute_paths import ABOUT_IMG_PATH
@@ -26,11 +26,18 @@ class ExtendedQLabel(QLabel):
         self.setPixmap(QPixmap(image_filename))
 
     # Override
-    def paintEvent(self, event):
+    def paintEvent(self, paint_event: QPaintEvent):
         if self.p:
             painter = QPainter(self)
             painter.setRenderHint(QPainter.SmoothPixmapTransform)
             painter.drawPixmap(self.rect(), self.p)
+
+        # Support stylesheets
+        style_option = QStyleOption()
+        style_option.initFrom(self)
+        painter = QPainter(self)
+        style = self.style()
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)
 
 
 class AboutView(QWidget):
@@ -45,6 +52,18 @@ class AboutView(QWidget):
         self.clipboard = self.root.clipboard
         self.status_bar = self.root.status_bar
         self.init_ui()
+
+    def paintEvent(self, paint_event: QPaintEvent):
+        """
+        Override painEvent in order to support stylesheets.
+        :param paint_event:
+        :return:
+        """
+        style_option = QStyleOption()
+        style_option.initFrom(self)
+        painter = QPainter(self)
+        style = self.style()
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)
 
     def init_ui(self):
         self.logger.info("Initializing UI: AboutView")

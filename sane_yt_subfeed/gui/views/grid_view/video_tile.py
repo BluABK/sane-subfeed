@@ -6,8 +6,8 @@ import datetime
 import subprocess
 import webbrowser
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPalette, QPixmap
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel
+from PyQt5.QtGui import QPalette, QPixmap, QPaintEvent, QPainter
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QStyleOption, QStyle
 from dateutil.relativedelta import relativedelta
 from string import Template
 
@@ -97,6 +97,18 @@ class VideoTile(QWidget):
 
     def init_thumbnail_tile(self):
         raise ValueError("ThumbnailTile initialised from VideoTile, not subclass!")
+
+    def paintEvent(self, paint_event: QPaintEvent):
+        """
+        Override painEvent in order to support stylesheets.
+        :param paint_event:
+        :return:
+        """
+        style_option = QStyleOption()
+        style_option.initFrom(self)
+        painter = QPainter(self)
+        style = self.style()
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)
 
     def set_thumbnail_pixmap(self, thumbnail_path):
         """

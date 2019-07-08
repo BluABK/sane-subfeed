@@ -1,8 +1,8 @@
 import math
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QWidget, QGridLayout, QSizePolicy
+from PyQt5.QtGui import QColor, QPaintEvent, QPainter
+from PyQt5.QtWidgets import QWidget, QGridLayout, QSizePolicy, QStyleOption, QStyle
 
 from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.controller.view_models import MainModel
@@ -39,6 +39,18 @@ class GridView(QWidget):
             self.set_bgcolor(root.bgcolor)
 
         # self.main_model.grid_view_listener.redrawVideos.connect(self.redraw_videos)
+
+    def paintEvent(self, paint_event: QPaintEvent):
+        """
+        Override painEvent in order to support stylesheets.
+        :param paint_event:
+        :return:
+        """
+        style_option = QStyleOption()
+        style_option.initFrom(self)
+        painter = QPainter(self)
+        style = self.style()
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)
 
     def redraw_video(self, video):
         """

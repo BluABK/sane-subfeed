@@ -1,3 +1,6 @@
+from PyQt5.QtGui import QPaintEvent, QPainter
+from PyQt5.QtWidgets import QStyleOption, QStyle
+
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.gui.views.grid_view.grid_view import GridView
 from sane_yt_subfeed.gui.views.grid_view.subfeed.subfeed_grid_view_tile import SubfeedGridViewTile
@@ -23,6 +26,18 @@ class SubfeedGridView(GridView):
         self.logger.debug("Init grid")
         self.update_grid()
         self.logger.info("Initialized SubfeedGridView")
+
+    def paintEvent(self, paint_event: QPaintEvent):
+        """
+        Override painEvent in order to support stylesheets.
+        :param paint_event:
+        :return:
+        """
+        style_option = QStyleOption()
+        style_option.initFrom(self)
+        painter = QPainter(self)
+        style = self.style()
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)
 
     def new_tile(self, counter, video):
         return SubfeedGridViewTile(self, video, counter, self.clipboard, self.status_bar)

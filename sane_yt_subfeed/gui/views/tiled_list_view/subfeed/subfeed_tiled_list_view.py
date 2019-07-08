@@ -30,11 +30,18 @@ class ExtendedQLabel(QLabel):
         if not read_config('Debug', 'disable_tooltips'):
             self.setToolTip("{}: {}".format(self.video.channel_title, self.video.title))
 
-    def paintEvent(self, event):
+    def paintEvent(self, paint_event: QPaintEvent):
         if self.p:
             painter = QPainter(self)
             painter.setRenderHint(QPainter.SmoothPixmapTransform)
             painter.drawPixmap(self.rect(), self.p)
+
+        # Support stylesheets
+        style_option = QStyleOption()
+        style_option.initFrom(self)
+        painter = QPainter(self)
+        style = self.style()
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)
 
     def mouseReleaseEvent(self, ev):
         print('clicked {:2d}: {}'.format(self.img_id, self.video))
@@ -142,3 +149,15 @@ class SubfeedTiledListView(QWidget):
         more_layout.addWidget(date)
         more_layout.addWidget(published)
         description_layout.addWidget(view_description)
+
+    def paintEvent(self, paint_event: QPaintEvent):
+        """
+        Override painEvent in order to support stylesheets.
+        :param paint_event:
+        :return:
+        """
+        style_option = QStyleOption()
+        style_option.initFrom(self)
+        painter = QPainter(self)
+        style = self.style()
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)

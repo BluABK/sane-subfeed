@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QFontDialog
+from PyQt5.QtGui import QFont, QPaintEvent, QPainter
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QFontDialog, QStyleOption, QStyle
 
 from sane_yt_subfeed.gui.views.config_view.config_items.font_picker_button import FontPickerButton
 from sane_yt_subfeed.handlers.config_handler import read_config, set_config
@@ -42,6 +42,18 @@ class InputSuper(QWidget):
 
         # Create tabs - Part 2: Set self layout and add tabs to it
         self.setLayout(self.layout)
+
+    def paintEvent(self, paint_event: QPaintEvent):
+        """
+        Override painEvent in order to support stylesheets.
+        :param paint_event:
+        :return:
+        """
+        style_option = QStyleOption()
+        style_option.initFrom(self)
+        painter = QPainter(self)
+        style = self.style()
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)
 
     def add_tab(self, tab, name):
         """

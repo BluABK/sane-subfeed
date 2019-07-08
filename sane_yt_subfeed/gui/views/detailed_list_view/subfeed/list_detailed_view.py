@@ -1,4 +1,5 @@
 # PyQt5 libs
+from PyQt5.QtGui import QPaintEvent, QPainter
 from PyQt5.QtWidgets import *
 
 # Project internal libs
@@ -33,6 +34,18 @@ class SubfeedDetailedListView(QWidget):
             self.headers = ['Channel', 'Title', 'URL', 'Published', 'Description', 'Missed?', 'Downloaded?',
                             'Discarded?']
         self.init_ui()
+
+    def paintEvent(self, paint_event: QPaintEvent):
+        """
+        Override painEvent in order to support stylesheets.
+        :param paint_event:
+        :return:
+        """
+        style_option = QStyleOption()
+        style_option.initFrom(self)
+        painter = QPainter(self)
+        style = self.style()
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)
 
     def init_ui(self):
         """
