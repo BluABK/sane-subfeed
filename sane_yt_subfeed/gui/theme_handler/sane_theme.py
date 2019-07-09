@@ -15,7 +15,7 @@ TEMPLATE_COMPILED_QRC_MODULENAME = 'resources'
 
 class SaneTheme(QObject):
 
-    def __init__(self, theme_dir_absolute_path, theme_handler=None):
+    def __init__(self, theme_dir_absolute_path, theme_handler=None, compile_qrc=False):
         """
         Creates a custom theme from relevant files and returns it as a dict
 
@@ -42,6 +42,7 @@ class SaneTheme(QObject):
 
         :param: theme_dir_absolute_path:    Full path to the theme directory (in the themes directory).
         :param: theme_handler:              Pointer to theme handler in order to send things up the chain.
+        :param: compile_qrc:                Whether to compile a QRC file into a module upon theme creation.
         :return:
         """
         super(SaneTheme).__init__()
@@ -56,6 +57,7 @@ class SaneTheme(QObject):
         self.theme_dir_absolute_path = theme_dir_absolute_path
 
         # Pesky pesky QRC shenanigans.
+        self.compile_qrc = compile_qrc
         self.qrc_filename = None
         self.compiled_qrc_filename = None
         self.compiled_qrc_modulename = None
@@ -202,7 +204,7 @@ class SaneTheme(QObject):
         # Post-process variants
         self.post_process_variants()
 
-        if self.qrc_filename:
+        if self.compile_qrc and self.qrc_filename:
             # Compile any wanted QRC file
             # (This is (re)compiled on creation due to how fragile (SEGFAULT prone) the compiled resource can be)
             self.compile_qrc_module()

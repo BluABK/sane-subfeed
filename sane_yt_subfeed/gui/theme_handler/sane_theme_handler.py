@@ -1,7 +1,8 @@
 import importlib
 import os
+import re
 
-from PyQt5.QtCore import QObject, QFile, QTextStream
+from PyQt5.QtCore import QObject
 from PyQt5.QtWidgets import QStyleFactory, QMainWindow
 
 from sane_yt_subfeed import create_logger
@@ -178,10 +179,45 @@ class SaneThemeHandler(QObject):
 
         self.logger.info("Loaded PyQt5 compiled QRC module for theme '{}': {}".format(theme.name, COMPILED_QRC_THEME))
 
-    def set_theme(self, variant_absolute_path):
+    def absolute_pathize_stylesheet(self, theme_dir_absolute_path, stylesheet_text):
+        """
+        Prepends the theme directory absolute path to a dynamic path in a stylesheet.
+        :param theme_dir_absolute_path: Absolute path to the theme's directory.
+        :param stylesheet_text:         Raw stylesheet text
+        :return:                        Modified stylesheet
+        """
+        # Get a list of all URLS
+        urls = re.findall(r'url\((.*)\);', stylesheet_text)
+
+        try:
+            for url in urls:
+                # Store a copy of the original.
+                original_url = url
+
+                # Strip possible leading colon
+                if url.startswith(':'):
+                    url = url[1:]
+
+                # Strip leading slash (os.path.join refuses to join if second argument has a leading slash)
+                if url.startswith('/'):
+                    url = url[1:]
+
+                # Prepend the theme directory's absolute path to URL.
+                url = os.path.join(theme_dir_absolute_path, url)
+
+                # Replace the original URL with our modified one.
+                stylesheet_text = re.sub(re.escape(original_url), url, stylesheet_text)
+
+            return stylesheet_text
+        except Exception as exc:
+            self.logger.exception(exc)
+            pass
+
+    def set_theme(self, variant_absolute_path, load_compiled_qrc=False):
         """
         Applies a QStyle or QStyleSheet to the QApplication
-        :param variant_absolute_path: absolute filepath
+        :param variant_absolute_path:   absolute filepath
+        :param load_compiled_qrc:       Load a compiled QRC module instead of replacing urls with abs path.
         :return:
         """
         theme = None
@@ -202,15 +238,18 @@ class SaneThemeHandler(QObject):
             # Get the variant
             variant = theme.variants[self.get_variant_index_by_variant_absolute_path(theme, variant_absolute_path)]
 
-            # Load PyQt5 compiled QRC (if any)
-            if theme.compiled_qrc_filename is not None:
+            with open(variant_absolute_path, 'r') as theme_file:
+                theme_string = theme_file.read()
+
+            if load_compiled_qrc and theme.compiled_qrc_filename:
+                # Load PyQt5 compiled QRC (if any)
                 self.load_compiled_qrc(theme)
+            else:
+                # Alternatively live convert every path in the QSS to absolute paths.
+                theme_string = self.absolute_pathize_stylesheet(theme.theme_dir_absolute_path, theme_string)
 
-            theme_file = QFile(variant_absolute_path)
-            theme_file.open(QFile.ReadOnly | QFile.Text)
-            theme_stream = QTextStream(theme_file)
-
-            self.main_window.setStyleSheet(theme_stream.readAll())
+            # Apply the stylesheet
+            self.main_window.setStyleSheet(theme_string)
 
             self.update_current_theme(variant_absolute_path)
 
