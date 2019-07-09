@@ -87,23 +87,7 @@ Combo boxes (inherits **QComboBox**)
 Line editors (inherits **QLineEdit**)
 * GenericLineEdit
 
-### 2. Define any required resources in a QRC file
-
-Format:
-
-```xml
-<RCC>
-  <qresource>
-    <file>img/menubar.png</file>
-    <file>img/toolbar.png</file>
-  </qresource>
-</RCC>
-```
-
-NB: If you specify a non-existent file or otherwise invalid entry the entire QRC compilation will fail. The compiler has
-a zero-tolerance policy on 404 and pals.
-
-### 3. Create a metadata JSON (optional, but recommended)
+### 2. Create a metadata JSON (optional, but recommended)
 
 Format:
 ```json
