@@ -727,7 +727,7 @@ class MainWindow(QMainWindow):
         theme_submenu = self.add_menu(window_menu, 'Theme')
         self.add_submenu(theme_submenu, 'Cycle theme', self.theme_handler.cycle_themes, tooltip='Cycle theme',
                          subsubmenu=True)
-        self.add_submenu(theme_submenu, 'Default', self.theme_handler.set_theme_native,
+        self.add_submenu(theme_submenu, 'Default', self.theme_handler.clear_current_theme,
                          tooltip='Set theme to system default', subsubmenu=True)
 
         for theme in self.theme_handler.themes:

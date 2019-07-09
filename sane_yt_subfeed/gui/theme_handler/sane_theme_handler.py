@@ -10,17 +10,11 @@ from sane_yt_subfeed.absolute_paths import RESOURCES_PATH
 from sane_yt_subfeed.handlers.config_handler import set_config, read_config
 
 THEME_PATH = os.path.join(RESOURCES_PATH, 'themes')
-COMPILED_QRC_LOADED = None
-QRC_RESTART_MSG = "Compiled QRC assets are only loaded on startup. " \
-                  "<br/><br/>" \
-                  "If you pick a theme with such assets, " \
-                  "you have to restart to load its assets (images and such). " \
-                  "<br/><br/>" \
-                  "This is due to overlapping issues when " \
-                  "loading a second compiled QRC script which instantly" \
-                  "<br/>" \
-                  "makes Qt throw a SEGFAULT." \
-                  "<br/><br/>"
+
+# If not None, holds the theme dict related to the currently loaded QRC.
+COMPILED_QRC_THEME = None
+# If not None, holds the currently loaded QRC module.
+COMPILED_QRC_MODULE = None
 
 
 class SaneThemeHandler(QObject):
@@ -54,12 +48,10 @@ class SaneThemeHandler(QObject):
             # Determine the theme dict based on the absolute path to its variant
             root_path, variant_path = os.path.split(read_config('Theme', 'last_theme', literal_eval=False))
 
+            # Retrieve the respective theme dict.
             theme = self.get_theme_by_root_path(root_path)
 
             if theme is not None:
-                # Load PyQt5 compiled QRC (if any)
-                self.load_compiled_theme_resources(theme)
-
                 # Set the theme
                 self.set_theme(last_theme)
             else:
@@ -85,12 +77,13 @@ class SaneThemeHandler(QObject):
           "version": "<version>",
           "author": "<author>",
           "description": "<description>",
+          "compiled_qrc": "resources.py",
           "variants":
           [
             {
               "name": "<name of variant 1>",
               "path": "<filename of variant 1>.qss"
-              "platform_whitelist": <null or list containing linux|win32|cygwin||darwin>
+              "platform_whitelist": <null or list containing linux|win32|cygwin|darwin>
             },
             {
               "name": "<name of variant 2>",
@@ -206,35 +199,50 @@ class SaneThemeHandler(QObject):
 
                 return index
 
-    def load_compiled_theme_resources(self, theme):
+    def unload_compiled_qrc(self):
+        """
+        Attempts to unload a compiled QRC module, if any exception occurs raise it to avoid the SEGFAULT of Doom™.
+        :return:
+        """
+        global COMPILED_QRC_MODULE, COMPILED_QRC_THEME
+
+        # Unload the currently loaded PyQt5 compiled QRC module and its resources.
+        self.logger.info("Unloading currently loaded PyQt5 compiled QRC module "
+                         "for theme '{}': {}".format(COMPILED_QRC_THEME['name'], COMPILED_QRC_MODULE))
+        try:
+            COMPILED_QRC_MODULE.qCleanupResources()
+        except Exception as abort_before_segfault:
+            self.logger.critical("Unable to unload currently loaded compiled QRC module, "
+                                 "Aborting in order to not cause a SEGFAULT!", exc_info=abort_before_segfault)
+
+            raise abort_before_segfault
+
+    def load_compiled_qrc(self, theme):
         """
         Loads a PyQt5 compiled QRC python script.
 
-        NB: ONLY do this once (e.g. on startup) or you will get overlapping
-        Qt resource imports leading to a lovely segmentation fault.
+        NB: PyQt can only handle a single compiled QRC module at a time,
+        if you load more than one Qt will SEGFAULT. So make sure to unload
+        the current one first.
 
-        :param theme:
+        :param theme: theme dict
         :return:
         """
-        # Make sure this thing won't accidentally be run more than once (checker)
-        global COMPILED_QRC_LOADED
-        if COMPILED_QRC_LOADED:
-            self.logger.critical("CAUTION: Attempted to import PyQt5 compiled resources, more than once! Bad idea...")
-            return
+        # If a compiled QRC is already loaded, unload it or suffer the consequences; a swift SEGFAULT.
+        global COMPILED_QRC_THEME, COMPILED_QRC_MODULE
+        if COMPILED_QRC_MODULE:
+            self.unload_compiled_qrc()
 
-        # Import PyQt5 compiled resources (if any), imports in the middle of the script, woohoo! (RIP PEP8)
-        if theme['compiled_qrc'] is not None:
-            # Partition out the file extension (for module loading).
-            module, sep, junk = theme['compiled_qrc'].partition('.py')
+        # Partition out the file extension (for module loading).
+        module, sep, junk = theme['compiled_qrc'].partition('.py')
 
-            # Import the compiled QRC "module".
-            compiled_resources = importlib.machinery.SourceFileLoader(module, os.path.join(
-                theme['root_path'], theme['compiled_qrc'])).load_module()
+        # Import the PyQt5 compiled QRC module. Imports happening in the middle of the script, RIP PEP8 =/
+        self.logger.info("Loading PyQt5 compiled QRC module for theme '{}': {}".format(theme['name'], COMPILED_QRC_THEME))
+        COMPILED_QRC_MODULE = importlib.machinery.SourceFileLoader(module, os.path.join(
+            theme['root_path'], theme['compiled_qrc'])).load_module()
 
-            self.logger.info("Imported compiled QRC for theme '{}': {}".format(theme['name'], compiled_resources))
-
-            # Make sure this thing won't accidentally be run more than once (setter)
-            COMPILED_QRC_LOADED = theme
+        # Store which theme the loaded compiled QRC resources belong to.
+        COMPILED_QRC_THEME = theme
 
     def set_theme(self, theme_abs_path):
         """
@@ -244,56 +252,48 @@ class SaneThemeHandler(QObject):
         """
         theme = None
         variant = None
+
+        # If given NoneType, reset to defaults.
+        if theme_abs_path is None:
+            self.clear_current_theme()
+            return
+
         try:
-            # Actions to take when theme_abs_path is not None
-            if theme_abs_path:
-                # Unset any previous stylesheets to avoid overlapping issues.
-                self.set_theme_native()
+            # Unset any previous stylesheets to avoid overlapping issues.
+            self.clear_current_theme()
 
-                # Figure out the root and variant paths.
-                root_path, variant_path = os.path.split(theme_abs_path)
+            # Figure out the root and variant paths.
+            root_path, variant_path = os.path.split(theme_abs_path)
 
-                # Get the actual theme dict by given theme_abs_path
-                theme = self.get_theme_by_root_path(root_path)
+            # Get the actual theme dict by given theme_abs_path
+            theme = self.get_theme_by_root_path(root_path)
 
-                # Get the variant
-                variant = theme['variants'][self.get_variant_index_by_path(theme, variant_path)]
+            # Get the variant
+            variant = theme['variants'][self.get_variant_index_by_path(theme, variant_path)]
+
+            # Load PyQt5 compiled QRC (if any)
+            if theme['compiled_qrc'] is not None:
+                self.load_compiled_qrc(theme)
 
             theme_file = QFile(theme_abs_path)
             theme_file.open(QFile.ReadOnly | QFile.Text)
             theme_stream = QTextStream(theme_file)
+
             self.main_window.setStyleSheet(theme_stream.readAll())
+
             self.update_current_theme(theme_abs_path)
-            if theme_abs_path:
-                self.logger.info("Set theme: {} (variant: {})".format(theme['name'], variant['name']))
-            else:
-                self.logger.info("Reset theme to defaults.")
+
+            self.logger.info("Set theme: {} (variant: {})".format(theme['name'], variant['name']))
         except Exception as exc:
             self.logger.error("Failed setting theme: {}".format(theme), exc_info=exc)
 
-        # Check that there exists a popup dialog action and that theme is not None
-        if self.popup_dialog is not None and theme is not None:
-
-            # Check if the new theme has a compiled QRC it wants loaded.
-            if theme['compiled_qrc']:
-
-                # Check if a compiled QRC has been loaded (to avoid NoneType in the following check).
-                if COMPILED_QRC_LOADED is not None:
-
-                    # Check if the QRC belongs to the current theme, if so no need to warn user.
-                    if theme['name'] == COMPILED_QRC_LOADED['name']:
-                        return
-
-            # If compiled QRC either isn't loaded or is loaded but doesn't belong to the new theme.
-            self.popup_dialog(title="Restart required for theme assets!", message=QRC_RESTART_MSG,
-                              exclusive=True)
-
-    def set_theme_native(self):
+    def clear_current_theme(self):
         """
         Reset the theme to default/native.
         :return:
         """
-        self.set_theme(None)
+        self.main_window.setStyleSheet(None)
+        self.logger.info("Cleared theming.")
 
     def cycle_themes(self):
         """
@@ -348,7 +348,7 @@ class SaneThemeHandler(QObject):
             self.set_custom_background_image(read_config('Theme', 'custom_image', literal_eval=False))
         if read_config('Theme', 'custom_toolbar_image', literal_eval=False):
             self.set_custom_toolbar_image(read_config('Theme', 'custom_toolbar_image',
-                                                                    literal_eval=False))
+                                                      literal_eval=False))
         if read_config('Theme', 'custom_central_widget_image', literal_eval=False):
             self.set_custom_central_widget_image(
                 read_config('Theme', 'custom_central_widget_image', literal_eval=False))
@@ -381,6 +381,6 @@ class SaneThemeHandler(QObject):
         try:
             self.main_window.setStyle(QStyleFactory.create(style))
             self.update_current_style(style)
-            self.logger.info("Set style (QStylePlugin): {}".format(style))
+            self.logger.info("Set style: {}".format(style))
         except Exception as exc:
             self.logger.error("Failed setting style: {}".format(style), exc_info=exc)
