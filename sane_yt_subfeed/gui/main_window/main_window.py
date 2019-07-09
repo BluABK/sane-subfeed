@@ -756,8 +756,6 @@ class MainWindow(QMainWindow):
                                                                                     variant['name']),
                                      subsubmenu=True, variant_absolute_path=variant['file_absolute_path'])
             else:
-                # self.logger.debug("Adding theme with no variants: {} {}".format(theme.variants[0]['name'],
-                #                                                                 theme.variants[0]['filename']))
                 self.add_submenu(theme_submenu, theme.name, self.theme_handler.set_theme,
                                  tooltip='Set theme to {}'.format(theme.name),
                                  subsubmenu=True, variant_absolute_path=theme.variants[0]['file_absolute_path'])
