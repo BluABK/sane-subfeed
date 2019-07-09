@@ -1,7 +1,12 @@
 import json
 import os
+import sys
+import subprocess
+from shutil import which
 
 from PyQt5.QtCore import QObject
+
+from sane_yt_subfeed import create_logger
 
 KEYS_WANTED = ['name', 'version', 'author', 'description', 'compiled_qrc', 'variants']
 
@@ -40,6 +45,7 @@ class SaneTheme(QObject):
         """
         super(SaneTheme).__init__()
 
+        self.logger = create_logger(__name__)
         self.theme_handler = theme_handler
 
         self.name = None
@@ -47,6 +53,8 @@ class SaneTheme(QObject):
         self.author = None
         self.description = None
         self.theme_dir_absolute_path = theme_dir_absolute_path
+
+        self.qrc_filename = None
         self.compiled_qrc_filename = None
         self.compiled_qrc_modulename = None
 
@@ -74,6 +82,48 @@ class SaneTheme(QObject):
             # Only care about files, directories are irrelevant from this scope.
             if os.path.isfile(os.path.join(self.theme_dir_absolute_path, file)):
                 self.files.append(file)
+
+                if file.endswith('.qrc'):
+                    self.qrc_filename = file
+
+    def compile_qrc_module(self):
+        """
+        Compiles a QRC file into a PyQt5 compatible module.
+        :return: True if successful, False if not.
+        """
+        # Determine path to pyrcc5 binary
+        if sys.platform.startswith('linux'):
+            pyrcc5_bin_filename = 'pyrcc5'
+        else:
+            pyrcc5_bin_filename = 'pyrcc5.exe'
+
+        pyrcc5_bin_path = which(pyrcc5_bin_filename)
+
+        if pyrcc5_bin_path is None:
+            self.logger.error("Unable to locate PyQt5 resource compiler (pyrcc5) binary! QRC won't be compiled.")
+            return False
+
+        # pyrcc5_bin_path = "/usr/bin/pyrcc5"
+
+        args = [pyrcc5_bin_path, self.qrc_filename, '-o', 'resources.py']
+        try:
+            self.logger.info("Compiling PyQt5 QRC module for theme: {}, args: {}".format(self.name, args))
+            result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                    cwd=self.theme_dir_absolute_path)
+
+            if result.returncode == 0:
+                return True
+            else:
+                if result.stderr:
+                    self.logger.error(result.__dict__)
+                    self.logger.error(result.stderr.decode())
+                else:
+                    self.logger.error('Command returned with non-zero exit status {}'.format(result.returncode))
+        except Exception as exc:
+            self.logger.exception(exc)
+            pass
+
+        return False
 
     def locate_compiled_qrc_module(self):
         for file in self.files:
@@ -149,6 +199,11 @@ class SaneTheme(QObject):
         # Post-process variants
         self.post_process_variants()
 
-        # Compiled QRC handling: Partition out the file extension (for module loading), if it exists.
-        if self.compiled_qrc_filename:
-            self.compiled_qrc_modulename, sep, junk = self.compiled_qrc_filename.partition('.py')
+        if self.qrc_filename:
+            # Compile any wanted QRC file
+            # (This is recompiled on creation due to how fragile the compiled resource can be)
+            compiled = self.compile_qrc_module()
+
+            if compiled:
+                # Compiled QRC handling: Partition out the file extension (for module loading), if it exists.
+                self.compiled_qrc_modulename, sep, junk = self.compiled_qrc_filename.partition('.py')

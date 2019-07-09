@@ -76,7 +76,6 @@ class SaneThemeHandler(QObject):
             theme_dir_absolute_path = os.path.join(THEME_PATH, theme_dir)
             if os.path.isdir(theme_dir_absolute_path):
                 new_theme = SaneTheme(theme_dir_absolute_path, theme_handler=self)
-                self.logger.debug9(new_theme.__dict__)
                 self.themes.append(new_theme)
                 for variant in new_theme.variants:
                     self.themes_by_variant_absolute_path[variant['file_absolute_path']] = new_theme

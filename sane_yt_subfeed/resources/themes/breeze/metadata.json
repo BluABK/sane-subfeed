@@ -4,7 +4,6 @@
   "author": "Colin Duquesnoy",
   "editor": "Alex Huszagh",
   "description": "This is originally a fork of QDarkStyleSheet, and is based on Breeze. BreezeDark color scheme, but is in no way affiliated with KDE.",
-  "compiled_qrc": "resources.py",
   "variants":
   [
     {
