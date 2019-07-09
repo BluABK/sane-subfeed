@@ -123,12 +123,12 @@ Format:
   [
     {
       "name": "<variant 1>",
-      "path": "<variant 1 filename>.qss",
+      "filename": "<variant 1 filename>.qss",
       "platform_whitelist": null
     },
     {
       "name": "<variant 2>",
-      "path": "<variant 2 filename>.qss",
+      "filename": "<variant 2 filename>.qss",
       "platform_whitelist": ["win32", "darwin"]
     }
   ]

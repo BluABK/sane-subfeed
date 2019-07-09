@@ -1,0 +1,14 @@
+{
+  "name": "Sample theme customisation",
+  "version": "2019-07-08",
+  "author": "BluABK",
+  "description": "Sample theme file, not very uable as a real theme",
+  "variants":
+  [
+    {
+      "name": "Default",
+      "filename": "default.qss",
+      "platform_whitelist": null
+    }
+  ]
+}

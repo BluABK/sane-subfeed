@@ -731,35 +731,36 @@ class MainWindow(QMainWindow):
                          tooltip='Set theme to system default', subsubmenu=True)
 
         for theme in self.theme_handler.themes:
-            self.logger.info("Adding theme: {} {}".format(theme['name'],
-                                                          theme['variants'][0]['path']))
-            if len(theme['variants']) > 1:
-                theme_variant_submenu = self.add_menu(theme_submenu, theme['name'])
-                for theme_variant in theme['variants']:
+            self.logger.info("Adding theme: {} (variant: {})".format(theme.name,
+                                                                     theme.variants[0]['name']))
+            if len(theme.variants) > 1:
+                theme_variant_submenu = self.add_menu(theme_submenu, theme.name)
+                for variant in theme.variants:
                     # Abide by specified whitelist policy if one exists.
-                    if theme_variant['platform_whitelist']:
-                        if sys.platform not in theme_variant['platform_whitelist']:
+                    if variant['platform_whitelist']:
+                        if sys.platform not in variant['platform_whitelist']:
                             self.logger.info(
                                 "\tSKIPPING (whitelist: {})'{}'"
-                                " variant submenu for theme: {} {}".format(theme_variant['platform_whitelist'],
-                                                                           theme_variant['name'],
-                                                                           theme['name'],
-                                                                           theme_variant['path']))
+                                " variant submenu for theme: {} {}".format(variant['platform_whitelist'],
+                                                                           variant['name'],
+                                                                           theme.name,
+                                                                           variant['filename']))
                             continue
 
-                    self.logger.info("\tAdding '{}' variant submenu for theme: {} {}".format(theme_variant['name'],
-                                                                                             theme['name'],
-                                                                                             theme_variant['path']))
-                    self.add_submenu(theme_variant_submenu, theme_variant['name'], self.theme_handler.set_theme,
-                                     tooltip='Set theme to {} (variant: {})'.format(theme['name'],
-                                                                                    theme_variant['name']),
-                                     subsubmenu=True, theme_abs_path=theme_variant['path'])
+                    self.logger.info("\tAdding '{}' variant submenu for theme: {} (abs path: {})".format(
+                        variant['name'],
+                        theme.name,
+                        variant['filename']))
+                    self.add_submenu(theme_variant_submenu, variant['name'], self.theme_handler.set_theme,
+                                     tooltip='Set theme to {} (variant: {})'.format(theme.name,
+                                                                                    variant['name']),
+                                     subsubmenu=True, variant_absolute_path=variant['file_absolute_path'])
             else:
-                self.logger.debug("Adding theme with no variants: {} {}".format(theme['variants'][0]['name'],
-                                                                                theme['variants'][0]['path']))
-                self.add_submenu(theme_submenu, theme['name'], self.theme_handler.set_theme,
-                                 tooltip='Set theme to {}'.format(theme['name']),
-                                 subsubmenu=True, theme_abs_path=theme['variants'][0]['path'])
+                # self.logger.debug("Adding theme with no variants: {} {}".format(theme.variants[0]['name'],
+                #                                                                 theme.variants[0]['filename']))
+                self.add_submenu(theme_submenu, theme.name, self.theme_handler.set_theme,
+                                 tooltip='Set theme to {}'.format(theme.name),
+                                 subsubmenu=True, variant_absolute_path=theme.variants[0]['file_absolute_path'])
 
         # --- Style submenu
         style_submenu = self.add_menu(window_menu, 'Style')

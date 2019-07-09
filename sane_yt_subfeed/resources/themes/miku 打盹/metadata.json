@@ -1,0 +1,14 @@
+{
+  "name": "miku 打盹",
+  "version": "2019-07-08",
+  "author": "BluABK",
+  "description": "Background image sourced from https://www.pixiv.net/member_illust.php?mode=medium&illust_id=74451898",
+  "variants":
+  [
+    {
+      "name": "Default",
+      "filename": "default.qss",
+      "platform_whitelist": null
+    }
+  ]
+}

@@ -8,22 +8,22 @@
   [
     {
       "name": "Dark",
-      "path": "dark.qss",
+      "filename": "dark.qss",
       "platform_whitelist": ["linux", "cygwin", "darwin"]
     },
     {
       "name": "Light",
-      "path": "light.qss",
+      "filename": "light.qss",
       "platform_whitelist": ["linux", "cygwin", "darwin"]
     },
     {
       "name": "Dark",
-      "path": "dark-windows-mod.qss",
+      "filename": "dark-windows-mod.qss",
       "platform_whitelist": ["win32"]
     },
     {
       "name": "Light",
-      "path": "light-windows-mod.qss",
+      "filename": "light-windows-mod.qss",
       "platform_whitelist": ["win32"]
     }
   ]

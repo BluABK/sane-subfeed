@@ -3,12 +3,11 @@
   "version": "2019-07-08",
   "author": "BluABK",
   "description": "Incomplete / WIP",
-  "compiled_qrc": "resources.py",
   "variants":
   [
     {
       "name": "Default",
-      "path": "default.qss",
+      "filename": "default.qss",
       "platform_whitelist": null
     }
   ]

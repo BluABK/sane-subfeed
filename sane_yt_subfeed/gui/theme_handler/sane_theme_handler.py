@@ -1,12 +1,12 @@
 import importlib
 import os
-import json
 
 from PyQt5.QtCore import QObject, QFile, QTextStream
 from PyQt5.QtWidgets import QStyleFactory, QMainWindow
 
 from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.absolute_paths import RESOURCES_PATH
+from sane_yt_subfeed.gui.theme_handler.sane_theme import SaneTheme
 from sane_yt_subfeed.handlers.config_handler import set_config, read_config
 
 THEME_PATH = os.path.join(RESOURCES_PATH, 'themes')
@@ -28,34 +28,31 @@ class SaneThemeHandler(QObject):
         self.popup_dialog = popup_dialog
 
         self.themes = None
+        # Theme lookup where key is the absolute path to variant filename and value is the corresponding SaneTheme.
+        self.themes_by_variant_absolute_path = {}
         self.styles = None
 
         self.current_theme = None
         self.current_theme_idx = 0
         self.current_style = None
 
-        # Generate available themes
+        # Generate available themes and styles
         self.generate_themes()
-
-        # Generate available qstyles
         self.generate_styles()
 
         # Set the last used theme.
-        last_theme = read_config('Theme', 'last_theme', literal_eval=False)
-        if last_theme:
-            self.logger.info("Using 'last used' theme: {}".format(last_theme))
-
-            # Determine the theme dict based on the absolute path to its variant
-            root_path, variant_path = os.path.split(read_config('Theme', 'last_theme', literal_eval=False))
+        variant_absolute_path = read_config('Theme', 'last_theme', literal_eval=False)
+        if variant_absolute_path:
+            self.logger.info("Using 'last used' theme: {}".format(variant_absolute_path))
 
             # Retrieve the respective theme dict.
-            theme = self.get_theme_by_root_path(root_path)
+            theme = self.get_theme_by_variant_absolute_path(variant_absolute_path)
 
             if theme is not None:
                 # Set the theme
-                self.set_theme(last_theme)
+                self.set_theme(variant_absolute_path)
             else:
-                self.logger.error("Unable to restore last theme (INVALID: NoneType): {}".format(last_theme))
+                self.logger.error("Unable to restore last theme (INVALID: NoneType): {}".format(variant_absolute_path))
 
         # Set the last used style.
         last_style = read_config('Theme', 'last_style', literal_eval=False)
@@ -66,101 +63,22 @@ class SaneThemeHandler(QObject):
         # Apply custom user theme mod overrides
         self.apply_user_overrides()
 
-    @staticmethod
-    def create_theme(path):
-        """
-        Creates a custom theme from relevant files and returns it as a dict
-
-        metadata.json specification:
-        {
-          "name": "<name>",
-          "version": "<version>",
-          "author": "<author>",
-          "description": "<description>",
-          "compiled_qrc": "resources.py",
-          "variants":
-          [
-            {
-              "name": "<name of variant 1>",
-              "path": "<filename of variant 1>.qss"
-              "platform_whitelist": <null or list containing linux|win32|cygwin|darwin>
-            },
-            {
-              "name": "<name of variant 2>",
-              "path": "<filename of variant 2>.qss"
-              "platform_whitelist": <null or list containing linux|win32|cygwin|darwin>
-            }, ....
-          ]
-        }
-
-        :param: path:   Full path to the theme directory (in the themes directory).
-        :return:
-        """
-        compiled_qrc = None
-
-        # Iterate through the files in the theme directory.
-        files = []
-        for file in os.listdir(path):
-            # Only care about files, directories are irrelevant from this scope.
-            if os.path.isfile(os.path.join(path, file)):
-                # Store info about any required compiled qrc file (basic guess by name, best if user specifies in JSON.
-                if file.endswith('.py') and 'resources' in file:
-                    compiled_qrc = file
-
-                files.append(file)
-
-        # Parse metadata json (if one exists), if not make best guesses based on filenames.
-        if 'metadata.json' in files:
-            with open(os.path.join(path, 'metadata.json'), 'r') as infile:
-                # Read metadata.json directly into a theme dict
-                theme = json.load(infile)
-
-                # Convert paths to absolute paths:
-                for variant in theme['variants']:
-                    variant['path'] = os.path.join(path, variant['path'])
-
-                # Add the root path to the theme directory (required for compiled QRC)
-                theme['root_path'] = path
-
-                # Add entry about whether or not the theme requires compiled QRC (if it does not already exist)
-                if 'compiled_qrc' not in theme:
-                    theme['compiled_qrc'] = compiled_qrc
-
-        else:
-            variants = []
-            for file in files:
-                if file.endswith('.qss'):
-                    variant_path = file
-                    variant_name, sep, extension = file.partition('.qss')
-
-                    # Add variant to list of variants.
-                    variants.append({'name': variant_name, 'path': os.path.join(path, variant_path),
-                                     'platform_whitelist': None})
-
-            # Create the theme dict based on best guesses.
-            theme = {'name': os.path.split(path)[-1],
-                     'version': None,
-                     'author': None,
-                     'description': None,
-                     'variants': variants,
-                     'root_path': path,
-                     'compiled_qrc': compiled_qrc}
-
-        return theme
-
     def generate_themes(self):
         """
         Generates a list of theme dicts and returns it.
         :return:
         """
-        themes = []
+        # Clear any current theme entries to avoid dupes.
+        self.themes = []
+        self.themes_by_variant_absolute_path = {}
 
         for theme_dir in os.listdir(THEME_PATH):
-            full_theme_dir_path = os.path.join(THEME_PATH, theme_dir)
-            if os.path.isdir(full_theme_dir_path):
-                themes.append(self.create_theme(full_theme_dir_path))
-
-        self.themes = themes
+            theme_dir_absolute_path = os.path.join(THEME_PATH, theme_dir)
+            if os.path.isdir(theme_dir_absolute_path):
+                new_theme = SaneTheme(theme_dir_absolute_path, theme_handler=self)
+                self.themes.append(new_theme)
+                for variant in new_theme.variants:
+                    self.themes_by_variant_absolute_path[variant['file_absolute_path']] = new_theme
 
     def update_current_theme(self, theme_abs_path):
         """
@@ -171,33 +89,51 @@ class SaneThemeHandler(QObject):
         self.current_theme = theme_abs_path
         set_config('Theme', 'last_theme', theme_abs_path)
 
-    def get_theme_by_root_path(self, path):
+    def get_theme_by_variant_absolute_path(self, variant_absolute_path):
         """
-        Takes an absolute path to a theme (and its variant) QSS file
+        Takes an absolute path to a theme variant QSS file
         and returns the respective assembled theme dict.
 
-        :param path:    absolute path to a .qss file
-        :return:        theme dict
+        :param variant_absolute_path:    Absolute path to a .qss theme variant file.
+        :return:                         SaneTheme or NoneType.
         """
-        for theme in self.themes:
-            if theme['root_path'] == path:
-
-                return theme
+        if variant_absolute_path in self.themes_by_variant_absolute_path:
+            return self.themes_by_variant_absolute_path[variant_absolute_path]
+        else:
+            return None
 
     @staticmethod
-    def get_variant_index_by_path(theme, variant_path):
+    def get_variant_index_by_variant_absolute_path(theme, variant_absolute_path):
         """
-        Takes a theme dict and a variant path (usually 'filename.qss')
+        Takes a SaneTheme and an absolute path to a theme variant filename
         and returns the index of the variant in theme['variants].
 
-        :param theme:           dict
-        :param variant_path:    string
-        :return:                integer
+        :param theme:                   SaneTheme
+        :param variant_absolute_path:   str
+        :return:                        int index of variant or None
         """
-        for index in range(len(theme['variants'])):
-            if theme['variants'][index]['path'] == os.path.join(theme['root_path'], variant_path):
-
+        for index in range(len(theme.variants)):
+            if theme.variants[index]['file_absolute_path'] == variant_absolute_path:
                 return index
+
+        return None
+
+    @staticmethod
+    def get_variant_index_by_filename(theme, variant_filename):
+        """
+        Takes a SaneTheme and a variant path (usually 'filename.qss')
+        and returns the index of the variant in theme['variants].
+
+        :param theme:               SaneTheme
+        :param variant_filename:    str
+        :return:                    int index of variant or None
+        """
+        for index in range(len(theme.variants)):
+            if theme.variants[index]['file_absolute_path'] == os.path.join(theme.theme_dir_absolute_path,
+                                                                           variant_filename):
+                return index
+            else:
+                return None
 
     def unload_compiled_qrc(self):
         """
@@ -208,7 +144,7 @@ class SaneThemeHandler(QObject):
 
         # Unload the currently loaded PyQt5 compiled QRC module and its resources.
         self.logger.info("Unloading currently loaded PyQt5 compiled QRC module "
-                         "for theme '{}': {}".format(COMPILED_QRC_THEME['name'], COMPILED_QRC_MODULE))
+                         "for theme '{}': {}".format(COMPILED_QRC_THEME.name, COMPILED_QRC_MODULE))
         try:
             COMPILED_QRC_MODULE.qCleanupResources()
         except Exception as abort_before_segfault:
@@ -233,28 +169,26 @@ class SaneThemeHandler(QObject):
         if COMPILED_QRC_MODULE:
             self.unload_compiled_qrc()
 
-        # Partition out the file extension (for module loading).
-        module, sep, junk = theme['compiled_qrc'].partition('.py')
-
         # Import the PyQt5 compiled QRC module. Imports happening in the middle of the script, RIP PEP8 =/
-        self.logger.info("Loading PyQt5 compiled QRC module for theme '{}': {}".format(theme['name'], COMPILED_QRC_THEME))
-        COMPILED_QRC_MODULE = importlib.machinery.SourceFileLoader(module, os.path.join(
-            theme['root_path'], theme['compiled_qrc'])).load_module()
+        COMPILED_QRC_MODULE = importlib.machinery.SourceFileLoader(theme.compiled_qrc_modulename, os.path.join(
+            theme.theme_dir_absolute_path, theme.compiled_qrc_filename)).load_module()
 
         # Store which theme the loaded compiled QRC resources belong to.
         COMPILED_QRC_THEME = theme
 
-    def set_theme(self, theme_abs_path):
+        self.logger.info("Loaded PyQt5 compiled QRC module for theme '{}': {}".format(theme.name, COMPILED_QRC_THEME))
+
+    def set_theme(self, variant_absolute_path):
         """
         Applies a QStyle or QStyleSheet to the QApplication
-        :param theme_abs_path: absolute filepath
+        :param variant_absolute_path: absolute filepath
         :return:
         """
         theme = None
         variant = None
 
         # If given NoneType, reset to defaults.
-        if theme_abs_path is None:
+        if variant_absolute_path is None:
             self.clear_current_theme()
             return
 
@@ -262,28 +196,25 @@ class SaneThemeHandler(QObject):
             # Unset any previous stylesheets to avoid overlapping issues.
             self.clear_current_theme()
 
-            # Figure out the root and variant paths.
-            root_path, variant_path = os.path.split(theme_abs_path)
-
-            # Get the actual theme dict by given theme_abs_path
-            theme = self.get_theme_by_root_path(root_path)
+            # Get the actual SaneTheme by given variant_absolute_path
+            theme = self.get_theme_by_variant_absolute_path(variant_absolute_path)
 
             # Get the variant
-            variant = theme['variants'][self.get_variant_index_by_path(theme, variant_path)]
+            variant = theme.variants[self.get_variant_index_by_variant_absolute_path(theme, variant_absolute_path)]
 
             # Load PyQt5 compiled QRC (if any)
-            if theme['compiled_qrc'] is not None:
+            if theme.compiled_qrc_filename is not None:
                 self.load_compiled_qrc(theme)
 
-            theme_file = QFile(theme_abs_path)
+            theme_file = QFile(variant_absolute_path)
             theme_file.open(QFile.ReadOnly | QFile.Text)
             theme_stream = QTextStream(theme_file)
 
             self.main_window.setStyleSheet(theme_stream.readAll())
 
-            self.update_current_theme(theme_abs_path)
+            self.update_current_theme(variant_absolute_path)
 
-            self.logger.info("Set theme: {} (variant: {})".format(theme['name'], variant['name']))
+            self.logger.info("Set theme: {} (variant: {})".format(theme.name, variant['name']))
         except Exception as exc:
             self.logger.error("Failed setting theme: {}".format(theme), exc_info=exc)
 
@@ -293,7 +224,7 @@ class SaneThemeHandler(QObject):
         :return:
         """
         self.main_window.setStyleSheet(None)
-        self.logger.info("Cleared theming.")
+        self.logger.debug("Cleared theming.")
 
     def cycle_themes(self):
         """
