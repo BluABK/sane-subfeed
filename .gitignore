@@ -29,7 +29,7 @@ hotkeys.ini
 __pycache__
 *.pyc
 
-# Blacklist images
+# Blacklist thumbnail images
 sane_yt_subfeed/resources/thumbnails/*.jpg
 sane_yt_subfeed/resources/thumbnails/*.png
 
@@ -40,6 +40,10 @@ sane_yt_subfeed/resources/thumbnails/*.png
 
 # Whitelist docs and related assets
 !docs/readme_assets/app_preview.png
+
+# Themes
+## Blacklist python files (mostly a catch-all for rogue compiled QRC modules)
+sane_yt_subfeed/resources/themes/**/*.py
 
 # logs
 logs/
