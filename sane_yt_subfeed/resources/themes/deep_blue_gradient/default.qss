@@ -1,6 +1,5 @@
 MainWindow, GridView, DownloadView, ConfigViewWidget, HotkeysViewWidget, QDialog, QPlainTextEdit {
     background-image: url(:/img/gradient01_1080p.png);
-    background-size:cover
 }
 
 Toolbar, QMenuBar, VideoTile {
