@@ -1,8 +1,8 @@
 {
-  "name": "Deep Blue Gradient [WIP]",
+  "name": "Sample theme customisation",
   "version": "2019-07-08",
   "author": "BluABK",
-  "description": "Incomplete / WIP",
+  "description": "Sample theme file, not very uable as a real theme",
   "compiled_qrc": "resources.py",
   "variants":
   [

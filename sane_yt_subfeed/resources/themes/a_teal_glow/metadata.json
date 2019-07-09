@@ -8,12 +8,12 @@
   [
     {
       "name": "Dark",
-      "path": "dark.qss",
+      "filename": "dark.qss",
       "platform_whitelist": null
     },
     {
       "name": "Semi-Dark",
-      "path": "semi-dark.qss",
+      "filename": "semi-dark.qss",
       "platform_whitelist": null
     }
   ]
