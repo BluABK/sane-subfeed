@@ -9,6 +9,8 @@ from PyQt5.QtCore import QObject
 from sane_yt_subfeed import create_logger
 
 KEYS_WANTED = ['name', 'version', 'author', 'description', 'compiled_qrc', 'variants']
+TEMPLATE_COMPILED_QRC_FILENAME = 'resources.py'
+TEMPLATE_COMPILED_QRC_MODULENAME = 'resources'
 
 
 class SaneTheme(QObject):
@@ -23,7 +25,6 @@ class SaneTheme(QObject):
           "version": "<version>",
           "author": "<author>",
           "description": "<description>",
-          "compiled_qrc": "resources.py",
           "variants":
           [
             {
@@ -54,6 +55,7 @@ class SaneTheme(QObject):
         self.description = None
         self.theme_dir_absolute_path = theme_dir_absolute_path
 
+        # Pesky pesky QRC shenanigans.
         self.qrc_filename = None
         self.compiled_qrc_filename = None
         self.compiled_qrc_modulename = None
@@ -74,6 +76,13 @@ class SaneTheme(QObject):
         self.create()
 
     def locate_files(self):
+        """
+        Iterates through its theme directory and adds all existing files to a list.
+
+        Also sets the QRC filename variable (which, if set to not None,
+        triggers QRC compilation routines).
+        :return:
+        """
         # Empty the current list of files to avoid dupes.
         self.files = []
 
@@ -88,7 +97,7 @@ class SaneTheme(QObject):
 
     def compile_qrc_module(self):
         """
-        Compiles a QRC file into a PyQt5 compatible module.
+        Compiles the theme's QRC file into a PyQt5 compatible module.
         :return: True if successful, False if not.
         """
         # Determine path to pyrcc5 binary
@@ -103,15 +112,18 @@ class SaneTheme(QObject):
             self.logger.error("Unable to locate PyQt5 resource compiler (pyrcc5) binary! QRC won't be compiled.")
             return False
 
-        # pyrcc5_bin_path = "/usr/bin/pyrcc5"
+        args = [pyrcc5_bin_path, self.qrc_filename, '-o', TEMPLATE_COMPILED_QRC_FILENAME]
 
-        args = [pyrcc5_bin_path, self.qrc_filename, '-o', 'resources.py']
         try:
             self.logger.info("Compiling PyQt5 QRC module for theme: {}, args: {}".format(self.name, args))
             result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                     cwd=self.theme_dir_absolute_path)
 
             if result.returncode == 0:
+                # Set QRC variables to their respective values and return True.
+                self.compiled_qrc_filename = TEMPLATE_COMPILED_QRC_FILENAME
+                self.compiled_qrc_modulename = TEMPLATE_COMPILED_QRC_MODULENAME
+
                 return True
             else:
                 if result.stderr:
@@ -125,20 +137,12 @@ class SaneTheme(QObject):
 
         return False
 
-    def locate_compiled_qrc_module(self):
-        for file in self.files:
-            # Store info about any required compiled qrc file (basic guess by name, best if user specifies in JSON.
-            if file.endswith('.py') and 'resources' in file:
-                self.compiled_qrc_filename = file
-            else:
-                self.compiled_qrc_filename = None
-
     def post_process_variants(self):
         """
         Applies any necessary post-processing to the list of variants.
         :return:
         """
-        # Convert variant filename paths to absolute paths:
+        # Add a key with variant filename paths converted to absolute paths:
         for variant in self.variants:
             variant['file_absolute_path'] = os.path.join(self.theme_dir_absolute_path, variant['filename'])
 
@@ -159,11 +163,6 @@ class SaneTheme(QObject):
             self.description = metadata['description']
             self.variants = metadata['variants']
 
-            if 'compiled_qrc' not in metadata:
-                self.locate_compiled_qrc_module()
-            else:
-                self.compiled_qrc_filename = metadata['compiled_qrc']
-
             # Remove expected keys from metadata and store any extraneous data.
             for k in KEYS_WANTED:
                 if k in metadata:
@@ -177,19 +176,23 @@ class SaneTheme(QObject):
         """
         for file in self.files:
             if file.endswith('.qss'):
-                variant_path = file
                 variant_name, sep, extension = file.partition('.qss')
 
                 # Add variant to list of variants.
-                self.variants.append({'name': variant_name, 'filename': os.path.join(self.theme_dir_absolute_path, variant_path),
+                self.variants.append({'name': variant_name,
+                                      'filename': os.path.join(self.theme_dir_absolute_path, file),
                                       'platform_whitelist': None})
 
         # Assign theme values based on best guess.
         self.name = os.path.split(self.theme_dir_absolute_path)[-1]
 
-        self.locate_compiled_qrc_module()
-
     def create(self):
+        """
+        Creates a theme based on JSON or if none present makes a best guess effort.
+
+        Also issues a QRC compilation if warranted.
+        :return:
+        """
         # Parse metadata json (if one exists), if not make best guesses based on filenames.
         if 'metadata.json' in self.files:
             self.create_from_json()
@@ -201,9 +204,5 @@ class SaneTheme(QObject):
 
         if self.qrc_filename:
             # Compile any wanted QRC file
-            # (This is recompiled on creation due to how fragile the compiled resource can be)
-            compiled = self.compile_qrc_module()
-
-            if compiled:
-                # Compiled QRC handling: Partition out the file extension (for module loading), if it exists.
-                self.compiled_qrc_modulename, sep, junk = self.compiled_qrc_filename.partition('.py')
+            # (This is (re)compiled on creation due to how fragile (SEGFAULT prone) the compiled resource can be)
+            self.compile_qrc_module()
