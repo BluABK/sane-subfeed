@@ -1,4 +1,4 @@
-from PySide2.QtCore.Qt import Qt
+from PySide2.QtCore import Qt
 from PySide2.QtGui import QMouseEvent, QPaintEvent, QPainter
 from PySide2.QtWidgets import QMenu, QApplication, QStyleOption, QStyle
 

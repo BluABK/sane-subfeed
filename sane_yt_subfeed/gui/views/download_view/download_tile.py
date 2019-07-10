@@ -2,7 +2,7 @@ from collections import Counter
 
 import copy
 
-from PySide2.QtCore import SLOT
+from PySide2.QtCore import Slot
 from PySide2.QtGui import QPaintEvent, QPainter
 from PySide2.QtWidgets import QGridLayout, QWidget, QMenu, QStyleOption, QStyle
 from datetime import datetime
@@ -231,7 +231,7 @@ class DownloadTile(QWidget):
         return human_readable_error
 
     # noinspection PyCallingNonCallable
-    @SLOT(Exception)
+    @Slot(Exception)
     def failed_download(self, e):
         """
         How to handle a failed download.

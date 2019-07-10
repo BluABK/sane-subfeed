@@ -1,6 +1,7 @@
 import sys
 
 from PySide2.QtWidgets import QApplication
+from PySide2.QtCore import Qt
 
 from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.controller.view_models import MainModel
@@ -25,12 +26,12 @@ class Controller:
         start_with_stored_videos = read_config('Debug', 'start_with_stored_videos')
 
         main_model = MainModel([], vid_limit)
-        if start_with_stored_videos:
-            main_model.update_subfeed_videos_from_db()
-        else:
-            main_model.update_subfeed_videos_from_remote()
-
-        main_model.update_playback_videos_from_db()
+        # if start_with_stored_videos:
+        #     main_model.update_subfeed_videos_from_db()
+        # else:
+        #     main_model.update_subfeed_videos_from_remote()
+        #
+        # main_model.update_playback_videos_from_db()
 
         self.logger.info(
             "Created MainModel: len(subscription_feed) = {}, vid_limit = {}".format(len(main_model.subfeed_videos),

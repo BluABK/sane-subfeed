@@ -1,5 +1,5 @@
 from PySide2.QtCore import QSize, QPoint
-from PySide2.QtCore.Qt import Qt
+from PySide2.QtCore import Qt
 from PySide2.QtGui import QPixmap
 
 from sane_yt_subfeed.absolute_paths import OVERLAY_NO_FILE_PATH, OVERLAY_WATCHED_PATH, OVERLAY_DISCARDED_PATH

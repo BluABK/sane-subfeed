@@ -5,7 +5,7 @@ import os
 import datetime
 import subprocess
 import webbrowser
-from PySide2.QtCore.Qt import Qt
+from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette, QPixmap, QPaintEvent, QPainter
 from PySide2.QtWidgets import QWidget, QGridLayout, QLabel, QStyleOption, QStyle
 from dateutil.relativedelta import relativedelta

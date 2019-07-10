@@ -2,7 +2,7 @@ import time
 
 import datetime
 import threading
-from PySide2.QtCore import QObject, SIGNAL
+from PySide2.QtCore import QObject, Signal
 from sqlalchemy import false
 
 from sane_yt_subfeed import create_logger
@@ -16,9 +16,9 @@ from sane_yt_subfeed.youtube.youtube_dl_handler import YoutubeDownload
 
 
 class DownloadProgressSignals(QObject):
-    updateProgress = SIGNAL(dict)
-    finishedDownload = SIGNAL()
-    failedDownload = SIGNAL(Exception)
+    updateProgress = Signal(dict)
+    finishedDownload = Signal()
+    failedDownload = Signal(Exception)
 
     def __init__(self, video, threading_event):
         super(DownloadProgressSignals, self).__init__()
@@ -29,12 +29,12 @@ class DownloadProgressSignals(QObject):
 class DownloadViewListener(QObject):
     static_self = None
 
-    newYTDLDownload = SIGNAL(DownloadProgressSignals)
-    loadDBDownloadTiles = SIGNAL()
-    dbDownloadTiles = SIGNAL(list)
-    newDownloadTile = SIGNAL(DDBDownloadTile)
-    updateDownloadTileEvent = SIGNAL(DDBDownloadTile)
-    updateDownloadTile = SIGNAL(DDBDownloadTile)
+    newYTDLDownload = Signal(DownloadProgressSignals)
+    loadDBDownloadTiles = Signal()
+    dbDownloadTiles = Signal(list)
+    newDownloadTile = Signal(DDBDownloadTile)
+    updateDownloadTileEvent = Signal(DDBDownloadTile)
+    updateDownloadTile = Signal(DDBDownloadTile)
 
     def __init__(self, main_model):
         super(DownloadViewListener, self).__init__()
@@ -87,13 +87,13 @@ class DownloadViewListener(QObject):
         db_result = db_session.query(DBDownloadTile).filter(DBDownloadTile.cleared == false()).all()
         detached_db_result = DDBDownloadTile.list_detach(db_result)
         use_youtube_dl = read_config('Youtube-dl', 'use_youtube_dl')
-        download_finished_signals = [static_grid_view_listener.STATIC_GRID_VIEW_LISTENER.downloadFinished]
+        download_finished_Signals = [static_grid_view_listener.STATIC_GRID_VIEW_LISTENER.downloadFinished]
         for tile in detached_db_result:
             if use_youtube_dl and not tile.finished:
                 self.logger.info("Starting paused in progress download for: {}".format(tile.video.__dict__))
                 tile.progress_listener = \
                     DownloadViewListener.download_using_youtube_dl(tile.video,
-                                                                   youtube_dl_finished_listener=download_finished_signals,
+                                                                   youtube_dl_finished_listener=download_finished_Signals,
                                                                    wait=True)
         self.dbDownloadTiles.emit(detached_db_result)
 
@@ -105,16 +105,16 @@ class DownloadViewListener(QObject):
         UpdateVideo(video, update_existing=True,
                     finished_listeners=db_update_listeners).start()
         if use_youtube_dl:
-            download_progress_signal = DownloadViewListener.download_using_youtube_dl(video,
+            download_progress_Signal = DownloadViewListener.download_using_youtube_dl(video,
                                                                                       youtube_dl_finished_listener)
-            DownloadViewListener.static_self.newYTDLDownload.emit(download_progress_signal)
+            DownloadViewListener.static_self.newYTDLDownload.emit(download_progress_Signal)
 
     @staticmethod
     def download_using_youtube_dl(video, youtube_dl_finished_listener=None, wait=False):
         event = threading.Event()
         if not wait:
             event.set()
-        download_progress_signal = DownloadProgressSignals(video, event)
-        YoutubeDownload(video, event, download_progress_listener=download_progress_signal,
+        download_progress_Signal = DownloadProgressSignals(video, event)
+        YoutubeDownload(video, event, download_progress_listener=download_progress_Signal,
                         finished_listeners=youtube_dl_finished_listener).start()
-        return download_progress_signal
+        return download_progress_Signal

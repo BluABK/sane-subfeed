@@ -8,6 +8,7 @@ import shutil
 import traceback
 import json
 
+from PySide2 import QtCore
 from PySide2.QtWidgets import QApplication, QMainWindow, QStackedWidget, QFileDialog, QStyle, QProxyStyle
 from PySide2.QtCore import QRegExp, QCoreApplication
 from PySide2.QtGui import QIcon, QRegExpValidator
@@ -53,8 +54,9 @@ HOTKEYS_EVAL = False
 HOTKEYS_INI = 'hotkeys'
 YOUTUBE_URL_REGEX = QRegExp('((http[s]?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[^ ]'
                             '([a-zA-Z0-9_-]{9}|[a-zA-Z0-9_-]{10}|[a-zA-Z0-9_-]{11})[048AEIMQUYcgkosw]|'
-                            '([a-zA-Z0-9_-]{9}|[a-zA-Z0-9_-]{10}|[a-zA-Z0-9_-]{11})[048AEIMQUYcgkosw])')
-YOUTUBE_URL_REGEX.setCaseSensitivity(False)
+                            '([a-zA-Z0-9_-]{9}|[a-zA-Z0-9_-]{10}|[a-zA-Z0-9_-]{11})[048AEIMQUYcgkosw])',
+                            QtCore.Qt.CaseInsensitive)
+# YOUTUBE_URL_REGEX.setCaseSensitivity(QtCore.Qt.CaseInsensitive) # False -- put in above assignment ^
 QMAINWINDOW_TITLE = 'Sane Subscription Feed'
 QMAINWINDOW_ICON = 'yubbtubbz-padding.ico'
 SUBFEED_VIEW_ICON_LIGHT = 'grid.png'

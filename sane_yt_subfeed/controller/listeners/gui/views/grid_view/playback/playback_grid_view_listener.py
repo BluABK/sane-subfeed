@@ -1,4 +1,4 @@
-from PySide2.QtCore import SIGNAL, SLOT
+from PySide2.QtCore import Signal, Slot
 
 from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.handlers.config_handler import read_config
@@ -15,30 +15,30 @@ class PlaybackGridViewListener(GridViewListener):
     static_self = None
 
     # Listeners
-    updateFromDb = SIGNAL()
-    scrollReachedEnd = SIGNAL()
-    thumbnailDownload = SIGNAL()
-    tileDiscarded = SIGNAL(VideoD)
-    tileUndiscarded = SIGNAL(VideoD)
-    tileWatched = SIGNAL(VideoD)
-    tileUnwatched = SIGNAL(VideoD)
-    tileDeleteDownloadedData = SIGNAL(VideoD)
-    videosChanged = SIGNAL()
-    videosUpdated = SIGNAL()
-    tileDownloaded = SIGNAL(VideoD)
-    decreaseWatchPrio = SIGNAL(VideoD)
-    increaseWatchPrio = SIGNAL(VideoD)
+    updateFromDb = Signal()
+    scrollReachedEnd = Signal()
+    thumbnailDownload = Signal()
+    tileDiscarded = Signal(VideoD)
+    tileUndiscarded = Signal(VideoD)
+    tileWatched = Signal(VideoD)
+    tileUnwatched = Signal(VideoD)
+    tileDeleteDownloadedData = Signal(VideoD)
+    videosChanged = Signal()
+    videosUpdated = Signal()
+    tileDownloaded = Signal(VideoD)
+    decreaseWatchPrio = Signal(VideoD)
+    increaseWatchPrio = Signal(VideoD)
 
     # Defined in grid_view.py inheritance
-    redrawVideos = SIGNAL(list)
-    redrawVideo = SIGNAL(VideoD)
-    repaintVideos = SIGNAL(list)
-    repaintVideo = SIGNAL(VideoD)
+    redrawVideos = Signal(list)
+    redrawVideo = Signal(VideoD)
+    repaintVideos = Signal(list)
+    repaintVideo = Signal(VideoD)
 
     # FIXME: move youtube-dl listener to its own listener?
-    downloadFinished = SIGNAL(VideoD)
+    downloadFinished = Signal(VideoD)
     # FIXME: move to db listener?
-    downloadedVideosChangedinDB = SIGNAL()
+    downloadedVideosChangedinDB = Signal()
 
     def __init__(self, model):
         super().__init__(model)
@@ -82,14 +82,14 @@ class PlaybackGridViewListener(GridViewListener):
 
     def videos_changed(self):
         """
-        Emits a signal that video list has been modified, usual response is to reload feed.
+        Emits a Signal that video list has been modified, usual response is to reload feed.
         :return:
         """
         self.videosChanged.emit()
 
     def videos_updated(self):
         """
-        Emits a signal that videos in the list have been modified, usual response is to redraw videos.
+        Emits a Signal that videos in the list have been modified, usual response is to redraw videos.
         :return:
         """
         self.videosUpdated.emit()
@@ -127,7 +127,7 @@ class PlaybackGridViewListener(GridViewListener):
         self.repaintVideos.emit([videos])
 
     # noinspection PyCallingNonCallable
-    @SLOT(VideoD)
+    @Slot(VideoD)
     def decrease_watch_prio(self, video):
         """
         Decreases the priority of a video, which will put it further down the list in a sort.
@@ -140,7 +140,7 @@ class PlaybackGridViewListener(GridViewListener):
         UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
 
     # noinspection PyCallingNonCallable
-    @SLOT(VideoD)
+    @Slot(VideoD)
     def increase_watch_prio(self, video):
         """
         Increases the priority of a video, which will put it further up the list in a sort.
@@ -153,7 +153,7 @@ class PlaybackGridViewListener(GridViewListener):
         UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
 
     # noinspection PyCallingNonCallable
-    @SLOT(VideoD)
+    @Slot(VideoD)
     def tile_downloaded(self, video: VideoD):
         """
         Action to take if tile has been flagged as downloaded.
@@ -174,7 +174,7 @@ class PlaybackGridViewListener(GridViewListener):
                                             db_update_listeners=[self.downloadedVideosChangedinDB])
 
     # noinspection PyCallingNonCallable
-    @SLOT(VideoD)
+    @Slot(VideoD)
     def download_finished(self, video: VideoD):
         """
         Action to take when download has finished.

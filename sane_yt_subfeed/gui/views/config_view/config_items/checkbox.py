@@ -1,4 +1,4 @@
-from PySide2.QtCore.Qt import Qt
+from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QCheckBox
 
 from sane_yt_subfeed.handlers.config_handler import set_config

@@ -1,4 +1,4 @@
-from PySide2.QtCore.Qt import Qt
+from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QPushButton, QHBoxLayout, QLabel, QLineEdit, QVBoxLayout, QDialog
 
 from sane_yt_subfeed import create_logger

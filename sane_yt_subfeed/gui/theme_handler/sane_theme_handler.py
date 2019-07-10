@@ -332,6 +332,8 @@ class SaneThemeHandler(QObject):
         qsf = QStyleFactory()
 
         # Populate the QStyle dict
+        import pdb
+        pdb.set_trace()
         for style in qsf.keys():
             available_styles[style] = qsf.create(style)
         del qsf

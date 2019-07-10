@@ -1,7 +1,6 @@
 import time
 
 # from PySide2.QtCore import QObject, SIGNAL, SLOT
-# noinspection PyUnresolvedReferences
 from PySide2.QtCore import QObject, Signal, Slot
 
 from sane_yt_subfeed import create_logger
@@ -10,21 +9,16 @@ from sane_yt_subfeed import create_logger
 class DatabaseListener(QObject):
     static_instance = None
 
-    # databaseUpdated = Signal('')   # was: int
-    # refreshVideos = SIGNAL('')     # was: str
-    # startWrite = SIGNAL('')        # was: int
-    # finishWrite = SIGNAL('')       # was: int
-    # startRead = SIGNAL('')         # was: int
-    # finishRead = SIGNAL('')        # was: int
-    # dbStateChanged = SIGNAL('')    # was: int
+    databaseUpdated = Signal(int)
+    refreshVideos = Signal(str)
 
-    databaseUpdated = int()
-    refreshVideos = str()
-    startWrite = int()
-    finishWrite = int()
-    startRead = int()
-    finishRead = int()
-    dbStateChanged = int()
+    # Signal is a thread ID
+    startWrite = Signal(str)
+    finishWrite = Signal(str)
+    startRead = Signal(str)
+    finishRead = Signal(str)
+
+    dbStateChanged = Signal(int)
 
     DB_STATE_IDLE = 0
     DB_STATE_READ = 1
@@ -76,33 +70,59 @@ class DatabaseListener(QObject):
         self.logger.db_debug("Updated db state to {}".format(self.db_state))
         self.dbStateChanged.emit(self.db_state)
 
+    """
+    Shibroken (not a typo) workaround (bug: https://bugreports.qt.io/browse/PYSIDE-648):
+    
+    When int > 4 byte, send it as a string and then convert it back to int on this end. 
+    """
+
     def start_write(self, db_id):
+        """
+        Appends the DB write thread id to a a list of threads and logs it.
+        :param db_id:
+        :return:
+        """
         try:
-            self.writing_threads.append(db_id)
+            self.writing_threads.append(int(db_id))
             self.update_db_stat()
             self.logger.db_debug("Added db_id {} to writing_threads".format(db_id))
         except Exception as e:
             self.logger.warning("Failed to add {} to writing_threads - {}".format(db_id, e), exc_info=1)
 
     def finish_write(self, db_id):
+        """
+        Removes the DB write thread id to a a list of threads and logs it.
+        :param db_id:
+        :return:
+        """
         try:
-            self.writing_threads.remove(db_id)
+            self.writing_threads.remove(int(db_id))
             self.update_db_stat()
             self.logger.db_debug("Removed db_id {} from writing_threads".format(db_id))
         except Exception as e:
             self.logger.warning("Failed to remove {} from writing threads - {}".format(db_id, e), exc_info=1)
 
     def start_read(self, db_id):
+        """
+        Appends the DB read thread id to a a list of threads and logs it.
+        :param db_id:
+        :return:
+        """
         try:
-            self.reading_threads.append(db_id)
+            self.reading_threads.append(int(db_id))
             self.update_db_stat()
             self.logger.db_debug("Added db_id {} to reading_threads".format(db_id))
         except Exception as e:
             self.logger.warning("Failed to add {} to reading_threads - {}".format(db_id, e), exc_info=1)
 
     def finish_read(self, db_id):
+        """
+        Removes the DB read thread id to a a list of threads and logs it.
+        :param db_id:
+        :return:
+        """
         try:
-            self.reading_threads.remove(db_id)
+            self.reading_threads.remove(int(db_id))
             self.update_db_stat()
             self.logger.db_debug("Removed db_id {} from reading_threads".format(db_id))
         except Exception as e:

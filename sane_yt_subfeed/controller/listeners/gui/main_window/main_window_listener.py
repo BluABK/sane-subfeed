@@ -2,7 +2,7 @@ import gc
 import time
 import re
 
-from PySide2.QtCore import SIGNAL, QObject, SLOT
+from PySide2.QtCore import Signal, QObject, Slot
 
 from sane_yt_subfeed import main
 from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
@@ -17,14 +17,14 @@ YOUTUBE_URL_PATTERN = '(http[s]?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.b
 
 
 class MainWindowListener(QObject):
-    testChannels = SIGNAL()
-    refreshVideos = SIGNAL(int)
-    refreshSubs = SIGNAL()
-    getSingleVideo = SIGNAL(str)
-    addYouTubeChannelSubscriptionById = SIGNAL(str)
-    addYouTubeChannelSubscriptionByUsername = SIGNAL(str)
-    raiseGenericException = SIGNAL()
-    raiseException = SIGNAL(Exception)
+    testChannels = Signal()
+    refreshVideos = Signal(int)
+    refreshSubs = Signal()
+    getSingleVideo = Signal(str)
+    addYouTubeChannelSubscriptionById = Signal(str)
+    addYouTubeChannelSubscriptionByUsername = Signal(str)
+    raiseGenericException = Signal()
+    raiseException = Signal(Exception)
 
     def __init__(self, model):
         super().__init__()
@@ -43,7 +43,7 @@ class MainWindowListener(QObject):
             time.sleep(2)
 
     # noinspection PyCallingNonCallable
-    @SLOT(int)
+    @Slot(int)
     def refresh_videos(self, refresh_type):
         """
         Fetches new videos and reloads the subscription feed
@@ -56,7 +56,7 @@ class MainWindowListener(QObject):
         gc.collect()
 
     # noinspection PyCallingNonCallable
-    @SLOT()
+    @Slot()
     def refresh_subs(self):
         """
         Fetches a new list of subscriptions from YouTube API via OAuth
@@ -66,7 +66,7 @@ class MainWindowListener(QObject):
         get_remote_subscriptions_cached_oauth()
 
     # noinspection PyCallingNonCallable
-    @SLOT()
+    @Slot()
     def test_channels(self):
         """
         Runs the test channels test
@@ -76,7 +76,7 @@ class MainWindowListener(QObject):
         main.run_channels_test()
 
     # noinspection PyCallingNonCallable
-    @SLOT(str)
+    @Slot(str)
     def get_single_video(self, video_url):
         """
         Fetches a specified video based on url
@@ -95,7 +95,7 @@ class MainWindowListener(QObject):
                                                 self.model.playback_grid_view_listener.downloadedVideosChangedinDB])
 
     # noinspection PyCallingNonCallable
-    @SLOT(str)
+    @Slot(str)
     def add_youtube_channel_subscription_by_id(self, channel_id):
         """
         Subscribes to a channel based on channel ID
@@ -105,7 +105,7 @@ class MainWindowListener(QObject):
         add_subscription(load_keys(1)[0], channel_id)
 
     # noinspection PyCallingNonCallable
-    @SLOT(str)
+    @Slot(str)
     def add_youtube_channel_subscription_by_username(self, username):
         """
         Subscribes to a channel based on username

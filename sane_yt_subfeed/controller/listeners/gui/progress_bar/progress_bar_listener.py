@@ -1,18 +1,18 @@
 import time
 
-from PySide2.QtCore import QObject, SIGNAL
-from PySide2.QtCore.Qt import Qt
+from PySide2.QtCore import QObject, Signal
+from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
 
 from sane_yt_subfeed.handlers.log_handler import create_logger
 
 
 class ProgressBarListener(QObject):
-    setMaximum = SIGNAL(int)
-    setProgress = SIGNAL(int)
-    updateProgress = SIGNAL()
-    setText = SIGNAL(str)
-    resetBar = SIGNAL()
+    setMaximum = Signal(int)
+    setProgress = Signal(int)
+    updateProgress = Signal()
+    setText = Signal(str)
+    resetBar = Signal()
     progress_bar = None
 
     def __init__(self, model, progress_bar):

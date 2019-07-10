@@ -33,15 +33,20 @@ def get_db_videos_subfeed(limit, filters=(~Video.downloaded, ~Video.discarded)):
     if filter_days >= 0:
         date = datetime.datetime.utcnow() - datetime.timedelta(days=filter_days)
         filters = filters + (Video.date_published > date,)
-
+    """
+    Shibroken (not a typo) workaround (bug: https://bugreports.qt.io/browse/PYSIDE-648):
+    
+    When int > 4 byte, send it as a string and then convert it back to int on the other end. (ノಠ益ಠ)ノ彡┻━┻
+    """
     # Signal DB listener about started read operation (Used in DB status indicator and logs)
-    DatabaseListener.static_instance.startRead.emit(threading.get_ident())
+    t_ident = str(threading.get_ident())
+    DatabaseListener.static_instance.startRead.emit(t_ident)
 
     # Execute query, ordered by publish date (descending), filtered by filters and limited by limit.
     db_videos = db_session.query(Video).order_by(desc(Video.date_published)).filter(*filters).limit(limit).all()
 
     # Signal DB listener about finished read operation (Used in DB status indicator and logs)
-    DatabaseListener.static_instance.finishRead.emit(threading.get_ident())
+    DatabaseListener.static_instance.finishRead.emit(str(threading.get_ident()))
 
     # Convert Video objects to VideoD (Detached model) objects.
     videos = Video.to_video_ds(db_videos)

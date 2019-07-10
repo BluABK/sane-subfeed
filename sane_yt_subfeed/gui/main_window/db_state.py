@@ -1,6 +1,6 @@
 import os
 from PySide2.QtCore import QSize
-from PySide2.QtCore.Qt import Qt
+from PySide2.QtCore import Qt
 from PySide2.QtGui import QPixmap, QPainter
 from PySide2.QtWidgets import QLabel
 

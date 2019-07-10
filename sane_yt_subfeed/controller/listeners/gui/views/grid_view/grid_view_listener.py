@@ -1,6 +1,6 @@
 import os
 
-from PySide2.QtCore import QObject, SLOT
+from PySide2.QtCore import QObject, Slot
 
 from sane_yt_subfeed.handlers.config_handler import read_config
 # from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
@@ -146,7 +146,7 @@ class GridViewListener(QObject):
             self.redraw_videos(video)
 
     # noinspection PyCallingNonCallable
-    @SLOT(VideoD)
+    @Slot(VideoD)
     def tile_watched(self, video: Video):
         """
         Action to take if tile has been flagged as watched.
@@ -162,7 +162,7 @@ class GridViewListener(QObject):
         self.update_and_repaint_tile(video)
 
     # noinspection PyCallingNonCallable
-    @SLOT(VideoD)
+    @Slot(VideoD)
     def tile_unwatched(self, video: Video):
         """
         Action to take if tile has been un-flagged as watched.
@@ -178,7 +178,7 @@ class GridViewListener(QObject):
         self.update_and_repaint_tile(video)
 
     # noinspection PyCallingNonCallable
-    @SLOT(VideoD)
+    @Slot(VideoD)
     def tile_discarded(self, video: Video):
         """
         Action to take if tile has been flagged as dismissed.
@@ -194,7 +194,7 @@ class GridViewListener(QObject):
         self.update_and_repaint_tile(video)
 
     # noinspection PyCallingNonCallable
-    @SLOT(VideoD)
+    @Slot(VideoD)
     def tile_undiscarded(self, video: Video):
         """
         Action to take if tile has been un-flagged as dismissed.
@@ -210,7 +210,7 @@ class GridViewListener(QObject):
         self.update_and_repaint_tile(video)
 
     # noinspection PyCallingNonCallable
-    @SLOT(VideoD)
+    @Slot(VideoD)
     def tile_delete_downloaded_data(self, video: Video):
         """
         Action to take if tile has been told to delete its downloaded data.

@@ -1,4 +1,4 @@
-from PySide2.QtCore import SIGNAL, SLOT
+from PySide2.QtCore import Signal, Slot
 
 from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.controller.listeners.gui.views.grid_view.grid_view_listener import GridViewListener
@@ -11,30 +11,30 @@ from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VID
 
 class SubfeedGridViewListener(GridViewListener):
     # Shared Listeners
-    tileDiscarded = SIGNAL(VideoD)
-    tileUndiscarded = SIGNAL(VideoD)
-    tileWatched = SIGNAL(VideoD)
-    tileUnwatched = SIGNAL(VideoD)
+    tileDiscarded = Signal(VideoD)
+    tileUndiscarded = Signal(VideoD)
+    tileWatched = Signal(VideoD)
+    tileUnwatched = Signal(VideoD)
 
     # Own listeners
-    tileMarkedPremiere = SIGNAL(VideoD)
-    tileUnmarkedPremiere = SIGNAL(VideoD)
-    tileMarkedLivestreamUpcoming = SIGNAL(VideoD)
-    tileUnmarkedLivestreamUpcoming = SIGNAL(VideoD)
-    tileMarkedLivestream = SIGNAL(VideoD)
-    tileUnmarkedLivestream = SIGNAL(VideoD)
+    tileMarkedPremiere = Signal(VideoD)
+    tileUnmarkedPremiere = Signal(VideoD)
+    tileMarkedLivestreamUpcoming = Signal(VideoD)
+    tileUnmarkedLivestreamUpcoming = Signal(VideoD)
+    tileMarkedLivestream = Signal(VideoD)
+    tileUnmarkedLivestream = Signal(VideoD)
 
-    videosChanged = SIGNAL()
-    videosUpdated = SIGNAL()
-    updateFromDb = SIGNAL()
-    scrollReachedEnd = SIGNAL()
-    thumbnailDownload = SIGNAL()
+    videosChanged = Signal()
+    videosUpdated = Signal()
+    updateFromDb = Signal()
+    scrollReachedEnd = Signal()
+    thumbnailDownload = Signal()
 
     # Defined in grid_view.py inheritance
-    redrawVideos = SIGNAL(list)
-    redrawVideo = SIGNAL(VideoD)
-    repaintVideos = SIGNAL(list)
-    repaintVideo = SIGNAL(VideoD)
+    redrawVideos = Signal(list)
+    redrawVideo = Signal(VideoD)
+    repaintVideos = Signal(list)
+    repaintVideo = Signal(VideoD)
 
     def __init__(self, model):
         super().__init__(model)
@@ -73,14 +73,14 @@ class SubfeedGridViewListener(GridViewListener):
 
     def videos_changed(self):
         """
-        Emits a signal that video list has been modified, usual response is to reload feed.
+        Emits a Signal that video list has been modified, usual response is to reload feed.
         :return:
         """
         self.videosChanged.emit()
 
     def videos_updated(self):
         """
-        Emits a signal that videos in the list have been modified, usual response is to redraw videos.
+        Emits a Signal that videos in the list have been modified, usual response is to redraw videos.
         :return:
         """
         self.videosUpdated.emit()
@@ -118,7 +118,7 @@ class SubfeedGridViewListener(GridViewListener):
         self.repaintVideos.emit([videos])
 
     # noinspection PyCallingNonCallable
-    @SLOT(VideoD)
+    @Slot(VideoD)
     def tile_marked_premiere(self, video: Video):
         """
         Mark the video as live broadcast content (premiere)
@@ -130,7 +130,7 @@ class SubfeedGridViewListener(GridViewListener):
         self.update_and_repaint_tile(video)
 
     # noinspection PyCallingNonCallable
-    @SLOT(VideoD)
+    @Slot(VideoD)
     def tile_unmarked_premiere(self, video: Video):
         """
         Unmark the video as live broadcast content (premiere)
@@ -142,7 +142,7 @@ class SubfeedGridViewListener(GridViewListener):
         self.update_and_repaint_tile(video)
 
     # noinspection PyCallingNonCallable
-    @SLOT(VideoD)
+    @Slot(VideoD)
     def tile_marked_livestream_upcoming(self, video: Video):
         """
         Mark the video as live broadcast content (upcoming)
@@ -152,7 +152,7 @@ class SubfeedGridViewListener(GridViewListener):
         self.update_and_repaint_tile(video)
 
     # noinspection PyCallingNonCallable
-    @SLOT(VideoD)
+    @Slot(VideoD)
     def tile_unmarked_livestream_upcoming(self, video: Video):
         """
         Unmark the video as live broadcast content (upcoming)
@@ -162,7 +162,7 @@ class SubfeedGridViewListener(GridViewListener):
         self.update_and_repaint_tile(video)
 
     # noinspection PyCallingNonCallable
-    @SLOT(VideoD)
+    @Slot(VideoD)
     def tile_marked_livestream(self, video: Video):
         """
         Mark the video as live broadcast content (live)
@@ -172,7 +172,7 @@ class SubfeedGridViewListener(GridViewListener):
         self.update_and_repaint_tile(video)
 
     # noinspection PyCallingNonCallable
-    @SLOT(VideoD)
+    @Slot(VideoD)
     def tile_unmarked_livestream(self, video: Video):
         """
         Unmark the video as live broadcast content (live)
