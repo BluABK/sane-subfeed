@@ -1,5 +1,5 @@
 import os
-from PyQt5 import QtCore
+from PySide2 import QtCore
 
 from sane_yt_subfeed.absolute_paths import HISTORY_FILE_PATH, LOG_DIR
 from sane_yt_subfeed.database.orm import init_db
@@ -14,11 +14,11 @@ PICKLE_PATH = os.path.join(OS_PATH, 'resources', 'pickles')
 THUMBNAIL_PATH = os.path.join(OS_PATH, 'resources', 'thumbnails')
 
 # Required on windows (w/ virtualenv)
-PYQT_PATH = os.path.join(OS_PATH, '..', 'env', 'Lib', 'site-packages', 'PyQt5', 'Qt', 'plugins')
-PYQT_PATH2 = os.path.join(OS_PATH, 'env', 'Lib', 'site-packages', 'PyQt5', 'Qt', 'plugins')
+QT_BINDING_PATH = os.path.join(OS_PATH, '..', 'env', 'Lib', 'site-packages', 'PySide2', 'Qt', 'plugins')
+QT_BINDING_PATH2 = os.path.join(OS_PATH, 'env', 'Lib', 'site-packages', 'PySide2', 'Qt', 'plugins')
 
-QtCore.QCoreApplication.addLibraryPath(PYQT_PATH)
-QtCore.QCoreApplication.addLibraryPath(PYQT_PATH2)
+QtCore.QCoreApplication.addLibraryPath(QT_BINDING_PATH)
+QtCore.QCoreApplication.addLibraryPath(QT_BINDING_PATH2)
 
 # Initialize database
 init_db()

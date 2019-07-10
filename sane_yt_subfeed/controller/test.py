@@ -1,10 +1,10 @@
 import time
 
-from PyQt5.QtCore import QObject, pyqtSignal
+from PySide2.QtCore import QObject, SIGNAL
 
 
 class MainWindowListener(QObject):
-    refreshVideosfwheiuf = pyqtSignal()
+    refreshVideosfwheiuf = SIGNAL()
 
     def __init__(self, model):
         super().__init__()

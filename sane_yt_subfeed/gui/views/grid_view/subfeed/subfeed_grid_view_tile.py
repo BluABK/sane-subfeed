@@ -1,6 +1,6 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QMouseEvent, QPaintEvent, QPainter
-from PyQt5.QtWidgets import QMenu, QApplication, QStyleOption, QStyle
+from PySide2.QtCore.Qt import Qt
+from PySide2.QtGui import QMouseEvent, QPaintEvent, QPainter
+from PySide2.QtWidgets import QMenu, QApplication, QStyleOption, QStyle
 
 from sane_yt_subfeed.handlers.config_handler import read_config, get_valid_options
 from sane_yt_subfeed.handlers.default_application_handler import open_with_default_application

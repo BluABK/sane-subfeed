@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QLabel, QSizePolicy
+from PySide2.QtWidgets import QLabel, QSizePolicy
 
 
 class SmallLabel(QLabel):

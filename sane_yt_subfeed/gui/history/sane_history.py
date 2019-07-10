@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QObject
+from PySide2.QtCore import QObject
 
 from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.gui.history.sane_history_item import SaneHistoryItem

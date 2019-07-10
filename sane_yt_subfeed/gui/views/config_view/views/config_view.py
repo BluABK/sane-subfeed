@@ -1,12 +1,11 @@
-# PyQt5
 import sys
 
-from PyQt5.QtCore import QRegExp
-from PyQt5.QtGui import QIntValidator, QDoubleValidator, QRegExpValidator, QPaintEvent, QPainter
+# Qt5
+from PySide2.QtCore import QRegExp
+from PySide2.QtGui import QIntValidator, QDoubleValidator, QRegExpValidator, QPaintEvent, QPainter
+from PySide2.QtWidgets import QStyleOption, QStyle
 
 # Internal
-from PyQt5.QtWidgets import QStyleOption, QStyle
-
 from sane_yt_subfeed.handlers.config_handler import get_options, read_config, has_section
 from sane_yt_subfeed.gui.views.config_view.config_item_types import THUMBNAIL_QUALITIES, TT_FONT_SIZES, \
     LEFT_MOUSE_ACTIONS, TILE_TITLE_FONT_WEIGHTS

@@ -1,6 +1,6 @@
-from PyQt5.QtCore import QThread
-from PyQt5.QtGui import QPalette, QColor
-from PyQt5.QtWidgets import QProgressBar
+from PySide2.QtCore import QThread
+from PySide2.QtGui import QPalette, QColor
+from PySide2.QtWidgets import QProgressBar
 from sqlalchemy import asc, desc, false, or_
 from sqlalchemy.dialects import postgresql
 

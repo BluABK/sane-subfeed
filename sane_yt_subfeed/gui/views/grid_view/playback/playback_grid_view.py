@@ -1,5 +1,5 @@
-from PyQt5.QtGui import QPainter, QPaintEvent
-from PyQt5.QtWidgets import QStyleOption, QStyle
+from PySide2.QtGui import QPainter, QPaintEvent
+from PySide2.QtWidgets import QStyleOption, QStyle
 
 from sane_yt_subfeed.controller.view_models import MainModel
 from sane_yt_subfeed.gui.views.grid_view.grid_view import GridView

@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QAction
+from PySide2.QtWidgets import QAction
 
 
 class SaneToolBarAction(QAction):

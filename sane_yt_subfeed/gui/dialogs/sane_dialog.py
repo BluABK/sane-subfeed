@@ -1,5 +1,5 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QLabel, QVBoxLayout, QHBoxLayout, QPushButton
+from PySide2.QtCore.Qt import Qt
+from PySide2.QtWidgets import QDialog, QLabel, QVBoxLayout, QHBoxLayout, QPushButton
 
 from sane_yt_subfeed import create_logger
 

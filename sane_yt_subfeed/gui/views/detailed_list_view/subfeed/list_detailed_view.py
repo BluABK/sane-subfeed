@@ -1,6 +1,6 @@
-# PyQt5 libs
-from PyQt5.QtGui import QPaintEvent, QPainter
-from PyQt5.QtWidgets import *
+# Qt5
+from PySide2.QtGui import QPaintEvent, QPainter
+from PySide2.QtWidgets import QWidget, QStyleOption, QStyle, QVBoxLayout, QTableWidget, QHeaderView, QTableWidgetItem
 
 # Project internal libs
 from sane_yt_subfeed.database.read_operations import get_db_videos_subfeed

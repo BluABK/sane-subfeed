@@ -2,7 +2,8 @@ import time
 
 import datetime
 import os
-from PyQt5.QtCore import *
+
+from PySide2.QtCore import QObject, SIGNAL, SLOT
 from watchdog.observers import Observer
 
 from sane_yt_subfeed.handlers.config_handler import read_config
@@ -17,8 +18,9 @@ from sane_yt_subfeed.youtube.youtube_requests import list_uploaded_videos_videos
 
 
 class YoutubeDirListener(QObject):
-    newFile = pyqtSignal(str, str)
-    manualCheck = pyqtSignal()
+    # noinspection PyArgumentList
+    newFile = SIGNAL(str, str)
+    manualCheck = SIGNAL()
 
     def __init__(self, model):
         super().__init__()
@@ -40,7 +42,8 @@ class YoutubeDirListener(QObject):
         while True:
             time.sleep(2)
 
-    @pyqtSlot(str, str)
+    # noinspection PyCallingNonCallable,PyArgumentList
+    @SLOT(str, str)
     def new_file(self, vid_id, vid_path):
         vid = db_session.query(Video).get(vid_id)
         if vid:
@@ -89,7 +92,8 @@ class YoutubeDirListener(QObject):
             else:
                 self.logger.warning("Video with id {}, not found on youtube servers".format(vid_id))
 
-    @pyqtSlot()
+    # noinspection PyCallingNonCallable
+    @SLOT()
     def manual_check(self):
         youtube_folder = read_config("Play", "yt_file_path", literal_eval=False)
         CheckYoutubeFolderForNew(youtube_folder,

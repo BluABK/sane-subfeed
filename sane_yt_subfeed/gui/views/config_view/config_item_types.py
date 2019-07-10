@@ -1,4 +1,4 @@
-from PyQt5.QtGui import QFont
+from PySide2.QtGui import QFont
 
 COMBO_INT = 0
 

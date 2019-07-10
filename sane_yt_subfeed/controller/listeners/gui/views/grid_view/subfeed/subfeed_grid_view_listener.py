@@ -1,7 +1,6 @@
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PySide2.QtCore import SIGNAL, SLOT
 
 from sane_yt_subfeed import create_logger
-# from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view/_listener import DownloadViewListener
 from sane_yt_subfeed.controller.listeners.gui.views.grid_view.grid_view_listener import GridViewListener
 from sane_yt_subfeed.database.detached_models.video_d import VideoD
 from sane_yt_subfeed.controller.static_controller_vars import SUBFEED_VIEW_ID
@@ -12,30 +11,30 @@ from sane_yt_subfeed.database.detached_models.video_d import VIDEO_KIND_VOD, VID
 
 class SubfeedGridViewListener(GridViewListener):
     # Shared Listeners
-    tileDiscarded = pyqtSignal(VideoD)
-    tileUndiscarded = pyqtSignal(VideoD)
-    tileWatched = pyqtSignal(VideoD)
-    tileUnwatched = pyqtSignal(VideoD)
+    tileDiscarded = SIGNAL(VideoD)
+    tileUndiscarded = SIGNAL(VideoD)
+    tileWatched = SIGNAL(VideoD)
+    tileUnwatched = SIGNAL(VideoD)
 
     # Own listeners
-    tileMarkedPremiere = pyqtSignal(VideoD)
-    tileUnmarkedPremiere = pyqtSignal(VideoD)
-    tileMarkedLivestreamUpcoming = pyqtSignal(VideoD)
-    tileUnmarkedLivestreamUpcoming = pyqtSignal(VideoD)
-    tileMarkedLivestream = pyqtSignal(VideoD)
-    tileUnmarkedLivestream = pyqtSignal(VideoD)
+    tileMarkedPremiere = SIGNAL(VideoD)
+    tileUnmarkedPremiere = SIGNAL(VideoD)
+    tileMarkedLivestreamUpcoming = SIGNAL(VideoD)
+    tileUnmarkedLivestreamUpcoming = SIGNAL(VideoD)
+    tileMarkedLivestream = SIGNAL(VideoD)
+    tileUnmarkedLivestream = SIGNAL(VideoD)
 
-    videosChanged = pyqtSignal()
-    videosUpdated = pyqtSignal()
-    updateFromDb = pyqtSignal()
-    scrollReachedEnd = pyqtSignal()
-    thumbnailDownload = pyqtSignal()
+    videosChanged = SIGNAL()
+    videosUpdated = SIGNAL()
+    updateFromDb = SIGNAL()
+    scrollReachedEnd = SIGNAL()
+    thumbnailDownload = SIGNAL()
 
     # Defined in grid_view.py inheritance
-    redrawVideos = pyqtSignal(list)
-    redrawVideo = pyqtSignal(VideoD)
-    repaintVideos = pyqtSignal(list)
-    repaintVideo = pyqtSignal(VideoD)
+    redrawVideos = SIGNAL(list)
+    redrawVideo = SIGNAL(VideoD)
+    repaintVideos = SIGNAL(list)
+    repaintVideo = SIGNAL(VideoD)
 
     def __init__(self, model):
         super().__init__(model)
@@ -118,7 +117,8 @@ class SubfeedGridViewListener(GridViewListener):
         """
         self.repaintVideos.emit([videos])
 
-    @pyqtSlot(VideoD)
+    # noinspection PyCallingNonCallable
+    @SLOT(VideoD)
     def tile_marked_premiere(self, video: Video):
         """
         Mark the video as live broadcast content (premiere)
@@ -129,7 +129,8 @@ class SubfeedGridViewListener(GridViewListener):
         video.kind = VIDEO_KIND_PREMIERE
         self.update_and_repaint_tile(video)
 
-    @pyqtSlot(VideoD)
+    # noinspection PyCallingNonCallable
+    @SLOT(VideoD)
     def tile_unmarked_premiere(self, video: Video):
         """
         Unmark the video as live broadcast content (premiere)
@@ -140,7 +141,8 @@ class SubfeedGridViewListener(GridViewListener):
         video.kind = VIDEO_KIND_VOD
         self.update_and_repaint_tile(video)
 
-    @pyqtSlot(VideoD)
+    # noinspection PyCallingNonCallable
+    @SLOT(VideoD)
     def tile_marked_livestream_upcoming(self, video: Video):
         """
         Mark the video as live broadcast content (upcoming)
@@ -149,7 +151,8 @@ class SubfeedGridViewListener(GridViewListener):
         video.kind = VIDEO_KIND_LIVE_SCHEDULED
         self.update_and_repaint_tile(video)
 
-    @pyqtSlot(VideoD)
+    # noinspection PyCallingNonCallable
+    @SLOT(VideoD)
     def tile_unmarked_livestream_upcoming(self, video: Video):
         """
         Unmark the video as live broadcast content (upcoming)
@@ -158,7 +161,8 @@ class SubfeedGridViewListener(GridViewListener):
         video.kind = VIDEO_KIND_VOD
         self.update_and_repaint_tile(video)
 
-    @pyqtSlot(VideoD)
+    # noinspection PyCallingNonCallable
+    @SLOT(VideoD)
     def tile_marked_livestream(self, video: Video):
         """
         Mark the video as live broadcast content (live)
@@ -167,7 +171,8 @@ class SubfeedGridViewListener(GridViewListener):
         video.kind = VIDEO_KIND_LIVE
         self.update_and_repaint_tile(video)
 
-    @pyqtSlot(VideoD)
+    # noinspection PyCallingNonCallable
+    @SLOT(VideoD)
     def tile_unmarked_livestream(self, video: Video):
         """
         Unmark the video as live broadcast content (live)

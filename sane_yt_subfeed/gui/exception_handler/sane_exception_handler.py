@@ -1,7 +1,7 @@
 import sys
 
 import copy
-from PyQt5.QtCore import QObject, pyqtSignal
+from PySide2.QtCore import QObject, SIGNAL
 
 from sane_yt_subfeed import create_logger
 
@@ -23,8 +23,8 @@ class SaneExceptionHandler(QObject):
     """
     exc_id = 0
     exceptions = []
-    errorSignal = pyqtSignal()
-    silentSignal = pyqtSignal()
+    errorSignal = SIGNAL()
+    silentSignal = SIGNAL()
 
     def __init__(self, app_ref=None, use_list=True, display=True):
         super(SaneExceptionHandler, self).__init__()

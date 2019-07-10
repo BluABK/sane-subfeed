@@ -1,6 +1,5 @@
-# from PyQt5.QtGui import QListWidgetItem
-from PyQt5.QtGui import QPaintEvent, QPainter
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QStyleOption, QStyle
+from PySide2.QtGui import QPaintEvent, QPainter
+from PySide2.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QStyleOption, QStyle
 
 from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.handlers.log_handler import create_logger

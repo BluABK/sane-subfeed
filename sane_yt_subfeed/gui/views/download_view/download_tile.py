@@ -2,9 +2,9 @@ from collections import Counter
 
 import copy
 
-from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtGui import QPaintEvent, QPainter
-from PyQt5.QtWidgets import QGridLayout, QWidget, QMenu, QStyleOption, QStyle
+from PySide2.QtCore import SLOT
+from PySide2.QtGui import QPaintEvent, QPainter
+from PySide2.QtWidgets import QGridLayout, QWidget, QMenu, QStyleOption, QStyle
 from datetime import datetime
 
 from sane_yt_subfeed.handlers.config_handler import read_config
@@ -230,12 +230,13 @@ class DownloadTile(QWidget):
 
         return human_readable_error
 
-    @pyqtSlot(Exception)
+    # noinspection PyCallingNonCallable
+    @SLOT(Exception)
     def failed_download(self, e):
         """
         How to handle a failed download.
 
-        Called by PyQtSignal connected to the download listener.
+        Called by Qt Signal connected to the download listener.
         :return:
         """
         human_readable_error = self.humanize_dl_error(e)

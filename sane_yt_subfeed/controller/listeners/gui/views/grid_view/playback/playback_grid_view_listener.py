@@ -1,4 +1,4 @@
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PySide2.QtCore import SIGNAL, SLOT
 
 from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.handlers.config_handler import read_config
@@ -15,30 +15,30 @@ class PlaybackGridViewListener(GridViewListener):
     static_self = None
 
     # Listeners
-    updateFromDb = pyqtSignal()
-    scrollReachedEnd = pyqtSignal()
-    thumbnailDownload = pyqtSignal()
-    tileDiscarded = pyqtSignal(VideoD)
-    tileUndiscarded = pyqtSignal(VideoD)
-    tileWatched = pyqtSignal(VideoD)
-    tileUnwatched = pyqtSignal(VideoD)
-    tileDeleteDownloadedData = pyqtSignal(VideoD)
-    videosChanged = pyqtSignal()
-    videosUpdated = pyqtSignal()
-    tileDownloaded = pyqtSignal(VideoD)
-    decreaseWatchPrio = pyqtSignal(VideoD)
-    increaseWatchPrio = pyqtSignal(VideoD)
+    updateFromDb = SIGNAL()
+    scrollReachedEnd = SIGNAL()
+    thumbnailDownload = SIGNAL()
+    tileDiscarded = SIGNAL(VideoD)
+    tileUndiscarded = SIGNAL(VideoD)
+    tileWatched = SIGNAL(VideoD)
+    tileUnwatched = SIGNAL(VideoD)
+    tileDeleteDownloadedData = SIGNAL(VideoD)
+    videosChanged = SIGNAL()
+    videosUpdated = SIGNAL()
+    tileDownloaded = SIGNAL(VideoD)
+    decreaseWatchPrio = SIGNAL(VideoD)
+    increaseWatchPrio = SIGNAL(VideoD)
 
     # Defined in grid_view.py inheritance
-    redrawVideos = pyqtSignal(list)
-    redrawVideo = pyqtSignal(VideoD)
-    repaintVideos = pyqtSignal(list)
-    repaintVideo = pyqtSignal(VideoD)
+    redrawVideos = SIGNAL(list)
+    redrawVideo = SIGNAL(VideoD)
+    repaintVideos = SIGNAL(list)
+    repaintVideo = SIGNAL(VideoD)
 
     # FIXME: move youtube-dl listener to its own listener?
-    downloadFinished = pyqtSignal(VideoD)
+    downloadFinished = SIGNAL(VideoD)
     # FIXME: move to db listener?
-    downloadedVideosChangedinDB = pyqtSignal()
+    downloadedVideosChangedinDB = SIGNAL()
 
     def __init__(self, model):
         super().__init__(model)
@@ -126,7 +126,8 @@ class PlaybackGridViewListener(GridViewListener):
         """
         self.repaintVideos.emit([videos])
 
-    @pyqtSlot(VideoD)
+    # noinspection PyCallingNonCallable
+    @SLOT(VideoD)
     def decrease_watch_prio(self, video):
         """
         Decreases the priority of a video, which will put it further down the list in a sort.
@@ -138,7 +139,8 @@ class PlaybackGridViewListener(GridViewListener):
         # Update Video in Database with the changed attributes
         UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
 
-    @pyqtSlot(VideoD)
+    # noinspection PyCallingNonCallable
+    @SLOT(VideoD)
     def increase_watch_prio(self, video):
         """
         Increases the priority of a video, which will put it further up the list in a sort.
@@ -150,7 +152,8 @@ class PlaybackGridViewListener(GridViewListener):
         # Update Video in Database with the changed attributes
         UpdateVideo(video, update_existing=True, finished_listeners=[self.downloadedVideosChangedinDB]).start()
 
-    @pyqtSlot(VideoD)
+    # noinspection PyCallingNonCallable
+    @SLOT(VideoD)
     def tile_downloaded(self, video: VideoD):
         """
         Action to take if tile has been flagged as downloaded.
@@ -170,7 +173,8 @@ class PlaybackGridViewListener(GridViewListener):
         DownloadViewListener.download_video(video, youtube_dl_finished_listener=[self.downloadFinished],
                                             db_update_listeners=[self.downloadedVideosChangedinDB])
 
-    @pyqtSlot(VideoD)
+    # noinspection PyCallingNonCallable
+    @SLOT(VideoD)
     def download_finished(self, video: VideoD):
         """
         Action to take when download has finished.

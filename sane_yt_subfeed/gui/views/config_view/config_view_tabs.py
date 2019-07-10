@@ -1,5 +1,5 @@
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QTabWidget
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QTabWidget
 
 from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.handlers.config_handler import read_config

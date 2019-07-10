@@ -1,6 +1,5 @@
-from PyQt5.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLayout,
-                             QPlainTextEdit, QPushButton, QSizePolicy,
-                             QSpacerItem, QVBoxLayout)
+from PySide2.QtWidgets import QApplication, QDialog, QHBoxLayout, QLayout, QSpacerItem, QVBoxLayout, QPlainTextEdit, \
+    QPushButton, QSizePolicy
 
 
 class SaneTextViewDialog(QDialog):

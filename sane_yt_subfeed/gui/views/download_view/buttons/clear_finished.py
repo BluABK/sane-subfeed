@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QPushButton
+from PySide2.QtWidgets import QPushButton
 
 
 class ClearFinishedDownloads(QPushButton):

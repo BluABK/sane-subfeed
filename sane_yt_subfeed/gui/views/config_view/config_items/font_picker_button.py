@@ -1,5 +1,5 @@
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QPushButton, QFontDialog
+from PySide2.QtGui import QFont
+from PySide2.QtWidgets import QPushButton, QFontDialog
 
 from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.handlers.config_handler import read_config, set_config

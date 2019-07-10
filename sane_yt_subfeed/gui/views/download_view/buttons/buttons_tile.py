@@ -1,6 +1,6 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPaintEvent, QPainter
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QSizePolicy, QStyleOption, QStyle
+from PySide2.QtCore.Qt import Qt
+from PySide2.QtGui import QPaintEvent, QPainter
+from PySide2.QtWidgets import QWidget, QHBoxLayout, QSizePolicy, QStyleOption, QStyle
 
 from sane_yt_subfeed.gui.views.download_view.buttons.clear_finished import ClearFinishedDownloads
 

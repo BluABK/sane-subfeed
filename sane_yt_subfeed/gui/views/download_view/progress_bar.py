@@ -1,6 +1,6 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPalette, QColor
-from PyQt5.QtWidgets import QProgressBar, QSizePolicy
+from PySide2.QtCore.Qt import Qt
+from PySide2.QtGui import QPalette, QColor
+from PySide2.QtWidgets import QProgressBar, QSizePolicy
 
 
 class DownloadProgressBar(QProgressBar):

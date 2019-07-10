@@ -8,11 +8,10 @@ import shutil
 import traceback
 import json
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import QFile, QTextStream, QRegExp
-from PyQt5.QtGui import QIcon, QRegExpValidator, QPixmap
-from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QStackedWidget, QStyleFactory, QFileDialog, QStyle, \
-    QProxyStyle, QLabel
+from PySide2.QtWidgets import QApplication, QMainWindow, QStackedWidget, QFileDialog, QStyle, QProxyStyle
+from PySide2.QtCore import QRegExp, QCoreApplication
+from PySide2.QtGui import QIcon, QRegExpValidator
+
 from subprocess import check_output
 
 # Project internal libs
@@ -577,7 +576,7 @@ class MainWindow(QMainWindow):
                          shortcut=read_config('Global', 'show_usage_history',
                                               custom_ini=HOTKEYS_INI, literal_eval=HOTKEYS_EVAL),
                          tooltip='Show usage history in a dialog box')
-        self.add_submenu('&File', 'Exit', qApp.quit, shortcut=read_config('Global', 'quit', custom_ini=HOTKEYS_INI,
+        self.add_submenu('&File', 'Exit', QCoreApplication.quit, shortcut=read_config('Global', 'quit', custom_ini=HOTKEYS_INI,
                                                                           literal_eval=HOTKEYS_EVAL),
                          tooltip='Exit application')
 

@@ -2,8 +2,8 @@ import importlib
 import os
 import re
 
-from PyQt5.QtCore import QObject
-from PyQt5.QtWidgets import QStyleFactory, QMainWindow
+from PySide2.QtCore import QObject
+from PySide2.QtWidgets import QStyleFactory, QMainWindow
 
 from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.absolute_paths import RESOURCES_PATH
@@ -143,8 +143,8 @@ class SaneThemeHandler(QObject):
         """
         global COMPILED_QRC_MODULE, COMPILED_QRC_THEME
 
-        # Unload the currently loaded PyQt5 compiled QRC module and its resources.
-        self.logger.info("Unloading currently loaded PyQt5 compiled QRC module "
+        # Unload the currently loaded Qt5 compiled QRC module and its resources.
+        self.logger.info("Unloading currently loaded Qt5 compiled QRC module "
                          "for theme '{}': {}".format(COMPILED_QRC_THEME.name, COMPILED_QRC_MODULE))
         try:
             COMPILED_QRC_MODULE.qCleanupResources()
@@ -156,9 +156,9 @@ class SaneThemeHandler(QObject):
 
     def load_compiled_qrc(self, theme):
         """
-        Loads a PyQt5 compiled QRC python script.
+        Loads a Qt5 compiled QRC python script.
 
-        NB: PyQt can only handle a single compiled QRC module at a time,
+        NB: Qt can only handle a single compiled QRC module at a time,
         if you load more than one Qt will SEGFAULT. So make sure to unload
         the current one first.
 
@@ -170,14 +170,14 @@ class SaneThemeHandler(QObject):
         if COMPILED_QRC_MODULE:
             self.unload_compiled_qrc()
 
-        # Import the PyQt5 compiled QRC module. Imports happening in the middle of the script, RIP PEP8 =/
+        # Import the Qt5 compiled QRC module. Imports happening in the middle of the script, RIP PEP8 =/
         COMPILED_QRC_MODULE = importlib.machinery.SourceFileLoader(theme.compiled_qrc_modulename, os.path.join(
             theme.theme_dir_absolute_path, theme.compiled_qrc_filename)).load_module()
 
         # Store which theme the loaded compiled QRC resources belong to.
         COMPILED_QRC_THEME = theme
 
-        self.logger.info("Loaded PyQt5 compiled QRC module for theme '{}': {}".format(theme.name, COMPILED_QRC_THEME))
+        self.logger.info("Loaded Qt5 compiled QRC module for theme '{}': {}".format(theme.name, COMPILED_QRC_THEME))
 
     def absolute_pathize_stylesheet(self, theme_dir_absolute_path, stylesheet_text):
         """
@@ -242,7 +242,7 @@ class SaneThemeHandler(QObject):
                 theme_string = theme_file.read()
 
             if load_compiled_qrc and theme.compiled_qrc_filename:
-                # Load PyQt5 compiled QRC (if any)
+                # Load Qt5 compiled QRC (if any)
                 self.load_compiled_qrc(theme)
             else:
                 # Alternatively live convert every path in the QSS to absolute paths.
@@ -262,7 +262,7 @@ class SaneThemeHandler(QObject):
         Reset the theme to default/native.
         :return:
         """
-        self.main_window.setStyleSheet(None)
+        self.main_window.setStyleSheet("")  # FIXME: PySide2 port, check if bork.
         self.logger.debug("Cleared theming.")
 
     def cycle_themes(self):

@@ -1,6 +1,6 @@
-from PyQt5.QtGui import *
-# TODO: Easier to work with wildcard imports from PyQt, fix afterwards
-from PyQt5.QtWidgets import *
+from PySide2.QtCore import QCoreApplication
+from PySide2.QtGui import QPixmap, QPaintEvent, QPainter
+from PySide2.QtWidgets import QLabel, QStyleOption, QStyle, QMenu, QWidget, QVBoxLayout, QHBoxLayout
 
 from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.database.write_operations import UpdateVideo
@@ -55,7 +55,7 @@ class ExtendedQLabel(QLabel):
         quitAction = menu.addAction("Quit")
         action = menu.exec_(self.mapToGlobal(event.pos()))
         if action == quitAction:
-            qApp.quit()
+            QCoreApplication.quit()
 
     # Get the system clipboard contents
     def clipboard_changed(self):

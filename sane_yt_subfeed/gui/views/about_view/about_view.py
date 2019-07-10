@@ -1,7 +1,6 @@
-# std libs
-from PyQt5.QtGui import QPixmap, QPainter, QPaintEvent
-# PyQt5 libs
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QStyleOption, QStyle
+# Qt5
+from PySide2.QtGui import QPixmap, QPainter, QPaintEvent
+from PySide2.QtWidgets import QWidget, QLabel, QVBoxLayout, QStyleOption, QStyle
 
 # Project internal libs
 from sane_yt_subfeed.absolute_paths import ABOUT_IMG_PATH

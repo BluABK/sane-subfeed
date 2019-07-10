@@ -1,9 +1,7 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QValidator
-from PyQt5.QtWidgets import QPushButton, QHBoxLayout, QLabel, QLineEdit, QVBoxLayout, QDialog
+from PySide2.QtCore.Qt import Qt
+from PySide2.QtWidgets import QPushButton, QHBoxLayout, QLabel, QLineEdit, QVBoxLayout, QDialog
 
 from sane_yt_subfeed import create_logger
-from sane_yt_subfeed.gui.dialogs.sane_input_dialog import SaneInputDialog
 
 TITLE = 'Unnamed SaneOAuth2BuilderDialog'
 TEXT = 'This is a SaneOAuth2BuilderDialog'

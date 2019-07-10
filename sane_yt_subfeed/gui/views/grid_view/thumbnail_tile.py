@@ -1,6 +1,6 @@
-from PyQt5.QtCore import Qt, QSize, QPoint, QRect
-from PyQt5.QtGui import QPainter, QPixmap, QBrush, QColor, QPen, QFont, QFontMetrics
-from PyQt5.QtWidgets import QLabel
+from PySide2.QtCore import Qt, QSize, QPoint, QRect
+from PySide2.QtGui import QPainter, QPixmap, QBrush, QColor, QPen, QFont, QFontMetrics
+from PySide2.QtWidgets import QLabel
 
 from sane_yt_subfeed.absolute_paths import THUMBNAIL_NA_PATH
 from sane_yt_subfeed.handlers.config_handler import read_config
@@ -20,7 +20,7 @@ class ThumbnailTile(QLabel):
     def setPixmap(self, p):
         """
         Override setPixmap
-        :param p:  <class 'PyQt5.QtGui.QPixmap'>: <PyQt5.QtGui.QPixmap object>
+        :param p:  QPixMap
         :return:
         """
         # self.logger.debug("{}: {}".format(type(p), p))

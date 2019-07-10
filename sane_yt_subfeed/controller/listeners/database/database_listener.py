@@ -1,6 +1,8 @@
 import time
 
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
+# from PySide2.QtCore import QObject, SIGNAL, SLOT
+# noinspection PyUnresolvedReferences
+from PySide2.QtCore import QObject, Signal, Slot
 
 from sane_yt_subfeed import create_logger
 
@@ -8,13 +10,21 @@ from sane_yt_subfeed import create_logger
 class DatabaseListener(QObject):
     static_instance = None
 
-    databaseUpdated = pyqtSignal()
-    refreshVideos = pyqtSignal()
-    startWrite = pyqtSignal(int)
-    finishWrite = pyqtSignal(int)
-    startRead = pyqtSignal(int)
-    finishRead = pyqtSignal(int)
-    dbStateChanged = pyqtSignal(int)
+    # databaseUpdated = Signal('')   # was: int
+    # refreshVideos = SIGNAL('')     # was: str
+    # startWrite = SIGNAL('')        # was: int
+    # finishWrite = SIGNAL('')       # was: int
+    # startRead = SIGNAL('')         # was: int
+    # finishRead = SIGNAL('')        # was: int
+    # dbStateChanged = SIGNAL('')    # was: int
+
+    databaseUpdated = int()
+    refreshVideos = str()
+    startWrite = int()
+    finishWrite = int()
+    startRead = int()
+    finishRead = int()
+    dbStateChanged = int()
 
     DB_STATE_IDLE = 0
     DB_STATE_READ = 1
@@ -102,6 +112,6 @@ class DatabaseListener(QObject):
         while True:
             time.sleep(2)
 
-    @pyqtSlot()
+    @Slot()
     def refresh_videos(self):
         self.logger.info('Reloading videos')

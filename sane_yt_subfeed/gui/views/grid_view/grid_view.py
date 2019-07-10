@@ -1,8 +1,8 @@
 import math
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor, QPaintEvent, QPainter
-from PyQt5.QtWidgets import QWidget, QGridLayout, QSizePolicy, QStyleOption, QStyle
+from PySide2.QtCore import Qt
+from PySide2.QtGui import QColor, QPaintEvent, QPainter
+from PySide2.QtWidgets import QWidget, QGridLayout, QSizePolicy, QStyleOption, QStyle
 
 from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.controller.view_models import MainModel

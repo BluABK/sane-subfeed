@@ -1,10 +1,9 @@
-# PyQt5
-from PyQt5.QtGui import QIcon, QPaintEvent, QPainter
-from PyQt5.QtWidgets import QLabel, QStyleOption, QStyle
+# Qt5
+from PySide2.QtGui import QIcon, QPaintEvent, QPainter
+from PySide2.QtWidgets import QLabel, QStyleOption, QStyle
 
 # Internal
 from sane_yt_subfeed.handlers.config_handler import read_config, set_config
-# import sane_yt_subfeed.gui.views.config_view.checkbox as checkbox
 from sane_yt_subfeed.gui.views.config_view.config_items.line_edit import GenericLineEdit
 from sane_yt_subfeed.gui.views.config_view.input_super import InputSuper
 

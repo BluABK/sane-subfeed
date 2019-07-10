@@ -1,6 +1,6 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPaintEvent, QPainter
-from PyQt5.QtWidgets import QScrollArea, QStyleOption, QStyle
+from PySide2.QtCore.Qt import Qt
+from PySide2.QtGui import QPaintEvent, QPainter
+from PySide2.QtWidgets import QScrollArea, QStyleOption, QStyle
 
 
 class ConfigScrollArea(QScrollArea):

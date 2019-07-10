@@ -1,5 +1,5 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QScrollArea
+from PySide2.QtCore.Qt import Qt
+from PySide2.QtWidgets import QScrollArea
 
 from sane_yt_subfeed.controller.static_controller_vars import PLAYBACK_VIEW_ID, SUBFEED_VIEW_ID
 from sane_yt_subfeed.controller.view_models import MainModel
@@ -15,7 +15,7 @@ class GridScrollArea(QScrollArea):
         self.widget = None
         self.widget_id = None
 
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         # self.resize(100, 100)
         self.setWidgetResizable(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)

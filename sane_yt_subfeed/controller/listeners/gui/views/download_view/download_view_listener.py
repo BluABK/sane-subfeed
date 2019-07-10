@@ -2,7 +2,7 @@ import time
 
 import datetime
 import threading
-from PyQt5.QtCore import QObject, pyqtSignal
+from PySide2.QtCore import QObject, SIGNAL
 from sqlalchemy import false
 
 from sane_yt_subfeed import create_logger
@@ -16,9 +16,9 @@ from sane_yt_subfeed.youtube.youtube_dl_handler import YoutubeDownload
 
 
 class DownloadProgressSignals(QObject):
-    updateProgress = pyqtSignal(dict)
-    finishedDownload = pyqtSignal()
-    failedDownload = pyqtSignal(Exception)
+    updateProgress = SIGNAL(dict)
+    finishedDownload = SIGNAL()
+    failedDownload = SIGNAL(Exception)
 
     def __init__(self, video, threading_event):
         super(DownloadProgressSignals, self).__init__()
@@ -29,12 +29,12 @@ class DownloadProgressSignals(QObject):
 class DownloadViewListener(QObject):
     static_self = None
 
-    newYTDLDownload = pyqtSignal(DownloadProgressSignals)
-    loadDBDownloadTiles = pyqtSignal()
-    dbDownloadTiles = pyqtSignal(list)
-    newDownloadTile = pyqtSignal(DDBDownloadTile)
-    updateDownloadTileEvent = pyqtSignal(DDBDownloadTile)
-    updateDownloadTile = pyqtSignal(DDBDownloadTile)
+    newYTDLDownload = SIGNAL(DownloadProgressSignals)
+    loadDBDownloadTiles = SIGNAL()
+    dbDownloadTiles = SIGNAL(list)
+    newDownloadTile = SIGNAL(DDBDownloadTile)
+    updateDownloadTileEvent = SIGNAL(DDBDownloadTile)
+    updateDownloadTile = SIGNAL(DDBDownloadTile)
 
     def __init__(self, main_model):
         super(DownloadViewListener, self).__init__()

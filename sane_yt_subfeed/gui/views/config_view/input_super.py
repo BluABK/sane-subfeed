@@ -1,6 +1,6 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont, QPaintEvent, QPainter
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QFontDialog, QStyleOption, QStyle
+from PySide2.QtCore.Qt import Qt
+from PySide2.QtGui import QFont, QPaintEvent, QPainter
+from PySide2.QtWidgets import QWidget, QGridLayout, QLabel, QStyleOption, QStyle
 
 from sane_yt_subfeed.gui.views.config_view.config_items.font_picker_button import FontPickerButton
 from sane_yt_subfeed.handlers.config_handler import read_config, set_config
@@ -21,8 +21,6 @@ class InputSuper(QWidget):
         """
         A GUI Widget that reads and sets config.ini settings
         :param parent:
-        :param clipboard:
-        :param status_bar:
         """
         super(InputSuper, self).__init__(parent)
         self.parent = parent
@@ -236,7 +234,6 @@ class InputSuper(QWidget):
         :param restart_check: If set to false, don't check if a restart (may) be required for this option.
         :param name:
         :param clear:
-        :param items:
         :param cfg_option:
         :param cfg_section:
         :param description:

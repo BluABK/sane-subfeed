@@ -2,7 +2,7 @@ import gc
 import time
 import re
 
-from PyQt5.QtCore import *
+from PySide2.QtCore import SIGNAL, QObject, SLOT
 
 from sane_yt_subfeed import main
 from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
@@ -17,14 +17,14 @@ YOUTUBE_URL_PATTERN = '(http[s]?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.b
 
 
 class MainWindowListener(QObject):
-    testChannels = pyqtSignal()
-    refreshVideos = pyqtSignal(int)
-    refreshSubs = pyqtSignal()
-    getSingleVideo = pyqtSignal(str)
-    addYouTubeChannelSubscriptionById = pyqtSignal(str)
-    addYouTubeChannelSubscriptionByUsername = pyqtSignal(str)
-    raiseGenericException = pyqtSignal()
-    raiseException = pyqtSignal(Exception)
+    testChannels = SIGNAL()
+    refreshVideos = SIGNAL(int)
+    refreshSubs = SIGNAL()
+    getSingleVideo = SIGNAL(str)
+    addYouTubeChannelSubscriptionById = SIGNAL(str)
+    addYouTubeChannelSubscriptionByUsername = SIGNAL(str)
+    raiseGenericException = SIGNAL()
+    raiseException = SIGNAL(Exception)
 
     def __init__(self, model):
         super().__init__()
@@ -42,7 +42,8 @@ class MainWindowListener(QObject):
         while True:
             time.sleep(2)
 
-    @pyqtSlot(int)
+    # noinspection PyCallingNonCallable
+    @SLOT(int)
     def refresh_videos(self, refresh_type):
         """
         Fetches new videos and reloads the subscription feed
@@ -54,7 +55,8 @@ class MainWindowListener(QObject):
         # Attempt to force garbage collection to close unnecessary sockets
         gc.collect()
 
-    @pyqtSlot()
+    # noinspection PyCallingNonCallable
+    @SLOT()
     def refresh_subs(self):
         """
         Fetches a new list of subscriptions from YouTube API via OAuth
@@ -63,7 +65,8 @@ class MainWindowListener(QObject):
         self.logger.info("Reloading subscriptions list")
         get_remote_subscriptions_cached_oauth()
 
-    @pyqtSlot()
+    # noinspection PyCallingNonCallable
+    @SLOT()
     def test_channels(self):
         """
         Runs the test channels test
@@ -72,7 +75,8 @@ class MainWindowListener(QObject):
         self.logger.info("Running test: channels test")
         main.run_channels_test()
 
-    @pyqtSlot(str)
+    # noinspection PyCallingNonCallable
+    @SLOT(str)
     def get_single_video(self, video_url):
         """
         Fetches a specified video based on url
@@ -90,7 +94,8 @@ class MainWindowListener(QObject):
                                             db_update_listeners=[
                                                 self.model.playback_grid_view_listener.downloadedVideosChangedinDB])
 
-    @pyqtSlot(str)
+    # noinspection PyCallingNonCallable
+    @SLOT(str)
     def add_youtube_channel_subscription_by_id(self, channel_id):
         """
         Subscribes to a channel based on channel ID
@@ -99,7 +104,8 @@ class MainWindowListener(QObject):
         self.logger.info("Adding subscription to channel: '{}'".format(channel_id))
         add_subscription(load_keys(1)[0], channel_id)
 
-    @pyqtSlot(str)
+    # noinspection PyCallingNonCallable
+    @SLOT(str)
     def add_youtube_channel_subscription_by_username(self, username):
         """
         Subscribes to a channel based on username

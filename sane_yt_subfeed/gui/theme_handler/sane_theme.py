@@ -4,7 +4,7 @@ import sys
 import subprocess
 from shutil import which
 
-from PyQt5.QtCore import QObject
+from PySide2.QtCore import QObject
 
 from sane_yt_subfeed import create_logger
 
@@ -99,25 +99,25 @@ class SaneTheme(QObject):
 
     def compile_qrc_module(self):
         """
-        Compiles the theme's QRC file into a PyQt5 compatible module.
+        Compiles the theme's QRC file into a Qt5 compatible module.
         :return: True if successful, False if not.
         """
-        # Determine path to pyrcc5 binary
+        # Determine path to rcc5 binary
         if sys.platform.startswith('linux'):
-            pyrcc5_bin_filename = 'pyrcc5'
+            rcc5_bin_filename = 'rcc-qt5'
         else:
-            pyrcc5_bin_filename = 'pyrcc5.exe'
+            rcc5_bin_filename = 'rcc-qt5.exe'
 
-        pyrcc5_bin_path = which(pyrcc5_bin_filename)
+        rcc5_bin_path = which(rcc5_bin_filename)
 
-        if pyrcc5_bin_path is None:
-            self.logger.error("Unable to locate PyQt5 resource compiler (pyrcc5) binary! QRC won't be compiled.")
+        if rcc5_bin_path is None:
+            self.logger.error("Unable to locate Qt5 resource compiler (pyrcc5) binary! QRC won't be compiled.")
             return False
 
-        args = [pyrcc5_bin_path, self.qrc_filename, '-o', TEMPLATE_COMPILED_QRC_FILENAME]
+        args = [rcc5_bin_path, self.qrc_filename, '-o', TEMPLATE_COMPILED_QRC_FILENAME]
 
         try:
-            self.logger.info("Compiling PyQt5 QRC module for theme: {}, args: {}".format(self.name, args))
+            self.logger.info("Compiling Qt5 QRC module for theme: {}, args: {}".format(self.name, args))
             result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                     cwd=self.theme_dir_absolute_path)
 

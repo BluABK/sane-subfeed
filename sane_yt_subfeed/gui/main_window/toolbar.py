@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QToolBar, QActionGroup
+from PySide2.QtWidgets import QToolBar, QActionGroup
 
 
 class Toolbar(QToolBar):

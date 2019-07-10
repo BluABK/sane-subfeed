@@ -1,7 +1,8 @@
 import os
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QPixmap, QPainter
-from PyQt5.QtWidgets import QLabel
+from PySide2.QtCore import QSize
+from PySide2.QtCore.Qt import Qt
+from PySide2.QtGui import QPixmap, QPainter
+from PySide2.QtWidgets import QLabel
 
 from sane_yt_subfeed.absolute_paths import ICONS_PATH
 from sane_yt_subfeed.controller.listeners.database.database_listener import DatabaseListener

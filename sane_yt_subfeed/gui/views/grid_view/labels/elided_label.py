@@ -1,9 +1,8 @@
 from bs4 import BeautifulSoup
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont, QFontMetrics
-from PyQt5.QtWidgets import QLabel
+from PySide2.QtCore.Qt import Qt
+from PySide2.QtGui import QFont, QFontMetrics
+from PySide2.QtWidgets import QLabel
 
 from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.utils import get_unicode_weight
@@ -49,7 +48,7 @@ class ElidedLabel(QLabel):
         self.setFixedHeight((metrics.height() * lines) + (unicode_height_offset * lines))
 
         # Set alignment and enable word wrapping so the text newlines instead of continuing OOB
-        self.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.setAlignment(Qt.AlignLeft | Qt.AlignTop)
         self.setWordWrap(True)
 
         # Finally, set the text string.

@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QComboBox
+from PySide2.QtWidgets import QComboBox
 
 # FIXME: Get QComboBox to set strings not ints
 tt_font_sizes = ['h1', 'h2', 'h3', 'h4', 'h5', 'p']

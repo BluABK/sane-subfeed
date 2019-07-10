@@ -1,7 +1,8 @@
-from PyQt5 import sip
-from PyQt5.QtCore import Qt, pyqtSlot
-from PyQt5.QtGui import QPaintEvent, QPainter
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QStyleOption, QStyle
+from PySide2.QtCore import Shiboken
+from PySide2.QtCore import SLOT
+from PySide2.QtCore.Qt import Qt
+from PySide2.QtGui import QPaintEvent, QPainter
+from PySide2.QtWidgets import QWidget, QVBoxLayout, QStyleOption, QStyle
 
 from sane_yt_subfeed.controller.listeners.gui.views.download_view.download_view_listener import DownloadViewListener
 from sane_yt_subfeed.database.detached_models.d_db_download_tile import DDBDownloadTile
@@ -60,7 +61,7 @@ class DownloadView(QWidget):
         while widgets_to_delete:
             widget = widgets_to_delete.pop()
             self.logger.info("Removing widget for video: {} - {}".format(widget.video.title, widget.__dict__))
-            sip.delete(widget)
+            Shiboken.delete(widget)
             self.widgets.remove(widget)
 
     def clear_download_forced(self, widget):
@@ -73,7 +74,7 @@ class DownloadView(QWidget):
         DownloadViewListener.static_self.updateDownloadTile.emit(DDBDownloadTile(widget))
         self.logger.info("Forcibly removing widget for video: {} - {}".format(widget.video.title, widget.__dict__))
         try:
-            sip.delete(widget)
+            Shiboken.delete(widget)
             self.widgets.remove(widget)
         except RuntimeError as re_exc:
             if hasattr(self, 'video'):
@@ -86,7 +87,8 @@ class DownloadView(QWidget):
                 self.logger.exception("Unexpected RuntimeError on deleting widget: {}".format(cur_vid),
                                       exc_info=re_exc)
 
-    @pyqtSlot(list)
+    # noinspection PyCallingNonCallable
+    @SLOT(list)
     def update_widgets(self, d_db_download_til_list):
         self.logger.info("Adding loaded downloads: {}".format(d_db_download_til_list))
         for db_download_tile in d_db_download_til_list:
