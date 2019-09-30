@@ -251,7 +251,8 @@ def refresh_and_get_newest_videos(limit, filter_downloaded=True, filter_discarde
     except Exception as exc_other:
         logger.critical("Unexpected exception occurred in refresh_and_get_newest_videos!", exc_info=exc_other)
 
-        raise exc_other
+        # raise exc_other
+        pass                # FIXME: Workaround for backend errors, if they get raised the entire refresh aborts.
 
 
 def get_vid_by_id(video_id):
