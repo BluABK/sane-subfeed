@@ -80,7 +80,7 @@ def update_video_stmt():
 
 
 def update_channel_from_remote(channel):
-    return Channel.__table__.update().where("id = '{}'".format(channel.id)).values(
+    return Channel.__table__.update().where(text("id = '{}'".format(channel.id))).values(
         title=channel.title, description=channel.description, snippet=channel.snippet, playlist_id=channel.playlist_id,
         subscribed=channel.subscribed, subscribed_override=channel.subscribed_override)
 
