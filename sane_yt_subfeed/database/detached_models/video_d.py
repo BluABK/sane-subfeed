@@ -78,7 +78,26 @@ class VideoD:
         self.channel_title = search_item['snippet']['channelTitle']
         self.title = search_item['snippet']['title']
         str_date = search_item['snippet']['publishedAt']
-        self.date_published = datetime.datetime.strptime(str_date, '%Y-%m-%dT%H:%M:%S.000Z')
+
+        try:
+            # Handle: ValueError: time data '2012-07-17T08:50:*Z' does not match format '%Y-%m-%dT%H:%M:%S*Z'
+            self.date_published = datetime.datetime.strptime(str_date, '%Y-%m-%dT%H:%M:%S.000Z')
+        except ValueError as ve_exc:
+            self.logger.warning("Retrying str_date strptime after caught ValueException: {}".format(str(ve_exc)))
+            try:
+                self.date_published = datetime.datetime.strptime(str_date, '%Y-%m-%dT%H:%M:%S.00Z')
+            except ValueError as ve_exc:
+                self.logger.warning("Retrying str_date strptime after caught ValueException: {}".format(str(ve_exc)))
+                try:
+                    self.date_published = datetime.datetime.strptime(str_date, '%Y-%m-%dT%H:%M:%S0Z')
+                except ValueError as ve_exc:
+                    self.logger.warning(
+                        "Retrying str_date strptime after caught ValueException: {}".format(str(ve_exc)))
+                    self.date_published = datetime.datetime.strptime(str_date, '%Y-%m-%dT%H:%M:%SZ')
+                    pass
+                pass
+            pass
+
         self.description = search_item['snippet']['description']
         self.channel_id = search_item['snippet']['channelId']
 
