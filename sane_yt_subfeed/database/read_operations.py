@@ -15,6 +15,8 @@ from sane_yt_subfeed.handlers.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
 from sane_yt_subfeed.youtube.update_videos import refresh_uploads, get_extra_videos_information
 
+import sane_yt_subfeed.debug
+
 logger = create_logger(__name__)
 
 
@@ -48,6 +50,9 @@ def get_db_videos_subfeed(limit, filters=(~Video.downloaded, ~Video.discarded)):
 
     # Close DB Query session.
     db_session.remove()
+
+    logger.debug5("sane_yt_subfeed.debug.date_formats: {}".format(sane_yt_subfeed.debug.date_formats))
+    sane_yt_subfeed.debug.clear_date_formats()
 
     return videos
 
@@ -83,6 +88,9 @@ def get_db_videos_playback(limit,
 
     # Close DB Query session.
     db_session.remove()
+
+    logger.debug5("sane_yt_subfeed.debug.date_formats: {}".format(sane_yt_subfeed.debug.date_formats))
+    sane_yt_subfeed.debug.clear_date_formats()
 
     return videos
 

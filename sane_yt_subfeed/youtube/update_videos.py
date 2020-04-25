@@ -13,6 +13,8 @@ from sane_yt_subfeed.handlers.pickle_handler import load_youtube_resource_keys, 
 from sane_yt_subfeed.youtube.uploads_thread import GetUploadsThread
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions, get_videos_result
 
+import sane_yt_subfeed.debug
+
 YOUTUBE_URL = "https://www.youtube.com/"
 YOUTUBE_PARM_VIDEO = "watch?v="
 YOUTUBE_PARM_PLIST = "playlist?list ="
@@ -214,6 +216,9 @@ def refresh_uploads(progress_bar_listener=None, add_to_max=0,
             else:
                 # Delete current thread due to abort condition being set.
                 del t
+
+    logger.debug5("sane_yt_subfeed.debug.date_formats: {}".format(sane_yt_subfeed.debug.date_formats))
+    sane_yt_subfeed.debug.clear_date_formats()
 
     if abort_all_threads:
         raise SaneAbortedOperation("Refresh uploads operation ABORTED due to critical exceptions.",
