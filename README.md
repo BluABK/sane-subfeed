@@ -50,11 +50,11 @@ Useful ref: https://developers.google.com/youtube/v3/getting-started
   5. Search for, and select "YouTube Data API v3"
   6. Enable "YouTube Data API v3"
   7. Go to "Credentials" screen
-  8. Create an API Key and copy the key into `sane_yt_subfeed/resources/keys.json.sample` and rename it `keys.json`
+  8. Create an API Key and copy the key either into the prompt when you first start the program or manually into `sane_yt_subfeed/resources/keys.json.sample` and rename it `keys.json`
   9. 
      1. a) Create an OAuth Client ID
      2. b) Configure consent screen, usage type is "other".
-     3. c) Download json and save it as `sane_yt_subfeed/resources/client_secret.json` 
+     3. c) Download json and select it at the opening prompt or manually save it as `sane_yt_subfeed/resources/client_secret.json` 
 
 
 <details><summary>Option B Step by Step in pictures</summary>
