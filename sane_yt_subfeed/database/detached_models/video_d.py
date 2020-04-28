@@ -4,6 +4,8 @@ from sane_yt_subfeed import create_logger
 from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.constants import YOUTUBE_URL_BASE, YOUTUBE_URL_PART_VIDEO
 
+import sane_yt_subfeed.debug
+
 GRAB_METHOD_LIST = 'list()'
 GRAB_METHOD_SEARCH = 'search()'
 GRAB_METHOD_VIDEOS = 'videos()'
@@ -78,7 +80,9 @@ class VideoD:
         self.channel_title = search_item['snippet']['channelTitle']
         self.title = search_item['snippet']['title']
         str_date = search_item['snippet']['publishedAt']
-        self.date_published = datetime.datetime.strptime(str_date, '%Y-%m-%dT%H:%M:%S.000Z')
+
+        self.set_date_published(str_date)
+
         self.description = search_item['snippet']['description']
         self.channel_id = search_item['snippet']['channelId']
 
@@ -91,6 +95,38 @@ class VideoD:
             self.thumbnails = None
         self.search_item = search_item
         self.watched = False
+
+    def set_date_published(self, str_date):
+        """
+        Handle YouTube API datetime format inconsistency...
+
+        Sometime in 2020 YouTube API changed from *%S.000Z to %SZ,
+        but they didn't retroactively update old videos.
+
+        So there are now multiple formats.
+        """
+        # Handle: ValueError: time data '2012-07-17T08:50*Z' does not match format '%Y-%m-%dT%H:%M:%S*Z'
+        try:
+            self.date_published = datetime.datetime.strptime(str_date, '%Y-%m-%dT%H:%M:%SZ')
+            sane_yt_subfeed.debug.add_date_format('%Y-%m-%dT%H:%M:%SZ')
+        except ValueError as ve_exc:
+            try:
+                self.date_published = datetime.datetime.strptime(str_date, '%Y-%m-%dT%H:%M:%S.Z')
+                sane_yt_subfeed.debug.add_date_format('%Y-%m-%dT%H:%M:%S.Z')
+            except ValueError as ve_exc:
+                try:
+                    self.date_published = datetime.datetime.strptime(str_date, '%Y-%m-%dT%H:%M:%S.0Z')
+                    sane_yt_subfeed.debug.add_date_format('%Y-%m-%dT%H:%M:%S.0Z')
+                except ValueError as ve_exc:
+                    try:
+                        self.date_published = datetime.datetime.strptime(str_date, '%Y-%m-%dT%H:%M:%S.00Z')
+                        sane_yt_subfeed.debug.add_date_format('%Y-%m-%dT%H:%M:%S.00Z')
+                    except ValueError as ve_exc:
+                        try:
+                            self.date_published = datetime.datetime.strptime(str_date, '%Y-%m-%dT%H:%M:%S.000Z')
+                            sane_yt_subfeed.debug.add_date_format('%Y-%m-%dT%H:%M:%S.000Z')
+                        except ValueError as ve_exc:
+                            raise
 
     def __str__(self):
         """

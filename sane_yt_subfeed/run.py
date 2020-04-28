@@ -8,7 +8,9 @@ from sane_yt_subfeed.handlers.config_handler import read_config
 from sane_yt_subfeed.database.orm import db_session
 from sane_yt_subfeed.database.video import Video
 from sane_yt_subfeed.handlers.log_handler import create_logger
+from sane_yt_subfeed.handlers.pickle_handler import save_youtube_resource_oauth
 from sane_yt_subfeed.main import run_with_gui, run_channels_test, run_with_cli, cli_refresh_and_print_subfeed
+from sane_yt_subfeed.youtube.authentication import youtube_auth_oauth
 from sane_yt_subfeed.youtube.update_videos import load_keys
 from sane_yt_subfeed.youtube.youtube_requests import get_subscriptions
 from sane_yt_subfeed.cli import print_functions
@@ -30,11 +32,13 @@ LEGACY_EXCEPTION_HANDLER = False
 @click.option(u'--print_discarded_videos', is_flag=True)
 @click.option(u'--print_playlist_items', is_flag=False)
 @click.option(u'--print_playlist_items_url_only', is_flag=True)
+@click.option(u'--auth_oauth2', is_flag=True)
 @click.command()
 def cli(no_gui, test_channels, update_watch_prio, set_watched_day, refresh_and_print_subfeed, print_subscriptions,
         print_watched_videos, print_discarded_videos, print_downloaded_videos, print_playlist_items,
-        print_playlist_items_url_only):
+        print_playlist_items_url_only, auth_oauth2):
     logger = create_logger(__name__)
+
     if update_watch_prio:
         videos = db_session.query(Video).all()
         watch_prio = read_config('Play', 'default_watch_prio')
@@ -53,10 +57,13 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day, refresh_and_p
                 video.watched = True
         db_session.commit()
         return
+
     if test_channels:
         run_channels_test()
+
     if refresh_and_print_subfeed:
         cli_refresh_and_print_subfeed()
+
     if print_subscriptions:
         cached_subs = True
         subs = get_subscriptions(cached_subs)
@@ -65,15 +72,19 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day, refresh_and_p
                 print(("[{}]    {} [Subscription override]".format(channel.id, channel.title)))
             else:
                 print(("[{}]    {}".format(channel.id, channel.title)))
+
     if print_watched_videos:
         videos = db_session.query(Video).filter(and_(Video.watched is True, (Video.vid_path.isnot(None)))).all()
         print_functions.print_videos(videos, path_only=True)
+
     if print_discarded_videos:
         videos = db_session.query(Video).filter(and_(Video.discarded is True, (Video.vid_path.isnot(None)))).all()
         print_functions.print_videos(videos, path_only=True)
+
     if print_downloaded_videos:
         videos = db_session.query(Video).filter(and_(Video.downloaded is True, (Video.vid_path.isnot(None)))).all()
         print_functions.print_videos(videos, path_only=True)
+
     if print_playlist_items:
         youtube_auth_resource = load_keys(1)[0]
         playlist_video_items = []
@@ -84,6 +95,13 @@ def cli(no_gui, test_channels, update_watch_prio, set_watched_day, refresh_and_p
                 print(vid.url_video)
             else:
                 print(vid)
+
+    if auth_oauth2:
+        youtube_oauth = youtube_auth_oauth()
+        if youtube_oauth is None:
+            logger.critical("Failed to authenticate YouTube API OAuth2!")
+            return None
+        save_youtube_resource_oauth(youtube_oauth)
 
     if no_gui:
         run_with_cli()
