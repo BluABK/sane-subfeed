@@ -1,14 +1,13 @@
 alembic==1.0.0
-beautifulsoup4>=4.7.1
+argh==0.26.2
+beautifulsoup4==4.9.0
 cachetools==2.1.0
 certifi==2018.4.16
 chardet==3.0.4
 click==6.7
 configparser==3.5.0
 ffmpeg-python==0.1.16
-# future is pulled by ffmpeg-python
-future==0.17.1
-# False positive unlisted req: Calls itself 'googleapiclient' when imported as lib
+future==0.18.2
 google-api-python-client==1.7.3
 google-auth==1.5.0
 google-auth-httplib2==0.0.3
@@ -20,19 +19,21 @@ MarkupSafe==1.0
 oauthlib==2.1.0
 pathtools==0.1.2
 Pillow==5.2.0
+pkg-resources==0.0.0
 pyasn1==0.4.3
 pyasn1-modules==0.2.2
-PyQt5>=5.11.2
-PyQt5-sip>=4.19.11
+PyQt5==5.14.2
+PyQt5-sip==12.7.2
 python-dateutil==2.7.3
 python-editor==1.0.3
-PyYAML>=4.2b4
-requests==2.21.0
+PyYAML==5.3.1
+requests==2.23.0
 requests-oauthlib==1.0.0
 rsa==3.4.2
-#-e git+git@github.com:BluABK/sane-subfeed.git@f165de62cf16d343f388dce64a61de29545847fb#egg=Sane_Subscription_Feed
 six==1.11.0
-SQLAlchemy>=1.3.0
+soupsieve==2.0
+SQLAlchemy==1.3.16
 uritemplate==3.0.0
-urllib3>=1.24.2
+urllib3==1.25.9
 watchdog==0.8.3
+youtube-dl==2020.3.24

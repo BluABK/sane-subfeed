@@ -53,3 +53,6 @@ Sane_Subscription_Feed.egg-info/
 
 # alembic
 alembic/versions/*.py
+
+# Accidental Snapshots
+mpv-shot*.jpg
