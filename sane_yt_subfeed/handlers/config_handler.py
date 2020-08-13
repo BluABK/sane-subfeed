@@ -386,7 +386,7 @@ def get_valid_options(config_section):
         current_option = read_config(config_section, proxy_option, literal_eval=False)
 
         # Check that the current option is valid.
-        if current_option is not "" and current_option is not None:
+        if current_option != "" and current_option is not None:
             # Append the option to a list of valid options.
             valid_options.append(current_option)
 
