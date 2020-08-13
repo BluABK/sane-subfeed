@@ -70,6 +70,7 @@ class VideoD:
             self.thumbnails = ""
             self.search_item = ""
             self.watched = False
+
             return
         try:
             self.video_id = search_item['id']['videoId']
@@ -168,5 +169,6 @@ class VideoD:
 
     @staticmethod
     def videos_item_new_video_d(videos_item, grab_methods=None):
+        # Rename the video ID key to VideoD format.
         videos_item['id'] = {'videoId': videos_item['id']}
         return VideoD(videos_item, grab_methods=grab_methods)

@@ -12,7 +12,7 @@ from sane_yt_subfeed.handlers.log_handler import create_logger
 from sane_yt_subfeed.youtube.thumbnail_handler import download_thumbnails_threaded
 from sane_yt_subfeed.youtube.update_videos import load_keys
 from sane_yt_subfeed.youtube.youtube_requests import get_remote_subscriptions_cached_oauth, \
-    list_uploaded_videos_videos, add_subscription
+    list_uploaded_videos_videos, add_subscription, get_video_by_id
 
 YOUTUBE_URL_PATTERN = '(http[s]?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)?' \
                       '([0-9A-Za-z_-]{10}[048AEIMQUYcgkosw])'
@@ -84,7 +84,10 @@ class MainWindowListener(QObject):
         reggie = re.match(YOUTUBE_URL_PATTERN, video_url)
         video_id = reggie.groups()[-1]
         self.logger.debug("{} --> ID: {}".format(video_url, video_id))
-        video_d = list_uploaded_videos_videos(load_keys(1)[0], [video_id], 50)[0]
+        if read_config('YouTube-API', 'enabled'):
+            video_d = list_uploaded_videos_videos(load_keys(1)[0], [video_id], 50)[0]
+        else:
+            video_d = get_video_by_id(video_id, video_url=video_url)
         download_thumbnails_threaded([video_d])
         DownloadViewListener.download_video(video_d,
                                             youtube_dl_finished_listener=[

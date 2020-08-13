@@ -1,5 +1,8 @@
+import json
+
 from googleapiclient.errors import HttpError
 from sqlalchemy import or_
+from youtube_dl import YoutubeDL
 
 from sane_yt_subfeed.youtube.authentication import youtube_auth_oauth
 from sane_yt_subfeed.database.detached_models.video_d import VideoD, GRAB_METHOD_SEARCH, GRAB_METHOD_LIST, \
@@ -144,6 +147,63 @@ def check_if_livestream(search_result):
         logger.critical("Anomaly detected while checking if search_result was liveBroadcastContent", exc_info=anomaly)
         logger.info(search_result)
         return None
+
+
+def get_video_facts_using_youtube_dl(video_id, video_url):
+    """
+    Gets video info using youtube_dl.
+    """
+    with YoutubeDL() as ydl:
+        logger.info("Gathering facts (using youtube-dl) for: {}".format(video_id))
+        result = ydl.extract_info(video_url, download=False)
+        if 'entries' in result:
+            # Can be a playlist or a list of videos
+            video_info = result['entries'][0]
+        else:
+            # Just a video
+            video_info = result
+
+        logger.debug("get_video_facts_using_youtube_dl video:")
+        logger.debug(video_info)
+        logger.debug(json.dumps(video_info, indent=4))
+
+        # FIXME: youtube_dl doesn't include time in upload_date!!
+        # FIXME: Need to convert date to Video/VideoD's expected YouTube API format: '%Y-%m-%dT%H:%M:%SZ'
+        upload_datestr = '{Y}-{m}-{d}T00:00:00Z'.format(
+            Y=video_info['upload_date'][:4],
+            m=video_info['upload_date'][4:6],
+            d=video_info['upload_date'][6:9],
+        )
+
+        facts = {
+            'id': {
+                'videoId': video_id
+            },
+            'snippet': {
+                'channelTitle': video_info['uploader'],
+                'title': video_info['title'],
+                'publishedAt': upload_datestr,
+                'description': video_info['description'],
+                'channelId': video_info['channel_id'],
+                'thumbnails': video_info['thumbnails']
+            }
+        }
+
+        return facts
+    
+
+def get_video_by_id(video_id, video_url):
+    """
+    Returns a VideoD object with video info attributes.
+    """
+    # FIXME: Create a fake search_item object to appease the Video object (and conversion funcs)
+    search_item = get_video_facts_using_youtube_dl(video_id, video_url)
+
+    # Create a VideoD object using the search_item.
+    video_d = VideoD(search_item)
+
+    # Return the VideoD object.
+    return video_d
 
 
 def list_uploaded_videos(youtube_key, videos, uploads_playlist_id, req_limit):
