@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QAction
 
 class SaneToolBarAction(QAction):
 
-    def __init__(self, parent, name, action, icon=None, **kwargs):
+    def __init__(self, parent, name, action, icon=None, disabled=False, **kwargs):
         if icon:
             super(SaneToolBarAction, self).__init__(icon, name, parent=parent)
         else:

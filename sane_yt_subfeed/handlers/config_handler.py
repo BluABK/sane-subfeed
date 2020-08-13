@@ -176,6 +176,9 @@ DEFAULTS = {
     },
     'Authentication': {
         'oauth2_local_server_port': '8080'
+    },
+    'YouTube-API': {
+        'enabled': 'False'
     }
 }
 

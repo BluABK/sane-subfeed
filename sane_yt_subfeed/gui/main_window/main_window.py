@@ -334,21 +334,22 @@ class MainWindow(QMainWindow):
         # Indicate function is in running state.
         self.startup_checks_status = 1
 
-        if not os.path.isfile(KEYS_FILE):
-            self.logger.info("Startup check triggered: Missing YouTube API Keys file.")
-            self.confirmation_dialog("Failed to detect the YouTube API keys file!",
-                                     self.select_custom_api_keys_choice_dialog, title="Missing API keys",
-                                     ok_text="Load/Create custom API Keys file", cancel_text="Use public API Keys",
-                                     cancel_actions=self.select_public_api_keys, exclusive=True)
+        if read_config('YouTube-API', 'enabled'):
+            if not os.path.isfile(KEYS_FILE):
+                self.logger.info("Startup check triggered: Missing YouTube API Keys file.")
+                self.confirmation_dialog("Failed to detect the YouTube API keys file!",
+                                         self.select_custom_api_keys_choice_dialog, title="Missing API keys",
+                                         ok_text="Load/Create custom API Keys file", cancel_text="Use public API Keys",
+                                         cancel_actions=self.select_public_api_keys, exclusive=True)
 
-        if not os.path.isfile(CLIENT_SECRET_FILE):
-            self.logger.info("Startup check triggered: Missing YouTube API OAuth2 client secret file.")
-            self.confirmation_dialog("Failed to detect the YouTube API OAuth2 client secret file!",
-                                     self.select_custom_oauth_secret_choice_dialog,
-                                     title="Missing YouTube API OAuth2 Secret",
-                                     ok_text="Load/Create custom OAuth2 client secret file",
-                                     cancel_text="Use public API Keys",
-                                     cancel_actions=self.select_public_oauth_secret, exclusive=True)
+            if not os.path.isfile(CLIENT_SECRET_FILE):
+                self.logger.info("Startup check triggered: Missing YouTube API OAuth2 client secret file.")
+                self.confirmation_dialog("Failed to detect the YouTube API OAuth2 client secret file!",
+                                         self.select_custom_oauth_secret_choice_dialog,
+                                         title="Missing YouTube API OAuth2 Secret",
+                                         ok_text="Load/Create custom OAuth2 client secret file",
+                                         cancel_text="Use public API Keys",
+                                         cancel_actions=self.select_public_oauth_secret, exclusive=True)
 
         # Indicate all checks ran successfully
         self.startup_checks_status = 0
@@ -604,13 +605,15 @@ class MainWindow(QMainWindow):
                                                                 tooltip='Refresh the subscription feed',
                                                                 icon=REFRESH_SUBFEED_ICON,
                                                                 signal=self.main_model.main_window_listener.refreshVideos,
-                                                                args=(LISTENER_SIGNAL_NORMAL_REFRESH,))
+                                                                args=(LISTENER_SIGNAL_NORMAL_REFRESH,),
+                                                                disabled=not read_config('YouTube-API', 'enabled'))
 
         self.add_submenu('F&unction', 'Fetch &List of Subscribed Channels',
                          self.main_model.main_window_listener.refreshSubs.emit,
                          shortcut=read_config('Global', 'reload_subslist', custom_ini=HOTKEYS_INI,
                                               literal_eval=HOTKEYS_EVAL),
-                         tooltip='Fetch a new subscriptions list', icon=RELOAD_SUBS_LIST_ICON)
+                         tooltip='Fetch a new subscriptions list', icon=RELOAD_SUBS_LIST_ICON,
+                         disabled=not read_config('YouTube-API', 'enabled'))
 
         # FIXME: icon, shortcut(alt/shift as extra modifier to the normal refresh shortcut?)
         self.add_submenu('F&unction', 'Deep refresh of feed', self.emit_signal_with_set_args,
@@ -618,10 +621,12 @@ class MainWindow(QMainWindow):
                                               literal_eval=HOTKEYS_EVAL),
                          tooltip='Deep refresh the subscription feed', icon=REFRESH_SUBFEED_DEEP_ICON,
                          signal=self.main_model.main_window_listener.refreshVideos,
-                         args=(LISTENER_SIGNAL_DEEP_REFRESH,))
+                         args=(LISTENER_SIGNAL_DEEP_REFRESH,),
+                         disabled=not read_config('YouTube-API', 'enabled'))
 
         self.add_submenu('F&unction', 'Test Channels', self.main_model.main_window_listener.testChannels.emit,
-                         tooltip='Tests the test_pages and miss_limit of channels', icon=RERUN_TEST_ICON)
+                         tooltip='Tests the test_pages and miss_limit of channels', icon=RERUN_TEST_ICON,
+                         disabled=not read_config('YouTube-API', 'enabled'))
 
         if self.main_model.yt_dir_listener is not None:
             self.add_submenu('F&unction', 'Manual dir search', self.main_model.yt_dir_listener.manualCheck.emit,
@@ -1037,6 +1042,8 @@ class MainWindow(QMainWindow):
             this_icon = None
 
         submenu = SaneToolBarAction(self, name, action, icon=this_icon, **kwargs)
+        if disabled:
+            submenu.setDisabled(True)
         if shortcut:
             submenu.setShortcut(shortcut)
         elif shortcuts:
